@@ -4,7 +4,7 @@ datarootdir=@datarootdir@
 data_dir=@datadir@/@PACKAGE_NAME@
 
 version=@PACKAGE_VERSION@
-include_dir=@includedir@
+include_dir=@includedir@/libmowgli
 lib_dir=@libdir@
 
 Name: libmowgli
