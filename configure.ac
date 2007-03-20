@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.59)
 AC_INIT([libmowgli], [0.1], [bugs+libmowgli@atheme.org])
-AC_CONFIG_SRCDIR([src/libmowgli/mowgli_list.c])
+AC_CONFIG_SRCDIR([src/libmowgli/mowgli_alloc.c])
 AC_CONFIG_HEADER([src/libmowgli/mowgli_config.h])
 
 # Checks for programs.
