@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_object.c: Object management.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,17 +31,87 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#include "mowgli.h"
 
-#define mowgli_log printf
+/*
+ * mowgli_object_init
+ *
+ * Populates the object manager part of an object.
+ *
+ * Inputs:
+ *      - pointer to object manager area
+ *      - (optional) name of object
+ *      - (optional) custom destructor
+ *
+ * Outputs:
+ *      - none
+ *
+ * Side Effects:
+ *      - none
+ */
+void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_destructor_t des)
+{
+	return_if_fail(obj != NULL);
 
-#include "mowgli_stdinc.h"
+	if (name != NULL)
+		obj->name = strdup(name);
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
+	obj->destructor = des;
+	obj->refcount = 1;
+}
 
-#endif
+/*
+ * mowgli_object_ref
+ *
+ * Increment the reference counter on an object.
+ *
+ * Inputs:
+ *      - the object to refcount
+ *
+ * Outputs:
+ *      - none
+ *
+ * Side Effects:
+ *      - none
+ */
+void * mowgli_object_ref(void *object)
+{
+	return_val_if_fail(object != NULL, NULL);
 
+	mowgli_object(object)->refcount++;
+
+	return object;
+}
+
+/*
+ * mowgli_object_unref
+ *
+ * Decrement the reference counter on an object.
+ *
+ * Inputs:
+ *      - the object to refcount
+ *
+ * Outputs:
+ *      - none
+ *
+ * Side Effects:
+ *      - if the refcount is 0, the object is destroyed.
+ */
+void mowgli_object_unref(void *object)
+{
+	return_if_fail(object != NULL);
+	mowgli_object_t *obj = mowgli_object(object);
+
+	obj->refcount--;
+
+	if (obj->refcount <= 0)
+	{
+		if (obj->name != NULL)
+			free(obj->name);
+
+		if (obj->destructor != NULL)
+			obj->destructor(obj);
+		else
+			free(obj);
+	}
+}

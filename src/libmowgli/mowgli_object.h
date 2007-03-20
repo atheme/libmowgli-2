@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_object.h: Object management.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,17 +31,21 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_OBJECT_H__
+#define __MOWGLI_OBJECT_H__
 
-#define mowgli_log printf
+typedef void (*mowgli_destructor_t)(void *);
 
-#include "mowgli_stdinc.h"
+typedef struct {
+	char *name;
+	int refcount;
+	mowgli_destructor_t destructor;
+} mowgli_object_t;
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
+extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_destructor_t destructor);
+extern void *mowgli_object_ref(void *);
+extern void mowgli_object_unref(void *);
+
+#define mowgli_object(x) ((mowgli_object_t *) x)
 
 #endif
-
