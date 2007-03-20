@@ -7,11 +7,9 @@ version=@PACKAGE_VERSION@
 include_dir=@includedir@
 lib_dir=@libdir@
 
-backend_dir=@libdir@/mcs
-
-Name: libmcs
-Description: Simple, abstractable configuration library.
+Name: libmowgli
+Description: A library which contains many utility functions and classes.
 Version: @PACKAGE_VERSION@
-Libs: -L${lib_dir} -lmcs
+Libs: -L${lib_dir} -lmowgli
 Cflags: -I${include_dir}
 
