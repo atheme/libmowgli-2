@@ -129,10 +129,11 @@ void *mowgli_heap_alloc(mowgli_heap_t *heap)
 		
 		/* keep count */
 		heap->free_elems--;
-		
+
+#ifdef HEAP_DEBUG		
 		/* debug */
 		mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
-		
+#endif
 		/* return pointer to it */
 		return fn->data;
 	}
@@ -163,10 +164,10 @@ void mowgli_heap_free(mowgli_heap_t *heap, void *data)
 			
 			/* keep count */
 			heap->free_elems++;
-			
+#ifdef HEAP_DEBUG
 			/* debug */
 			mowgli_log("mowgli_heap_free(heap = @%p, data = %p)", heap, data);
-			
+#endif
 			/* we're done */
 			return;
 		}

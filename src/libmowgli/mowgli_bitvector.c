@@ -125,7 +125,7 @@ mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvec
 	mowgli_boolean_t ret = TRUE;
 
 	/* cache the size of the bitvector in memory. */
-	bs = out->bits / out->divisor;
+	bs = bv1->bits / bv1->divisor;
 
 	for (iter = 0; iter < bs; iter++)
 	{
