@@ -99,8 +99,8 @@ mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func)
 	mowgli_hook_t *hook;
 	mowgli_node_t *n, *tn;
 
-	g_return_val_if_fail(name != NULL, -1);
-	g_return_val_if_fail(func != NULL, -1);
+	return_val_if_fail(name != NULL, -1);
+	return_val_if_fail(func != NULL, -1);
 
 	hook = mowgli_hook_find(name);
 
