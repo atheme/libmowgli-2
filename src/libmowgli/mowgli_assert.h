@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_assert.h: Assertions.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,20 +31,62 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_ASSERT_H__
+#define __MOWGLI_ASSERT_H__
 
-#define mowgli_log printf
-
-#include "mowgli_stdinc.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-
+/*
+ * Performs a soft assertion. If the assertion fails, we log it.
+ */
+#ifdef __GNUC__
+#define soft_assert(x)								\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
+			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+	}
+#else
+#define soft_assert(x)								\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d): critical: Assertion '%s' failed.",	\
+			__FILE__, __LINE__, #x);				\
+	}
 #endif
 
+/*
+ * Same as soft_assert, but returns if an assertion fails.
+ */
+#ifdef __GNUC__
+#define return_if_fail(x)							\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
+			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+		return;								\
+	}
+#else
+#define return_if_fail(x)							\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d): critical: Assertion '%s' failed.",	\
+			__FILE__, __LINE__, #x);				\
+		return;								\
+	}
+#endif
+
+/*
+ * Same as soft_assert, but returns a given value if an assertion fails.
+ */
+#ifdef __GNUC__
+#define return_val_if_fail(x, y)						\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
+			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+		return (y);							\
+	}
+#else
+#define return_val_if_fail(x, y)						\
+	if (!(x)) { 								\
+		mowgli_log("%s(%d): critical: Assertion '%s' failed.",		\
+			__FILE__, __LINE__, #x);				\
+		return (y);							\
+	}
+#endif
+
+#endif

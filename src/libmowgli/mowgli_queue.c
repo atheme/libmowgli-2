@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_queue.c: Double-linked queues.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,20 +31,68 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#include "mowgli.h"
 
-#define mowgli_log printf
+mowgli_queue_t *
+mowgli_queue_append(mowgli_queue_t *head, void *data)
+{
+	mowgli_queue_t *out = mowgli_alloc(sizeof(mowgli_queue_t));
 
-#include "mowgli_stdinc.h"
+	out->next = head;
+	out->data = data;
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
+	if (head != NULL)
+		head->prev = out;
 
-#endif
+	return out;
+}
 
+mowgli_queue_t *
+mowgli_queue_remove(mowgli_queue_t *head)
+{
+	mowgli_queue_t *out;
+
+	if (head->prev != NULL)
+		head->prev->next = head->next;
+
+	if (head->next != NULL)
+		head->next->prev = head->prev;
+
+	out = head->prev != NULL ? head->prev : head->next;
+
+	free(head);
+
+	return out;
+}
+
+mowgli_queue_t *
+mowgli_queue_find(mowgli_queue_t *head, void *data)
+{
+	mowgli_queue_t *n;
+
+	for (n = head; n != NULL; n = n->next)
+		if (n->data == data)
+			return n;
+
+	return NULL;
+}
+
+mowgli_queue_t *
+mowgli_queue_remove_data(mowgli_queue_t *head, void *data)
+{
+	mowgli_queue_t *n = mowgli_queue_find(head, data);
+
+	if (n != NULL)
+		return mowgli_queue_remove(n);
+
+	return NULL;
+}
+
+void
+mowgli_queue_free(mowgli_queue_t *head)
+{
+	mowgli_queue_t *n, *n2;
+
+	for (n = head, n2 = n ? n->next : NULL; n != NULL; n = n2, n2 = n ? n->next : NULL)
+		mowgli_queue_remove(n);
+}

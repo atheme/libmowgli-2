@@ -17,9 +17,7 @@ SOURCES = \
 	mowgli_memorypool.c \
 	mowgli_module.c \
 	mowgli_object.c \
-	mowgli_queue.c \
-	mowgli_sequence.c \
-	mowgli_stack.c
+	mowgli_queue.c
 
 OBJECTS = ${SOURCES:.c=.o}
 

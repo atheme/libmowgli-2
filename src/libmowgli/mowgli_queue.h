@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_queue.h: Double-linked queues.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,20 +31,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_QUEUE_H__
+#define __MOWGLI_QUEUE_H__
 
-#define mowgli_log printf
+typedef struct mowgli_queue_ {
+	struct mowgli_queue_ *prev, *next;
+	void *data;
+} mowgli_queue_t;
 
-#include "mowgli_stdinc.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
+extern mowgli_queue_t *mowgli_queue_append(mowgli_queue_t *head, void *data);
+extern mowgli_queue_t *mowgli_queue_remove(mowgli_queue_t *head);
+extern mowgli_queue_t *mowgli_queue_find(mowgli_queue_t *head, void *data);
+extern mowgli_queue_t *mowgli_queue_remove_data(mowgli_queue_t *head, void *data);
+extern void mowgli_queue_free(mowgli_queue_t *head);
 
 #endif
-
