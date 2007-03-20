@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_module.c: Loadable modules.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,19 +31,45 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#include "mowgli.h"
 
-#define mowgli_log printf
+#include <dlfcn.h>
 
-#include "mowgli_stdinc.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-
+#ifndef RTLD_NOW
+#define RTLD_NOW RTLD_LAZY
 #endif
 
+mowgli_module_t mowgli_module_open(const char *path)
+{
+	void *handle = dlopen(path, RTLD_NOW);
+
+	/* make sure we have something. make this an assertion so that 
+	 * there is feedback if something happens. (poor programming practice).
+	 */
+	return_val_if_fail(handle != NULL, NULL);
+
+	return handle;
+}
+
+void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
+{
+	void *handle;
+
+	return_val_if_fail(module != NULL, NULL);
+
+	handle = dlsym(module, symbol);
+
+	/* make sure we have something. make this an assertion so that 
+	 * there is feedback if something happens. (poor programming practice).
+	 */
+	return_val_if_fail(handle != NULL, NULL);
+
+	return handle;
+}
+
+void mowgli_module_close(mowgli_module_t module)
+{
+	return_if_fail(module != NULL);
+
+	dlclose(module);
+}

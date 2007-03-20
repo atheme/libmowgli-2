@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_module.h: Loadable modules.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,19 +31,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_MODULE_H__
+#define __MOWGLI_MODULE_H__
 
-#define mowgli_log printf
+typedef void * mowgli_module_t;
 
-#include "mowgli_stdinc.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
+extern mowgli_module_t mowgli_module_open(const char *path);
+extern void * mowgli_module_symbol(mowgli_module_t module, const char *symbol);
+extern void mowgli_module_close(mowgli_module_t module);
 
 #endif
-
