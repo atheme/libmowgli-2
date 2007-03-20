@@ -33,21 +33,17 @@
 
 #include "mowgli.h"
 
-#ifdef NOTYET
 static mowgli_heap_t *mowgli_node_heap;
-#endif
 
 void mowgli_node_init(void)
 {
-#ifdef NOTYET
-        mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 256);
+        mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 256, BH_NOW);
 
 	if (mowgli_node_heap == NULL)
 	{
 		mowgli_log("heap allocator failure.");
 		exit(EXIT_FAILURE);
 	}
-#endif
 }
 
 /* creates a new node */
@@ -56,11 +52,7 @@ mowgli_node_t *mowgli_node_create(void)
         mowgli_node_t *n;
 
         /* allocate it */
-#ifdef NOTYET
         n = mowgli_heap_alloc(mowgli_node_heap);
-#else
-	n = mowgli_alloc(sizeof(mowgli_node_t));
-#endif
 
         /* initialize */
         n->next = n->prev = n->data = NULL;
@@ -75,11 +67,7 @@ void mowgli_node_free(mowgli_node_t *n)
 	return_if_fail(n != NULL);
 
         /* free it */
-#ifdef NOTYET
-        mowgli_heap_release(mowgli_node_heap, n);
-#else
-	mowgli_free(n);
-#endif
+        mowgli_heap_free(mowgli_node_heap, n);
 }
 
 /* adds a node to the end of a list */
