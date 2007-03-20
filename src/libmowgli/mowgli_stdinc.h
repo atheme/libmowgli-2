@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_alloc.c: Safe, portable implementations of malloc, calloc, and free.
+ * mowgli_stdinc.h: Pulls in the base system includes for libmowgli.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,48 +31,57 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
+#ifndef __MOWGLI_STDINC_H__
+#define __MOWGLI_STDINC_H__
 
-/*
- * mowgli_alloc_array:
- *
- * Allocates an array of data that contains "amt" objects,
- * of "size" size.
- *
- * Usually, this wraps calloc().
- *
- * size: size of objects to allocate.
- * amt:  amount of objects to allocate.
- */
-void * mowgli_alloc_array(size_t size, size_t amt)
-{
-	return calloc(size, amt);
-}
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <signal.h>
+#include <time.h>
+#include <errno.h>
+#include <setjmp.h>
+#include <sys/stat.h>
+#include <ctype.h>
+#include <regex.h>
 
-/*
- * mowgli_alloc:
- *
- * Allocates an object of "size" size.
- * This is the equivilant of calling mowgli_alloc_array(size, 1).
- *
- * size: size of object to allocate.
- */
-void * mowgli_alloc(size_t size)
-{
-	return mowgli_alloc_array(size, 1);
-}
+#ifdef HAVE_GETOPT_H
+#include <getopt.h>
+#endif
 
-/*
- * mowgli_free:
- *
- * Frees an object back to the system memory pool.
- * Wraps free protecting against common mistakes (reports an error instead).
- *
- * ptr: pointer to object to free.
- */
-void mowgli_free(void *ptr)
-{
-	return_if_fail(ptr != NULL);
+#ifdef HAVE_LINK_H
+#include <link.h>
+#endif
 
-	free(ptr);
-}
+/* socket stuff */
+#ifndef _WIN32
+# include <netdb.h>
+# include <netinet/in.h>
+# include <unistd.h>
+# include <grp.h>
+# include <sys/time.h>
+# include <sys/wait.h>
+# include <sys/resource.h>
+# include <sys/socket.h>
+# include <fcntl.h>
+# include <arpa/inet.h>
+#else
+# include <windows.h>
+# include <winsock.h>
+# include <sys/timeb.h>
+# include <direct.h>
+# include <io.h>
+# include <fcntl.h>
+#endif
+
+#include <sys/types.h>
+
+#ifndef _WIN32
+#include <libgen.h>
+#endif
+#include <dirent.h>
+
+typedef enum { FALSE, TRUE } mowgli_bool_t;
+
+#endif

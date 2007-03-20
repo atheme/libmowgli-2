@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_alloc.c: Safe, portable implementations of malloc, calloc, and free.
+ * mowgli_alloc.h: Safe, portable implementations of malloc, calloc, and free.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,48 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
+#ifndef __MOWGLI_ALLOC_H__
+#define __MOWGLI_ALLOC_H__
 
-/*
- * mowgli_alloc_array:
- *
- * Allocates an array of data that contains "amt" objects,
- * of "size" size.
- *
- * Usually, this wraps calloc().
- *
- * size: size of objects to allocate.
- * amt:  amount of objects to allocate.
- */
-void * mowgli_alloc_array(size_t size, size_t amt)
-{
-	return calloc(size, amt);
-}
+extern void * mowgli_alloc_array(size_t size, size_t amt);
+extern void * mowgli_alloc(size_t size);
+extern void mowgli_free(void *ptr);
 
-/*
- * mowgli_alloc:
- *
- * Allocates an object of "size" size.
- * This is the equivilant of calling mowgli_alloc_array(size, 1).
- *
- * size: size of object to allocate.
- */
-void * mowgli_alloc(size_t size)
-{
-	return mowgli_alloc_array(size, 1);
-}
-
-/*
- * mowgli_free:
- *
- * Frees an object back to the system memory pool.
- * Wraps free protecting against common mistakes (reports an error instead).
- *
- * ptr: pointer to object to free.
- */
-void mowgli_free(void *ptr)
-{
-	return_if_fail(ptr != NULL);
-
-	free(ptr);
-}
+#endif
