@@ -23,7 +23,8 @@ SOURCES = \
 	mowgli_memorypool.c \
 	mowgli_module.c \
 	mowgli_object.c \
-	mowgli_queue.c
+	mowgli_queue.c \
+	mowgli_signal.c
 
 OBJECTS = ${SOURCES:.c=.o}
 
@@ -46,6 +47,7 @@ HEADERS = \
 	mowgli_module.h \
 	mowgli_object.h \
 	mowgli_queue.h \
+	mowgli_signal.h \
 	mowgli_stdinc.h
 
 include ../../mk/objective.mk
