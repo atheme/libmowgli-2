@@ -49,6 +49,7 @@
 #include "mowgli_queue.h"
 #include "mowgli_hash.h"
 #include "mowgli_heap.h"
+#include "mowgli_init.h"
 
 #endif
 
