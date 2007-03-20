@@ -1,8 +1,9 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_hook.h: Hooks.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007 Giacomo Lozito <james -at- develia.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -31,27 +32,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_HOOK_H__
+#define __MOWGLI_HOOK_H__
 
-#define mowgli_log printf
+typedef void (*mowgli_hook_function_t)(void *hook_data, void *user_data);
 
-#include "mowgli_assert.h"
+typedef struct {
+    mowgli_hook_function_t func;
+    void *user_data;
+    mowgli_node_t node;
+} mowgli_hook_item_t;
 
-#include "mowgli_stdinc.h"
+typedef struct {
+    const char *name;
+    mowgli_list_t items;
+} mowgli_hook_t;
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
+extern void mowgli_hook_init(void);
+extern void mowgli_hook_register(const char *name);
+extern int  mowgli_hook_associate(const char *name, mowgli_hook_function_t func, void * user_data);
+extern int  mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func);
+extern void mowgli_hook_call(const char *name, void * hook_data);
 
 #endif
-

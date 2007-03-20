@@ -16,6 +16,7 @@ SOURCES = \
 	mowgli_dictionary.c \
 	mowgli_hash.c \
 	mowgli_heap.c \
+	mowgli_hook.c \
 	mowgli_init.c \
 	mowgli_list.c \
 	mowgli_memorypool.c \
@@ -36,6 +37,7 @@ HEADERS = \
 	mowgli_dictionary.h \
 	mowgli_hash.h \
 	mowgli_heap.h \
+	mowgli_hook.h \
 	mowgli_init.h \
 	mowgli_list.h \
 	mowgli_memorypool.h \
