@@ -37,7 +37,7 @@
 static mowgli_heap_t *mowgli_node_heap;
 #endif
 
-void mowgli_mowgli_node_init(void)
+void mowgli_node_init(void)
 {
 #ifdef NOTYET
         mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 256);

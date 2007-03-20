@@ -42,6 +42,7 @@
 #include "mowgli_list.h"
 #include "mowgli_object.h"
 #include "mowgli_dictionary.h"
+#include "mowgli_memorypool.h"
 
 #endif
 
