@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_hash.h: FNV-1 hashing implementation.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,23 +31,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_HASH_H__
+#define __MOWGLI_HASH_H__
 
-#define mowgli_log printf
-
-#include "mowgli_assert.h"
-
-#include "mowgli_stdinc.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
+extern int mowgli_fnv_hash_string(const char *data);
+extern int mowgli_fnv_hash(unsigned int *data);
 
 #endif
-

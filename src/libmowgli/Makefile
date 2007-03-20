@@ -13,6 +13,7 @@ CFLAGS += $(PICFLAGS) -I..
 SOURCES = \
 	mowgli_alloc.c \
 	mowgli_dictionary.c \
+	mowgli_hash.c \
 	mowgli_list.c \
 	mowgli_memorypool.c \
 	mowgli_module.c \

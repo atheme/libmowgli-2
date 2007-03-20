@@ -426,7 +426,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
 		return NULL;
 	}
 
-	i = mowgli_fnv_hash((const unsigned char *) key) % dtree->resolution;
+	i = mowgli_fnv_hash_string(key) % dtree->resolution;
 
 	data = delem->node.data;
 

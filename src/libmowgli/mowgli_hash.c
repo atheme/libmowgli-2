@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_hash.c: FNV-1 hashing implementation.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,23 +31,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#define HASHINIT 0x811c9dc5
+#define HASHBITS 16
+#define HASHSIZE (1 << HASHBITS)  /* 2^16 = 65536 */
 
-#define mowgli_log printf
+int mowgli_fnv_hash_string(const char *p)
+{
+	static int htoast = 0;
+        unsigned int hval = HASHINIT;
 
-#include "mowgli_assert.h"
+	if (htoast == 0)
+		htoast = rand();
 
-#include "mowgli_stdinc.h"
+        if (!p)
+                return (0);
+        for (; *p != '\0'; ++p)
+        {
+                hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+                hval ^= (tolower(*p) ^ htoast);
+        }
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
+        return ((hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE);
+}
 
-#endif
+int mowgli_fnv_hash(unsigned int *p)
+{
+	static int htoast = 0;
+        unsigned int hval = HASHINIT;
 
+	if (htoast == 0)
+		htoast = rand();
+
+        if (!p)
+                return (0);
+        for (; *p != '\0'; ++p)
+        {
+                hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+                hval ^= (tolower(*p) ^ htoast);
+        }
+
+        return ((hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE);
+}
