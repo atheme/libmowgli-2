@@ -14,6 +14,7 @@ SOURCES = \
 	mowgli_alloc.c \
 	mowgli_dictionary.c \
 	mowgli_hash.c \
+	mowgli_heap.c \
 	mowgli_list.c \
 	mowgli_memorypool.c \
 	mowgli_module.c \
@@ -24,7 +25,20 @@ OBJECTS = ${SOURCES:.c=.o}
 
 INCLUDEDIR = ${prefix}/include/libmowgli
 
-HEADERS = mowgli.h mowgli_config.h
+HEADERS = \
+	mowgli.h \
+	mowgli_alloc.h \
+	mowgli_assert.h \
+	mowgli_config.h \
+	mowgli_dictionary.h \
+	mowgli_hash.h \
+	mowgli_heap.h \
+	mowgli_list.h \
+	mowgli_memorypool.h \
+	mowgli_module.h \
+	mowgli_object.h \
+	mowgli_queue.h \
+	mowgli_stdinc.h
 
 include ../../mk/objective.mk
 

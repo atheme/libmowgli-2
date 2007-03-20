@@ -1,8 +1,9 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_heap.h: Heap allocation.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2005-2006 Theo Julienne <terminal -at- atheme.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -29,26 +30,61 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Legal note: code devised from claro.base.block module r288 (Pre MPL)
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_HEAP_H__
+#define __MOWGLI_HEAP_H__
 
-#define mowgli_log printf
+typedef struct mowgli_heap_ mowgli_heap_t;
+typedef struct mowgli_block_ mowgli_block_t;
 
-#include "mowgli_assert.h"
+/* A block of memory allocated to the allocator */
+struct mowgli_block_
+{
+	mowgli_node_t node;
+	
+	/* link back to our heap */
+	mowgli_heap_t *heap;
+	
+	/* pointer to the first item */
+	void *data;
+	
+	/* lists of items */
+	mowgli_list_t free_list;
+	mowgli_list_t used_list;
+};
 
-#include "mowgli_stdinc.h"
+/* A pile of blocks */
+struct mowgli_heap_
+{
+	mowgli_node_t node;
+	
+	unsigned int elem_size;
+	unsigned int mowgli_heap_elems;
+	unsigned int free_elems;
+	
+	unsigned int alloc_size;
+	
+	unsigned int flags;
+	
+	mowgli_list_t blocks;
+};
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
+/* Flag for mowgli_heap_create */
+#define BH_DONTCARE 0
+
+#define BH_NOW 1
+#define BH_LAZY 0
+
+/* Functions for heaps */
+extern mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags);
+extern void mowgli_heap_destroy(mowgli_heap_t *heap);
+
+/* Functions for blocks */
+extern void *mowgli_heap_alloc(mowgli_heap_t *heap);
+extern void mowgli_heap_free(mowgli_heap_t *heap, void *data);
 
 #endif
 
