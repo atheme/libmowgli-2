@@ -50,6 +50,7 @@
 #include "mowgli_init.h"
 #include "mowgli_bitvector.h"
 #include "mowgli_hook.h"
+#include "mowgli_signal.h"
 
 #endif
 
