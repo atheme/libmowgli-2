@@ -50,7 +50,7 @@ mowgli_signal_install_handler_full(int signum, signal_handler_t handler,
 
 	if (sigaction(signum, &action, &old_action) == -1)
 	{
-		slog(LG_DEBUG, "Failed to install signal handler for signal %d", signum);
+		mowgli_log("Failed to install signal handler for signal %d", signum);
 		return NULL;
 	}
 
@@ -67,5 +67,5 @@ mowgli_signal_install_handler_full(int signum, signal_handler_t handler,
 signal_handler_t
 mowgli_signal_install_handler(int signum, signal_handler_t handler)
 {
-	return signal_install_handler_full(signum, handler, NULL, 0);
+	return mowgli_signal_install_handler_full(signum, handler, NULL, 0);
 }
