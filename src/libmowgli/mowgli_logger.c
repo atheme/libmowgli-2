@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_logger.c: Event and debugging message logging.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,25 +31,33 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#include "mowgli.h"
 
-#include "mowgli_stdinc.h"
+void mowgli_log_cb_default(const char *buf)
+{
+	printf("%s\n", buf);
+}
 
-#include "mowgli_logger.h"
-#include "mowgli_assert.h"
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
+static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
 
-#endif
+void mowgli_log_real(const char *file, int line, const char *func, const char *fmt, ...)
+{
+	char buf[65535];
+	char snbuf[65535];
+	va_list va;
 
+	va_start(va, fmt);
+	vsnprintf(snbuf, 65535, fmt, va);
+	va_end(va);
+
+	snprintf(buf, 65535, "(%s:%d) [%s]: %s", file, line, func, snbuf);
+
+	mowgli_log_cb(buf);
+}
+
+void mowgli_log_set_cb(mowgli_log_cb_t callback)
+{
+	return_if_fail(callback != NULL);
+
+	mowgli_log_cb = callback;
+}

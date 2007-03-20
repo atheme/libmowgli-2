@@ -19,6 +19,7 @@ SOURCES = \
 	mowgli_hook.c \
 	mowgli_init.c \
 	mowgli_list.c \
+	mowgli_logger.c \
 	mowgli_memorypool.c \
 	mowgli_module.c \
 	mowgli_object.c \
@@ -40,6 +41,7 @@ HEADERS = \
 	mowgli_hook.h \
 	mowgli_init.h \
 	mowgli_list.h \
+	mowgli_logger.h \
 	mowgli_memorypool.h \
 	mowgli_module.h \
 	mowgli_object.h \

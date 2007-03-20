@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_logger.h: Event and debugging message logging.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,25 +31,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_LOGGER_H__
+#define __MOWGLI_LOGGER_H__
 
-#include "mowgli_stdinc.h"
+typedef void (*mowgli_log_cb_t)(const char *);
 
-#include "mowgli_logger.h"
-#include "mowgli_assert.h"
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
-
+#ifdef __GNUC__
+# define mowgli_log(fmt, args ...) mowgli_log_real(__FILE__, __LINE__, __PRETTY_FUNCTION__, fmt, ## args)
+#else
+# define mowgli_log(fmt, args ...) mowgli_log_real(__FILE__, __LINE__, "", fmt, ## args)
 #endif
 
+extern void mowgli_log_real(const char *file, int line, const char *func, const char *buf, ...);
+
+#endif
