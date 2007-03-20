@@ -45,5 +45,6 @@ extern void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolea
 extern mowgli_boolean_t mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot);
 extern mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 extern mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
+extern mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 
 #endif

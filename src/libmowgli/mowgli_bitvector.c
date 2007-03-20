@@ -119,3 +119,19 @@ mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvect
 	return out;
 }
 
+mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
+{
+	int iter, bs;	
+	mowgli_boolean_t ret = TRUE;
+
+	/* cache the size of the bitvector in memory. */
+	bs = out->bits / out->divisor;
+
+	for (iter = 0; iter < bs; iter++)
+	{
+		if (!(bv1->vector[iter] & bv2->vector[iter]))
+			ret = FALSE;
+	}
+
+	return ret;
+}
