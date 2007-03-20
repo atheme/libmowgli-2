@@ -62,7 +62,7 @@ extern void mowgli_node_free(mowgli_node_t *n);
 extern void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before);
-extern void mowgli_node_del(mowgli_node_t *n, mowgli_list_t *l);
+extern void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l);
 extern mowgli_node_t *mowgli_node_find(void *data, mowgli_list_t *l);
 extern void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist);
 

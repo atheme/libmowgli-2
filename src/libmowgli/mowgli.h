@@ -36,6 +36,8 @@
 
 #define mowgli_log printf
 
+#include "mowgli_assert.h"
+
 #include "mowgli_stdinc.h"
 
 #include "mowgli_alloc.h"

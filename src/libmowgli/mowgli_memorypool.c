@@ -118,7 +118,7 @@ mowgli_memory_pool_cleanup_nolock(mowgli_memorypool_t * pool)
 	{
 		mowgli_log("mowgli_memorypool_t<%p> element at %p was not released until cleanup!", pool, n->data);
 		pool->destructor(n->data);
-		mowgli_node_del(n, &pool->stack);
+		mowgli_node_delete(n, &pool->stack);
 	}
 }
 
@@ -159,7 +159,7 @@ mowgli_memory_pool_strdup(mowgli_memorypool_t * pool, char * src)
 	size_t sz = strlen(src) + 1;
 
 	out = mowgli_memory_pool_allocate(pool, sz);
-	g_strlcpy(out, src, sz);
+	strncpy(out, src, sz);
 
 	return out;
 }

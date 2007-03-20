@@ -389,7 +389,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, cons
 	delem = mowgli_alloc(sizeof(mowgli_dictionary_elem_t));
 
 	delem->key = strdup(key);
-	node_add(data, &delem->node, &dtree->hashv[i]);
+	mowgli_node_add(data, &delem->node, &dtree->hashv[i]);
 
 	return delem;
 }

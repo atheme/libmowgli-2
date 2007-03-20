@@ -165,7 +165,7 @@ void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowg
 	}
 }
 
-void mowgli_node_del(mowgli_node_t *n, mowgli_list_t *l)
+void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l)
 {
 	return_if_fail(n != NULL);
 	return_if_fail(l != NULL);
