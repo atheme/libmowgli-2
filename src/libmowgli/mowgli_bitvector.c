@@ -40,6 +40,8 @@ mowgli_bitvector_t *mowgli_bitvector_new(int bits)
 	bv->bits    = bits;
 	bv->divisor = sizeof(int);
 	bv->vector  = mowgli_alloc_array(bv->divisor, bv->bits / bv->divisor);
+
+	return bv;
 }
 
 void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val)
