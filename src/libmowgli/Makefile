@@ -12,6 +12,7 @@ CFLAGS += $(PICFLAGS) -I..
 
 SOURCES = \
 	mowgli_alloc.c \
+	mowgli_bitvector.c \
 	mowgli_dictionary.c \
 	mowgli_hash.c \
 	mowgli_heap.c \
@@ -30,6 +31,7 @@ HEADERS = \
 	mowgli.h \
 	mowgli_alloc.h \
 	mowgli_assert.h \
+	mowgli_bitvector.h \
 	mowgli_config.h \
 	mowgli_dictionary.h \
 	mowgli_hash.h \

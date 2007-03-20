@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_stdinc.h: Pulls in the base system includes for libmowgli.
+ * mowgli_bitvector.h: Bitvectors.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,57 +31,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STDINC_H__
-#define __MOWGLI_STDINC_H__
+#ifndef __MOWGLI_BITVECTOR_H__
+#define __MOWGLI_BITVECTOR_H__
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <time.h>
-#include <errno.h>
-#include <setjmp.h>
-#include <sys/stat.h>
-#include <ctype.h>
-#include <regex.h>
+typedef struct {
+	unsigned int bits;
+	unsigned int divisor;
+	unsigned int *vector;
+} mowgli_bitvector_t;
 
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
-#endif
-
-#ifdef HAVE_LINK_H
-#include <link.h>
-#endif
-
-/* socket stuff */
-#ifndef _WIN32
-# include <netdb.h>
-# include <netinet/in.h>
-# include <unistd.h>
-# include <grp.h>
-# include <sys/time.h>
-# include <sys/wait.h>
-# include <sys/resource.h>
-# include <sys/socket.h>
-# include <fcntl.h>
-# include <arpa/inet.h>
-#else
-# include <windows.h>
-# include <winsock.h>
-# include <sys/timeb.h>
-# include <direct.h>
-# include <io.h>
-# include <fcntl.h>
-#endif
-
-#include <sys/types.h>
-
-#ifndef _WIN32
-#include <libgen.h>
-#endif
-#include <dirent.h>
-
-typedef enum { FALSE, TRUE } mowgli_boolean_t;
+extern mowgli_bitvector_t *mowgli_bitvector_new(int bits);
+extern void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val);
+extern mowgli_boolean_t mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot);
+extern mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
+extern mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 
 #endif
