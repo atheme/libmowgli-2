@@ -36,8 +36,15 @@
 
 #include "mowgli.h"
 
+#ifdef HAVE_MMAP
+# include <sys/mman.h>
+# if !defined(MAP_ANON) && defined(MAP_ANONYMOUS)
+#  define MAP_ANON MAP_ANONYMOUS
+# endif
+#endif
+
 /* expands a mowgli_heap_t by 1 block */
-void mowgli_heap_expand(mowgli_heap_t *bh)
+static void mowgli_heap_expand(mowgli_heap_t *bh)
 {
 	mowgli_block_t *block;
 	void *blp;
@@ -45,7 +52,12 @@ void mowgli_heap_expand(mowgli_heap_t *bh)
 	void *offset;
 	int a;
 	
+#if defined(HAVE_MMAP) && defined(MAP_ANON)
+	blp = mmap(NULL, sizeof(mowgli_heap_t) + (bh->alloc_size * bh->mowgli_heap_elems),
+		PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+#else
 	blp = mowgli_alloc(sizeof(mowgli_heap_t) + (bh->alloc_size * bh->mowgli_heap_elems));
+#endif
 	block = (mowgli_block_t *)blp;
 	
 	offset = blp + sizeof(mowgli_heap_t);
@@ -61,9 +73,29 @@ void mowgli_heap_expand(mowgli_heap_t *bh)
 		offset += bh->alloc_size;
 	}
 	
-	mowgli_node_add(block, (mowgli_node_t *) block, &bh->blocks);
+	mowgli_node_add(block, &block->node, &bh->blocks);
 	
 	bh->free_elems += bh->mowgli_heap_elems;
+}
+
+/* shrinks a mowgli_heap_t by 1 block. */
+static void mowgli_heap_shrink(mowgli_block_t *b)
+{
+	mowgli_heap_t *heap;
+
+	return_if_fail(b != NULL);
+	return_if_fail(b->heap != NULL);
+	return_if_fail(MOWGLI_LIST_LENGTH(&b->used_list) == 0);
+
+	heap = b->heap;
+
+	mowgli_node_delete(&b->node, &heap->blocks);
+
+#ifdef HAVE_MMAP
+	munmap(b, sizeof(mowgli_heap_t) + (heap->alloc_size * heap->mowgli_heap_elems));
+#else
+	mowgli_free(b);
+#endif
 }
 
 /* creates a new mowgli_heap_t */
@@ -79,8 +111,8 @@ mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, un
 	
 	bh->flags = flags;
 	
-	if ( flags & BH_NOW )
-		mowgli_heap_expand( bh );
+	if (flags & BH_NOW)
+		mowgli_heap_expand(bh);
 	
 	return bh;
 }
@@ -147,10 +179,10 @@ void *mowgli_heap_alloc(mowgli_heap_t *heap)
 /* frees an item back to the mowgli_heap_t */
 void mowgli_heap_free(mowgli_heap_t *heap, void *data)
 {
-	mowgli_node_t *n, *dn;
+	mowgli_node_t *n, *tn, *dn;
 	mowgli_block_t *b;
 	
-	MOWGLI_LIST_FOREACH(n, heap->blocks.head)
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, heap->blocks.head)
 	{
 		b = (mowgli_block_t *) n->data;
 
@@ -168,6 +200,10 @@ void mowgli_heap_free(mowgli_heap_t *heap, void *data)
 			/* debug */
 			mowgli_log("mowgli_heap_free(heap = @%p, data = %p)", heap, data);
 #endif
+			/* if this block is entirely unfree, free it. */
+			if (MOWGLI_LIST_LENGTH(&b->used_list) == 0)
+				mowgli_heap_shrink(b);
+
 			/* we're done */
 			return;
 		}

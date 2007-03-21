@@ -190,6 +190,7 @@ int
 mowgli_queue_length(mowgli_queue_t *head)
 {
 	int iter;
+	mowgli_queue_t *n;
 
 	for (n = head, iter = 0; n != NULL; n = n->next, iter++);
 

@@ -11,6 +11,9 @@
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
 
+/* Define to 1 if you have the `gettimeofday' function. */
+#define HAVE_GETTIMEOFDAY 1
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
@@ -29,11 +32,23 @@
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
+/* Define to 1 if you have the `mmap' function. */
+#define HAVE_MMAP 1
+
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
 
+/* Define to 1 if you have the `printf' function. */
+#define HAVE_PRINTF 1
+
 /* Define to 1 if you have the `setlocale' function. */
 #define HAVE_SETLOCALE 1
+
+/* Define to 1 if you have the `snprintf' function. */
+#define HAVE_SNPRINTF 1
+
+/* Define to 1 if you have the `sprintf' function. */
+#define HAVE_SPRINTF 1
 
 /* Define to 1 if `stat' has the bug that it succeeds when given the
    zero-length file name argument. */
@@ -66,8 +81,14 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if you have the `strstr' function. */
-#define HAVE_STRSTR 1
+/* Define to 1 if you have the `strlcat' function. */
+/* #undef HAVE_STRLCAT */
+
+/* Define to 1 if you have the `strlcpy' function. */
+/* #undef HAVE_STRLCPY */
+
+/* Define to 1 if you have the `strndup' function. */
+#define HAVE_STRNDUP 1
 
 /* Define to 1 if you have the `strtod' function. */
 #define HAVE_STRTOD 1
@@ -92,6 +113,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
+/* Define to 1 if you have the `vsnprintf' function. */
+#define HAVE_VSNPRINTF 1
+
 /* Define to 1 if `lstat' dereferences a symlink specified with a trailing
    slash. */
 #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
@@ -103,13 +127,13 @@
 #define PACKAGE_NAME "libmowgli"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "libmowgli 0.1"
+#define PACKAGE_STRING "libmowgli 0.1.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "libmowgli"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "0.1"
+#define PACKAGE_VERSION "0.1.2"
 
 /* Define the shared module suffix extension on your platform. */
 #define SHARED_SUFFIX ".so"
