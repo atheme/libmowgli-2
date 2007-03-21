@@ -45,7 +45,7 @@ mowgli_queue_init(void)
 }
 
 mowgli_queue_t *
-mowgli_queue_append(mowgli_queue_t *head, void *data)
+mowgli_queue_push(mowgli_queue_t *head, void *data)
 {
 	mowgli_queue_t *out = mowgli_heap_alloc(mowgli_queue_heap);
 
@@ -137,4 +137,40 @@ mowgli_queue_tail(mowgli_queue_t *n)
 	for (tn = n; tn != NULL && tn->next != NULL; tn = tn->next);
 
 	return tn;
+}
+
+void *
+mowgli_queue_pop_head(mowgli_queue_t **n)
+{
+	mowgli_queue_t *tn;
+	void *out;
+
+	return_val_if_fail(n != NULL, NULL);
+	return_val_if_fail(*n != NULL, NULL);
+
+	tn = *n;
+	out = tn->data;
+	*n = tn->next;
+
+	mowgli_queue_remove(tn);
+
+	return out;
+}
+
+void *
+mowgli_queue_pop_tail(mowgli_queue_t **n)
+{
+	mowgli_queue_t *tn;
+	void *out;
+
+	return_val_if_fail(n != NULL, NULL);
+	return_val_if_fail(*n != NULL, NULL);
+
+	tn = *n;
+	out = tn->data;
+	*n = tn->prev;
+
+	mowgli_queue_remove(tn);
+
+	return out;
 }
