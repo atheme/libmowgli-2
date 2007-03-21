@@ -62,6 +62,7 @@ static void mowgli_heap_expand(mowgli_heap_t *bh)
 	
 	offset = blp + sizeof(mowgli_heap_t);
 	block->data = offset;
+	block->heap = bh;
 
 	for (a = 0; a < bh->mowgli_heap_elems; a++)
 	{
