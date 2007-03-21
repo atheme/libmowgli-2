@@ -82,6 +82,14 @@
 #endif
 #include <dirent.h>
 
+#ifdef FALSE
+# undef FALSE
+#endif
+
+#ifdef TRUE
+# undef TRUE
+#endif
+
 typedef enum { FALSE, TRUE } mowgli_boolean_t;
 
 #endif
