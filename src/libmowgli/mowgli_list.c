@@ -260,24 +260,26 @@ void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *n
 	return_if_fail(newlist != NULL);
 
         /* Assumption: If m->next == NULL, then list->tail == m
-         *      and:   If m->prev == NULL, then list->head == m
+         *        and: If m->prev == NULL, then list->head == m
          */
-        if (m->next)
+        if (m->next != NULL)
                 m->next->prev = m->prev;
         else
                 oldlist->tail = m->prev;
 
-        if (m->prev)
+        if (m->prev != NULL)
                 m->prev->next = m->next;
         else
                 oldlist->head = m->next;
 
         m->prev = NULL;
         m->next = newlist->head;
+
         if (newlist->head != NULL)
                 newlist->head->prev = m;
         else if (newlist->tail == NULL)
                 newlist->tail = m;
+
         newlist->head = m;
 
         oldlist->count--;
