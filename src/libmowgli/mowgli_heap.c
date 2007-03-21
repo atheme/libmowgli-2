@@ -97,6 +97,8 @@ static void mowgli_heap_shrink(mowgli_block_t *b)
 #else
 	mowgli_free(b);
 #endif
+
+	heap -= heap->mowgli_heap_elems;
 }
 
 /* creates a new mowgli_heap_t */
