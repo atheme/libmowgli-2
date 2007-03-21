@@ -45,5 +45,8 @@ extern mowgli_queue_t *mowgli_queue_remove(mowgli_queue_t *head);
 extern mowgli_queue_t *mowgli_queue_find(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_remove_data(mowgli_queue_t *head, void *data);
 extern void mowgli_queue_free(mowgli_queue_t *head);
+extern mowgli_queue_t *mowgli_queue_skip(mowgli_queue_t *head, int amt);
+extern mowgli_queue_t *mowgli_queue_head(mowgli_queue_t *n);
+extern mowgli_queue_t *mowgli_queue_tail(mowgli_queue_t *n);
 
 #endif

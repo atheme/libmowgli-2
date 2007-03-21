@@ -107,3 +107,34 @@ mowgli_queue_free(mowgli_queue_t *head)
 	for (n = head, n2 = n ? n->next : NULL; n != NULL; n = n2, n2 = n ? n->next : NULL)
 		mowgli_queue_remove(n);
 }
+
+mowgli_queue_t *
+mowgli_queue_skip(mowgli_queue_t *head, int nodes)
+{
+	mowgli_queue_t *n;
+	int iter;
+
+	for (n = head; n != NULL && iter < nodes; n = n->next, iter++);
+
+	return n;
+}
+
+mowgli_queue_t *
+mowgli_queue_head(mowgli_queue_t *n)
+{
+	mowgli_queue_t *tn;
+
+	for (tn = n; tn != NULL && tn->prev != NULL; tn = tn->prev);
+
+	return tn;
+}
+
+mowgli_queue_t *
+mowgli_queue_tail(mowgli_queue_t *n)
+{
+	mowgli_queue_t *tn;
+
+	for (tn = n; tn != NULL && tn->next != NULL; tn = tn->next);
+
+	return tn;
+}
