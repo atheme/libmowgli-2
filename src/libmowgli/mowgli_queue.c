@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_queue.c: Double-linked queues.
+ * mowgli_queue.c: Double-ended queues, also known as deque.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -45,7 +45,7 @@ mowgli_queue_init(void)
 }
 
 mowgli_queue_t *
-mowgli_queue_push(mowgli_queue_t *head, void *data)
+mowgli_queue_shift(mowgli_queue_t *head, void *data)
 {
 	mowgli_queue_t *out = mowgli_heap_alloc(mowgli_queue_heap);
 
@@ -53,7 +53,28 @@ mowgli_queue_push(mowgli_queue_t *head, void *data)
 	out->data = data;
 
 	if (head != NULL)
+	{
+		out->prev = head->prev;
+
+		if (out->prev != NULL)
+			out->prev->next = out;
+
 		head->prev = out;
+	}
+
+	return out;
+}
+
+mowgli_queue_t *
+mowgli_queue_push(mowgli_queue_t *head, void *data)
+{
+	mowgli_queue_t *out = mowgli_heap_alloc(mowgli_queue_heap);
+
+	out->prev = head;
+	out->data = data;
+
+	if (head != NULL)
+		head->next = out;
 
 	return out;
 }

@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_queue.h: Double-linked queues.
+ * mowgli_queue.h: Double-ended queues, also known as deque.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -41,6 +41,7 @@ typedef struct mowgli_queue_ {
 
 extern void mowgli_queue_init(void);
 extern mowgli_queue_t *mowgli_queue_push(mowgli_queue_t *head, void *data);
+extern mowgli_queue_t *mowgli_queue_shift(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_remove(mowgli_queue_t *head);
 extern mowgli_queue_t *mowgli_queue_find(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_remove_data(mowgli_queue_t *head, void *data);
