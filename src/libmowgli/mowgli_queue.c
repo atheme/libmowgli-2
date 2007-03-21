@@ -114,7 +114,7 @@ mowgli_queue_skip(mowgli_queue_t *head, int nodes)
 	mowgli_queue_t *n;
 	int iter;
 
-	for (n = head; n != NULL && iter < nodes; n = n->next, iter++);
+	for (iter = 0, n = head; n != NULL && iter < nodes; n = n->next, iter++);
 
 	return n;
 }
@@ -125,7 +125,7 @@ mowgli_queue_rewind(mowgli_queue_t *head, int nodes)
 	mowgli_queue_t *n;
 	int iter;
 
-	for (n = head; n != NULL && iter < nodes; n = n->prev, iter++);
+	for (iter = 0, n = head; n != NULL && iter < nodes; n = n->prev, iter++);
 
 	return n;
 }
@@ -184,4 +184,14 @@ mowgli_queue_pop_tail(mowgli_queue_t **n)
 	mowgli_queue_remove(tn);
 
 	return out;
+}
+
+int
+mowgli_queue_length(mowgli_queue_t *head)
+{
+	int iter;
+
+	for (n = head, iter = 0; n != NULL; n = n->next, iter++);
+
+	return iter;
 }
