@@ -172,6 +172,21 @@ mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
 	return n;
 }
 
+/* returns the data from node at `position` position, or NULL. */
+void *mowgli_node_nth_data(mowgli_list_t *l, int pos)
+{
+	mowgli_node_t *n;
+
+	return_val_if_fail(l != NULL, NULL);
+
+	n = mowgli_node_nth(l, pos);
+
+	if (n == NULL)
+		return NULL;
+
+	return n->data;
+}
+
 /* inserts a node at `position` position. */
 void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int pos)
 {

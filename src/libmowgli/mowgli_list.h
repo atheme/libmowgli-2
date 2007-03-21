@@ -74,6 +74,7 @@ extern mowgli_node_t *mowgli_node_find(void *data, mowgli_list_t *l);
 extern void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist);
 extern mowgli_list_t *mowgli_node_parent(mowgli_node_t *n);
 extern mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos);
+extern void *mowgli_node_nth_data(mowgli_list_t *l, int pos);
 
 extern mowgli_list_t *mowgli_list_create(void);
 extern void mowgli_list_free(mowgli_list_t *l);
