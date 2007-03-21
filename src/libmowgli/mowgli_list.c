@@ -34,12 +34,14 @@
 #include "mowgli.h"
 
 static mowgli_heap_t *mowgli_node_heap;
+static mowgli_heap_t *mowgli_list_heap;
 
 void mowgli_node_init(void)
 {
         mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 256, BH_NOW);
+        mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 256, BH_NOW);
 
-	if (mowgli_node_heap == NULL)
+	if (mowgli_node_heap == NULL || mowgli_list_heap == NULL)
 	{
 		mowgli_log("heap allocator failure.");
 		exit(EXIT_FAILURE);
@@ -153,6 +155,54 @@ void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowg
 	}
 }
 
+/* retrieves a node at `position` position. */
+mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
+{
+	int iter;
+	mowgli_node_t *n;
+
+	return_val_if_fail(l != NULL, NULL);
+
+	if (pos < 0)
+		return NULL;
+
+	/* locate the proper position. */
+	for (iter = 0, n = l->head; iter <= pos && n != NULL; iter++, n = n->next);
+
+	return n;
+}
+
+/* inserts a node at `position` position. */
+void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int pos)
+{
+	int iter;
+	mowgli_node_t *tn;
+
+	return_if_fail(n != NULL);
+	return_if_fail(l != NULL);
+
+	/* locate the proper position. */
+	tn = mowgli_node_nth(l, pos);
+
+	mowgli_node_add_before(data, n, l, tn);
+}
+
+/* retrieves the index position of a node in a list. */
+int mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
+{
+	int iter;
+	mowgli_node_t *tn;
+
+	return_val_if_fail(n != NULL, -1);
+	return_val_if_fail(l != NULL, -1);
+
+	/* locate the proper position. */
+	for (iter = 0, tn = l->head; tn != n && tn != NULL; iter++, tn = tn->next);
+
+	return iter < MOWGLI_LIST_LENGTH(l) ? iter : -1;
+}
+
+/* deletes a link between a node and a list. */
 void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l)
 {
 	return_if_fail(n != NULL);
@@ -187,6 +237,7 @@ mowgli_node_t *mowgli_node_find(void *data, mowgli_list_t *l)
 	return NULL;
 }
 
+/* moves a node from one list to another. */
 void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist)
 {
 	return_if_fail(m != NULL);
@@ -216,4 +267,26 @@ void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *n
 
         oldlist->count--;
         newlist->count++;
+}
+
+/* returns a list node's parent list. */
+mowgli_list_t *mowgli_node_parent(mowgli_node_t *n)
+{
+	return_val_if_fail(n != NULL, NULL);
+
+	return n->parent;
+}
+
+/* creates a new list. */
+mowgli_list_t *mowgli_list_create(void)
+{
+	mowgli_list_t *out = mowgli_heap_alloc(mowgli_list_heap);
+
+	return out;
+}
+
+/* frees a created list. */
+void mowgli_list_free(mowgli_list_t *l)
+{
+	mowgli_heap_free(mowgli_list_heap, l);
 }
