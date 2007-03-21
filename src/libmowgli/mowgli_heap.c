@@ -204,7 +204,7 @@ void mowgli_heap_free(mowgli_heap_t *heap, void *data)
 			mowgli_log("mowgli_heap_free(heap = @%p, data = %p)", heap, data);
 #endif
 			/* if this block is entirely unfree, free it. */
-			if (MOWGLI_LIST_LENGTH(&b->used_list) == 0)
+			if (MOWGLI_LIST_LENGTH(&b->used_list) == 0 && MOWGLI_LIST_LENGTH(&heap->blocks) > 2)
 				mowgli_heap_shrink(b);
 
 			/* we're done */
