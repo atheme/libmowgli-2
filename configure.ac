@@ -13,7 +13,7 @@ AC_PROG_MAKE_SET
 AC_ISC_POSIX
 
 # XXX workaround
-PACKAGE="libmcs"
+PACKAGE="libmowgli"
 AC_SUBST(PACKAGE)
 
 # Checks for libraries.
