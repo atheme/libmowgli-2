@@ -39,6 +39,7 @@ typedef struct mowgli_queue_ {
 	void *data;
 } mowgli_queue_t;
 
+extern void mowgli_queue_init(void);
 extern mowgli_queue_t *mowgli_queue_append(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_remove(mowgli_queue_t *head);
 extern mowgli_queue_t *mowgli_queue_find(mowgli_queue_t *head, void *data);

@@ -33,10 +33,21 @@
 
 #include "mowgli.h"
 
+static mowgli_heap_t *mowgli_queue_heap = NULL;
+
+void
+mowgli_queue_init(void)
+{
+	mowgli_queue_heap = mowgli_heap_create(sizeof(mowgli_queue_t), 256, BH_NOW);
+
+	if (mowgli_queue_heap == NULL)
+		mowgli_log("mowgli_queue_heap was not created, expect problems.");
+}
+
 mowgli_queue_t *
 mowgli_queue_append(mowgli_queue_t *head, void *data)
 {
-	mowgli_queue_t *out = mowgli_alloc(sizeof(mowgli_queue_t));
+	mowgli_queue_t *out = mowgli_heap_alloc(mowgli_queue_heap);
 
 	out->next = head;
 	out->data = data;
@@ -60,7 +71,7 @@ mowgli_queue_remove(mowgli_queue_t *head)
 
 	out = head->prev != NULL ? head->prev : head->next;
 
-	free(head);
+	mowgli_heap_free(mowgli_queue_heap, head);
 
 	return out;
 }
