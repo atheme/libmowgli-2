@@ -120,6 +120,17 @@ mowgli_queue_skip(mowgli_queue_t *head, int nodes)
 }
 
 mowgli_queue_t *
+mowgli_queue_rewind(mowgli_queue_t *head, int nodes)
+{
+	mowgli_queue_t *n;
+	int iter;
+
+	for (n = head; n != NULL && iter < nodes; n = n->prev, iter++);
+
+	return n;
+}
+
+mowgli_queue_t *
 mowgli_queue_head(mowgli_queue_t *n)
 {
 	mowgli_queue_t *tn;
