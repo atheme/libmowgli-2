@@ -31,6 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "mowgli.h"
+
 #define HASHINIT 0x811c9dc5
 #define HASHBITS 16
 #define HASHSIZE (1 << HASHBITS)  /* 2^16 = 65536 */
