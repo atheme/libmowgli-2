@@ -38,8 +38,8 @@ static mowgli_heap_t *mowgli_list_heap;
 
 void mowgli_node_init(void)
 {
-        mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 256, BH_NOW);
-        mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 256, BH_NOW);
+        mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 1024, BH_NOW);
+        mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 64, BH_NOW);
 
 	if (mowgli_node_heap == NULL || mowgli_list_heap == NULL)
 	{
