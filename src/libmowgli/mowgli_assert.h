@@ -40,14 +40,12 @@
 #ifdef __GNUC__
 #define soft_assert(x)								\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
-			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 	}
 #else
 #define soft_assert(x)								\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d): critical: Assertion '%s' failed.",	\
-			__FILE__, __LINE__, #x);				\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 	}
 #endif
 
@@ -57,15 +55,13 @@
 #ifdef __GNUC__
 #define return_if_fail(x)							\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
-			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 		return;								\
 	}
 #else
 #define return_if_fail(x)							\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d): critical: Assertion '%s' failed.",	\
-			__FILE__, __LINE__, #x);				\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 		return;								\
 	}
 #endif
@@ -76,15 +72,13 @@
 #ifdef __GNUC__
 #define return_val_if_fail(x, y)						\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d) [%s]: critical: Assertion '%s' failed.",	\
-			__FILE__, __LINE__, __PRETTY_FUNCTION__, #x);		\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 		return (y);							\
 	}
 #else
 #define return_val_if_fail(x, y)						\
 	if (!(x)) { 								\
-		mowgli_log("%s(%d): critical: Assertion '%s' failed.",		\
-			__FILE__, __LINE__, #x);				\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
 		return (y);							\
 	}
 #endif
