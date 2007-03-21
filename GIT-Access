@@ -1,0 +1,5 @@
+The atheme.org GIT repository is available for anonymous read-only access.
+
+To retrieve libmowgli from git.atheme.org, do:
+   $ git clone git://git.atheme.org/gitroot/libmowgli.git
+
