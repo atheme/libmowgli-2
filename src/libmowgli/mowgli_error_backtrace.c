@@ -51,7 +51,7 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 
 		mowgli_node_delete(n, &e->bt);
 
-		printf("%s%s", bt_msg, delim);
+		printf("%s%s", bt_msg, n->next != NULL ? delim : "");
 
 		mowgli_free(bt_msg);
 	}
