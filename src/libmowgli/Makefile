@@ -14,6 +14,7 @@ SOURCES = \
 	mowgli_alloc.c \
 	mowgli_bitvector.c \
 	mowgli_dictionary.c \
+	mowgli_error_backtrace.c \
 	mowgli_hash.c \
 	mowgli_heap.c \
 	mowgli_hook.c \
@@ -37,6 +38,7 @@ HEADERS = \
 	mowgli_bitvector.h \
 	mowgli_config.h \
 	mowgli_dictionary.h \
+	mowgli_error_backtrace.h \
 	mowgli_exception.h \
 	mowgli_hash.h \
 	mowgli_heap.h \
