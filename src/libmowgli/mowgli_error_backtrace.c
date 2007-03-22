@@ -58,6 +58,15 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 }
 
 void
+mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error)
+{
+	mowgli_error_context_display(e, delim);
+	printf("%s\n", error);
+
+	exit(EXIT_FAILURE);
+}
+
+void
 mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...)
 {
 	char buf[65535];
