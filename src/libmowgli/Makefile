@@ -37,6 +37,7 @@ HEADERS = \
 	mowgli_bitvector.h \
 	mowgli_config.h \
 	mowgli_dictionary.h \
+	mowgli_exception.h \
 	mowgli_hash.h \
 	mowgli_heap.h \
 	mowgli_hook.h \
