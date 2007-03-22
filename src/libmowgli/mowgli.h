@@ -38,6 +38,8 @@
 
 #include "mowgli_logger.h"
 #include "mowgli_assert.h"
+#include "mowgli_exception.h"
+
 #include "mowgli_alloc.h"
 #include "mowgli_list.h"
 #include "mowgli_object.h"
