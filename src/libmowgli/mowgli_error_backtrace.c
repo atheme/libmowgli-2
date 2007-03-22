@@ -58,12 +58,19 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 }
 
 void
-mowgli_error_context_push(mowgli_error_context_t *e, const char *msg)
+mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...)
 {
+	char buf[65535];
+	va_list va;
+
 	return_if_fail(e != NULL);
 	return_if_fail(msg != NULL);
 
-	mowgli_node_add(strdup(msg), mowgli_node_create(), &e->bt);
+	va_start(va, msg);
+	vsnprintf(buf, 65535, msg, va);
+	va_end(va);
+
+	mowgli_node_add(strdup(buf), mowgli_node_create(), &e->bt);
 }
 
 void
