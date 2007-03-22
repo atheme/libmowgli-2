@@ -53,6 +53,7 @@
 #include "mowgli_bitvector.h"
 #include "mowgli_hook.h"
 #include "mowgli_signal.h"
+#include "mowgli_error_backtrace.h"
 
 #endif
 

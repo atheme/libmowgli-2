@@ -63,7 +63,7 @@ mowgli_error_context_push(mowgli_error_context_t *e, const char *msg)
 	return_if_fail(e != NULL);
 	return_if_fail(msg != NULL);
 
-	e->queue = mowgli_queue_push(e->queue, strdup(msg));
+	mowgli_node_add(strdup(msg), mowgli_node_create(), &e->bt);
 }
 
 void
@@ -72,10 +72,8 @@ mowgli_error_context_pop(mowgli_error_context_t *e)
 	mowgli_queue_t *q;
 
 	return_if_fail(e != NULL);
-	return_if_fail(msg != NULL);
 
-	q = mowgli_queue_tail(e->queue);
-	mowgli_queue_pop_tail(&q);
+	mowgli_node_delete(e->bt.tail, &e->bt);
 }
 
 mowgli_error_context_t *

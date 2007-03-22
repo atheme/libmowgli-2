@@ -40,7 +40,7 @@
 
 #define mowgli_throw_exception_fatal(x) \
 	do { \
-		mowgli_log("exception %s thrown", #x);
+		mowgli_log("exception %s thrown", #x); \
 		exit(EXIT_FAILURE); \
 	} while (0)
 
