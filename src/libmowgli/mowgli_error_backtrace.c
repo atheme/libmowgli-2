@@ -36,7 +36,7 @@
 void
 mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 {
-	mowgli_node_t *n, *tn;
+	mowgli_node_t *n;
 	char *bt_msg;
 
 	return_if_fail(e != NULL);
@@ -45,15 +45,30 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 	if (MOWGLI_LIST_LENGTH(&e->bt) == 0)
 		mowgli_throw_exception(mowgli.error_backtrace.no_backtrace);
 
-	MOWGLI_LIST_FOREACH_SAFE(n, tn, e->bt.head)
+	MOWGLI_LIST_FOREACH(n, e->bt.head)
 	{
 		bt_msg = (char *) n->data;
 
-		mowgli_node_delete(n, &e->bt);
-
 		printf("%s%s", bt_msg, n->next != NULL ? delim : "\n");
+	}
+}
 
-		mowgli_free(bt_msg);
+void
+mowgli_error_context_destroy(mowgli_error_context_t *e)
+{
+	mowgli_node_t *n, *tn;
+
+	return_if_fail(e != NULL);
+
+	if (MOWGLI_LIST_LENGTH(&e->bt) == 0)
+		return;
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, e->bt.head)
+	{
+		mowgli_free(n->data);
+
+		mowgli_node_delete(n, &e->bt);
+		mowgli_node_free(n);
 	}
 }
 
@@ -61,7 +76,7 @@ void
 mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error)
 {
 	mowgli_error_context_display(e, delim);
-	printf("%s\n", error);
+	printf("Error: %s\n", error);
 
 	exit(EXIT_FAILURE);
 }
