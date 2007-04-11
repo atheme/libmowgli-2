@@ -8,7 +8,7 @@ LDADD = -L../../libmowgli -lmowgli
 
 CFLAGS += -I../../libmowgli
 
-SOURCES = randomtest
+SOURCES = randomtest.c
 
 OBJECTS = ${SOURCES:.c=.o}
 
