@@ -110,7 +110,7 @@ mowgli_error_context_pop(mowgli_error_context_t *e)
 mowgli_error_context_t *
 mowgli_error_context_create(void)
 {
-	mowgli_error_context_t *out = mowgli_alloc(sizeof(mowgli_error_context_t));
+	mowgli_error_context_t *out = (mowgli_error_context_t *) mowgli_alloc(sizeof(mowgli_error_context_t));
 
 	return out;
 }

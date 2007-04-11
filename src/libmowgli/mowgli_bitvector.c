@@ -35,11 +35,11 @@
 
 mowgli_bitvector_t *mowgli_bitvector_new(int bits)
 {
-	mowgli_bitvector_t *bv = mowgli_alloc(sizeof(mowgli_bitvector_t));
+	mowgli_bitvector_t *bv = (mowgli_bitvector_t *) mowgli_alloc(sizeof(mowgli_bitvector_t));
 
 	bv->bits    = bits;
 	bv->divisor = sizeof(int);
-	bv->vector  = mowgli_alloc_array(bv->divisor, bv->bits / bv->divisor);
+	bv->vector  = (unsigned int *) mowgli_alloc_array(bv->divisor, bv->bits / bv->divisor);
 
 	return bv;
 }

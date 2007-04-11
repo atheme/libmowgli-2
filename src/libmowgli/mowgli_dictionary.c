@@ -64,11 +64,11 @@ struct mowgli_dictionary_
  */
 mowgli_dictionary_t *mowgli_dictionary_create(const char *name, int resolution, int (*compare_cb)(const char *a, const char *b))
 {
-	mowgli_dictionary_t *dtree = mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	mowgli_object_init(&dtree->parent, name, NULL);
 	dtree->resolution = resolution;
-	dtree->hashv      = mowgli_alloc_array(sizeof(mowgli_list_t), resolution);
+	dtree->hashv      = (mowgli_list_t *) mowgli_alloc_array(sizeof(mowgli_list_t), resolution);
 	dtree->compare_cb = compare_cb;
 
 	return dtree;
@@ -386,7 +386,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, cons
 	return_val_if_fail(mowgli_dictionary_find(dtree, key) == NULL, NULL);
 
 	i = mowgli_fnv_hash_string(key) % dtree->resolution;
-	delem = mowgli_alloc(sizeof(mowgli_dictionary_elem_t));
+	delem = (mowgli_dictionary_elem_t *) mowgli_alloc(sizeof(mowgli_dictionary_elem_t));
 
 	delem->key = strdup(key);
 	mowgli_node_add(data, &delem->node, &dtree->hashv[i]);

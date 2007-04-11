@@ -25,6 +25,7 @@ SOURCES = \
 	mowgli_module.c \
 	mowgli_object.c \
 	mowgli_queue.c \
+	mowgli_random.c \
 	mowgli_signal.c
 
 OBJECTS = ${SOURCES:.c=.o}
@@ -50,6 +51,7 @@ HEADERS = \
 	mowgli_module.h \
 	mowgli_object.h \
 	mowgli_queue.h \
+	mowgli_random.h \
 	mowgli_signal.h \
 	mowgli_stdinc.h
 
