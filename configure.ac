@@ -34,42 +34,21 @@ AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup strl
 AC_FUNC_STAT
 
 # Check for optional features.
-AC_ARG_ENABLE(gconf,
-    [  --enable-gconf          enable GConf support (default=disabled)],
-    [enable_gconf=$enableval],
-    [enable_gconf="no"]
+EXAMPLES_BUILD=""
+AC_ARG_ENABLE(examples,
+    [  --enable-examples        build and install example programs],
+    [enable_examples=$enableval],
+    [enable_examples="no"]
 )
 
-if test "$enable_gconf" = "yes"; then
-    PKG_CHECK_MODULES(GCONF, [gconf-2.0 >= 2.6.0], ,
-        [AC_MSG_ERROR([Cannot find GConf])]
-    )
+if test "x$enable_examples" = "xyes"; then
+	EXAMPLES_BUILD="examples"
 fi
 
-if test "$enable_gconf" = "yes"; then
-	GCONF_BUILD="gconf"
-fi
-
-AC_SUBST(GCONF_BUILD)
-
-AC_ARG_ENABLE(kconfig,
-    [  --enable-kconfig        enable KDE KConfig support (default=disabled)],
-    [enable_kconfig=$enableval],
-    [enable_kconfig="no"]
-)
-
-if test "$enable_kconfig" = "yes"; then
-   AC_PROG_CXX
-
-   AC_CHECK_LIB([kdecore], [main], [], [AC_MSG_ERROR([Cannot find libkdecore])])
-
-   KCONFIG_BUILD="kconfig"
-fi
-
-AC_SUBST(KCONFIG_BUILD)
+AC_SUBST(EXAMPLES_BUILD)
 
 # Module support
-AC_MSG_CHECKING([for what extension and flags to use for plugin compilation])
+AC_MSG_CHECKING([for what extension and flags to use for library compilation])
 case "$target" in
         *-apple-*)
                 AC_MSG_RESULT([Mac OS X: -fPIC -bundle -fno-common -flat_namespace -undefined suppress, .dylib])
