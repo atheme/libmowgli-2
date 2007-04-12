@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_ioevent.h: Portable I/O event layer.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,32 +31,35 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef __MOWGLI_IOEVENT_H__
+#define __MOWGLI_IOEVENT_H__
 
-#include "mowgli_config.h"
-#include "mowgli_stdinc.h"
+typedef struct {
+	void *impldata;	/* implementation-specific data */
+} mowgli_ioevent_handle_t;
 
-#include "mowgli_logger.h"
-#include "mowgli_assert.h"
-#include "mowgli_exception.h"
+typedef enum {
+	MOWGLI_SOURCE_FD = 1
+} mowgli_ioevent_source_t;
 
-#include "mowgli_alloc.h"
-#include "mowgli_list.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_memorypool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
-#include "mowgli_signal.h"
-#include "mowgli_error_backtrace.h"
-#include "mowgli_random.h"
-#include "mowgli_ioevent.h"
+typedef struct {
+	mowgli_ioevent_source_t ev_source;
+	unsigned int ev_status;
+	int ev_object;
+	void *ev_opaque;
+} mowgli_ioevent_t;
+
+#define MOWGLI_POLLRDNORM		0x01
+#define MOWGLI_POLLWRNORM		0x02
+#define MOWGLI_POLLHUP			0x04
+#define MOWGLI_POLLERR			0x08
+
+extern mowgli_ioevent_handle_t *mowgli_ioevent_create(void);
+extern void mowgli_ioevent_destroy(mowgli_ioevent_handle_t *self);
+
+extern int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, size_t bufsize, unsigned int delay);
+
+extern void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object, unsigned int flags, void *opaque);
+extern void mowgli_ioevent_dissociate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object);
 
 #endif
-
