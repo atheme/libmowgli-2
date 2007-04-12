@@ -323,3 +323,22 @@ void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
 	l2->head = l2->tail = NULL;
 	l2->count = 0;
 }
+
+/* reverse a list -- O(n)! */
+void mowgli_list_reverse(mowgli_list_t *l)
+{
+	mowgli_node_t *n, *tn;
+
+	return_if_fail(l != NULL);
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, l->head)
+	{
+		mowgli_node_t *tn2 = n->next;
+		n->next = n->prev;
+		n->prev = tn2;
+	}
+
+	tn = l->head;
+	l->head = l->tail;
+	l->tail = tn;
+}
