@@ -78,5 +78,6 @@ extern void *mowgli_node_nth_data(mowgli_list_t *l, int pos);
 
 extern mowgli_list_t *mowgli_list_create(void);
 extern void mowgli_list_free(mowgli_list_t *l);
+extern void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2);
 
 #endif

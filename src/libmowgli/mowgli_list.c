@@ -307,3 +307,19 @@ void mowgli_list_free(mowgli_list_t *l)
 {
 	mowgli_heap_free(mowgli_list_heap, l);
 }
+
+/* concatenates two lists together. */
+void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
+{
+	return_if_fail(l != NULL);
+	return_if_fail(l2 != NULL);
+
+	l->tail->next = l2->head;
+	l->tail->next->prev = l->tail;
+	l->tail = l2->tail;
+	l->count += l2->count;
+
+	/* clear out l2 as it is no longer needed. */
+	l2->head = l2->tail = NULL;
+	l2->count = 0;
+}
