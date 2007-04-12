@@ -30,7 +30,7 @@ AC_C_CONST
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
 AC_CHECK_FUNCS([memset setlocale strcasecmp strchr strdup strerror strtol strtod])
-AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup strlcpy strlcat])
+AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup strlcpy strlcat epoll_ctl])
 AC_FUNC_STAT
 
 # Check for optional features.
