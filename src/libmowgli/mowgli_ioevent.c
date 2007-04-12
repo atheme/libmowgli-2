@@ -37,10 +37,9 @@
 # include <sys/epoll.h>
 #endif
 
-#define MOWGLI_POLLRDNORM		0x01
-#define MOWGLI_POLLWRNORM		0x02
-#define MOWGLI_POLLHUP			0x04
-#define MOWGLI_POLLERR			0x08
+#ifdef HAVE_PORT_CREATE
+# include <port.h>
+#endif
 
 mowgli_ioevent_handle_t *mowgli_ioevent_create(void)
 {
@@ -50,6 +49,10 @@ mowgli_ioevent_handle_t *mowgli_ioevent_create(void)
 	self->impldata = (void *) epoll_create(FD_SETSIZE);
 #endif
 
+#ifdef HAVE_PORT_CREATE
+	self->impldata = (void *) port_create();
+#endif
+
 	return self;
 }
 
@@ -57,7 +60,7 @@ void mowgli_ioevent_destroy(mowgli_ioevent_handle_t *self)
 {
 	return_if_fail(self != NULL);
 
-#ifdef HAVE_EPOLL_CTL
+#if defined(HAVE_EPOLL_CTL) || defined(HAVE_PORT_CREATE)
 	close((int) self->impldata);
 #endif
 
@@ -66,11 +69,14 @@ void mowgli_ioevent_destroy(mowgli_ioevent_handle_t *self)
 
 int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, size_t bufsize, unsigned int delay)
 {
+	int ret, iter;
 #ifdef HAVE_EPOLL_CTL
 	struct epoll_event events[bufsize];
-	int ret, iter;
 
 	ret = epoll_wait((int) self->impldata, events, bufsize, delay);
+
+	if (ret == -1)
+		return ret;
 
 	for (iter = 0; iter < ret; iter++)
 	{
@@ -93,18 +99,56 @@ int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, siz
 	}
 #endif
 
+#ifdef HAVE_PORT_CREATE
+	port_event_t events[bufsize];
+	unsigned int nget = 1;
+	struct timespec poll_time;
+
+	poll_time.tv_sec = delay / 1000;
+	poll_time.tv_nsec = (delay % 1000) * 1000000;
+
+	ret = port_getn((int) self->impldata, events, bufsize, &nget, &poll_time);
+
+	if (ret == -1)
+		return ret;
+
+	for (iter = 0; iter < nget; iter++)
+	{
+		buf[iter].ev_status = 0;
+		buf[iter].ev_object = events[iter].portev_object;
+		buf[iter].ev_opaque = events[iter].portev_user;
+		buf[iter].ev_source = MOWGLI_SOURCE_FD;
+
+		if (events[iter].portev_events & POLLRDNORM)
+			buf[iter].ev_status |= MOWGLI_POLLRDNORM;
+
+		if (events[iter].portev_events & POLLWRNORM)
+			buf[iter].ev_status |= MOWGLI_POLLWRNORM;
+
+		if (events[iter].portev_events & POLLHUP)
+			buf[iter].ev_status = MOWGLI_POLLHUP;
+
+		if (events[iter].portev_events & POLLERR)
+			buf[iter].ev_status = MOWGLI_POLLERR;
+	}
+
+	ret = nget;
+#endif
+
 	return ret;
 }
 
 void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object, unsigned int flags, void *opaque)
 {
+	int events;
+
 	if (source != MOWGLI_SOURCE_FD)
 		return;
 
 #ifdef HAVE_EPOLL_CTL
 	{
 		struct epoll_event ep_event = {};
-		int events = EPOLLONESHOT;
+		events = EPOLLONESHOT;
 
 		if (flags & MOWGLI_POLLRDNORM)
 			events |= EPOLLIN;
@@ -117,6 +161,16 @@ void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_sour
 
 		epoll_ctl((int) self->impldata, EPOLL_CTL_ADD, object, &ep_event);
 	}
+#endif
+
+#ifdef HAVE_PORT_CREATE
+	if (flags & MOWGLI_POLLRDNORM)
+		events |= POLLRDNORM;
+
+	if (flags & MOWGLI_POLLWRNORM)
+		events |= EPOLLWRNORM;
+
+	port_associate((int) self->impldata, PORT_SOURCE_FD, object, events, opaque);
 #endif
 }
 
@@ -131,6 +185,10 @@ void mowgli_ioevent_dissociate(mowgli_ioevent_handle_t *self, mowgli_ioevent_sou
 
 		epoll_ctl((int) self->impldata, EPOLL_CTL_DEL, object, &ep_event);
 	}
+#endif
+
+#ifdef HAVE_PORT_CREATE
+	port_dissociate((int) self->impldata, PORT_SOURCE_FD, object);
 #endif
 }
 
