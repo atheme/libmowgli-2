@@ -140,7 +140,7 @@ int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, siz
 
 void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object, unsigned int flags, void *opaque)
 {
-	int events;
+	int events = 0;
 
 	if (source != MOWGLI_SOURCE_FD)
 		return;
