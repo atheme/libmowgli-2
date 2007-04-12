@@ -155,6 +155,25 @@ void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowg
 	}
 }
 
+/* adds a node to a list after another node, or to the end */
+void mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before)
+{
+	return_if_fail(n != NULL);
+	return_if_fail(l != NULL);
+
+	if (before == NULL || before->next == NULL)
+		mowgli_node_add(data, n, l);
+	else
+	{
+		n->data = data;
+		n->prev = before;
+		n->next = before->next;
+		before->next = n;
+		n->next->prev = n;
+		l->count++;
+	}
+}
+
 /* retrieves a node at `position` position. */
 mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
 {
@@ -341,4 +360,41 @@ void mowgli_list_reverse(mowgli_list_t *l)
 	tn = l->head;
 	l->head = l->tail;
 	l->tail = tn;
+}
+
+/* sorts a list -- O(n ^ 2) most likely, i don't want to think about it. --nenolod */
+void mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opaque)
+{
+	mowgli_node_t *n, *tn, *n2, *tn2;
+
+	return_if_fail(l != NULL);
+	return_if_fail(comp != NULL);
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, l->head)
+	{
+		MOWGLI_LIST_FOREACH_SAFE(n2, tn2, l->head)
+		{
+			int result;
+			int i, i2;
+
+			if (n == n2)
+				continue;
+
+			i = mowgli_node_index(n, l);
+			i2 = mowgli_node_index(n2, l);
+
+			if ((result = comp(n, n2, opaque)) == 0)
+				continue;
+			else if (result < 0 && i > i2)
+			{
+				mowgli_node_delete(n, l);
+				mowgli_node_add_before(n->data, n, l, n2);
+			}
+			else if (result > 0 && i < i2)
+			{
+				mowgli_node_delete(n, l);
+				mowgli_node_add_after(n->data, n, l, n2);
+			}
+		}
+	}
 }

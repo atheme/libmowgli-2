@@ -67,6 +67,7 @@ extern void mowgli_node_free(mowgli_node_t *n);
 extern void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before);
+extern void mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before);
 extern void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int position);
 extern int mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l);
@@ -76,9 +77,12 @@ extern mowgli_list_t *mowgli_node_parent(mowgli_node_t *n);
 extern mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos);
 extern void *mowgli_node_nth_data(mowgli_list_t *l, int pos);
 
+typedef int (*mowgli_list_comparator_t)(mowgli_node_t *n, mowgli_node_t *n2, void *opaque);
+
 extern mowgli_list_t *mowgli_list_create(void);
 extern void mowgli_list_free(mowgli_list_t *l);
 extern void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2);
 extern void mowgli_list_reverse(mowgli_list_t *l);
+extern void mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opaque);
 
 #endif
