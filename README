@@ -30,6 +30,7 @@ It contains:
     - mowgli_heap: An optimistic heap-based memory allocator
     - mowgli_hook: A simple hooks API you can use for your application, which
                    allows for hooks to provide both application data and user data.
+    - mowgli_ioevent: Portable I/O completion ports for many OSes.
     - mowgli_list: A high performance linked lists implementation with O(1) scalability
                    for most common operations.
     - mowgli_logger: An internal class for handling logging of exceptions.
