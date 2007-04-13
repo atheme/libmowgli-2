@@ -34,7 +34,10 @@
 #ifndef __MOWGLI_STAND_H__
 #define __MOWGLI_STAND_H__
 
-#include "mowgli_config.h"
+#ifdef MOWGLI_CORE
+# include "mowgli_config.h"
+#endif
+
 #include "mowgli_stdinc.h"
 
 #include "mowgli_logger.h"
