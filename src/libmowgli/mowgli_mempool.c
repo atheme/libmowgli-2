@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_memorypool.c: Memory pooling.
+ * mowgli_mempool.c: Memory pooling.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -34,7 +34,7 @@
 #include "mowgli.h"
 
 /* visibility of this object is not available to the outside */
-struct mowgli_memorypool_t_ {
+struct mowgli_mempool_t_ {
 	mowgli_list_t stack;
 	mowgli_destructor_t destructor;
 #ifdef NOTYET
@@ -42,11 +42,11 @@ struct mowgli_memorypool_t_ {
 #endif
 };
 
-mowgli_memorypool_t *mowgli_memory_pool_new(void)
+mowgli_mempool_t *mowgli_mempool_new(void)
 {
-	mowgli_memorypool_t *pool;
+	mowgli_mempool_t *pool;
 
-	pool = mowgli_alloc_array(sizeof(mowgli_memorypool_t), 1);
+	pool = mowgli_alloc_array(sizeof(mowgli_mempool_t), 1);
 	pool->destructor = mowgli_free;
 #ifdef NOTYET
 	pool->mutex = mowgli_mutex_new();
@@ -54,11 +54,11 @@ mowgli_memorypool_t *mowgli_memory_pool_new(void)
 	return pool;
 }
 
-mowgli_memorypool_t *mowgli_memory_pool_with_custom_destructor(mowgli_destructor_t destructor)
+mowgli_mempool_t *mowgli_mempool_with_custom_destructor(mowgli_destructor_t destructor)
 {
-	mowgli_memorypool_t *pool;
+	mowgli_mempool_t *pool;
 
-	pool = mowgli_alloc_array(sizeof(mowgli_memorypool_t), 1);
+	pool = mowgli_alloc_array(sizeof(mowgli_mempool_t), 1);
 	pool->destructor = destructor;
 #ifdef NOTYET
 	pool->mutex = mowgli_mutex_new();
@@ -66,7 +66,7 @@ mowgli_memorypool_t *mowgli_memory_pool_with_custom_destructor(mowgli_destructor
 	return pool;
 }
 
-void *mowgli_memory_pool_add(mowgli_memorypool_t * pool, void * ptr)
+void *mowgli_mempool_add(mowgli_mempool_t * pool, void * ptr)
 {
 #ifdef NOTYET
 	mowgli_mutex_lock(pool->mutex);
@@ -79,7 +79,7 @@ void *mowgli_memory_pool_add(mowgli_memorypool_t * pool, void * ptr)
 }
 
 void *
-mowgli_memory_pool_allocate(mowgli_memorypool_t * pool, size_t sz)
+mowgli_mempool_allocate(mowgli_mempool_t * pool, size_t sz)
 {
 	void * addr;
 
@@ -95,7 +95,7 @@ mowgli_memory_pool_allocate(mowgli_memorypool_t * pool, size_t sz)
 }
 
 void
-mowgli_memory_pool_release(mowgli_memorypool_t * pool, void * addr)
+mowgli_mempool_release(mowgli_mempool_t * pool, void * addr)
 {
 	mowgli_node_t *n;
 #ifdef NOTYET
@@ -110,38 +110,38 @@ mowgli_memory_pool_release(mowgli_memorypool_t * pool, void * addr)
 }
 
 static void
-mowgli_memory_pool_cleanup_nolock(mowgli_memorypool_t * pool)
+mowgli_mempool_cleanup_nolock(mowgli_mempool_t * pool)
 {
 	mowgli_node_t *n, *tn;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, pool->stack.head)
 	{
-		mowgli_log("mowgli_memorypool_t<%p> element at %p was not released until cleanup!", pool, n->data);
+		mowgli_log("mowgli_mempool_t<%p> element at %p was not released until cleanup!", pool, n->data);
 		pool->destructor(n->data);
 		mowgli_node_delete(n, &pool->stack);
 	}
 }
 
 void
-mowgli_memory_pool_cleanup(mowgli_memorypool_t * pool)
+mowgli_mempool_cleanup(mowgli_mempool_t * pool)
 {
 #ifdef NOTYET
 	mowgli_mutex_lock(pool->mutex);
 #endif
-	mowgli_memory_pool_cleanup_nolock(pool);
+	mowgli_mempool_cleanup_nolock(pool);
 #ifdef NOTYET
 	mowgli_mutex_unlock(pool->mutex);
 #endif
 }
 
 void
-mowgli_memory_pool_destroy(mowgli_memorypool_t * pool)
+mowgli_mempool_destroy(mowgli_mempool_t * pool)
 {
 #ifdef NOTYET
 	mowgli_mutex_lock(pool->mutex);
 #endif
 
-	mowgli_memory_pool_cleanup_nolock(pool);
+	mowgli_mempool_cleanup_nolock(pool);
 
 #ifdef NOTYET
 	mowgli_mutex_unlock(pool->mutex);
@@ -153,12 +153,12 @@ mowgli_memory_pool_destroy(mowgli_memorypool_t * pool)
 }
 
 char *
-mowgli_memory_pool_strdup(mowgli_memorypool_t * pool, char * src)
+mowgli_mempool_strdup(mowgli_mempool_t * pool, char * src)
 {
 	char *out;
 	size_t sz = strlen(src) + 1;
 
-	out = mowgli_memory_pool_allocate(pool, sz);
+	out = mowgli_mempool_allocate(pool, sz);
 	strncpy(out, src, sz);
 
 	return out;

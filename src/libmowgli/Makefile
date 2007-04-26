@@ -22,7 +22,7 @@ SOURCES = \
 	mowgli_ioevent.c \
 	mowgli_list.c \
 	mowgli_logger.c \
-	mowgli_memorypool.c \
+	mowgli_mempool.c \
 	mowgli_module.c \
 	mowgli_object.c \
 	mowgli_queue.c \
@@ -49,7 +49,7 @@ HEADERS = \
 	mowgli_ioevent.h \
 	mowgli_list.h \
 	mowgli_logger.h \
-	mowgli_memorypool.h \
+	mowgli_mempool.h \
 	mowgli_module.h \
 	mowgli_object.h \
 	mowgli_queue.h \
