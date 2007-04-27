@@ -186,7 +186,7 @@ mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
 		return NULL;
 
 	/* locate the proper position. */
-	for (iter = 0, n = l->head; iter <= pos && n != NULL; iter++, n = n->next);
+	for (iter = 0, n = l->head; iter != pos && n != NULL; iter++, n = n->next);
 
 	return n;
 }
