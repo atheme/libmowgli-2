@@ -58,5 +58,9 @@ typedef struct {
 
 extern mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...);
 extern void mowgli_argstack_init(void);
+extern const char *mowgli_argstack_pop_string(mowgli_argstack_t *);
+extern int mowgli_argstack_pop_numeric(mowgli_argstack_t *);
+extern mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *);
+extern void *mowgli_argstack_pop_pointer(mowgli_argstack_t *);
 
 #endif
