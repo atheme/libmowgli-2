@@ -89,7 +89,7 @@ mowgli_argstack_t *mowgli_argstack_new_from_va_list(const char *descstr, va_list
 			break;
 		default:
 			va_end(va);
-			object_unref(out);
+			mowgli_object_unref(out);
 			mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
 			break;
 		}
