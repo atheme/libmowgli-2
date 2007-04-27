@@ -44,7 +44,7 @@
 /* mowgli_random_t contains state data which is private */
 struct mowgli_random_
 {
-	object_t object;
+	mowgli_object_t object;
 	unsigned int mt[N];
 	size_t mti;
 };

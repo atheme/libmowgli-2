@@ -34,7 +34,7 @@
 
 #include "mowgli.h"
 
-static mowgli_list_t mowgli_object_class_list = {};
+static mowgli_dictionary_t *mowgli_object_class_dict = NULL;
 
 void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic)
 {
@@ -58,12 +58,12 @@ void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mo
 	/* initialize object_class::dynamic */
 	klass->dynamic = dynamic;
 
-	/* add to the object_class index .. this may eventually be better as a dictionary
-	 * at present, however, this creates a circular dependency.
-	 *
-	 *   (to fix: make dictionaries a primitive type, instead of an object class.)
-	 */
-	mowgli_list_add(klass, mowgli_node_create(), &mowgli_object_class_list);
+	/* if the object_class dictionary has not yet been initialized, we will want to do that. */
+	if (mowgli_object_class_dict == NULL)
+		mowgli_object_class_dict = mowgli_dictionary_create(32, strcasecmp);
+
+	/* add to the object_class index */
+	mowgli_dictionary_add(mowgli_object_class_dict, klass->name, klass);
 }
 
 int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_class_t *klass2)
@@ -109,19 +109,7 @@ void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *opdata, m
 
 mowgli_object_class_t *mowgli_object_class_find_by_name(const char *name)
 {
-	mowgli_node_t *n;
-
-	MOWGLI_LIST_FOREACH(n, mowgli_object_class_list.head)
-	{
-		mowgli_object_class_t *klass = (mowgli_object_class_t *) n->data;
-
-		if (!strcasecmp(klass->name, name))
-			return klass;
-	}
-
-	mowgli_log("Unknown class '%s' requested", name);
-
-	return NULL;
+	return mowgli_dictionary_retrieve(mowgli_object_class_dict, name);
 }
 
 void mowgli_object_class_destroy(mowgli_object_class_t *klass)
