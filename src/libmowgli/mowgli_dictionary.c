@@ -66,7 +66,7 @@ mowgli_dictionary_t *mowgli_dictionary_create(const char *name, int resolution, 
 {
 	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
-	mowgli_object_init(&dtree->parent, name, NULL);
+	mowgli_object_init(&dtree->parent, name, NULL, NULL);
 	dtree->resolution = resolution;
 	dtree->hashv      = (mowgli_list_t *) mowgli_alloc_array(sizeof(mowgli_list_t), resolution);
 	dtree->compare_cb = compare_cb;

@@ -41,6 +41,7 @@
  * Inputs:
  *      - pointer to object manager area
  *      - (optional) name of object
+ *      - (optional) class of object
  *      - (optional) custom destructor
  *
  * Outputs:
@@ -49,14 +50,22 @@
  * Side Effects:
  *      - none
  */
-void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_destructor_t des)
+void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t des)
 {
 	return_if_fail(obj != NULL);
 
 	if (name != NULL)
 		obj->name = strdup(name);
 
-	obj->destructor = des;
+	if (klass != NULL)
+		obj->klass = klass;
+	else
+	{
+		mowgli_object_class_t *tmp = mowgli_alloc(sizeof(mowgli_object_class_t));
+		mowgli_object_class_init(tmp, name, des, TRUE);
+		obj->klass = tmp;
+	}
+
 	obj->refcount = 1;
 }
 
@@ -109,9 +118,19 @@ void mowgli_object_unref(void *object)
 		if (obj->name != NULL)
 			free(obj->name);
 
-		if (obj->destructor != NULL)
-			obj->destructor(obj);
+		if (obj->klass != NULL)
+		{
+			mowgli_destructor_t destructor = obj->klass->destructor;
+
+			if (obj->klass->dynamic == TRUE)
+				mowgli_object_class_destroy(obj->klass);
+
+			if (destructor != NULL)
+				destructor(obj);
+			else
+				free(obj);
+		}
 		else
-			free(obj);
+			mowgli_throw_exception(mowgli.object.invalid_object_class_exception);
 	}
 }

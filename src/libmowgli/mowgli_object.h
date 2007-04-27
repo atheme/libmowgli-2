@@ -34,15 +34,13 @@
 #ifndef __MOWGLI_OBJECT_H__
 #define __MOWGLI_OBJECT_H__
 
-typedef void (*mowgli_destructor_t)(void *);
-
 typedef struct {
 	char *name;
 	int refcount;
-	mowgli_destructor_t destructor;
+	mowgli_object_class_t *klass;
 } mowgli_object_t;
 
-extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_destructor_t destructor);
+extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t destructor);
 extern void *mowgli_object_ref(void *);
 extern void mowgli_object_unref(void *);
 
