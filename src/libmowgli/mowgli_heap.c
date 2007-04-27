@@ -174,7 +174,7 @@ void *mowgli_heap_alloc(mowgli_heap_t *heap)
 	}
 	
 	/* this should never happen */
-	mowgli_log("mowgli_heap_alloc() failed to allocate; heap free element count (%d) wrong", heap->free_elems);
+	mowgli_throw_exception_fatal(mowgli.heap.internal_error_exception);
 	
 	return NULL;
 }
@@ -214,9 +214,10 @@ void mowgli_heap_free(mowgli_heap_t *heap, void *data)
 		/* and just in case, check it's not already free'd */
 		dn = mowgli_node_find(data, &b->free_list);
 		
-		return_if_fail(dn == NULL);
+		if (dn != NULL)
+			mowgli_throw_exception(mowgli.heap.block_already_free_exception);
 	}
 	
 	/* this should never happen */
-	mowgli_log("attempt to mowgli_heap_free() data (%p) which doesn't belong to the heap passed (%p)", data, heap);
+	mowgli_throw_exception_fatal(mowgli.heap.invalid_pointer_exception);
 }
