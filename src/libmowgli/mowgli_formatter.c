@@ -40,7 +40,6 @@ static void mowgli_formatter_format_internal(char *buf, size_t bufstr, const cha
 	char *i = buf;
 	const char *fiter = fmtstr;
 	mowgli_argstack_t *stack;
-	va_list va;
 
 	return_if_fail(buf != NULL);
 	return_if_fail(fmtstr != NULL);
@@ -116,6 +115,7 @@ void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const
 
 void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...)
 {
+	va_list va;
 	char buf[65535];
 
 	va_start(va, descstr);
