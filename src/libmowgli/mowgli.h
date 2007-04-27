@@ -61,6 +61,7 @@
 #include "mowgli_error_backtrace.h"
 #include "mowgli_random.h"
 #include "mowgli_ioevent.h"
+#include "mowgli_argstack.h"
 
 #endif
 

@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_init.c: Initialization of libmowgli.
+ * mowgli_argstack.h: Argument stacks.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,10 +31,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-void mowgli_init(void)
-{
-	mowgli_node_init();
-	mowgli_queue_init();
-	mowgli_random_init();
-	mowgli_argstack_init();
-}
+#ifndef __MOWGLI_ARGSTACK_H__
+#define __MOWGLI_ARGSTACK_H__
+
+typedef enum {
+	MOWGLI_ARG_NUMERIC,
+	MOWGLI_ARG_POINTER,
+	MOWGLI_ARG_STRING,
+	MOWGLI_ARG_BOOLEAN
+} mowgli_argstack_element_type_t;
+
+typedef struct {
+	union {
+		int numeric;
+		void *pointer;
+		char *string;
+		mowgli_boolean_t boolean;
+	} data;
+	mowgli_argstack_element_type_t type;
+} mowgli_argstack_element_t;
+
+typedef struct {
+	mowgli_object_t parent;
+	mowgli_list_t stack;
+} mowgli_argstack_t;
+
+extern mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...);
+extern void mowgli_argstack_init(void);
+
+#endif

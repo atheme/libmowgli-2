@@ -12,6 +12,7 @@ CFLAGS += $(PICFLAGS) -I.. -DMOWGLI_CORE
 
 SOURCES = \
 	mowgli_alloc.c \
+	mowgli_argstack.c \
 	mowgli_bitvector.c \
 	mowgli_dictionary.c \
 	mowgli_error_backtrace.c \
@@ -37,6 +38,7 @@ INCLUDEDIR = ${prefix}/include/libmowgli
 HEADERS = \
 	mowgli.h \
 	mowgli_alloc.h \
+	mowgli_argstack.h \
 	mowgli_assert.h \
 	mowgli_bitvector.h \
 	mowgli_config.h \

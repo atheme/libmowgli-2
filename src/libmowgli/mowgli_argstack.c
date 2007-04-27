@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_init.c: Initialization of libmowgli.
+ * mowgli_argstack.c: Argument stacks.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,10 +31,77 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-void mowgli_init(void)
+#include "mowgli.h"
+
+static mowgli_object_class_t klass;
+
+static void mowgli_argstack_destroy(void *vptr)
 {
-	mowgli_node_init();
-	mowgli_queue_init();
-	mowgli_random_init();
-	mowgli_argstack_init();
+	mowgli_argstack_t *self = (mowgli_argstack_t *) vptr;
+	mowgli_node_t *n, *tn;
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->stack.head)
+	{
+		mowgli_free(n->data);
+
+		mowgli_node_delete(n, &self->stack);
+		mowgli_node_free(n);
+	}
+
+	mowgli_free(self);
 }
+
+void mowgli_argstack_init(void)
+{
+	mowgli_object_class_init(&klass, "mowgli_argstack_t", mowgli_argstack_destroy, FALSE);
+}
+
+mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...)
+{
+	mowgli_argstack_t *out = mowgli_alloc(sizeof(mowgli_argstack_t));
+	mowgli_object_init(mowgli_object(out), descstr, &klass, NULL);
+	const char *cp = descstr;
+	va_list va;
+
+	if (descstr == NULL)
+		mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
+
+	va_start(va, descstr);
+
+	while (*cp)
+	{
+		mowgli_argstack_element_t *e = mowgli_alloc(sizeof(mowgli_argstack_element_t));
+
+		switch(*cp)
+		{
+		case 's':
+			e->data.string = va_arg(va, char *);
+			e->type = MOWGLI_ARG_STRING;
+			break;
+		case 'd':
+			e->data.numeric = va_arg(va, int);
+			e->type = MOWGLI_ARG_NUMERIC;
+			break;
+		case 'p':
+			e->data.pointer = va_arg(va, void *);
+			e->type = MOWGLI_ARG_POINTER;
+			break;
+		case 'b':
+			e->data.boolean = va_arg(va, mowgli_boolean_t);
+			e->type = MOWGLI_ARG_BOOLEAN;
+			break;
+		default:
+			va_end(va);
+			object_unref(out);
+			mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
+			break;
+		}
+
+		cp++;
+	}
+
+	va_end(va);
+
+	return out;
+}
+
