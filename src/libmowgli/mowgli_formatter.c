@@ -33,7 +33,7 @@
 
 #include "mowgli.h"
 
-void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...)
+static void mowgli_formatter_format_internal(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, va_list va)
 {
 	char scratch[64];
 	size_t pos = 0;
@@ -45,10 +45,6 @@ void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const
 	return_if_fail(buf != NULL);
 	return_if_fail(fmtstr != NULL);
 	return_if_fail(descstr != NULL);
-
-	va_start(va, descstr);
-	stack = mowgli_argstack_new_from_va_list(descstr, va);
-	va_end(va);
 
 	*i = '\0';
 
@@ -107,4 +103,24 @@ void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const
 		i++;
 		fiter++;
 	}
+}
+
+void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...)
+{
+	va_list va;
+
+	va_start(va, descstr);
+	mowgli_formatter_format_internal(buf, bufstr, fmtstr, descstr, va);
+	va_end(va);
+}
+
+void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...)
+{
+	char buf[65535];
+
+	va_start(va, descstr);
+	mowgli_formatter_format_internal(buf, 65535, fmtstr, descstr, va);
+	va_end(va);
+
+	printf("%s", buf);
 }
