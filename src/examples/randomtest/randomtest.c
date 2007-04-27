@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 		if (i % 5 == 4) printf("\n");
 	}
 
-	mowgli_random_destroy(r);
+	mowgli_object_unref(r);
 
 	return 0;
 }

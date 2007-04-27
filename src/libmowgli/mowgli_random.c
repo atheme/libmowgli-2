@@ -44,9 +44,18 @@
 /* mowgli_random_t contains state data which is private */
 struct mowgli_random_
 {
+	object_t object;
 	unsigned int mt[N];
 	size_t mti;
 };
+
+static mowgli_object_class_t klass;
+
+/* initialization */
+void mowgli_random_init(void)
+{
+	mowgli_object_class_init(&klass, "mowgli_random_t", NULL, FALSE);
+}
 
 /* construction and destruction. */
 mowgli_random_t *mowgli_random_new(void)
@@ -57,14 +66,11 @@ mowgli_random_t *mowgli_random_new(void)
 mowgli_random_t *mowgli_random_new_with_seed(unsigned int seed)
 {
 	mowgli_random_t *out = mowgli_alloc(sizeof(mowgli_random_t));
+	mowgli_object_init(mowgli_object(out), NULL, &klass, NULL);
+
 	mowgli_random_reseed(out, seed);
 
 	return out;
-}
-
-void mowgli_random_destroy(mowgli_random_t *self)
-{
-	mowgli_free(self);
 }
 
 /* reset seed */
