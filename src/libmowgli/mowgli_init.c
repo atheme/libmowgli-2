@@ -35,4 +35,5 @@ void mowgli_init(void)
 {
 	mowgli_node_init();
 	mowgli_queue_init();
+	mowgli_random_init();
 }
