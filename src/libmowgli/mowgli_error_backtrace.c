@@ -61,7 +61,10 @@ mowgli_error_context_destroy(mowgli_error_context_t *e)
 	return_if_fail(e != NULL);
 
 	if (MOWGLI_LIST_LENGTH(&e->bt) == 0)
+	{
+		mowgli_free(e);
 		return;
+	}
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, e->bt.head)
 	{
@@ -70,6 +73,8 @@ mowgli_error_context_destroy(mowgli_error_context_t *e)
 		mowgli_node_delete(n, &e->bt);
 		mowgli_node_free(n);
 	}
+
+	mowgli_free(e);
 }
 
 void
