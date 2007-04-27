@@ -36,8 +36,6 @@
 
 struct mowgli_dictionary_
 {
-	mowgli_object_t parent;
-
 	int resolution;
 	mowgli_list_t *hashv;		/* dynamically allocated by dictionary_create() */
 	int (*compare_cb)(const char *a, const char *b);
@@ -62,11 +60,10 @@ struct mowgli_dictionary_
  *     - if services runs out of memory and cannot allocate the object,
  *       the program will abort.
  */
-mowgli_dictionary_t *mowgli_dictionary_create(const char *name, int resolution, int (*compare_cb)(const char *a, const char *b))
+mowgli_dictionary_t *mowgli_dictionary_create(int resolution, int (*compare_cb)(const char *a, const char *b))
 {
 	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
-	mowgli_object_init(&dtree->parent, name, NULL, NULL);
 	dtree->resolution = resolution;
 	dtree->hashv      = (mowgli_list_t *) mowgli_alloc_array(sizeof(mowgli_list_t), resolution);
 	dtree->compare_cb = compare_cb;

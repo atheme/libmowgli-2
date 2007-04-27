@@ -74,7 +74,7 @@ typedef struct mowgli_dictionary_iteration_state_ mowgli_dictionary_iteration_st
  * compare_cb is the comparison function, typically strcmp, strcasecmp or
  * irccasecmp.
  */
-extern mowgli_dictionary_t *mowgli_dictionary_create(const char *name, int resolution, int (*compare_cb)(const char *a, const char *b));
+extern mowgli_dictionary_t *mowgli_dictionary_create(int resolution, int (*compare_cb)(const char *a, const char *b));
 
 /*
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls
