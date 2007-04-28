@@ -36,5 +36,6 @@
 
 extern void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...);
 extern void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...);
+extern void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, mowgli_argstack_t *stack);
 
 #endif
