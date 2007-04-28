@@ -122,7 +122,7 @@ const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
 	mowgli_argstack_element_t *e;
 
 	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.null_pointer_exception, NULL);
+		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -138,7 +138,7 @@ int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 	mowgli_argstack_element_t *e;
 
 	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.null_pointer_exception, 0);
+		mowgli_throw_exception_val(mowgli.null_pointer_exception, 0);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -154,7 +154,7 @@ mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
 	mowgli_argstack_element_t *e;
 
 	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.null_pointer_exception, FALSE);
+		mowgli_throw_exception_val(mowgli.null_pointer_exception, FALSE);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -170,7 +170,7 @@ void *mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
 	mowgli_argstack_element_t *e;
 
 	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.null_pointer_exception, NULL);
+		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
