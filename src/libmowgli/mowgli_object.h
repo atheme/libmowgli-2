@@ -39,6 +39,7 @@ typedef struct {
 	int refcount;
 	mowgli_object_class_t *klass;
 	mowgli_list_t message_handlers;
+	mowgli_list_t metadata;
 } mowgli_object_t;
 
 extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t destructor);

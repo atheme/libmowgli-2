@@ -29,6 +29,7 @@ SOURCES = \
 	mowgli_object.c \
 	mowgli_object_class.c \
 	mowgli_object_messaging.c \
+	mowgli_object_metadata.c \
 	mowgli_queue.c \
 	mowgli_random.c \
 	mowgli_signal.c
@@ -60,6 +61,7 @@ HEADERS = \
 	mowgli_object.h \
 	mowgli_object_class.h \
 	mowgli_object_messaging.h \
+	mowgli_object_metadata.h \
 	mowgli_queue.h \
 	mowgli_random.h \
 	mowgli_signal.h \

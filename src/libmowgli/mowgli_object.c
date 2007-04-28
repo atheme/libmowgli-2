@@ -67,6 +67,14 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
 	}
 
 	obj->refcount = 1;
+
+	obj->message_handlers.head = NULL;
+	obj->message_handlers.tail = NULL;
+	obj->message_handlers.count = 0;
+
+	obj->metadata.head = NULL;
+	obj->metadata.tail = NULL;
+	obj->metadata.count = 0;
 }
 
 /*
