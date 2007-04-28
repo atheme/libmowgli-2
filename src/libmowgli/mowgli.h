@@ -62,6 +62,7 @@
 #include "mowgli_random.h"
 #include "mowgli_ioevent.h"
 #include "mowgli_argstack.h"
+#include "mowgli_object_messaging.h"
 
 #endif
 

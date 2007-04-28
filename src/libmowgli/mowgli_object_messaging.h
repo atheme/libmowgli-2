@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_object.h: Object management.
+ * mowgli_object_messaging.h: Object event notification and message passing.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,20 +31,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_H__
-#define __MOWGLI_OBJECT_H__
+#ifndef __MOWGLI_OBJECT_MESSAGING_H__
+#define __MOWGLI_OBJECT_MESSAGING_H__
 
-typedef struct {
+typedef struct mowgli_object_message_handler_ mowgli_object_message_handler_t;
+typedef void (*mowgli_object_messaging_func_t)(mowgli_object_t *self, mowgli_object_message_handler_t *sig, mowgli_argstack_t *argstack);
+
+struct mowgli_object_message_handler_ {
 	char *name;
-	int refcount;
-	mowgli_object_class_t *klass;
-	mowgli_list_t message_handlers;
-} mowgli_object_t;
+	char *descstr;
+	mowgli_object_messaging_func_t handler;
+};
 
-extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t destructor);
-extern void *mowgli_object_ref(void *);
-extern void mowgli_object_unref(void *);
-
-#define mowgli_object(x) ((mowgli_object_t *) x)
+extern void mowgli_object_class_message_handler_attach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig);
+extern void mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig);
+extern void mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_object_message_handler_t *sig);
+extern void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_message_handler_t *sig);
+extern void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...);
 
 #endif

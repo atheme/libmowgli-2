@@ -42,6 +42,7 @@ typedef struct {
 	mowgli_list_t derivitives;
 	mowgli_destructor_t destructor;
 	mowgli_boolean_t dynamic;
+	mowgli_list_t message_handlers;
 } mowgli_object_class_t;
 
 extern void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic);
