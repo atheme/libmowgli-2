@@ -42,23 +42,17 @@ struct mowgli_mempool_t_ {
 #endif
 };
 
-mowgli_mempool_t *mowgli_mempool_new(void)
-{
-	mowgli_mempool_t *pool;
-
-	pool = mowgli_alloc_array(sizeof(mowgli_mempool_t), 1);
-	pool->destructor = mowgli_free;
-#ifdef NOTYET
-	pool->mutex = mowgli_mutex_new();
-#endif
-	return pool;
-}
+typedef struct {
+	void *addr;
+	int refcount;
+	mowgli_node_t node;
+} mowgli_mempool_elem_t;
 
 mowgli_mempool_t *mowgli_mempool_with_custom_destructor(mowgli_destructor_t destructor)
 {
 	mowgli_mempool_t *pool;
 
-	pool = mowgli_alloc_array(sizeof(mowgli_mempool_t), 1);
+	pool = mowgli_alloc(sizeof(mowgli_mempool_t));
 	pool->destructor = destructor;
 #ifdef NOTYET
 	pool->mutex = mowgli_mutex_new();
@@ -66,12 +60,22 @@ mowgli_mempool_t *mowgli_mempool_with_custom_destructor(mowgli_destructor_t dest
 	return pool;
 }
 
+mowgli_mempool_t *mowgli_mempool_new(void)
+{
+	return mowgli_mempool_with_custom_destructor(mowgli_free);
+}
+
 void *mowgli_mempool_add(mowgli_mempool_t * pool, void * ptr)
 {
+	mowgli_mempool_elem_t *e = mowgli_alloc(sizeof(mowgli_mempool_elem_t));
+
+	e->addr = ptr;
+	e->refcount = 1;
+
 #ifdef NOTYET
 	mowgli_mutex_lock(pool->mutex);
 #endif
-	mowgli_node_add(ptr, mowgli_node_create(), &pool->stack);
+	mowgli_node_add(e, &e->node, &pool->stack);
 #ifdef NOTYET
 	mowgli_mutex_unlock(pool->mutex);
 #endif
@@ -95,17 +99,52 @@ mowgli_mempool_allocate(mowgli_mempool_t * pool, size_t sz)
 }
 
 void
-mowgli_mempool_release(mowgli_mempool_t * pool, void * addr)
+mowgli_mempool_sustain(mowgli_mempool_t * pool, void * addr)
 {
-	mowgli_node_t *n;
+	mowgli_node_t *n, *tn;
+	mowgli_mempool_elem_t *e;
+
 #ifdef NOTYET
 	mowgli_mutex_lock(pool->mutex);
 #endif
-	n = mowgli_node_find(addr, &pool->stack);
-	mowgli_node_delete(n, &pool->stack);
-	pool->destructor(addr);
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, pool->stack.head)
+	{
+		e = (mowgli_mempool_elem_t *) n->data;
+
+		if (e->addr == addr)
+			++e->refcount;
+	}
+
 #ifdef NOTYET
-	g_mutex_unlock(pool->mutex);
+	mowgli_mutex_unlock(pool->mutex);
+#endif
+}
+
+void
+mowgli_mempool_release(mowgli_mempool_t * pool, void * addr)
+{
+	mowgli_node_t *n, *tn;
+	mowgli_mempool_elem_t *e;
+
+#ifdef NOTYET
+	mowgli_mutex_lock(pool->mutex);
+#endif
+
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, pool->stack.head)
+	{
+		e = (mowgli_mempool_elem_t *) n->data;
+
+		if (e->addr == addr && --e->refcount == 0)
+		{
+			mowgli_node_delete(n, &pool->stack);
+			pool->destructor(addr);
+			mowgli_free(e);
+		}
+	}
+
+#ifdef NOTYET
+	mowgli_mutex_unlock(pool->mutex);
 #endif
 }
 
@@ -116,8 +155,13 @@ mowgli_mempool_cleanup_nolock(mowgli_mempool_t * pool)
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, pool->stack.head)
 	{
-		mowgli_log("mowgli_mempool_t<%p> element at %p was not released until cleanup!", pool, n->data);
-		pool->destructor(n->data);
+		mowgli_mempool_elem_t *e = (mowgli_mempool_elem_t *) n->data;
+
+		/* don't care about refcounting here. we're killing the entire pool. */
+		mowgli_log("mowgli_mempool_t<%p> element at %p was not released until cleanup (refcount: %d)", pool, e->addr, e->refcount);
+		pool->destructor(e->addr);
+		mowgli_free(e);
+
 		mowgli_node_delete(n, &pool->stack);
 	}
 }
