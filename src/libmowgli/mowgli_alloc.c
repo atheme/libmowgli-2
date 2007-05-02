@@ -36,17 +36,17 @@
 /*
  * mowgli_alloc_array:
  *
- * Allocates an array of data that contains "amt" objects,
+ * Allocates an array of data that contains "count" objects,
  * of "size" size.
  *
  * Usually, this wraps calloc().
  *
  * size: size of objects to allocate.
- * amt:  amount of objects to allocate.
+ * count:  amount of objects to allocate.
  */
-void * mowgli_alloc_array(size_t size, size_t amt)
+void * mowgli_alloc_array(size_t size, size_t count)
 {
-	return calloc(size, amt);
+	return calloc(size, count);
 }
 
 /*
