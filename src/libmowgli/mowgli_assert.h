@@ -61,3 +61,15 @@
 	}
 
 #endif
+
+/*
+ * Same as soft_assert, but returns NULL if the value is NULL.
+ */
+#define return_if_null(x)						\
+	if (x == NULL) { 								\
+		mowgli_log("critical: Assertion '%s' failed.", #x);		\
+		return (NULL);							\
+	}
+
+#endif
+
