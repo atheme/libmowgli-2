@@ -86,7 +86,6 @@ void test_integers(void)
 {
 	mowgli_list_t l = {};
 	mowgli_node_t *n, *tn;
-	mowgli_random_t *r = mowgli_random_new();
 	int i;
 
 	mowgli_node_add((void *) 3, mowgli_node_create(), &l);
@@ -94,7 +93,6 @@ void test_integers(void)
 	mowgli_node_add((void *) 4, mowgli_node_create(), &l);
 	mowgli_node_add((void *) 1, mowgli_node_create(), &l);
 
-	mowgli_random_destroy(r);
 	mowgli_list_sort(&l, int_comparator, NULL);
 
 	printf("\nInteger test results\n");
