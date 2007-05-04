@@ -121,7 +121,7 @@ mowgli_queue_remove_data(mowgli_queue_t *head, void *data)
 }
 
 void
-mowgli_queue_free(mowgli_queue_t *head)
+mowgli_queue_destroy(mowgli_queue_t *head)
 {
 	mowgli_queue_t *n, *n2;
 
