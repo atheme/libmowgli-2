@@ -35,7 +35,7 @@
 
 int main(int argc, char *argv[])
 {
-	mowgli_random_t *r = mowgli_random_new();
+	mowgli_random_t *r = mowgli_random_create();
 	int i;
 
 	printf("1000 iterations:\n");
