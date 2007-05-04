@@ -42,8 +42,8 @@ typedef struct mowgli_random_ mowgli_random_t;
 extern void mowgli_random_init(void);
 
 /* construction and destruction. */
-extern mowgli_random_t *mowgli_random_new(void);
-extern mowgli_random_t *mowgli_random_new_with_seed(unsigned int seed);
+extern mowgli_random_t *mowgli_random_create(void);
+extern mowgli_random_t *mowgli_random_create_with_seed(unsigned int seed);
 
 /* reset seed */
 extern void mowgli_random_reseed(mowgli_random_t *self, unsigned int seed);

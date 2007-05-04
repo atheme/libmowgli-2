@@ -129,7 +129,7 @@ void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ..
 		return;
 
 	va_start(va, name);
-	stack = mowgli_argstack_new_from_va_list(sig->descstr, va);
+	stack = mowgli_argstack_create_from_va_list(sig->descstr, va);
 	va_end(va);
 
 	MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)

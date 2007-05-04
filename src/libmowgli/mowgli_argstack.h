@@ -56,8 +56,8 @@ typedef struct {
 	mowgli_list_t stack;
 } mowgli_argstack_t;
 
-extern mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...);
-extern mowgli_argstack_t *mowgli_argstack_new_from_va_list(const char *descstr, va_list va);
+extern mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...);
+extern mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_list va);
 extern void mowgli_argstack_init(void);
 extern const char *mowgli_argstack_pop_string(mowgli_argstack_t *);
 extern int mowgli_argstack_pop_numeric(mowgli_argstack_t *);

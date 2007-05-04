@@ -109,7 +109,7 @@ void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const
 	mowgli_argstack_t *stack;
 
 	va_start(va, descstr);
-	stack = mowgli_argstack_new_from_va_list(descstr, va);
+	stack = mowgli_argstack_create_from_va_list(descstr, va);
 	va_end(va);
 
 	mowgli_formatter_format_from_argstack(buf, bufstr, fmtstr, descstr, stack);
@@ -122,7 +122,7 @@ void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...)
 	mowgli_argstack_t *stack;
 
 	va_start(va, descstr);
-	stack = mowgli_argstack_new_from_va_list(descstr, va);
+	stack = mowgli_argstack_create_from_va_list(descstr, va);
 	va_end(va);
 
 	mowgli_formatter_format_from_argstack(buf, 65535, fmtstr, descstr, stack);

@@ -40,7 +40,7 @@ typedef struct {
 	unsigned int *vector;
 } mowgli_bitvector_t;
 
-extern mowgli_bitvector_t *mowgli_bitvector_new(int bits);
+extern mowgli_bitvector_t *mowgli_bitvector_create(int bits);
 extern void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val);
 extern mowgli_boolean_t mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot);
 extern mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);

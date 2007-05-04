@@ -55,12 +55,12 @@ mowgli_mempool_t *mowgli_mempool_with_custom_destructor(mowgli_destructor_t dest
 	pool = mowgli_alloc(sizeof(mowgli_mempool_t));
 	pool->destructor = destructor;
 #ifdef NOTYET
-	pool->mutex = mowgli_mutex_new();
+	pool->mutex = mowgli_mutex_create();
 #endif
 	return pool;
 }
 
-mowgli_mempool_t *mowgli_mempool_new(void)
+mowgli_mempool_t *mowgli_mempool_create(void)
 {
 	return mowgli_mempool_with_custom_destructor(mowgli_free);
 }

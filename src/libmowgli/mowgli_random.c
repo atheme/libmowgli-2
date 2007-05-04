@@ -58,12 +58,12 @@ void mowgli_random_init(void)
 }
 
 /* construction and destruction. */
-mowgli_random_t *mowgli_random_new(void)
+mowgli_random_t *mowgli_random_create(void)
 {
-	return mowgli_random_new_with_seed(time(NULL));
+	return mowgli_random_create_with_seed(time(NULL));
 }
 
-mowgli_random_t *mowgli_random_new_with_seed(unsigned int seed)
+mowgli_random_t *mowgli_random_create_with_seed(unsigned int seed)
 {
 	mowgli_random_t *out = mowgli_alloc(sizeof(mowgli_random_t));
 	mowgli_object_init(mowgli_object(out), NULL, &klass, NULL);

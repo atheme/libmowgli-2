@@ -36,7 +36,7 @@
 
 typedef struct mowgli_mempool_t_ mowgli_mempool_t;
 
-mowgli_mempool_t * mowgli_mempool_new(void);
+mowgli_mempool_t * mowgli_mempool_create(void);
 mowgli_mempool_t * mowgli_mempool_with_custom_destructor(mowgli_destructor_t destructor);
 
 void * mowgli_mempool_add(mowgli_mempool_t * pool, void * ptr);

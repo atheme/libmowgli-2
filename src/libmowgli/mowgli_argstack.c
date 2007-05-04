@@ -56,7 +56,7 @@ void mowgli_argstack_init(void)
 	mowgli_object_class_init(&klass, "mowgli_argstack_t", mowgli_argstack_destroy, FALSE);
 }
 
-mowgli_argstack_t *mowgli_argstack_new_from_va_list(const char *descstr, va_list va)
+mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 {
 	mowgli_argstack_t *out = mowgli_alloc(sizeof(mowgli_argstack_t));
 	mowgli_object_init(mowgli_object(out), descstr, &klass, NULL);
@@ -101,7 +101,7 @@ mowgli_argstack_t *mowgli_argstack_new_from_va_list(const char *descstr, va_list
 	return out;
 }
 
-mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...)
+mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
 {
 	va_list va;
 	mowgli_argstack_t *out;
@@ -110,7 +110,7 @@ mowgli_argstack_t *mowgli_argstack_new(const char *descstr, ...)
 		mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
 
 	va_start(va, descstr);
-	out = mowgli_argstack_new_from_va_list(descstr, va);
+	out = mowgli_argstack_create_from_va_list(descstr, va);
 	va_end(va);
 
 	return out;

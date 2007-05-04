@@ -33,7 +33,7 @@
 
 #include "mowgli.h"
 
-mowgli_bitvector_t *mowgli_bitvector_new(int bits)
+mowgli_bitvector_t *mowgli_bitvector_create(int bits)
 {
 	mowgli_bitvector_t *bv = (mowgli_bitvector_t *) mowgli_alloc(sizeof(mowgli_bitvector_t));
 
@@ -79,7 +79,7 @@ mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bit
 	bits = bv1->bits > bv2->bits ? bv1->bits : bv2->bits;
 
 	/* create the third bitvector. */
-	out = mowgli_bitvector_new(bits);
+	out = mowgli_bitvector_create(bits);
 
 	/* cache the size of the bitvector in memory. */
 	bs = out->bits / out->divisor;
@@ -105,7 +105,7 @@ mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvect
 	bits = bv1->bits > bv2->bits ? bv1->bits : bv2->bits;
 
 	/* create the third bitvector. */
-	out = mowgli_bitvector_new(bits);
+	out = mowgli_bitvector_create(bits);
 
 	/* cache the size of the bitvector in memory. */
 	bs = out->bits / out->divisor;
