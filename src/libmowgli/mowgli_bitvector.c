@@ -33,9 +33,17 @@
 
 #include "mowgli.h"
 
+static mowgli_object_class_t klass;
+
+void mowgli_bitvector_init(void)
+{
+	mowgli_object_class_init(&klass, "mowgli_bitvector_t", mowgli_free, FALSE);
+}
+
 mowgli_bitvector_t *mowgli_bitvector_create(int bits)
 {
 	mowgli_bitvector_t *bv = (mowgli_bitvector_t *) mowgli_alloc(sizeof(mowgli_bitvector_t));
+	mowgli_object_init(mowgli_object(bv), "mowgli_bitvector_t", &klass, NULL);
 
 	bv->bits    = bits;
 	bv->divisor = sizeof(int);
