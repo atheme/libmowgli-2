@@ -35,6 +35,20 @@
 
 static mowgli_object_class_t klass;
 
+/*
+ * mowgli_argstack_destroy(void *vptr)
+ *
+ * Private destructor for the mowgli_argstack_t object.
+ *
+ * Inputs:
+ *       - pointer to mowgli_argstack_t to destroy.
+ *
+ * Outputs:
+ *       - nothing
+ *
+ * Side Effects:
+ *       - none
+ */
 static void mowgli_argstack_destroy(void *vptr)
 {
 	mowgli_argstack_t *self = (mowgli_argstack_t *) vptr;
@@ -51,11 +65,45 @@ static void mowgli_argstack_destroy(void *vptr)
 	mowgli_free(self);
 }
 
+/*
+ * mowgli_argstack_init(void)
+ *
+ * Initialization code for the mowgli.argstack library.
+ *
+ * Inputs:
+ *       - none
+ *
+ * Outputs:
+ *       - none
+ *
+ * Side Effects:
+ *       - the mowgli_argstack_t object class is registered.
+ */
 void mowgli_argstack_init(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_argstack_t", mowgli_argstack_destroy, FALSE);
 }
 
+/*
+ * mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
+ *
+ * Creates an argument stack from a va_list and an appropriate description schema.
+ *
+ * Inputs:
+ *       - a description string which describes the argument stack, where:
+ *         + the character 's' means that the value for that slot is a string
+ *         + the character 'd' means that the value for that slot is a numeric
+ *         + the character 'p' means that the value for that slot is a generic pointer
+ *         + the character 'b' means that the value for that slot is a boolean
+ *       - a va_list containing data to populate the argument stack with.
+ *
+ * Outputs:
+ *       - on success, an argument stack object.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - none
+ */
 mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 {
 	mowgli_argstack_t *out = mowgli_alloc(sizeof(mowgli_argstack_t));
@@ -101,6 +149,26 @@ mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_l
 	return out;
 }
 
+/*
+ * mowgli_argstack_create(const char *descstr, ...)
+ *
+ * Creates an argument stack.
+ *
+ * Inputs:
+ *       - a description string which describes the argument stack, where:
+ *         + the character 's' means that the value for that slot is a string
+ *         + the character 'd' means that the value for that slot is a numeric
+ *         + the character 'p' means that the value for that slot is a generic pointer
+ *         + the character 'b' means that the value for that slot is a boolean
+ *       - additional arguments to place in the argument stack
+ *
+ * Outputs:
+ *       - on success, an argument stack object.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - none
+ */
 mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
 {
 	va_list va;
@@ -116,6 +184,21 @@ mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
 	return out;
 }
 
+/*
+ * mowgli_argstack_pop_string(mowgli_argstack_t *self)
+ *
+ * Convenience function to pop a string value off of an argument stack.
+ *
+ * Inputs:
+ *       - mowgli_argstack_t object to pop a string off of.
+ *
+ * Outputs:
+ *       - on success, a string.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - the argument is removed from the argstack.
+ */
 const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
 {
 	mowgli_node_t *n;
@@ -132,6 +215,21 @@ const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
 	return e->data.string;
 }
 
+/*
+ * mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
+ *
+ * Convenience function to pop a numeric value off of an argument stack.
+ *
+ * Inputs:
+ *       - mowgli_argstack_t object to pop a numeric off of.
+ *
+ * Outputs:
+ *       - on success, a numeric.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - the argument is removed from the argstack.
+ */
 int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 {
 	mowgli_node_t *n;
@@ -148,6 +246,21 @@ int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 	return e->data.numeric;
 }
 
+/*
+ * mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
+ *
+ * Convenience function to pop a boolean value off of an argument stack.
+ *
+ * Inputs:
+ *       - mowgli_argstack_t object to pop a boolean off of.
+ *
+ * Outputs:
+ *       - on success, a boolean.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - the argument is removed from the argstack.
+ */
 mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
 {
 	mowgli_node_t *n;
@@ -164,6 +277,21 @@ mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
 	return e->data.boolean;
 }
 
+/*
+ * mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
+ *
+ * Convenience function to pop a pointer value off of an argument stack.
+ *
+ * Inputs:
+ *       - mowgli_argstack_t object to pop a pointer off of.
+ *
+ * Outputs:
+ *       - on success, a pointer.
+ *       - on failure, NULL.
+ *
+ * Side Effects:
+ *       - the argument is removed from the argstack.
+ */
 void *mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
 {
 	mowgli_node_t *n;
