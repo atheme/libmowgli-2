@@ -34,11 +34,21 @@
 #ifndef __MOWGLI_STAND_H__
 #define __MOWGLI_STAND_H__
 
+#ifdef __cplusplus
+# define MOWGLI_DECLS_START extern "C" {
+# define MOWGLI_DECLS_END   };
+#else
+# define MOWGLI_DECLS_START
+# define MOWGLI_DECLS_END
+#endif
+
 #ifdef MOWGLI_CORE
 # include "mowgli_config.h"
 #endif
 
 #include "mowgli_stdinc.h"
+
+MOWGLI_DECLS_START
 
 #include "mowgli_logger.h"
 #include "mowgli_assert.h"
@@ -64,6 +74,8 @@
 #include "mowgli_argstack.h"
 #include "mowgli_object_messaging.h"
 #include "mowgli_object_metadata.h"
+
+MOWGLI_DECLS_END
 
 #endif
 
