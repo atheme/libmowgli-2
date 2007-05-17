@@ -32,7 +32,8 @@ SOURCES = \
 	mowgli_object_metadata.c \
 	mowgli_queue.c \
 	mowgli_random.c \
-	mowgli_signal.c
+	mowgli_signal.c \
+	mowgli_spinlock.c
 
 OBJECTS = ${SOURCES:.c=.o}
 
@@ -65,6 +66,7 @@ HEADERS = \
 	mowgli_queue.h \
 	mowgli_random.h \
 	mowgli_signal.h \
+	mowgli_spinlock.h \
 	mowgli_stdinc.h
 
 include ../../mk/objective.mk
