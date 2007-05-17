@@ -75,6 +75,8 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
 	obj->metadata.head = NULL;
 	obj->metadata.tail = NULL;
 	obj->metadata.count = 0;
+
+	mowgli_object_message_broadcast(obj, "create");
 }
 
 /*
@@ -123,6 +125,8 @@ void mowgli_object_unref(void *object)
 
 	if (obj->refcount <= 0)
 	{
+		mowgli_object_message_broadcast(obj, "destroy");
+
 		if (obj->name != NULL)
 			free(obj->name);
 
