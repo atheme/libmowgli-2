@@ -33,19 +33,6 @@
 
 #include "mowgli.h"
 
-#if 0
-typedef struct {
-	void *read_owner;	/* opaque data representing a spinlock's owner */
-	void *write_owner;	/* opaque data representing a spinlock's owner */
-} mowgli_spinlock_t;
-
-typedef enum {
-	MOWGLI_SPINLOCK_READ,
-	MOWGLI_SPINLOCK_WRITE,
-	MOWGLI_SPINLOCK_READWRITE
-} mowgli_spinlock_lock_param_t;
-#endif
-
 mowgli_spinlock_t *mowgli_spinlock_create(void)
 {
 	mowgli_spinlock_t *out = mowgli_alloc(sizeof(mowgli_spinlock_t));
@@ -56,6 +43,12 @@ mowgli_spinlock_t *mowgli_spinlock_create(void)
 void mowgli_spinlock_lock(mowgli_spinlock_t *self, void *r, void *w)
 {
 	return_if_fail(self != NULL);
+
+	if (r)
+		mowgli_spinlock_wait(self, MOWGLI_SPINLOCK_READ);
+
+	if (w)
+		mowgli_spinlock_wait(self, MOWGLI_SPINLOCK_WRITE);
 
 	if (r && (self->read_owner == NULL || self->read_owner == r))
 		self->read_owner = r;
