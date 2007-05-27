@@ -17,6 +17,7 @@ SOURCES = \
 	mowgli_dictionary.c \
 	mowgli_error_backtrace.c \
 	mowgli_formatter.c \
+	mowgli_global_storage.c \
 	mowgli_hash.c \
 	mowgli_heap.c \
 	mowgli_hook.c \

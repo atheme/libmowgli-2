@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_global_storage.h: Simple key->value global storage tool.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -31,53 +31,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#ifndef MOWGLI_GLOBAL_STORAGE_H
+#define MOWGLI_GLOBAL_STORAGE_H
 
-#ifdef __cplusplus
-# define MOWGLI_DECLS_START extern "C" {
-# define MOWGLI_DECLS_END   };
-#else
-# define MOWGLI_DECLS_START
-# define MOWGLI_DECLS_END
-#endif
-
-#ifdef MOWGLI_CORE
-# include "mowgli_config.h"
-#endif
-
-#include "mowgli_stdinc.h"
-
-MOWGLI_DECLS_START
-
-#include "mowgli_logger.h"
-#include "mowgli_assert.h"
-#include "mowgli_exception.h"
-
-#include "mowgli_alloc.h"
-#include "mowgli_spinlock.h"
-#include "mowgli_list.h"
-#include "mowgli_object_class.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_mempool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
-#include "mowgli_signal.h"
-#include "mowgli_error_backtrace.h"
-#include "mowgli_random.h"
-#include "mowgli_ioevent.h"
-#include "mowgli_argstack.h"
-#include "mowgli_object_messaging.h"
-#include "mowgli_object_metadata.h"
-#include "mowgli_global_storage.h"
-
-MOWGLI_DECLS_END
+extern void mowgli_global_storage_init(void);
+extern void *mowgli_global_storage_get(char *name);
+extern void mowgli_global_storage_put(char *name, void *value);
+extern void mowgli_global_storage_free(char *name);
 
 #endif
-
