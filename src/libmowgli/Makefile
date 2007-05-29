@@ -51,6 +51,7 @@ HEADERS = \
 	mowgli_error_backtrace.h \
 	mowgli_exception.h \
 	mowgli_formatter.h \
+	mowgli_global_storage.h \
 	mowgli_hash.h \
 	mowgli_heap.h \
 	mowgli_hook.h \
