@@ -1,8 +1,9 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli.h: Base header for libmowgli. Includes everything.
+ * mowgli_string.c: Immutable string buffers with cheap manipulation.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007 Pippijn van Steenhoven <pippijn -at- one09.net>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -31,54 +32,66 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#include "mowgli.h"
 
-#ifdef __cplusplus
-# define MOWGLI_DECLS_START extern "C" {
-# define MOWGLI_DECLS_END   };
-#else
-# define MOWGLI_DECLS_START
-# define MOWGLI_DECLS_END
-#endif
+mowgli_string_t *mowgli_string_create(void)
+{
+	mowgli_string_t *self = mowgli_alloc(sizeof(mowgli_string_t));
 
-#ifdef MOWGLI_CORE
-# include "mowgli_config.h"
-#endif
+	self->size = 64;
+	self->pos = 0;
+	self->str = mowgli_alloc(self->size);
 
-#include "mowgli_stdinc.h"
+	self->append = &mowgli_string_append;
+	self->append_char = &mowgli_string_append_char;
+	self->reset = &mowgli_string_reset;
+	self->destroy = &mowgli_string_destroy;
 
-MOWGLI_DECLS_START
+	return self;
+}
 
-#include "mowgli_logger.h"
-#include "mowgli_assert.h"
-#include "mowgli_exception.h"
+void mowgli_string_reset(mowgli_string_t *self)
+{
+	return_if_fail(self != NULL);
 
-#include "mowgli_alloc.h"
-#include "mowgli_spinlock.h"
-#include "mowgli_list.h"
-#include "mowgli_object_class.h"
-#include "mowgli_object.h"
-#include "mowgli_dictionary.h"
-#include "mowgli_mempool.h"
-#include "mowgli_module.h"
-#include "mowgli_queue.h"
-#include "mowgli_hash.h"
-#include "mowgli_heap.h"
-#include "mowgli_init.h"
-#include "mowgli_bitvector.h"
-#include "mowgli_hook.h"
-#include "mowgli_signal.h"
-#include "mowgli_error_backtrace.h"
-#include "mowgli_random.h"
-#include "mowgli_ioevent.h"
-#include "mowgli_argstack.h"
-#include "mowgli_object_messaging.h"
-#include "mowgli_object_metadata.h"
-#include "mowgli_global_storage.h"
-#include "mowgli_string.h"
+	self->str[0] = self->pos = 0;
+}
 
-MOWGLI_DECLS_END
+void mowgli_string_destroy(mowgli_string_t *self)
+{
+	return_if_fail(self != NULL);
 
-#endif
+	mowgli_free(self->str);
+	mowgli_free(self);
+}
 
+void mowgli_string_append(mowgli_string_t *self, const char *src, size_t n)
+{
+	if (self->size - self->pos <= n)
+	{
+		char *new;
+
+		self->size = MAX(self->size * 2, self->pos + n + 8);
+		new = realloc(self->str, self->size);
+		self->str = new;
+	}
+
+	memcpy(self->str + self->pos, src, n);
+	self->pos += n;
+	self->str[self->pos] = 0;
+}
+
+void mowgli_string_append_char(mowgli_string_t *self, const char c)
+{
+	if (self->size - self->pos <= 1)
+	{
+		char *new;
+
+		self->size = MAX(self->size * 2, self->pos + 9);
+		new = realloc(self->str, self->size);
+		self->str = new;
+	}
+
+	self->str[self->pos++] = c;
+	self->str[self->pos] = 0;
+}
