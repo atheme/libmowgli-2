@@ -91,4 +91,13 @@
 
 typedef enum { FALSE, TRUE } mowgli_boolean_t;
 
+/* Macros for min/max.  */
+#ifndef MIN
+# define MIN(a,b) (((a)<(b))?(a):(b))
+#endif
+
+#ifndef MAX
+# define MAX(a,b) (((a)>(b))?(a):(b))
+#endif
+
 #endif
