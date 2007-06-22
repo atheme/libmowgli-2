@@ -38,4 +38,5 @@ void mowgli_init(void)
 	mowgli_random_init();
 	mowgli_argstack_init();
 	mowgli_bitvector_init();
+	mowgli_global_storage_init();
 }
