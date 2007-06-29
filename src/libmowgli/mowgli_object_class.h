@@ -54,4 +54,18 @@ extern void mowgli_object_class_destroy(mowgli_object_class_t *klass);
 
 #define MOWGLI_REINTERPRET_CAST(object, klass) (klass *) mowgli_object_class_reinterpret_impl(object, mowgli_object_class_find_by_name( # klass ));
 
+#define mowgli_forced_cast(from_type, to_type, from, to)\
+do {                                                    \
+  union cast_union                                      \
+  {                                                     \
+    to_type   out;                                      \
+    from_type in;                                       \
+  } u;                                                  \
+  typedef int cant_use_union_cast[                      \
+    sizeof (from_type) == sizeof (u)                    \
+    && sizeof (from_type) == sizeof (to_type) ? 1 : -1];\
+  u.in = from;                                          \
+  to = u.out;                                           \
+} while (0)
+
 #endif
