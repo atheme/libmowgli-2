@@ -92,9 +92,6 @@ mowgli_dictionary_t *mowgli_dictionary_create(int resolution, int (*compare_cb)(
  * Notes:
  *     - if this is called without a callback, the objects bound to the
  *       DTree will not be destroyed.
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 	void (*destroy_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
@@ -102,6 +99,8 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 {
 	mowgli_node_t *n, *tn;
 	int i;
+
+	return_if_fail(dtree != NULL);
 
 	for (i = 0; i < dtree->resolution; i++)
 	{
@@ -140,9 +139,6 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
  *
  * Side Effects:
  *     - on success, a dtree is iterated
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
 	int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
@@ -150,6 +146,8 @@ void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
 {
 	mowgli_node_t *n, *tn;
 	int i, ret = 0;
+
+	return_if_fail(dtree != NULL);
 
 	for (i = 0; i < dtree->resolution && ret == 0; i++)
 	{
@@ -182,9 +180,6 @@ void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
  *
  * Side Effects:
  *     - a dtree is iterated until the requested conditions are met
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
 	void *(*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
@@ -193,6 +188,8 @@ void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
 	mowgli_node_t *n, *tn;
 	int i;
 	void *ret = NULL;
+
+	return_if_fail(dtree != NULL);
 
 	for (i = 0; i < dtree->resolution && ret == NULL; i++)
 	{
@@ -224,16 +221,17 @@ void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
  *
  * Side Effects:
  *     - the static iterator, &state, is initialized.
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
 	mowgli_dictionary_iteration_state_t *state)
 {
+	return_if_fail(dtree != NULL);
+	return_if_fail(state != NULL);
+
 	state->bucket = 0;
 	state->cur = NULL;
 	state->next = NULL;
+
 	/* find first item */
 	while (state->bucket < dtree->resolution)
 	{
@@ -242,8 +240,10 @@ void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
 			break;
 		state->bucket++;
 	}
+
 	if (state->cur == NULL)
 		return;
+
 	/* make state->cur point to first item and state->next point to
 	 * second item */
 	state->next = state->cur;
@@ -266,13 +266,13 @@ void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
  *
  * Side Effects:
  *     - none
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree,
 	mowgli_dictionary_iteration_state_t *state)
 {
+	return_val_if_fail(dtree != NULL, NULL);
+	return_val_if_fail(state != NULL, NULL);
+
 	return state->cur != NULL ? state->cur->node.data : NULL;
 }
 
@@ -291,13 +291,13 @@ void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree,
  *
  * Side Effects:
  *     - the static iterator, &state, is advanced to a new DTree node.
- *
- * Bugs:
- *     - this function assumes that the given dtree reference is valid.
  */
 void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
 	mowgli_dictionary_iteration_state_t *state)
 {
+	return_if_fail(dtree != NULL);
+	return_if_fail(state != NULL);
+
 	if (state->cur == NULL)
 	{
 		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", dtree);
