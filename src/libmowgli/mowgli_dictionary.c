@@ -540,7 +540,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, cons
 	/* retune for key, key will be the tree's root if it's available */
 	mowgli_dictionary_retune(dict, key);
 
-	if (!dict->compare_cb(key, dict->root->key))
+	if (dict->root && !dict->compare_cb(key, dict->root->key))
 		return dict->root;
 
 	return NULL;
