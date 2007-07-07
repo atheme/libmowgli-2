@@ -60,7 +60,7 @@ void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mo
 
 	/* if the object_class dictionary has not yet been initialized, we will want to do that. */
 	if (mowgli_object_class_dict == NULL)
-		mowgli_object_class_dict = mowgli_dictionary_create(32, strcasecmp);
+		mowgli_object_class_dict = mowgli_dictionary_create(strcasecmp);
 
 	/* add to the object_class index */
 	mowgli_dictionary_add(mowgli_object_class_dict, klass->name, klass);
