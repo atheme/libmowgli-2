@@ -575,6 +575,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 
 	delem = (mowgli_dictionary_elem_t *) mowgli_alloc(sizeof(mowgli_dictionary_elem_t));
 	delem->key = strdup(key);
+	delem->data = data;
 
 	mowgli_dictionary_link(dict, delem);
 
