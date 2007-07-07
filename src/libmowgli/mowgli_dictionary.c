@@ -39,7 +39,6 @@ struct mowgli_dictionary_
 	int resolution;
 	mowgli_list_t *hashv;		/* dynamically allocated by dictionary_create() */
 	int (*compare_cb)(const char *a, const char *b);
-	mowgli_node_t node;
 };
 
 /*
