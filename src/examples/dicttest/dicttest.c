@@ -36,16 +36,39 @@
 int main(int argc, const char *argv[])
 {
 	mowgli_dictionary_t *test_dict;
-	char *key = "test1";
+	mowgli_random_t *r;
+	char key[10];
+	int ans[100], i;
+	int pass = 0, fail = 0;
 
 	mowgli_init();
 
 	test_dict = mowgli_dictionary_create(strcasecmp);
+	r = mowgli_random_create();
 
-	mowgli_dictionary_add(test_dict, key, 0xdeadbeef);
+	for (i = 0; i < 100; i++)
+	{
+		ans[i] = mowgli_random_int(r);
+		snprintf(key, 10, "%dkey%d", i, i);
+		mowgli_dictionary_add(test_dict, key, (void *) ans[i]);
+	}
 
-	if ((int) mowgli_dictionary_retrieve(test_dict, "test1") != 0xdeadbeef)
-		printf("FAIL 1 %p\n", mowgli_dictionary_retrieve(test_dict, "test1"));
+	for (i = 0; i < 100; i++)
+	{
+		snprintf(key, 10, "%dkey%d", i, i);
 
+		if ((int) mowgli_dictionary_retrieve(test_dict, key) != ans[i])
+		{
+			printf("FAIL %d %p[%p]\n", i, mowgli_dictionary_retrieve(test_dict, key), ans[i]);
+			fail++;
+		}
+		else
+		{
+			printf("PASS %d %p[%p]\n", i, mowgli_dictionary_retrieve(test_dict, key), ans[i]);
+			pass++;
+		}
+	}
+
+	printf("%d tests failed, %d tests passed.\n", fail, pass);
 	return 0;
 }

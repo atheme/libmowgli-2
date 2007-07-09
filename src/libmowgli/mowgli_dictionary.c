@@ -273,6 +273,7 @@ mowgli_dictionary_unlink(mowgli_dictionary_t *dict,
 	{
 		dict->root = dict->root->left;
 		mowgli_dictionary_retune(dict, delem->key);
+		new_root = dict->root;
 		new_root->right = dict->root->right;
 	}
 
