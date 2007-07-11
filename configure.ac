@@ -6,8 +6,10 @@ AC_INIT([libmowgli], [0.3.0], [bugs+libmowgli@atheme.org])
 AC_CONFIG_SRCDIR([src/libmowgli/mowgli_alloc.c])
 AC_CONFIG_HEADER([src/libmowgli/mowgli_config.h])
 
-# Checks for programs.
 AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+# Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
