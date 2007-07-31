@@ -34,6 +34,8 @@
 
 #include "mowgli.h"
 
+static mowgli_heap_t *elem_heap = NULL;
+
 struct mowgli_dictionary_
 {
 	int (*compare_cb)(const char *a, const char *b);
@@ -63,6 +65,9 @@ mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, c
 
 	dtree->compare_cb = compare_cb;
 
+	if (!elem_heap)
+		elem_heap = mowgli_heap_create(1024, sizeof(mowgli_dictionary_elem_t));
+
 	return dtree;
 }
 
@@ -90,6 +95,9 @@ mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
 
 	dtree->compare_cb = compare_cb;
 	dtree->id = strdup(name);
+
+	if (!elem_heap)
+		elem_heap = mowgli_heap_create(1024, sizeof(mowgli_dictionary_elem_t));
 
 	return dtree;
 }
@@ -300,7 +308,7 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict,
 			dict->root->data = delem->data;
 			dict->count--;
 
-			mowgli_free(delem);
+			mowgli_heap_free(elem_heap, delem);
 		}
 	}
 }
@@ -645,7 +653,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 	return_val_if_fail(data != NULL, NULL);
 	return_val_if_fail(mowgli_dictionary_find(dict, key) == NULL, NULL);
 
-	delem = (mowgli_dictionary_elem_t *) mowgli_alloc(sizeof(mowgli_dictionary_elem_t));
+	delem = mowgli_heap_alloc(elem_heap);
 	delem->key = strdup(key);
 	delem->data = data;
 
@@ -685,7 +693,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
 	data = delem->data;
 
 	mowgli_dictionary_unlink(dtree, delem);
-	mowgli_free(delem);	
+	mowgli_heap_free(elem_heap, delem);	
 
 	return data;
 }
