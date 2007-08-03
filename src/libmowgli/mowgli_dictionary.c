@@ -406,7 +406,8 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 		if (destroy_cb != NULL)
 			(*destroy_cb)(n, privdata);
 
-		mowgli_free(n);
+		mowgli_free(n->key);
+		mowgli_heap_free(mowgli_elem_heap, n);
 	}
 
 	mowgli_free(dtree);
@@ -687,6 +688,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
 
 	data = delem->data;
 
+	mowgli_free(delem->key);
 	mowgli_dictionary_unlink_root(dtree);
 	mowgli_heap_free(elem_heap, delem);	
 
