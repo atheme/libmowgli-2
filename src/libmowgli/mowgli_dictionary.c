@@ -407,7 +407,7 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 			(*destroy_cb)(n, privdata);
 
 		mowgli_free(n->key);
-		mowgli_heap_free(mowgli_elem_heap, n);
+		mowgli_heap_free(elem_heap, n);
 	}
 
 	mowgli_free(dtree);
