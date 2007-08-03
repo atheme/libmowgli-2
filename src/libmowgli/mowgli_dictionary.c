@@ -653,6 +653,13 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 	delem->key = strdup(key);
 	delem->data = data;
 
+	if (delem->key == NULL)
+	{
+		mowgli_log("major WTF: delem->key is NULL, not adding node.", key);
+		mowgli_heap_free(elem_heap, delem);
+		return NULL;
+	}
+
 	mowgli_dictionary_link(dict, delem);
 
 	return delem;
