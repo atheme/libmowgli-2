@@ -66,7 +66,7 @@ mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, c
 	dtree->compare_cb = compare_cb;
 
 	if (!elem_heap)
-		elem_heap = mowgli_heap_create(1024, sizeof(mowgli_dictionary_elem_t));
+		elem_heap = mowgli_heap_create(sizeof(mowgli_dictionary_elem_t), 1024, BH_NOW);
 
 	return dtree;
 }
@@ -97,7 +97,7 @@ mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
 	dtree->id = strdup(name);
 
 	if (!elem_heap)
-		elem_heap = mowgli_heap_create(1024, sizeof(mowgli_dictionary_elem_t));
+		elem_heap = mowgli_heap_create(sizeof(mowgli_dictionary_elem_t), 1024, BH_NOW);
 
 	return dtree;
 }
