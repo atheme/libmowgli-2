@@ -105,8 +105,6 @@ mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...)
 void
 mowgli_error_context_pop(mowgli_error_context_t *e)
 {
-	mowgli_queue_t *q;
-
 	return_if_fail(e != NULL);
 
 	mowgli_node_delete(e->bt.tail, &e->bt);

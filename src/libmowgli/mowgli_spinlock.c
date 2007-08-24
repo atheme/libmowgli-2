@@ -107,7 +107,7 @@ void mowgli_spinlock_timed_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_pa
 		}
 
 	if (param == MOWGLI_SPINLOCK_READWRITE)
-		while (self->write_owner != NULL || self->read_owner != NULL && iter.tv_sec < tv->tv_sec && iter.tv_usec < tv->tv_usec)
+		while ((self->write_owner != NULL || self->read_owner != NULL) && iter.tv_sec < tv->tv_sec && iter.tv_usec < tv->tv_usec)
 		{
 			gettimeofday(&iter, NULL);
 			usleep(1000);	

@@ -31,6 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "mowgli.h"
+
 void mowgli_init(void)
 {
 	mowgli_node_init();

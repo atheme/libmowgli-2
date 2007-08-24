@@ -407,7 +407,6 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 	void *privdata)
 {
 	mowgli_dictionary_elem_t *n, *tn;
-	int i;
 
 	return_if_fail(dtree != NULL);
 
@@ -483,10 +482,9 @@ void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
 	void *privdata)
 {
 	mowgli_dictionary_elem_t *n, *tn;
-	int i;
 	void *ret = NULL;
 
-	return_if_fail(dtree != NULL);
+	return_val_if_fail(dtree != NULL, NULL);
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, dtree->head)
 	{
@@ -652,7 +650,6 @@ mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, cons
 mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const char *key, void *data)
 {
 	mowgli_dictionary_elem_t *delem;
-	int i;
 
 	return_val_if_fail(dict != NULL, NULL);
 	return_val_if_fail(key != NULL, NULL);
@@ -698,7 +695,6 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
 {
 	mowgli_dictionary_elem_t *delem = mowgli_dictionary_find(dtree, key);
 	void *data;
-	int i;
 
 	if (delem == NULL)
 		return NULL;

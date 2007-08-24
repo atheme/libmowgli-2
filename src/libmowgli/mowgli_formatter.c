@@ -35,7 +35,6 @@
 
 void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, mowgli_argstack_t *stack)
 {
-	char scratch[64];
 	size_t pos = 0;
 	char *i = buf;
 	const char *fiter = fmtstr;

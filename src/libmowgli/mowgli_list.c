@@ -214,7 +214,6 @@ void *mowgli_node_nth_data(mowgli_list_t *l, int pos)
 /* inserts a node at `position` position. */
 void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int pos)
 {
-	int iter;
 	mowgli_node_t *tn;
 
 	return_if_fail(n != NULL);

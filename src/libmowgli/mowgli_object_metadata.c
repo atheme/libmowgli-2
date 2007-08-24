@@ -35,7 +35,7 @@
 
 void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
 {
-	mowgli_object_metadata_entry_t *e;
+	mowgli_object_metadata_entry_t *e = NULL;
 	mowgli_node_t *n;
 
 	if (self == NULL)
@@ -97,10 +97,10 @@ void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 	mowgli_node_t *n;
 
 	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_metadata.invalid_object_exception);
+		mowgli_throw_exception_val(mowgli.object_metadata.invalid_object_exception, NULL);
 
 	if (key == NULL)
-		mowgli_throw_exception(mowgli.null_pointer_exception);
+		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
