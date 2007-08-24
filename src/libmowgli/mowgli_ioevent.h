@@ -35,7 +35,7 @@
 #define __MOWGLI_IOEVENT_H__
 
 typedef struct {
-	void *impldata;	/* implementation-specific data */
+	int impldata;	/* implementation-specific data: this is almost always an FD */
 } mowgli_ioevent_handle_t;
 
 typedef enum {
