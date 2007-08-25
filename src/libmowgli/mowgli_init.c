@@ -35,6 +35,11 @@
 
 void mowgli_init(void)
 {
+	static int mowgli_initted_ = 0;
+
+	if (mowgli_initted_)
+		return;
+
 	mowgli_node_init();
 	mowgli_queue_init();
 	mowgli_argstack_init();
@@ -42,4 +47,6 @@ void mowgli_init(void)
 	mowgli_global_storage_init();
 	mowgli_hook_init();
 	mowgli_random_init();
+
+	mowgli_initted_++;
 }
