@@ -80,6 +80,31 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
 }
 
 /*
+ * mowgli_object_init_from_class
+ *
+ * Populates the object manager part of an object from an object class.
+ *
+ * Inputs:
+ *      - pointer to object manager area
+ *      - class of object
+ *
+ * Outputs:
+ *      - none
+ *
+ * Side Effects:
+ *      - none
+ */
+void
+mowgli_object_init_from_class(mowgli_object_t *obj, const char *name,
+	mowgli_object_class_t *klass)
+{
+	return_if_fail(obj != NULL);
+	return_if_fail(klass != NULL);
+
+	mowgli_object_init(obj, name, klass, NULL);
+}
+
+/*
  * mowgli_object_ref
  *
  * Increment the reference counter on an object.

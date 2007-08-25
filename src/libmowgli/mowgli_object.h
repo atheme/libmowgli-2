@@ -43,6 +43,7 @@ typedef struct {
 } mowgli_object_t;
 
 extern void mowgli_object_init(mowgli_object_t *, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t destructor);
+extern void mowgli_object_init_from_class(mowgli_object_t *, const char *, mowgli_object_class_t *klass);
 extern void *mowgli_object_ref(void *);
 extern void mowgli_object_unref(void *);
 
