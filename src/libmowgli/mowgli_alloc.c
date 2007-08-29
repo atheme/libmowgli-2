@@ -34,15 +34,15 @@
 #include "mowgli.h"
 
 /*
- * mowgli_alloc_array:
- *
- * Allocates an array of data that contains "count" objects,
+ * \brief Allocates an array of data that contains "count" objects,
  * of "size" size.
  *
  * Usually, this wraps calloc().
  *
- * size: size of objects to allocate.
- * count:  amount of objects to allocate.
+ * \param size size of objects to allocate.
+ * \param count amount of objects to allocate.
+ *
+ * \return A pointer to a memory buffer.
  */
 void * mowgli_alloc_array(size_t size, size_t count)
 {
@@ -50,12 +50,13 @@ void * mowgli_alloc_array(size_t size, size_t count)
 }
 
 /*
- * mowgli_alloc:
+ * \brief Allocates an object of "size" size.
  *
- * Allocates an object of "size" size.
  * This is the equivilant of calling mowgli_alloc_array(size, 1).
  *
- * size: size of object to allocate.
+ * \param size size of object to allocate.
+ *
+ * \return A pointer to a memory buffer.
  */
 void * mowgli_alloc(size_t size)
 {
@@ -63,12 +64,11 @@ void * mowgli_alloc(size_t size)
 }
 
 /*
- * mowgli_free:
+ * \brief Frees an object back to the system memory pool.
  *
- * Frees an object back to the system memory pool.
  * Wraps free protecting against common mistakes (reports an error instead).
  *
- * ptr: pointer to object to free.
+ * \param ptr pointer to object to free.
  */
 void mowgli_free(void *ptr)
 {
