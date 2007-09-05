@@ -101,7 +101,7 @@ mowgli_heap_shrink(mowgli_block_t *b)
 /* creates a new mowgli_heap_t */
 mowgli_heap_t *
 mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags,
-	mowgli_allocator_t *allocator)
+	mowgli_allocation_policy_t *allocator)
 {
 	mowgli_heap_t *bh = mowgli_alloc(sizeof(mowgli_heap_t));
 	
