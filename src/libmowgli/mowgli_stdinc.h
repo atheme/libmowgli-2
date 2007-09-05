@@ -35,14 +35,6 @@
 #include <sys/stat.h>
 #include <ctype.h>
 
-#ifdef HAVE_GETOPT_H
-#include <getopt.h>
-#endif
-
-#ifdef HAVE_LINK_H
-#include <link.h>
-#endif
-
 /* socket stuff */
 #ifndef _WIN32
 # include <netdb.h>
