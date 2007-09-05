@@ -23,6 +23,8 @@
 
 #include "mowgli.h"
 
+mowgli_allocation_policy_t *mowgli_allocator_malloc = NULL;
+
 static void *
 mowgli_allocator_func_malloc(int size)
 {
