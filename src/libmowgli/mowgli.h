@@ -50,6 +50,7 @@ MOWGLI_DECLS_START
 #include "mowgli_list.h"
 #include "mowgli_object_class.h"
 #include "mowgli_object.h"
+#include "mowgli_allocation_policy.h"
 #include "mowgli_dictionary.h"
 #include "mowgli_mempool.h"
 #include "mowgli_module.h"
@@ -68,7 +69,6 @@ MOWGLI_DECLS_START
 #include "mowgli_object_metadata.h"
 #include "mowgli_global_storage.h"
 #include "mowgli_string.h"
-#include "mowgli_allocation_policy.h"
 #include "mowgli_allocator.h"
 
 MOWGLI_DECLS_END

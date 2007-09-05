@@ -74,7 +74,7 @@ struct mowgli_heap_
 /* Functions for heaps */
 extern mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags);
 extern mowgli_heap_t *mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags,
-	mowgli_allocator_t *allocator);
+	mowgli_allocation_policy_t *allocator);
 extern void mowgli_heap_destroy(mowgli_heap_t *heap);
 
 /* Functions for blocks */
