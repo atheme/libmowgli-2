@@ -88,11 +88,11 @@ mowgli_heap_shrink(mowgli_block_t *b)
 	mowgli_node_delete(&b->node, &heap->blocks);
 
 #ifdef HAVE_MMAP
-	if (bh->use_mmap)
+	if (heap->use_mmap)
 		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
 	else
 #else
-		bh->allocator->deallocate(b);
+		heap->allocator->deallocate(b);
 #endif
 
 	heap->free_elems -= heap->mowgli_heap_elems;
