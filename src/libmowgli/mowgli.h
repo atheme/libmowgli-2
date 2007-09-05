@@ -69,6 +69,7 @@ MOWGLI_DECLS_START
 #include "mowgli_global_storage.h"
 #include "mowgli_string.h"
 #include "mowgli_allocation_policy.h"
+#include "mowgli_allocator.h"
 
 MOWGLI_DECLS_END
 
