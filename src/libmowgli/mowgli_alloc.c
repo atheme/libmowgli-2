@@ -24,6 +24,31 @@
 #include "mowgli.h"
 
 /*
+ * bootstrapped allocators so that we can initialise without blowing up
+ */
+
+static void *
+_mowgli_bootstrap_alloc(int size)
+{
+	return calloc(size, 1);
+}
+
+static void
+_mowgli_bootstrap_free(void *ptr)
+{
+	if (ptr)
+		free(ptr);
+}
+
+static mowgli_allocation_policy_t _mowgli_allocator_bootstrap = {
+	{ 0 },
+	_mowgli_bootstrap_alloc,
+	_mowgli_bootstrap_free
+};
+
+static mowgli_allocation_policy_t *_mowgli_allocator = &_mowgli_allocator_bootstrap;
+
+/*
  * \brief Allocates an array of data that contains "count" objects,
  * of "size" size.
  *
@@ -34,9 +59,12 @@
  *
  * \return A pointer to a memory buffer.
  */
-void * mowgli_alloc_array(size_t size, size_t count)
+void *
+mowgli_alloc_array(size_t size, size_t count)
 {
-	return calloc(size, count);
+	return_val_if_fail(_mowgli_allocator != NULL, NULL);
+
+	return _mowgli_allocator->allocate(size * count);
 }
 
 /*
@@ -48,7 +76,8 @@ void * mowgli_alloc_array(size_t size, size_t count)
  *
  * \return A pointer to a memory buffer.
  */
-void * mowgli_alloc(size_t size)
+void *
+mowgli_alloc(size_t size)
 {
 	return mowgli_alloc_array(size, 1);
 }
@@ -60,9 +89,45 @@ void * mowgli_alloc(size_t size)
  *
  * \param ptr pointer to object to free.
  */
-void mowgli_free(void *ptr)
+void
+mowgli_free(void *ptr)
 {
+	return_if_fail(_mowgli_allocator != NULL);
 	return_if_fail(ptr != NULL);
 
-	free(ptr);
+	_mowgli_allocator->deallocate(ptr);
+}
+
+/*
+ * \brief Sets the mowgli.allocation_policy used by the allocation primitives.
+ *
+ * \param policy The mowgli_allocation_policy_t object to use.
+ */
+void
+mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy)
+{
+	return_if_fail(policy != NULL);
+
+	_mowgli_allocator = policy;
+}
+
+/*
+ * \brief Sets the mowgli.allocation_policy used by the allocation primitives,
+ * when given a name.
+ *
+ * \param name The name of the policy to use.
+ */
+void
+mowgli_allocator_set_policy_by_name(const char *name)
+{
+	mowgli_allocation_policy_t *policy;
+
+	return_if_fail(name != NULL);
+
+	policy = mowgli_allocation_policy_lookup(name);
+
+	if (policy == NULL)
+		return;
+
+	mowgli_allocator_set_policy(policy);
 }

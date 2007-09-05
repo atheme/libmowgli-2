@@ -68,6 +68,7 @@ MOWGLI_DECLS_START
 #include "mowgli_object_metadata.h"
 #include "mowgli_global_storage.h"
 #include "mowgli_string.h"
+#include "mowgli_allocation_policy.h"
 
 MOWGLI_DECLS_END
 
