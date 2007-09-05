@@ -37,8 +37,8 @@
 static void
 mowgli_heap_expand(mowgli_heap_t *bh)
 {
-	mowgli_block_t *block;
-	void *blp;
+	mowgli_block_t *block = NULL;
+	void *blp = NULL;
 	mowgli_node_t *node;
 	void *offset;
 	int a;
