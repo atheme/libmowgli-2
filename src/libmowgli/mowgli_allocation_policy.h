@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_init.c: Initialization of libmowgli.
+ * mowgli_allocation_policy.h: Allocation policy management.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -21,29 +21,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
+#ifndef __MOWGLI_ALLOCATION_POLICY_H__
+#define __MOWGLI_ALLOCATION_POLICY_H__
 
-void mowgli_init(void)
-{
-	static int mowgli_initted_ = 0;
+typedef void *(*mowgli_allocation_func_t)(int size);
+typedef void (*mowgli_deallocation_func_t)(void *ptr);
 
-	if (mowgli_initted_)
-		return;
+typedef struct {
+	mowgli_object_t parent;
+	mowgli_allocation_func_t allocate;
+	mowgli_deallocation_func_t deallocate;
+} mowgli_allocation_policy_t;
 
-	/* initial bootstrap */
-	mowgli_node_init();
-	mowgli_queue_init();
-	mowgli_argstack_init();
-	mowgli_bitvector_init();
-	mowgli_global_storage_init();
-	mowgli_hook_init();
-	mowgli_random_init();
-	mowgli_allocation_policy_init();
-	mowgli_allocator_init();
+void mowgli_allocation_policy_init(void);
+mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name,
+	mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
+mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);
 
-	/* now that we're bootstrapped, we can use a more optimised allocator
-	   if one is available. */
-	mowgli_allocator_set_policy(mowgli_allocator_malloc);
+/* for mowgli_alloc, et. al */
+void mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy);
+void mowgli_allocator_set_policy_by_name(const char *name);
 
-	mowgli_initted_++;
-}
+#endif

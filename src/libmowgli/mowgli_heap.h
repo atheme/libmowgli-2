@@ -60,6 +60,9 @@ struct mowgli_heap_
 	unsigned int flags;
 	
 	mowgli_list_t blocks;
+
+	mowgli_allocation_policy_t *allocator;
+	mowgli_boolean_t use_mmap;
 };
 
 /* Flag for mowgli_heap_create */
@@ -70,6 +73,8 @@ struct mowgli_heap_
 
 /* Functions for heaps */
 extern mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags);
+extern mowgli_heap_t *mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags,
+	mowgli_allocator_t *allocator);
 extern void mowgli_heap_destroy(mowgli_heap_t *heap);
 
 /* Functions for blocks */

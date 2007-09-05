@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_init.c: Initialization of libmowgli.
+ * mowgli_allocator.h: Builtin allocation policies (mmap/malloc).
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -23,27 +23,22 @@
 
 #include "mowgli.h"
 
-void mowgli_init(void)
+static void *
+mowgli_allocator_func_malloc(int size)
 {
-	static int mowgli_initted_ = 0;
+	return calloc(size, 1);
+}
 
-	if (mowgli_initted_)
-		return;
+static void
+mowgli_allocator_func_free(void *ptr)
+{
+	if (ptr)
+		free(ptr);
+}
 
-	/* initial bootstrap */
-	mowgli_node_init();
-	mowgli_queue_init();
-	mowgli_argstack_init();
-	mowgli_bitvector_init();
-	mowgli_global_storage_init();
-	mowgli_hook_init();
-	mowgli_random_init();
-	mowgli_allocation_policy_init();
-	mowgli_allocator_init();
-
-	/* now that we're bootstrapped, we can use a more optimised allocator
-	   if one is available. */
-	mowgli_allocator_set_policy(mowgli_allocator_malloc);
-
-	mowgli_initted_++;
+void
+mowgli_allocator_init(void)
+{
+	mowgli_allocator_malloc = mowgli_allocation_policy_create("malloc", mowgli_allocator_func_malloc, 
+		mowgli_allocator_func_free);
 }

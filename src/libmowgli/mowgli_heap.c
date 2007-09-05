@@ -34,7 +34,8 @@
 #endif
 
 /* expands a mowgli_heap_t by 1 block */
-static void mowgli_heap_expand(mowgli_heap_t *bh)
+static void
+mowgli_heap_expand(mowgli_heap_t *bh)
 {
 	mowgli_block_t *block;
 	void *blp;
@@ -43,11 +44,14 @@ static void mowgli_heap_expand(mowgli_heap_t *bh)
 	int a;
 	
 #if defined(HAVE_MMAP) && defined(MAP_ANON)
-	blp = mmap(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
-		PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	if (bh->use_mmap)
+		blp = mmap(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
+			PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	else
 #else
-	blp = mowgli_alloc(sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems));
+		blp = bh->allocator->allocate(sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems));
 #endif
+
 	block = (mowgli_block_t *)blp;
 	
 	offset = blp + sizeof(mowgli_block_t);
@@ -70,7 +74,8 @@ static void mowgli_heap_expand(mowgli_heap_t *bh)
 }
 
 /* shrinks a mowgli_heap_t by 1 block. */
-static void mowgli_heap_shrink(mowgli_block_t *b)
+static void
+mowgli_heap_shrink(mowgli_block_t *b)
 {
 	mowgli_heap_t *heap;
 
@@ -83,16 +88,20 @@ static void mowgli_heap_shrink(mowgli_block_t *b)
 	mowgli_node_delete(&b->node, &heap->blocks);
 
 #ifdef HAVE_MMAP
-	munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
+	if (bh->use_mmap)
+		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
+	else
 #else
-	mowgli_free(b);
+		bh->allocator->deallocate(b);
 #endif
 
 	heap->free_elems -= heap->mowgli_heap_elems;
 }
 
 /* creates a new mowgli_heap_t */
-mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags)
+mowgli_heap_t *
+mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags,
+	mowgli_allocator_t *allocator)
 {
 	mowgli_heap_t *bh = mowgli_alloc(sizeof(mowgli_heap_t));
 	
@@ -103,6 +112,12 @@ mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, un
 	bh->alloc_size = bh->elem_size + sizeof(mowgli_node_t);
 	
 	bh->flags = flags;
+
+	bh->allocator = allocator ? allocator : mowgli_allocator_malloc;
+
+#ifdef HAVE_MMAP
+	bh->use_mmap = allocator != NULL ? FALSE : TRUE;
+#endif
 	
 	if (flags & BH_NOW)
 		mowgli_heap_expand(bh);
@@ -110,8 +125,15 @@ mowgli_heap_t *mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, un
 	return bh;
 }
 
+mowgli_heap_t *
+mowgli_heap_create(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags)
+{
+	return mowgli_heap_create_full(elem_size, mowgli_heap_elems, flags, NULL);
+}
+
 /* completely frees a mowgli_heap_t and all blocks */
-void mowgli_heap_destroy(mowgli_heap_t *heap)
+void
+mowgli_heap_destroy(mowgli_heap_t *heap)
 {
 	mowgli_node_t *n, *tn;
 	
@@ -126,7 +148,8 @@ void mowgli_heap_destroy(mowgli_heap_t *heap)
 }
 
 /* allocates a new item from a mowgli_heap_t */
-void *mowgli_heap_alloc(mowgli_heap_t *heap)
+void *
+mowgli_heap_alloc(mowgli_heap_t *heap)
 {
 	mowgli_node_t *n, *fn;
 	mowgli_block_t *b;
@@ -170,7 +193,8 @@ void *mowgli_heap_alloc(mowgli_heap_t *heap)
 }
 
 /* frees an item back to the mowgli_heap_t */
-void mowgli_heap_free(mowgli_heap_t *heap, void *data)
+void
+mowgli_heap_free(mowgli_heap_t *heap, void *data)
 {
 	mowgli_node_t *n, *tn, *dn;
 	mowgli_block_t *b;
