@@ -48,9 +48,8 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 		blp = mmap(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
 			PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	else
-#else
-		blp = bh->allocator->allocate(sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems));
 #endif
+		blp = bh->allocator->allocate(sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems));
 
 	block = (mowgli_block_t *)blp;
 	
