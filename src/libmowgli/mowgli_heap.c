@@ -90,9 +90,8 @@ mowgli_heap_shrink(mowgli_block_t *b)
 	if (heap->use_mmap)
 		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
 	else
-#else
-		heap->allocator->deallocate(b);
 #endif
+		heap->allocator->deallocate(b);
 
 	heap->free_elems -= heap->mowgli_heap_elems;
 }
