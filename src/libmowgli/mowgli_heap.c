@@ -218,11 +218,6 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 			/* if this block is entirely unfree, free it. */
 			if (MOWGLI_LIST_LENGTH(&b->used_list) == 0 && MOWGLI_LIST_LENGTH(&heap->blocks) > 2)
 				mowgli_heap_shrink(b);
-			else
-			{
-				mowgli_node_delete(&b->node, &heap->blocks);
-				mowgli_node_add_head(b, &b->node, &heap->blocks);
-			}
 
 			/* we're done */
 			return;
