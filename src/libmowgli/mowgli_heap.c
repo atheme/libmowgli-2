@@ -222,12 +222,6 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 			/* we're done */
 			return;
 		}
-		
-		/* and just in case, check it's not already free'd */
-		dn = mowgli_node_find(data, &b->free_list);
-		
-		if (dn != NULL)
-			mowgli_throw_exception(mowgli.heap.block_already_free_exception);
 	}
 	
 	/* this should never happen */
