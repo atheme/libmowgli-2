@@ -67,7 +67,7 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 		offset += bh->alloc_size;
 	}
 	
-	mowgli_node_add(block, &block->node, &bh->blocks);
+	mowgli_node_add_head(block, &block->node, &bh->blocks);
 	
 	bh->free_elems += bh->mowgli_heap_elems;
 }
