@@ -226,7 +226,7 @@ install: ${LIB} ${PROG} install-extra
 
 install-extra:
 
-uninstall: ${LIB} ${PROG}
+uninstall: ${LIB} ${PROG} uninstall-extra
 	for i in ${SUBDIRS}; do \
 		${DIR_ENTER}; \
 		${MAKE} uninstall || exit 1; \
@@ -299,6 +299,8 @@ uninstall: ${LIB} ${PROG}
 			fi \
 		fi \
 	done
+
+uninstall-extra:
 
 clean:
 	for i in ${SUBDIRS}; do \
