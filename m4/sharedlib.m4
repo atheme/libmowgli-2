@@ -19,7 +19,7 @@ dnl POSSIBILITY OF SUCH DAMAGE.
 dnl
 
 AC_DEFUN([AM_SHARED_LIB], [
-	AC_MSG_CHECKING(for shared library sytem)
+	AC_MSG_CHECKING(for shared library system)
 	case "$target" in
 		intel-apple-*)
 			AC_MSG_RESULT([Mac OS X (Intel)])
