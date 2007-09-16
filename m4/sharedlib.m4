@@ -27,7 +27,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.*.dylib}.dylib'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			;;
 		*-apple-*)
 			AC_MSG_RESULT(Mac OS X)
@@ -35,7 +35,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.*.dylib}.dylib'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			;;
 		*-sun-* | *-openbsd-* | *-mirbsd-*)
 			AC_MSG_RESULT(Solaris)
