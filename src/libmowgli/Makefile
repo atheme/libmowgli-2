@@ -66,5 +66,5 @@ INCLUDES = mowgli.h			\
 
 include ../../buildsys.mk
 
-CPPFLAGS += -I.. -DMOWGLI_CORE
+CPPFLAGS += ${LIB_CPPFLAGS} -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}

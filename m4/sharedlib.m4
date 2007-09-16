@@ -23,7 +23,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 	case "$target" in
 		intel-apple-*)
 			AC_MSG_RESULT([Mac OS X (Intel)])
-			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_CPPFLAGS='-DPIC'
+			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
@@ -32,6 +33,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 		*-apple-*)
 			AC_MSG_RESULT(Mac OS X)
+			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
@@ -41,7 +43,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 		*-sun-* | *-openbsd-* | *-mirbsd-*)
 			AC_MSG_RESULT(Solaris)
-			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_CPPFLAGS='-DPIC'
+			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
@@ -50,7 +53,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 		*-*-mingw32)
 			AC_MSG_RESULT(MinGW32)
-			LIB_CFLAGS='-DPIC'
+			LIB_CPPFLAGS='-DPIC'
+			LIB_CFLAGS=''
 			LIB_LDFLAGS='-shared'
 			LIB_PREFIX=''
 			LIB_SUFFIX='.dll'
@@ -59,7 +63,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 		*)
 			AC_MSG_RESULT(POSIX)
-			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_CPPFLAGS='-DPIC'
+			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}.0'
@@ -68,6 +73,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 	esac
 
+	AC_SUBST(LIB_CPPFLAGS)
 	AC_SUBST(LIB_CFLAGS)
 	AC_SUBST(LIB_LDFLAGS)
 	AC_SUBST(LIB_PREFIX)
