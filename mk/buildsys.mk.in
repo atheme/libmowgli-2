@@ -50,6 +50,7 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
+LIBDIR ?= ${libdir}
 datarootdir = @datarootdir@
 datadir = @datadir@
 includedir = @includedir@
@@ -173,7 +174,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i && ${SYMLINK_LIB}; then \
+		if ${MKDIR_P} ${DESTDIR}${LIBDIR} && ${INSTALL} -m 755 $$i ${DESTDIR}${LIBDIR}/$$i && ${SYMLINK_LIB}; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -182,7 +183,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${STATIC_LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${LIBDIR} && ${INSTALL} -m 755 $$i ${DESTDIR}${LIBDIR}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -235,8 +236,8 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 	done
 
 	for i in ${LIB}; do \
-		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
-			if rm -f ${DESTDIR}${libdir}/$$i && ${UNSYMLINK_LIB}; then \
+		if [ -f ${DESTDIR}${LIBDIR}/$$i ]; then \
+			if rm -f ${DESTDIR}${LIBDIR}/$$i && ${UNSYMLINK_LIB}; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -245,8 +246,8 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 	done
 
 	for i in ${STATIC_LIB}; do \
-		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
-			if rm -f ${DESTDIR}${libdir}/$$i; then \
+		if [ -f ${DESTDIR}${LIBDIR}/$$i ]; then \
+			if rm -f ${DESTDIR}${LIBDIR}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
