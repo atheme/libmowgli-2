@@ -11,7 +11,9 @@ AC_CANONICAL_TARGET
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_OBJC
 AC_PROG_INSTALL
+AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_ISC_POSIX
 
@@ -20,7 +22,9 @@ PACKAGE="libmowgli"
 AC_SUBST(PACKAGE)
 
 # Checks for libraries.
+AM_SHARED_LIB
 AM_DL
+LIBS="$LIBS $DYNAMIC_LD_LIBS"
 
 # Checks for header files.
 AC_HEADER_DIRENT
@@ -50,44 +54,7 @@ fi
 
 AC_SUBST(EXAMPLES_BUILD)
 
-# Module support
-AC_MSG_CHECKING([if you are running Apple-GCC])
-case "$target" in
-        *-apple-*)
-                AC_MSG_RESULT([yes, sorry you poor bastard])
-                LDFLAGS="$LDFLAGS -Wl,-framework -Wl,CoreFoundation -Wl,-framework -Wl,CoreServices"
-                ;;
-        *)
-                AC_MSG_RESULT([no])
-                ;;
-esac
-AC_SUBST(LDFLAGS)
-
-AC_MSG_CHECKING([for what extension and flags to use for library compilation])
-case "$target" in
-        *-apple-*)
-                AC_MSG_RESULT([Mac OS X: -fPIC -bundle -fno-common -flat_namespace -undefined suppress, .dylib])
-                PICFLAGS="-fPIC -DPIC"
-                PICLDFLAGS="-fPIC -DPIC -bundle -fno-common -flat_namespace -undefined suppress"
-                LIBLDFLAGS="-dynamiclib"
-                SHARED_SUFFIX=".dylib"
-                ;;
-        *)
-                AC_MSG_RESULT([libdl-compatible: -fPIC -DPIC -shared, .so])
-                PICFLAGS="-fPIC -DPIC"
-                PICLDFLAGS="-fPIC -DPIC -shared"
-                LIBLDFLAGS="-fPIC -DPIC -shared"
-                SHARED_SUFFIX=".so"
-                ;;
-esac
-AC_SUBST(PICFLAGS)
-AC_SUBST(PICLDFLAGS)
-AC_SUBST(LIBLDFLAGS)
-AC_SUBST(SHARED_SUFFIX)
-AC_DEFINE_UNQUOTED(SHARED_SUFFIX, "${SHARED_SUFFIX}",
-        [Define the shared module suffix extension on your platform.])
-
-AC_CONFIG_FILES([libmowgli.pc mk/rules.mk])
+AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli.pc])
 AC_OUTPUT
 
 cat << _EOF_

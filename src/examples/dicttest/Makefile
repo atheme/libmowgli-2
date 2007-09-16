@@ -1,17 +1,7 @@
-include ../../../mk/rules.mk
-include ../../../mk/init.mk
-include ../../../mk/objective.mk
+PROG_NOINST = dicttest
+SRCS = dicttest.c
 
-OBJECTIVE_BINS = dicttest
+include ../../../buildsys.mk
 
-LDADD = -L../../libmowgli -lmowgli
-
-CFLAGS += -I../../libmowgli
-
-SOURCES = dicttest.c
-
-OBJECTS = ${SOURCES:.c=.o}
-
-dicttest: $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) $(LDADD) -o $@
-	@printf "%10s     %-20s\n" LINK $@
+CPPFLAGS += -I../../libmowgli
+LIBS += -L../../libmowgli -lmowgli
