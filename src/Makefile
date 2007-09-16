@@ -1,4 +1,4 @@
 SUBDIRS = libmowgli ${EXAMPLES_BUILD}
 
-include ../buildsys.mk
-include ../extra.mk
+include ../mk/buildsys.mk
+include ../mk/extra.mk
