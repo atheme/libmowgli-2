@@ -28,6 +28,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			PLUGIN_CPPFLAGS=''
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
@@ -39,6 +41,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			PLUGIN_CPPFLAGS=''
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
@@ -50,6 +54,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
+			PLUGIN_CPPFLAGS=''
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so'
@@ -61,6 +67,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-shared'
 			LIB_PREFIX=''
 			LIB_SUFFIX='.dll'
+			PLUGIN_CPPFLAGS=''
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$$i.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$$i.so'
@@ -72,6 +80,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}.0'
+			PLUGIN_CPPFLAGS=''
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} && ${LN_S} -f $${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
@@ -83,6 +93,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 	AC_SUBST(LIB_LDFLAGS)
 	AC_SUBST(LIB_PREFIX)
 	AC_SUBST(LIB_SUFFIX)
+	AC_SUBST(PLUGIN_CPPFLAGS)
+	AC_SUBST(PLUGIN_CFLAGS)
 	AC_SUBST(PLUGIN_LDFLAGS)
 	AC_SUBST(SYMLINK_LIB)
 	AC_SUBST(UNSYMLINK_LIB)
