@@ -40,6 +40,7 @@ LIB_LDFLAGS = @LIB_LDFLAGS@
 LIB_PREFIX = @LIB_PREFIX@
 LIB_SUFFIX = @LIB_SUFFIX@
 SYMLINK_LIB = @SYMLINK_LIB@
+UNSYMLINK_LIB = @UNSYMLINK_LIB@
 LN_S = @LN_S@
 MKDIR_P = mkdir -p
 INSTALL = @INSTALL@
@@ -236,19 +237,12 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 
 	for i in ${LIB}; do \
 		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
-			if rm -f ${DESTDIR}${libdir}/$$i; then \
+			if rm -f ${DESTDIR}${libdir}/$$i && ${UNSYMLINK_LIB}; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
 			fi \
 		fi; \
-		if [ -f ${DESTDIR}${libdir}/$${i%.so.*}.so ]; then \
-			if rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so; then \
-				${DELETE_OK}; \
-			else \
-				${DELETE_FAILED}; \
-			fi \
-		fi \
 	done
 
 	for i in ${STATIC_LIB}; do \
@@ -290,6 +284,7 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 			fi \
 		fi \
 	done
+	-rmdir ${DESTDIR}${includedir}/${includesubdir} >/dev/null 2>&1
 
 	for i in ${MAN}; do \
 		if [ -f ${DESTDIR}${mandir}/${mansubdir}/$$i ]; then \
