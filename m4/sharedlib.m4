@@ -19,7 +19,7 @@ dnl POSSIBILITY OF SUCH DAMAGE.
 dnl
 
 AC_DEFUN([AM_SHARED_LIB], [
-	AC_MSG_CHECKING(how to create shared libraries)
+	AC_MSG_CHECKING(for shared library sytem)
 	case "$target" in
 		intel-apple-*)
 			AC_MSG_RESULT([Mac OS X (Intel)])
@@ -48,8 +48,17 @@ AC_DEFUN([AM_SHARED_LIB], [
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			;;
+		*-*-mingw32)
+			AC_MSG_RESULT(MinGW32)
+			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_LDFLAGS='-shared -fPIC'
+			LIB_PREFIX=''
+			LIB_SUFFIX='.dll'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$$i.so'
+			UNSYMLINK_LIB='true'
+			;;
 		*)
-			AC_MSG_RESULT(Unix)
+			AC_MSG_RESULT(POSIX)
 			LIB_CFLAGS='-fPIC -DPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
