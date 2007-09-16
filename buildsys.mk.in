@@ -41,6 +41,7 @@ LIB_PREFIX = @LIB_PREFIX@
 LIB_SUFFIX = @LIB_SUFFIX@
 SYMLINK_LIB = @SYMLINK_LIB@
 LN_S = @LN_S@
+MKDIR_P = @MKDIR_P@
 INSTALL = @INSTALL@
 SHELL = @SHELL@
 prefix = @prefix@
@@ -172,7 +173,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i && ${SYMLINK_LIB}; then \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i && ${SYMLINK_LIB}; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -181,7 +182,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${STATIC_LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -190,7 +191,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${DATA}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/${PACKAGE}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${datadir} && ${INSTALL} -m 644 $$i ${DESTDIR}${datadir}/${PACKAGE}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -199,7 +200,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${PROG}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 -s $$i ${DESTDIR}${bindir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 -s $$i ${DESTDIR}${bindir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -208,7 +209,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${INCLUDES}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${includedir} && ${INSTALL} -m 644 $$i ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -217,7 +218,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${MAN}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${mandir}/${mansubdir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${mandir} && ${INSTALL} -m 644 $$i ${DESTDIR}${mandir}/${mansubdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
