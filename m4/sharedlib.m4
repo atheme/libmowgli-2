@@ -50,12 +50,12 @@ AC_DEFUN([AM_SHARED_LIB], [
 			;;
 		*-*-mingw32)
 			AC_MSG_RESULT(MinGW32)
-			LIB_CFLAGS='-fPIC -DPIC'
-			LIB_LDFLAGS='-shared -fPIC'
+			LIB_CFLAGS='-DPIC'
+			LIB_LDFLAGS='-shared'
 			LIB_PREFIX=''
 			LIB_SUFFIX='.dll'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$$i.so'
-			UNSYMLINK_LIB='true'
+			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$$i.so'
 			;;
 		*)
 			AC_MSG_RESULT(POSIX)
