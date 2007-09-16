@@ -42,7 +42,7 @@ LIB_SUFFIX = @LIB_SUFFIX@
 LN_S = @LN_S@
 INSTALL = @INSTALL@
 SHELL = @SHELL@
-prefix = ${DESTDIR}@prefix@
+prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
@@ -171,8 +171,8 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 $$i ${libdir}/$$i && \
-		    ${LN_S} -f $$i ${libdir}/$${i%.so.*}.so; then \
+		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i && \
+		    ${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -181,7 +181,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${STATIC_LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 $$i ${libdir}/$$i; then \
+		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -190,7 +190,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${DATA}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${datadir}/${PACKAGE}/$$i; then \
+		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${datadir}/${PACKAGE}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -199,7 +199,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${PROG}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 -s $$i ${bindir}/$$i; then \
+		if ${INSTALL} -D -m 755 -s $$i ${DESTDIR}${bindir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -208,8 +208,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${INCLUDES}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i \
-		    ${includedir}/${includesubdir}/$$i; then \
+		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -218,7 +217,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${MAN}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 644 $$i ${mandir}/${mansubdir}/$$i; then \
+		if ${INSTALL} -D -m 644 $$i ${DESTDIR}${mandir}/${mansubdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -235,15 +234,15 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${LIB}; do \
-		if [ -f ${libdir}/$$i ]; then \
-			if rm -f ${libdir}/$$i; then \
+		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
+			if rm -f ${DESTDIR}${libdir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
 			fi \
 		fi; \
-		if [ -f ${libdir}/$${i%.so.*}.so ]; then \
-			if rm -f ${libdir}/$${i%.so.*}.so; then \
+		if [ -f ${DESTDIR}${libdir}/$${i%.so.*}.so ]; then \
+			if rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -252,8 +251,8 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${STATIC_LIB}; do \
-		if [ -f ${libdir}/$$i ]; then \
-			if rm -f ${libdir}/$$i; then \
+		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
+			if rm -f ${DESTDIR}${libdir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -262,8 +261,8 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${DATA}; do \
-		if [ -f ${datadir}/${PACKAGE}/$$i ]; then \
-			if rm -f ${datadir}/${PACKAGE}/$$i; then \
+		if [ -f ${DESTDIR}${datadir}/${PACKAGE}/$$i ]; then \
+			if rm -f ${DESTDIR}${datadir}/${PACKAGE}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -272,8 +271,8 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${PROG}; do \
-		if [ -f ${bindir}/$$i ]; then \
-			if rm -f ${bindir}/$$i; then \
+		if [ -f ${DESTDIR}${bindir}/$$i ]; then \
+			if rm -f ${DESTDIR}${bindir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -282,8 +281,8 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${INCLUDES}; do \
-		if [ -f ${includedir}/${includesubdir}/$$i ]; then \
-			if rm -f ${includedir}/${includesubdir}/$$i; then \
+		if [ -f ${DESTDIR}${includedir}/${includesubdir}/$$i ]; then \
+			if rm -f ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -292,8 +291,8 @@ uninstall: ${LIB} ${PROG}
 	done
 
 	for i in ${MAN}; do \
-		if [ -f ${mandir}/${mansubdir}/$$i ]; then \
-			if rm -f ${mandir}/${mansubdir}/$$i; then \
+		if [ -f ${DESTDIR}${mandir}/${mansubdir}/$$i ]; then \
+			if rm -f ${DESTDIR}${mandir}/${mansubdir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
