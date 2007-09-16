@@ -39,6 +39,7 @@ LIB_CFLAGS = @LIB_CFLAGS@
 LIB_LDFLAGS = @LIB_LDFLAGS@
 LIB_PREFIX = @LIB_PREFIX@
 LIB_SUFFIX = @LIB_SUFFIX@
+SYMLINK_LIB = @SYMLINK_LIB@
 LN_S = @LN_S@
 INSTALL = @INSTALL@
 SHELL = @SHELL@
@@ -171,8 +172,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i && \
-		    ${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so; then \
+		if ${INSTALL} -D -m 755 $$i ${DESTDIR}${libdir}/$$i && ${SYMLINK_LIB}; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \

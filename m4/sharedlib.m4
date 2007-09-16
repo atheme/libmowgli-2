@@ -27,6 +27,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.*.dylib}.dylib'
 			;;
 		*-apple-*)
 			AC_MSG_RESULT(Mac OS X)
@@ -34,6 +35,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.*.dylib}.dylib'
 			;;
 		*-sun-* | *-openbsd-* | *-mirbsd-*)
 			AC_MSG_RESULT(Solaris)
@@ -41,6 +43,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			;;
 		*)
 			AC_MSG_RESULT(Unix)
@@ -48,6 +51,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}.0'
+			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} && ${LN_S} -f $${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			;;
 	esac
 
@@ -55,4 +59,5 @@ AC_DEFUN([AM_SHARED_LIB], [
 	AC_SUBST(LIB_LDFLAGS)
 	AC_SUBST(LIB_PREFIX)
 	AC_SUBST(LIB_SUFFIX)
+	AC_SUBST(SYMLINK_LIB)
 ])
