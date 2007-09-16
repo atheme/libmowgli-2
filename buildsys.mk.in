@@ -41,7 +41,7 @@ LIB_PREFIX = @LIB_PREFIX@
 LIB_SUFFIX = @LIB_SUFFIX@
 SYMLINK_LIB = @SYMLINK_LIB@
 LN_S = @LN_S@
-MKDIR_P = @MKDIR_P@
+MKDIR_P = mkdir -p
 INSTALL = @INSTALL@
 SHELL = @SHELL@
 prefix = @prefix@
@@ -209,7 +209,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${INCLUDES}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${includedir} && ${INSTALL} -m 644 $$i ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${includedir}/${includesubdir} && ${INSTALL} -m 644 $$i ${DESTDIR}${includedir}/${includesubdir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
