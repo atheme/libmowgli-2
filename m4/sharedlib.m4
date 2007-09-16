@@ -21,7 +21,7 @@ dnl
 AC_DEFUN([AM_SHARED_LIB], [
 	AC_MSG_CHECKING(how to create shared libraries)
 	case "$target" in
-		intel-apple*)
+		intel-apple-*)
 			AC_MSG_RESULT([Mac OS X (Intel)])
 			LIB_CFLAGS='-fPIC -DPIC'
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
