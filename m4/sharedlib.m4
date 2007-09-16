@@ -3,33 +3,36 @@ AC_DEFUN([AM_SHARED_LIB], [
 	case "$target" in
 		intel-apple*)
 			AC_MSG_RESULT([Mac OS X (Intel)])
-			SHARED_CFLAGS="-fPIC -DPIC"
-			SHARED_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
-			SHARED_PREFIX="lib"
-			SHARED_PREVER=""
-			SHARED_POSTVER=".dylib"
+			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
+			LIB_PREFIX='lib'
+			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
 			;;
 		*-apple-*)
 			AC_MSG_RESULT(Mac OS X)
-			SHARED_CFLAGS=""
-			SHARED_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
-			SHARED_PREFIX="lib"
-			SHARED_PREVER=""
-			SHARED_POSTVER=".dylib"
+			LIB_CFLAGS=''
+			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
+			LIB_PREFIX='lib'
+			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			;;
+		*-sun-* | *-openbsd-* | *-mirbsd-*)
+			AC_MSG_RESULT(Solaris)
+			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_LDFLAGS='-shared -fPIC'
+			LIB_PREFIX='lib'
+			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
 			;;
 		*)
 			AC_MSG_RESULT(Unix)
-			SHARED_CFLAGS="-fPIC -DPIC"
-			SHARED_LDFLAGS="-shared -fPIC"
-			SHARED_PREFIX="lib"
-			SHARED_PREVER=".so"
-			SHARED_POSTVER=""
+			LIB_CFLAGS='-fPIC -DPIC'
+			LIB_LDFLAGS='-shared -fPIC'
+			LIB_PREFIX='lib'
+			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}.0'
 			;;
 	esac
 
-	AC_SUBST(SHARED_CFLAGS)
-	AC_SUBST(SHARED_LDFLAGS)
-	AC_SUBST(SHARED_PREFIX)
-	AC_SUBST(SHARED_PREVER)
-	AC_SUBST(SHARED_POSTVER)
+	AC_SUBST(LIB_CFLAGS)
+	AC_SUBST(LIB_LDFLAGS)
+	AC_SUBST(LIB_PREFIX)
+	AC_SUBST(LIB_SUFFIX)
 ])

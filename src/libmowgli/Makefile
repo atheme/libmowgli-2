@@ -1,4 +1,7 @@
-LIB = ${SHARED_PREFIX}mowgli${SHARED_PREVER}.1${SHARED_POSTVER}
+LIB = ${LIB_PREFIX}mowgli${LIB_SUFFIX}
+LIB_MAJOR = 1
+LIB_MINOR = 0
+
 SRCS = mowgli_alloc.c			\
        mowgli_allocation_policy.c	\
        mowgli_allocator.c		\
@@ -64,4 +67,4 @@ INCLUDES = mowgli.h			\
 include ../../buildsys.mk
 
 CPPFLAGS += -I.. -DMOWGLI_CORE
-CFLAGS += ${SHARED_CFLAGS}
+CFLAGS += ${LIB_CFLAGS}
