@@ -1,7 +1,7 @@
 PROG_NOINST = randomtest
 SRCS = randomtest.c
 
-include ../../../buildsys.mk
+include ../../../mk/buildsys.mk
 
 CPPFLAGS += -I../../libmowgli
 LIBS += -L../../libmowgli -lmowgli
