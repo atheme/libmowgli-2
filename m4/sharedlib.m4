@@ -27,27 +27,27 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
-			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			LIB_SUFFIX='.dylib'
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
 			PLUGIN_SUFFIX='.impl'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
-			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib'
 			;;
 		*-apple-*)
 			AC_MSG_RESULT(Mac OS X)
 			LIB_CPPFLAGS='-DPIC'
-			LIB_CFLAGS='-fno-common'
+			LIB_CFLAGS=''
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
 			LIB_PREFIX='lib'
-			LIB_SUFFIX='.${LIB_MAJOR}.${LIB_MINOR}.dylib'
+			LIB_SUFFIX='.dylib'
 			PLUGIN_CPPFLAGS=''
-			PLUGIN_CFLAGS='-fno-common'
+			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
 			PLUGIN_SUFFIX='.impl'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
-			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib'
 			;;
 		*-sun-* | *-openbsd-* | *-mirbsd-*)
 			AC_MSG_RESULT(Solaris)
@@ -55,13 +55,13 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
-			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
-			PLUGIN_CPPFLAGS=$LIB_CPPFLAGS
-			PLUGIN_CFLAGS=$LIB_CFLAGS
-			PLUGIN_LDFLAGS=$LIB_LDFLAGS
+			LIB_SUFFIX='.so'
+			PLUGIN_CPPFLAGS='-DPIC'
+			PLUGIN_CFLAGS='-fPIC'
+			PLUGIN_LDFLAGS='-shared -fPIC'
 			PLUGIN_SUFFIX='.so'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so'
-			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR} && ${LN_S} -f $$i.${LIB_MAJOR}.${LIB_MINOR} ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}'
 			;;
 		*-*-mingw32)
 			AC_MSG_RESULT(MinGW32)
@@ -74,8 +74,8 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
 			PLUGIN_SUFFIX='.dll'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$$i.so'
-			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$$i.so'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i'
 			;;
 		*)
 			AC_MSG_RESULT(POSIX)
@@ -83,13 +83,13 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
-			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}.0'
-			PLUGIN_CPPFLAGS=$LIB_CPPFLAGS
-			PLUGIN_CFLAGS=$LIB_CFLAGS
-			PLUGIN_LDFLAGS=$LIB_LDFLAGS
+			LIB_SUFFIX='.so'
+			PLUGIN_CPPFLAGS='-DPIC'
+			PLUGIN_CFLAGS='-fPIC'
+			PLUGIN_LDFLAGS='-shared -fPIC'
 			PLUGIN_SUFFIX='.so'
-			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} && ${LN_S} -f $${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
-			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}.0 && ${LN_S} -f $$i.${LIB_MAJOR}.${LIB_MINOR}.0 ${DESTDIR}${libdir}/$$i.${LIB_MAJOR} && ${LN_S} -f $$i.${LIB_MAJOR}.${LIB_MINOR}.0 ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR} ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}.0'
 			;;
 	esac
 
@@ -102,6 +102,6 @@ AC_DEFUN([AM_SHARED_LIB], [
 	AC_SUBST(PLUGIN_CFLAGS)
 	AC_SUBST(PLUGIN_LDFLAGS)
 	AC_SUBST(PLUGIN_SUFFIX)
-	AC_SUBST(SYMLINK_LIB)
-	AC_SUBST(UNSYMLINK_LIB)
+	AC_SUBST(INSTALL_LIB)
+	AC_SUBST(UNINSTALL_LIB)
 ])

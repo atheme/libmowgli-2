@@ -44,8 +44,8 @@ PLUGIN_CPPFLAGS = @PLUGIN_CPPFLAGS@
 PLUGIN_CFLAGS = @PLUGIN_CFLAGS@
 PLUGIN_LDFLAGS = @PLUGIN_LDFLAGS@
 PLUGIN_SUFFIX = @PLUGIN_SUFFIX@
-SYMLINK_LIB = @SYMLINK_LIB@
-UNSYMLINK_LIB = @UNSYMLINK_LIB@
+INSTALL_LIB = @INSTALL_LIB@
+UNINSTALL_LIB = @UNINSTALL_LIB@
 LN_S = @LN_S@
 MKDIR_P = mkdir -p
 INSTALL = @INSTALL@
@@ -54,7 +54,7 @@ prefix = @prefix@
 exec_prefix = @exec_prefix@
 bindir = @bindir@
 libdir = @libdir@
-LIBDIR ?= ${libdir}
+plugindir ?= ${PACKAGE}
 datarootdir = @datarootdir@
 datadir = @datadir@
 includedir = @includedir@
@@ -73,7 +73,7 @@ OBJS += ${OBJS5:.m=.o}
 .SUFFIXES: .beam .c .cc .cxx .d .erl .m
 .PHONY: all subdirs depend install uninstall clean distclean
 
-all: subdirs depend ${OBJS} ${STATIC_LIB} ${STATIC_LIB_NOINST} ${LIB} ${LIB_NOINST} ${PROG} ${PROG_NOINST}
+all: subdirs depend ${OBJS} ${STATIC_LIB} ${STATIC_LIB_NOINST} ${LIB} ${LIB_NOINST} ${PLUGIN} ${PLUGIN_NOINST} ${PROG} ${PROG_NOINST}
 
 subdirs:
 	for i in ${SUBDIRS}; do \
@@ -106,6 +106,14 @@ ${PROG} ${PROG_NOINST}: ${EXT_DEPS} ${OBJS}
 ${LIB} ${LIB_NOINST}: ${EXT_DEPS} ${OBJS}
 	${LINK_STATUS}
 	if ${LD} -o $@ ${OBJS} ${LIB_LDFLAGS} ${LDFLAGS} ${LIBS}; then \
+		${LINK_OK}; \
+	else \
+		${LINK_FAILED}; \
+	fi
+
+${PLUGIN} ${PLUGIN_NONST}: ${EXT_DEPS} ${OBJS}
+	${LINK_STATUS}
+	if ${LD} -o $@ ${OBJS} ${PLUGIN_LDFLAGS} ${LDFLAGS} ${LIBS}; then \
 		${LINK_OK}; \
 	else \
 		${LINK_FAILED}; \
@@ -169,7 +177,7 @@ ${EXT_DEPS}: subdirs
 		${COMPILE_FAILED}; \
 	fi
 
-install: ${LIB} ${PROG} install-extra
+install: ${LIB} ${STATIC_LIB} ${PLUGIN} ${PROG} install-extra
 	for i in ${SUBDIRS}; do \
 		${DIR_ENTER}; \
 		${MAKE} install || exit 1; \
@@ -178,7 +186,7 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${LIBDIR} && ${INSTALL} -m 755 $$i ${DESTDIR}${LIBDIR}/$$i && ${SYMLINK_LIB}; then \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL_LIB}; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -187,7 +195,16 @@ install: ${LIB} ${PROG} install-extra
 
 	for i in ${STATIC_LIB}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${LIBDIR} && ${INSTALL} -m 755 $$i ${DESTDIR}${LIBDIR}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${libdir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i; then \
+			${INSTALL_OK}; \
+		else \
+			${INSTALL_FAILED}; \
+		fi \
+	done
+
+	for i in ${PLUGIN}; do \
+		${INSTALL_STATUS}; \
+		if ${MKDIR_P} ${DESTDIR}${libdir}/${plugindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/${plugindir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -232,7 +249,7 @@ install: ${LIB} ${PROG} install-extra
 
 install-extra:
 
-uninstall: ${LIB} ${PROG} uninstall-extra
+uninstall: uninstall-extra
 	for i in ${SUBDIRS}; do \
 		${DIR_ENTER}; \
 		${MAKE} uninstall || exit 1; \
@@ -240,8 +257,8 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 	done
 
 	for i in ${LIB}; do \
-		if [ -f ${DESTDIR}${LIBDIR}/$$i ]; then \
-			if rm -f ${DESTDIR}${LIBDIR}/$$i && ${UNSYMLINK_LIB}; then \
+		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
+			if ${UNINSTALL_LIB}; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
@@ -250,14 +267,25 @@ uninstall: ${LIB} ${PROG} uninstall-extra
 	done
 
 	for i in ${STATIC_LIB}; do \
-		if [ -f ${DESTDIR}${LIBDIR}/$$i ]; then \
-			if rm -f ${DESTDIR}${LIBDIR}/$$i; then \
+		if [ -f ${DESTDIR}${libdir}/$$i ]; then \
+			if rm -f ${DESTDIR}${libdir}/$$i; then \
 				${DELETE_OK}; \
 			else \
 				${DELETE_FAILED}; \
 			fi \
 		fi \
 	done
+
+	for i in ${PLUGIN}; do \
+		if [ -f ${DESTDIR}${libdir}/${plugindir}/$$i ]; then \
+			if rm -f ${DESTDIR}${libdir}/${plugindir}/$$i; then \
+				${DELETE_OK}; \
+			else \
+				${DELETE_FAILED}; \
+			fi \
+		fi \
+	done
+	-rmdir ${DESTDIR}${libdir}/${plugindir} >/dev/null 2>&1
 
 	for i in ${DATA}; do \
 		if [ -f ${DESTDIR}${datadir}/${PACKAGE}/$$i ]; then \
@@ -326,7 +354,7 @@ distclean: clean
 		${DIR_LEAVE}; \
 	done
 	
-	for i in ${PROG} ${PROG_NOINST} ${STATIC_LIB} ${STATIC_LIB_NOINST} ${DISTCLEAN}; do \
+	for i in ${PROG} ${PROG_NOINST} ${STATIC_LIB} ${STATIC_LIB_NOINST}  ${PLUGIN} ${PLUGIN_NOINST} ${DISTCLEAN}; do \
 		if [ -f $$i -o -d $$i ]; then \
 			if rm -fr $$i; then \
 				${DELETE_OK}; \
@@ -334,16 +362,6 @@ distclean: clean
 				${DELETE_FAILED}; \
 			fi \
 		fi \
-	done
-
-	for i in ${LIB} ${LIB_NOINST}; do \
-		if [ -f $$i ]; then \
-			if rm -f $$i; then \
-				${DELETE_OK}; \
-			else \
-				${DELETE_FAILED}; \
-			fi \
-		fi; \
 	done
 
 DIR_ENTER = printf "\033[0;36mEntering directory \033[1;36m$$i\033[0;36m.\033[0m\n"; cd $$i || exit 1
