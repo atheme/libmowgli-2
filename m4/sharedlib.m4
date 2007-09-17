@@ -31,6 +31,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
+			PLUGIN_SUFFIX='.impl'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			;;
@@ -44,6 +45,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
+			PLUGIN_SUFFIX='.impl'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%%.*.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%%.*.dylib}.dylib'
 			;;
@@ -57,6 +59,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
+			PLUGIN_SUFFIX='.so'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			;;
@@ -70,6 +73,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
+			PLUGIN_SUFFIX='.dll'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$$i.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$$i.so'
 			;;
@@ -83,6 +87,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS=''
+			PLUGIN_SUFFIX='.so'
 			SYMLINK_LIB='${LN_S} -f $$i ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} && ${LN_S} -f $${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			UNSYMLINK_LIB='rm -f ${DESTDIR}${libdir}/$${i%.so.*}.so.${LIB_MAJOR} ${DESTDIR}${libdir}/$${i%.so.*}.so'
 			;;
@@ -96,6 +101,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 	AC_SUBST(PLUGIN_CPPFLAGS)
 	AC_SUBST(PLUGIN_CFLAGS)
 	AC_SUBST(PLUGIN_LDFLAGS)
+	AC_SUBST(PLUGIN_SUFFIX)
 	AC_SUBST(SYMLINK_LIB)
 	AC_SUBST(UNSYMLINK_LIB)
 ])
