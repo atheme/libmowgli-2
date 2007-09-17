@@ -1,7 +1,7 @@
 PROG_NOINST = listsort
 SRCS = listsort.c
 
-include ../../../buildsys.mk
+include ../../../mk/buildsys.mk
 
 CPPFLAGS += -I../../libmowgli
 LIBS += -L../../libmowgli -lmowgli
