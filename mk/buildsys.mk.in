@@ -82,7 +82,7 @@ subdirs:
 		${DIR_LEAVE}; \
 	done
 
-depend:
+depend: pre-depend
 	regen=0; \
 	for i in ${SRCS}; do [ $$i -nt .deps ] && regen=1; done; \
 	if [ $$regen = 1 ]; then \
@@ -94,6 +94,8 @@ depend:
 			esac; \
 		done; \
 	fi
+
+pre-depend:
 
 ${PROG} ${PROG_NOINST}: ${EXT_DEPS} ${OBJS}
 	${LINK_STATUS}
