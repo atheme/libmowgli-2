@@ -67,7 +67,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			CLEAN_LIB=''
 			;;
 		*-*-mingw32 | *-*-cygwin)
-			AC_MSG_RESULT(MinGW32)
+			AC_MSG_RESULT(Win32)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
 			LIB_LDFLAGS='-shared -Wl,--out-implib,${LIB}.a'
