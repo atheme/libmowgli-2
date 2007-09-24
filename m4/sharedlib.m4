@@ -66,7 +66,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}'
 			CLEAN_LIB=''
 			;;
-		*-*-mingw32)
+		*-*-mingw32 | *-*-cygwin)
 			AC_MSG_RESULT(MinGW32)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
