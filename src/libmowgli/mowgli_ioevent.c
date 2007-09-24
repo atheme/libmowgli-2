@@ -154,11 +154,15 @@ void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_sour
 #endif
 
 #ifdef HAVE_PORT_CREATE
+#ifdef POLLRDNORM
 	if (flags & MOWGLI_POLLRDNORM)
 		events |= POLLRDNORM;
+#endif
 
+#ifdef EPOLLWRNORM
 	if (flags & MOWGLI_POLLWRNORM)
 		events |= EPOLLWRNORM;
+#endif
 
 	port_associate(self->impldata, PORT_SOURCE_FD, object, events, opaque);
 #endif
