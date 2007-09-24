@@ -53,7 +53,7 @@ fi
 
 AC_SUBST(EXAMPLES_BUILD)
 
-AC_CONFIG_FILES([mk/buildsys.mk mk/extra.mk libmowgli.pc])
+AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli.pc])
 AC_OUTPUT
 
 cat << _EOF_

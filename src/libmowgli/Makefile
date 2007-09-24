@@ -64,7 +64,7 @@ INCLUDES = mowgli.h			\
 	   mowgli_stdinc.h		\
 	   mowgli_string.h
 
-include ../../mk/buildsys.mk
+include ../../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}

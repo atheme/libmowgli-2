@@ -1,7 +1,7 @@
 SUBDIRS = src
-DISTCLEAN = mk/extra.mk
+DISTCLEAN = extra.mk
 
-include mk/buildsys.mk
+include buildsys.mk
 
 install-extra:
 	i="libmowgli.pc"; \
