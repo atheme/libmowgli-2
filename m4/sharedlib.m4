@@ -62,7 +62,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			PLUGIN_CFLAGS='-fPIC'
 			PLUGIN_LDFLAGS='-shared -fPIC'
 			PLUGIN_SUFFIX='.so'
-			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR} && ${LN_S} -f $$i.${LIB_MAJOR}.${LIB_MINOR} ${DESTDIR}${libdir}/$$i'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR} && rm -f ${DESTDIR}${libdir}/$$i && ${LN_S} $$i.${LIB_MAJOR}.${LIB_MINOR} ${DESTDIR}${libdir}/$$i'
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}'
 			CLEAN_LIB=''
 			;;
@@ -75,7 +75,7 @@ AC_DEFUN([AM_SHARED_LIB], [
 			LIB_SUFFIX='.dll'
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
-			PLUGIN_LDFLAGS=''
+			PLUGIN_LDFLAGS='-shared'
 			PLUGIN_SUFFIX='.dll'
 			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i && ${INSTALL} -m 755 $$i.a ${DESTDIR}${libdir}/$$i.a'
 			UNINSTALL_LIB='rm -f ${DESTDIR}${bindir}/$$i ${DESTDIR}${libdir}/$$i.a'
