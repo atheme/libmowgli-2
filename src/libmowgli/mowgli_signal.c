@@ -21,6 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef __MINGW32__
+
 #include "mowgli.h"
 
 static mowgli_signal_handler_t
@@ -59,3 +61,5 @@ mowgli_signal_install_handler(int signum, mowgli_signal_handler_t handler)
 {
 	return mowgli_signal_install_handler_full(signum, handler, NULL, 0);
 }
+
+#endif
