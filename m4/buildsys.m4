@@ -18,20 +18,6 @@ dnl ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 dnl POSSIBILITY OF SUCH DAMAGE.
 dnl
 
-AC_DEFUN([BUILDSYS_PROG_SUFFIX], [
-	AC_MSG_CHECKING(for program suffix)
-	case "$target" in
-		*-*-cygwin | *-*-mingw32)
-			PROG_SUFFIX='.exe'
-			;;
-		*)
-			PROG_SUFFIX=''
-			;;
-	esac
-
-	AC_SUBST(PROG_SUFFIX)
-])
-
 AC_DEFUN([BUILDSYS_SHARED_LIB], [
 	AC_MSG_CHECKING(for shared library system)
 	case "$target" in
