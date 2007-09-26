@@ -1,4 +1,4 @@
-PROG_NOINST = listsort
+PROG_NOINST = listsort${PROG_SUFFIX}
 SRCS = listsort.c
 
 include ../../../buildsys.mk

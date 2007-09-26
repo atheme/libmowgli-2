@@ -1,4 +1,4 @@
-PROG_NOINST = dicttest
+PROG_NOINST = dicttest${PROG_SUFFIX}
 SRCS = dicttest.c
 
 include ../../../buildsys.mk

@@ -35,6 +35,7 @@ ERLCFLAGS = @ERLCFLAGS@
 OBJCFLAGS = @OBJCFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
+PROG_SUFFIX = @PROG_SUFFIX@
 LIB_CPPFLAGS = @LIB_CPPFLAGS@
 LIB_CFLAGS = @LIB_CFLAGS@
 LIB_LDFLAGS = @LIB_LDFLAGS@
@@ -234,7 +235,7 @@ install: ${LIB} ${STATIC_LIB} ${PLUGIN} ${PROG} install-extra
 
 	for i in ${PROG}; do \
 		${INSTALL_STATUS}; \
-		if ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 -s $$i ${DESTDIR}${bindir}/$$i; then \
+		if ${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i; then \
 			${INSTALL_OK}; \
 		else \
 			${INSTALL_FAILED}; \
@@ -349,7 +350,7 @@ clean:
 		${DIR_LEAVE}; \
 	done
 	
-	for i in ${OBJS} ${CLEAN} ${CLEAN_LIB} .deps *~; do \
+	for i in ${OBJS} ${CLEAN} ${CLEAN_LIB} .deps; do \
 		if test -f $$i -o -d $$i; then \
 			if rm -fr $$i; then \
 				${DELETE_OK}; \
@@ -366,7 +367,7 @@ distclean: clean
 		${DIR_LEAVE}; \
 	done
 	
-	for i in ${PROG} ${PROG_NOINST} ${LIB} ${LIB_NOINST} ${STATIC_LIB} ${STATIC_LIB_NOINST}  ${PLUGIN} ${PLUGIN_NOINST} ${DISTCLEAN}; do \
+	for i in ${PROG} ${PROG_NOINST} ${LIB} ${LIB_NOINST} ${STATIC_LIB} ${STATIC_LIB_NOINST}  ${PLUGIN} ${PLUGIN_NOINST} ${DISTCLEAN} *~; do \
 		if test -f $$i -o -d $$i; then \
 			if rm -fr $$i; then \
 				${DELETE_OK}; \

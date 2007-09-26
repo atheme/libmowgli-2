@@ -1,4 +1,4 @@
-PROG_NOINST = formattertest
+PROG_NOINST = formattertest${PROG_SUFFIX}
 SRCS = formattertest.c
 
 include ../../../buildsys.mk

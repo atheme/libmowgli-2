@@ -1,4 +1,4 @@
-PROG_NOINST = randomtest
+PROG_NOINST = randomtest${PROG_SUFFIX}
 SRCS = randomtest.c
 
 include ../../../buildsys.mk
