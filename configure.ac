@@ -37,6 +37,8 @@ AC_CHECK_FUNCS([memset setlocale strcasecmp strchr strdup strerror strtol strtod
 AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup strlcpy strlcat epoll_ctl port_create])
 AC_FUNC_STAT
 
+AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
+
 # Check for optional features.
 EXAMPLES_BUILD=""
 AC_ARG_ENABLE(examples,
