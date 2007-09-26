@@ -28,7 +28,8 @@ SRCS = mowgli_alloc.c			\
        mowgli_random.c			\
        mowgli_signal.c			\
        mowgli_spinlock.c		\
-       mowgli_string.c
+       mowgli_string.c			\
+       dlfcn.c
 
 INCLUDES = mowgli.h			\
 	   mowgli_alloc.h		\
@@ -66,5 +67,5 @@ INCLUDES = mowgli.h			\
 
 include ../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I.. -DMOWGLI_CORE
+CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}

@@ -21,7 +21,6 @@ AC_SUBST(PACKAGE)
 
 # Checks for libraries.
 BUILDSYS_SHARED_LIB
-AM_DL
 LIBS="$LIBS $DYNAMIC_LD_LIBS"
 
 # Checks for header files.
