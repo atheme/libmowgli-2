@@ -53,7 +53,7 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 
 	block = (mowgli_block_t *)blp;
 	
-	offset = blp + sizeof(mowgli_block_t);
+	offset = (char*)blp + sizeof(mowgli_block_t);
 	block->data = offset;
 	block->heap = bh;
 
@@ -62,9 +62,9 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 		node = (mowgli_node_t *)offset;
 		node->prev = node->next = NULL;
 
-		mowgli_node_add(offset + sizeof(mowgli_node_t), node, &block->free_list);
+		mowgli_node_add((char*)offset + sizeof(mowgli_node_t), node, &block->free_list);
 
-		offset += bh->alloc_size;
+		offset = (char*)offset + bh->alloc_size;
 	}
 	
 	mowgli_node_add(block, &block->node, &bh->blocks);

@@ -81,7 +81,7 @@ void mowgli_spinlock_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t 
 
 void mowgli_spinlock_timed_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param, struct timeval *tv)
 {
-	struct timeval iter;
+	struct timeval iter = {0};
 
 	return_if_fail(self != NULL)
 	return_if_fail(tv != NULL)
