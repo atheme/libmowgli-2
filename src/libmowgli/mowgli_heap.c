@@ -42,6 +42,8 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 	mowgli_node_t *node;
 	void *offset;
 	int a;
+
+	size_t blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
 	
 #if defined(HAVE_MMAP) && defined(MAP_ANON)
 	if (bh->use_mmap)
@@ -49,7 +51,12 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 			PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	else
 #endif
-		blp = bh->allocator->allocate(sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems));
+	{
+		if (bh->allocator)
+			blp = bh->allocator->allocate(blp_size);
+		else
+			blp = mowgli_alloc(blp_size);
+	}
 
 	block = (mowgli_block_t *)blp;
 	
