@@ -15,6 +15,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_ISC_POSIX
 
+test x"$GCC" = x"yes" && CFLAGS="$CFLAGS -pipe -Wall"
+
 # XXX workaround
 PACKAGE="libmowgli"
 AC_SUBST(PACKAGE)
