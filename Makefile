@@ -1,5 +1,5 @@
 SUBDIRS = src
-DISTCLEAN = extra.mk
+DISTCLEAN = extra.mk buildsys.mk config.log config.status libmowgli.pc
 
 include buildsys.mk
 

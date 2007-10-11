@@ -1,6 +1,7 @@
 LIB = ${LIB_PREFIX}mowgli${LIB_SUFFIX}
 LIB_MAJOR = 1
 LIB_MINOR = 0
+DISTCLEAN = mowgli_config.h
 
 SRCS = mowgli_alloc.c			\
        mowgli_allocation_policy.c	\
