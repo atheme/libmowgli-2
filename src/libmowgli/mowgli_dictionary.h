@@ -31,6 +31,8 @@ typedef struct mowgli_dictionary_ mowgli_dictionary_t;
 
 typedef struct mowgli_dictionary_elem_ mowgli_dictionary_elem_t;
 
+typedef int (*mowgli_dictionary_comparator_func_t)(const char *a, const char *b);
+
 struct mowgli_dictionary_elem_
 {
 	mowgli_dictionary_elem_t *left, *right, *prev, *next;
@@ -54,11 +56,30 @@ typedef struct mowgli_dictionary_iteration_state_ mowgli_dictionary_iteration_st
 #define MOWGLI_DICTIONARY_FOREACH(element, state, dict) for (mowgli_dictionary_foreach_start((dict), (state)); (element = mowgli_dictionary_foreach_cur((dict), (state))); mowgli_dictionary_foreach_next((dict), (state)))
 
 /*
- * mowgli_dictionary_create() creates a new dictionary tree of the defined resolution.
+ * mowgli_dictionary_create() creates a new dictionary tree.
  * compare_cb is the comparison function, typically strcmp, strcasecmp or
  * irccasecmp.
  */
-extern mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, const char *b));
+extern mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb);
+
+/*
+ * mowgli_dictionary_create_named() creates a new dictionary tree which has a name.
+ * name is the name, compare_cb is the comparator.
+ */
+extern mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb);
+
+/*
+ * mowgli_dictionary_set_comparator_func() resets the comparator used for lookups and
+ * insertions in the DTree structure.
+ */
+extern void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
+	mowgli_dictionary_comparator_func_t compare_cb);
+
+/*
+ * mowgli_dictionary_get_comparator_func() returns the comparator used for lookups and
+ * insertions in the DTree structure.
+ */
+extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict);
 
 /*
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls

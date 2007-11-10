@@ -28,14 +28,14 @@ static mowgli_heap_t *elem_heap = NULL;
 
 struct mowgli_dictionary_
 {
-	int (*compare_cb)(const char *a, const char *b);
+	mowgli_dictionary_comparator_func_t compare_cb;
 	mowgli_dictionary_elem_t *root, *head, *tail;
 	unsigned int count;
 	char *id;
 };
 
 /*
- * mowgli_dictionary_create(int (*compare_cb)(const char *a, const char *b)
+ * mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
  *
  * Dictionary object factory.
  *
@@ -49,7 +49,7 @@ struct mowgli_dictionary_
  *     - if services runs out of memory and cannot allocate the object,
  *       the program will abort.
  */
-mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, const char *b))
+mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 {
 	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
@@ -63,7 +63,7 @@ mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, c
 
 /*
  * mowgli_dictionary_create_named(const char *name, 
- *     int (*compare_cb)(const char *a, const char *b)
+ *     mowgli_dictionary_comparator_func_t compare_cb)
  *
  * Dictionary object factory.
  *
@@ -79,7 +79,7 @@ mowgli_dictionary_t *mowgli_dictionary_create(int (*compare_cb)(const char *a, c
  *       the program will abort.
  */
 mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
-	int (*compare_cb)(const char *a, const char *b))
+	mowgli_dictionary_comparator_func_t compare_cb)
 {
 	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
@@ -90,6 +90,54 @@ mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
 		elem_heap = mowgli_heap_create(sizeof(mowgli_dictionary_elem_t), 1024, BH_NOW);
 
 	return dtree;
+}
+
+/*
+ * mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
+ *     mowgli_dictionary_comparator_func_t compare_cb)
+ *
+ * Resets the comparator function used by the dictionary code for
+ * updating the DTree structure.
+ *
+ * Inputs:
+ *     - dictionary object
+ *     - new comparator function (passed as functor)
+ *
+ * Outputs:
+ *     - nothing
+ *
+ * Side Effects:
+ *     - the dictionary comparator function is reset.
+ */
+void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
+	mowgli_dictionary_comparator_func_t compare_cb)
+{
+	return_if_fail(dict != NULL);
+	return_if_fail(compare_cb != NULL);
+
+	dict->compare_cb = compare_cb;
+}
+
+/*
+ * mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
+ *
+ * Returns the current comparator function used by the dictionary.
+ *
+ * Inputs:
+ *     - dictionary object
+ *
+ * Outputs:
+ *     - comparator function (returned as functor)
+ *
+ * Side Effects:
+ *     - none
+ */
+mowgli_dictionary_comparator_func_t
+mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
+{
+	return_val_if_fail(dict != NULL, NULL);
+
+	return dict->compare_cb;
 }
 
 /*
