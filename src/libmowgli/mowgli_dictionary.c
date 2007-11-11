@@ -404,14 +404,10 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 	elem = dict->head;
 
 	ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
-	while (ret > 0)
+	while (ret > 0 && elem->next)
 	{
 		elem = elem->next;
-
 		ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
-
-		if (elem->next == NULL)
-			break;
 	}
 
 	if (elem->next == NULL && ret > 0)
