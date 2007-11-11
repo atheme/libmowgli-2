@@ -388,7 +388,7 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
  *     - a node is linked to the dictionary tree's linear
  *       list.
  */
-static inline void
+/* static inline */ void
 _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 	mowgli_dictionary_elem_t *delem)
 {
@@ -398,22 +398,18 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 	return_if_fail(dict != NULL);
 	return_if_fail(delem != NULL);
 
-	/* optimization: if no linked list, make this the start of the list. */
-	if (dict->head == NULL)
-	{
-		delem->prev = NULL;
-		delem->next = NULL;
-		dict->head = delem;
-		dict->tail = delem;
-
-		return;
-	}
-
 	elem = dict->head;
 
-	for (ret = dict->compare_linear_cb(delem->data, elem->data);
-	     ret > 0 && elem != NULL;
-	     elem = elem->next, ret = dict->compare_linear_cb(delem->data, elem->data));
+	ret = dict->compare_linear_cb(delem->data, elem->data);
+	while (ret > 0)
+	{
+		elem = elem->next;
+
+		ret = dict->compare_linear_cb(delem->data, elem->data);
+
+		if (elem->next == NULL)
+			break;
+	}
 
 	if (elem->next == NULL && ret > 0)
 	{
@@ -428,7 +424,7 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 		elem->prev->next = delem;
 		delem->prev = elem->prev;
 	}
-	else
+	else if (ret < 0)
 		dict->head = delem;
 
 	delem->next = elem;
