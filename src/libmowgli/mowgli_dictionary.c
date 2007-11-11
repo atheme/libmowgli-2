@@ -33,6 +33,7 @@ struct mowgli_dictionary_
 	mowgli_dictionary_elem_t *root, *head, *tail;
 	unsigned int count;
 	char *id;
+	mowgli_boolean_t dirty;
 };
 
 /*
@@ -187,6 +188,54 @@ mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict)
 	return_val_if_fail(dict != NULL, NULL);
 
 	return dict->compare_linear_cb;
+}
+
+/*
+ * mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict,
+ *     const char *key)
+ *
+ * Gets a linear index number for key. Returns 0 if there is no
+ * indexing function.
+ *
+ * Inputs:
+ *     - dictionary tree object
+ *     - pointer to data
+ *
+ * Outputs:
+ *     - position, from zero.
+ *
+ * Side Effects:
+ *     - rebuilds the linear index if the tree is marked as dirty.
+ */
+int
+mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key)
+{
+	mowgli_dictionary_elem_t *elem;
+
+	return_val_if_fail(dict != NULL, 0);
+	return_val_if_fail(key != NULL, 0);
+
+	if (!dict->compare_linear_cb)
+		return 0;
+
+	elem = mowgli_dictionary_find(dict, key);
+	if (elem == NULL)
+		return -1;
+
+	if (!dict->dirty)
+		return elem->position;
+	else
+	{
+		mowgli_dictionary_elem_t *delem;
+		int i;
+
+		for (delem = dict->head, i = 0; delem != NULL; delem = delem->next, i++)
+			delem->position = i;
+
+		dict->dirty = FALSE;
+	}
+
+	return elem->position;
 }
 
 /*
@@ -414,6 +463,8 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict,
 	return_if_fail(dict != NULL);
 	return_if_fail(delem != NULL);
 
+	dict->dirty = TRUE;
+
 	dict->count++;
 
 	if (dict->root == NULL)
@@ -501,6 +552,8 @@ void
 mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 {
 	mowgli_dictionary_elem_t *delem, *nextnode, *parentofnext;
+
+	dict->dirty = TRUE;
 
 	delem = dict->root;
 	if (delem == NULL)

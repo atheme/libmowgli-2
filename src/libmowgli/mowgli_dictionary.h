@@ -38,6 +38,7 @@ struct mowgli_dictionary_elem_
 	mowgli_dictionary_elem_t *left, *right, *prev, *next;
 	void *data;
 	char *key;
+	int position;
 };
 
 /*
@@ -93,6 +94,12 @@ extern void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *di
  * insertions in the DTree structure.
  */
 extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict);
+
+/*
+ * mowgli_dictionary_get_linear_index() returns the linear index of an object in the
+ * DTree structure.
+ */
+extern int mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key);
 
 /*
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls
