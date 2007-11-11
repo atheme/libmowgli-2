@@ -32,7 +32,7 @@ typedef struct mowgli_dictionary_ mowgli_dictionary_t;
 typedef struct mowgli_dictionary_elem_ mowgli_dictionary_elem_t;
 
 typedef int (*mowgli_dictionary_comparator_func_t)(const char *a, const char *b);
-typedef int (*mowgli_dictionary_linear_comparator_func_t)(const char *a, const char *b, void *opaque);
+typedef int (*mowgli_dictionary_linear_comparator_func_t)(void *a, void *b, void *opaque);
 
 struct mowgli_dictionary_elem_
 {
