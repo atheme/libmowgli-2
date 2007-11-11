@@ -425,7 +425,14 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 		delem->prev = elem->prev;
 	}
 	else if (ret < 0)
+	{
 		dict->head = delem;
+
+		if (dict->head->prev)
+			dict->head->prev->next = NULL;
+
+		dict->head->prev = NULL;
+	}
 
 	delem->next = elem;
 	elem->prev = delem;
