@@ -33,7 +33,7 @@
 
 #include <mowgli.h>
 
-int str_comparator(void *left, void *right)
+int str_comparator(void *left, void *right, void *data)
 {
 	return strcasecmp(left, right);
 }
@@ -51,7 +51,7 @@ void test_strings(void)
 	mowgli_dictionary_iteration_state_t state;
 
 	dict = mowgli_dictionary_create(str_comparator);
-	mowgli_dictionary_set_linear_comparator_func(dict, str_comparator);
+	mowgli_dictionary_set_linear_comparator_func(dict, str_comparator, NULL);
 
 	dictionary_add(dict, "foo");
 	dictionary_add(dict, "bar");
@@ -80,7 +80,7 @@ void test_strings(void)
 	mowgli_dictionary_destroy(dict, NULL, NULL);
 }
 
-int int_comparator(void *left, void *right)
+int int_comparator(void *left, void *right, void *data)
 {
 	int a = (int) left;
 	int b = (int) right;
@@ -95,7 +95,7 @@ void test_integers(void)
 	void *x;
 
 	dict = mowgli_dictionary_create(str_comparator);
-	mowgli_dictionary_set_linear_comparator_func(dict, int_comparator);
+	mowgli_dictionary_set_linear_comparator_func(dict, int_comparator, NULL);
 
 	mowgli_dictionary_add(dict, "a", 3);
 	mowgli_dictionary_add(dict, "b", 2);
