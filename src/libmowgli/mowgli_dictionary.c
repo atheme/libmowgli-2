@@ -388,7 +388,7 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
  *     - a node is linked to the dictionary tree's linear
  *       list.
  */
-/* static inline */ void
+static inline void
 _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 	mowgli_dictionary_elem_t *delem)
 {
