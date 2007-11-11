@@ -29,6 +29,7 @@ static mowgli_heap_t *elem_heap = NULL;
 struct mowgli_dictionary_
 {
 	mowgli_dictionary_comparator_func_t compare_cb;
+	mowgli_dictionary_comparator_func_t compare_linear_cb;
 	mowgli_dictionary_elem_t *root, *head, *tail;
 	unsigned int count;
 	char *id;
@@ -134,6 +135,54 @@ void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
  */
 mowgli_dictionary_comparator_func_t
 mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
+{
+	return_val_if_fail(dict != NULL, NULL);
+
+	return dict->compare_cb;
+}
+
+/*
+ * mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
+ *     mowgli_dictionary_comparator_func_t compare_cb)
+ *
+ * Resets the comparator function used by the dictionary code for
+ * updating the DTree structure's linear list.
+ *
+ * Inputs:
+ *     - dictionary object
+ *     - new comparator function (passed as functor)
+ *
+ * Outputs:
+ *     - nothing
+ *
+ * Side Effects:
+ *     - the dictionary comparator function is reset.
+ */
+void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
+	mowgli_dictionary_comparator_func_t compare_cb)
+{
+	return_if_fail(dict != NULL);
+	return_if_fail(compare_cb != NULL);
+
+	dict->compare_cb = compare_cb;
+}
+
+/*
+ * mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict)
+ *
+ * Returns the current comparator function used by the dictionary.
+ *
+ * Inputs:
+ *     - dictionary object
+ *
+ * Outputs:
+ *     - comparator function (returned as functor)
+ *
+ * Side Effects:
+ *     - none
+ */
+mowgli_dictionary_comparator_func_t
+mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict)
 {
 	return_val_if_fail(dict != NULL, NULL);
 
@@ -267,6 +316,77 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
 }
 
 /*
+ * _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
+ *     mowgli_dictionary_elem_t *delem)
+ *
+ * Links a dictionary tree element to the dictionary's
+ * linear list.
+ *
+ * This is only called if a linear comparator is used by
+ * the dictionary. Otherwise, normal linked lists are
+ * used by the dictionary.
+ *
+ * This function is private.
+ *
+ * Inputs:
+ *     - dictionary tree
+ *     - dictionary tree element
+ *
+ * Outputs:
+ *     - nothing
+ *
+ * Side Effects:
+ *     - a node is linked to the dictionary tree's linear
+ *       list.
+ */
+static inline void
+_mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
+	mowgli_dictionary_elem_t *delem)
+{
+	mowgli_dictionary_elem_t *elem;
+	int ret;
+
+	return_if_fail(dict != NULL);
+	return_if_fail(delem != NULL);
+
+	/* optimization: if no linked list, make this the start of the list. */
+	if (dict->head == NULL)
+	{
+		delem->prev = NULL;
+		delem->next = NULL;
+		dict->head = delem;
+		dict->tail = delem;
+
+		return;
+	}
+
+	elem = dict->head;
+
+	for (ret = dict->compare_linear_cb(delem->data, elem->data);
+	     ret > 0 && elem != NULL;
+	     elem = elem->next, ret = dict->compare_linear_cb(delem->data, elem->data));
+
+	if (elem->next == NULL && ret > 0)
+	{
+		elem->next = delem;
+		delem->prev = elem;
+		dict->tail = delem;
+		return;
+	}
+
+	if (elem->prev != NULL)
+	{
+		elem->prev->next = delem;
+		delem->prev = elem->prev;
+	}
+	else
+		dict->head = delem;
+
+	delem->next = elem;
+	elem->prev = delem;
+}
+
+/*
  * mowgli_dictionary_link(mowgli_dictionary_t *dict,
  *     mowgli_dictionary_elem_t *delem)
  *
@@ -314,14 +434,20 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict,
 			delem->right = dict->root;
 			dict->root->left = NULL;
 
-			if (dict->root->prev)
-				dict->root->prev->next = delem;
-			else
-				dict->head = delem;
+			if (!dict->compare_linear_cb)
+			{
+				if (dict->root->prev)
+					dict->root->prev->next = delem;
+				else
+					dict->head = delem;
 
-			delem->prev = dict->root->prev;
-			delem->next = dict->root;
-			dict->root->prev = delem;
+				delem->prev = dict->root->prev;
+				delem->next = dict->root;
+				dict->root->prev = delem;
+			}
+			else
+				_mowgli_dictionary_linear_link(dict, delem);
+
 			dict->root = delem;
 		}
 		else if (ret > 0)
@@ -330,14 +456,20 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict,
 			delem->left = dict->root;
 			dict->root->right = NULL;
 
-			if (dict->root->next)
-				dict->root->next->prev = delem;
-			else
-				dict->tail = delem;
+			if (!dict->compare_linear_cb)
+			{
+				if (dict->root->next)
+					dict->root->next->prev = delem;
+				else
+					dict->tail = delem;
 
-			delem->next = dict->root->next;
-			delem->prev = dict->root;
-			dict->root->next = delem;
+				delem->next = dict->root->next;
+				delem->prev = dict->root;
+				dict->root->next = delem;
+			}
+			else
+				_mowgli_dictionary_linear_link(dict, delem);
+
 			dict->root = delem;
 		}
 		else

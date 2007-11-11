@@ -82,6 +82,19 @@ extern void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
 extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict);
 
 /*
+ * mowgli_dictionary_set_linear_comparator_func() resets the comparator used for linear
+ * insertions in the DTree structure.
+ */
+extern void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
+	mowgli_dictionary_comparator_func_t compare_cb);
+
+/*
+ * mowgli_dictionary_get_linear_comparator_func() returns the comparator used for linear
+ * insertions in the DTree structure.
+ */
+extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict);
+
+/*
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls
  * a defined callback function to destroy any data attached to it.
  */
