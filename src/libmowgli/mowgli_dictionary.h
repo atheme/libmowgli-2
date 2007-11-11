@@ -32,6 +32,7 @@ typedef struct mowgli_dictionary_ mowgli_dictionary_t;
 typedef struct mowgli_dictionary_elem_ mowgli_dictionary_elem_t;
 
 typedef int (*mowgli_dictionary_comparator_func_t)(const char *a, const char *b);
+typedef int (*mowgli_dictionary_linear_comparator_func_t)(const char *a, const char *b, void *opaque);
 
 struct mowgli_dictionary_elem_
 {
@@ -87,13 +88,13 @@ extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_comparator_func
  * insertions in the DTree structure.
  */
 extern void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
-	mowgli_dictionary_comparator_func_t compare_cb);
+	mowgli_dictionary_linear_comparator_func_t compare_cb, void *linear_opaque);
 
 /*
  * mowgli_dictionary_get_linear_comparator_func() returns the comparator used for linear
  * insertions in the DTree structure.
  */
-extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict);
+extern mowgli_dictionary_linear_comparator_func_t mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict);
 
 /*
  * mowgli_dictionary_get_linear_index() returns the linear index of an object in the

@@ -29,11 +29,12 @@ static mowgli_heap_t *elem_heap = NULL;
 struct mowgli_dictionary_
 {
 	mowgli_dictionary_comparator_func_t compare_cb;
-	mowgli_dictionary_comparator_func_t compare_linear_cb;
+	mowgli_dictionary_linear_comparator_func_t compare_linear_cb;
 	mowgli_dictionary_elem_t *root, *head, *tail;
 	unsigned int count;
 	char *id;
 	mowgli_boolean_t dirty;
+	void *linear_opaque;
 };
 
 /*
@@ -160,12 +161,14 @@ mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
  *     - the dictionary comparator function is reset.
  */
 void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
-	mowgli_dictionary_comparator_func_t compare_cb)
+	mowgli_dictionary_linear_comparator_func_t compare_cb,
+	void *linear_opaque)
 {
 	return_if_fail(dict != NULL);
 	return_if_fail(compare_cb != NULL);
 
 	dict->compare_linear_cb = compare_cb;
+	dict->linear_opaque = linear_opaque;
 }
 
 /*
@@ -182,7 +185,7 @@ void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
  * Side Effects:
  *     - none
  */
-mowgli_dictionary_comparator_func_t
+mowgli_dictionary_linear_comparator_func_t
 mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict)
 {
 	return_val_if_fail(dict != NULL, NULL);
@@ -400,12 +403,12 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 
 	elem = dict->head;
 
-	ret = dict->compare_linear_cb(delem->data, elem->data);
+	ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
 	while (ret > 0)
 	{
 		elem = elem->next;
 
-		ret = dict->compare_linear_cb(delem->data, elem->data);
+		ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
 
 		if (elem->next == NULL)
 			break;
