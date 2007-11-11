@@ -404,10 +404,13 @@ _mowgli_dictionary_linear_link(mowgli_dictionary_t *dict,
 	elem = dict->head;
 
 	ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
-	while (ret > 0 && elem->next)
+	while (elem->next)
 	{
 		elem = elem->next;
+
 		ret = dict->compare_linear_cb(delem->data, elem->data, dict->linear_opaque);
+		if (ret <= 0)
+			break;
 	}
 
 	if (elem->next == NULL && ret > 0)
@@ -565,6 +568,8 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 		dict->root = dict->root->right;
 	else if (dict->root->right == NULL)
 		dict->root = dict->root->left;
+	else if (dict->head != delem)
+		dict->root = dict->head;	/* XXX: can we really get away with this? */
 	else if (delem->next)
 	{
 		/* Make the node with the next highest key the new root.
@@ -588,7 +593,7 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 			dict->root->right = delem->right;
 		}
 	}
-	else
+	else	/* last resort. not guaranteed to work. */
 	{
 		/* Make the node with the next highest key the new root.
 		 * This node has a NULL right pointer. */
@@ -611,7 +616,6 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 			dict->root->right = delem->right;
 		}
 	}
-
 
 	/* linked list */
 	if (delem->prev != NULL)
