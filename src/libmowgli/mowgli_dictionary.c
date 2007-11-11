@@ -569,7 +569,7 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 		dict->root = dict->root->right;
 	else if (dict->root->right == NULL)
 		dict->root = dict->root->left;
-	else
+	else if (delem->next != NULL)
 	{
 		/* Make the node with the next highest key the new root.
 		 * This node has a NULL left pointer. */
