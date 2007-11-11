@@ -569,7 +569,7 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 		dict->root = dict->root->right;
 	else if (dict->root->right == NULL)
 		dict->root = dict->root->left;
-	else
+	else if (delem->next)
 	{
 		/* Make the node with the next highest key the new root.
 		 * This node has a NULL left pointer. */
@@ -592,6 +592,30 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 			dict->root->right = delem->right;
 		}
 	}
+	else
+	{
+		/* Make the node with the next highest key the new root.
+		 * This node has a NULL right pointer. */
+		nextnode = delem->prev;
+		soft_assert(nextnode->right == NULL);
+		if (nextnode == delem->left)
+		{
+			dict->root = nextnode;
+			dict->root->right = delem->right;
+		}
+		else
+		{
+			parentofnext = delem->left;
+			while (parentofnext->right != NULL && parentofnext->right != nextnode)
+				parentofnext = parentofnext->right;
+			soft_assert(parentofnext->right == nextnode);
+			parentofnext->right = nextnode->left;
+			dict->root = nextnode;
+			dict->root->left = delem->left;
+			dict->root->right = delem->right;
+		}
+	}
+
 
 	/* linked list */
 	if (delem->prev != NULL)
