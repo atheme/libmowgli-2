@@ -164,7 +164,7 @@ void mowgli_dictionary_set_linear_comparator_func(mowgli_dictionary_t *dict,
 	return_if_fail(dict != NULL);
 	return_if_fail(compare_cb != NULL);
 
-	dict->compare_cb = compare_cb;
+	dict->compare_linear_cb = compare_cb;
 }
 
 /*
@@ -186,7 +186,7 @@ mowgli_dictionary_get_linear_comparator_func(mowgli_dictionary_t *dict)
 {
 	return_val_if_fail(dict != NULL, NULL);
 
-	return dict->compare_cb;
+	return dict->compare_linear_cb;
 }
 
 /*
