@@ -30,7 +30,7 @@ SRCS = mowgli_alloc.c			\
        mowgli_signal.c			\
        mowgli_spinlock.c		\
        mowgli_string.c			\
-       dlfcn.c
+       win32_dlfcn.c
 
 INCLUDES = mowgli.h			\
 	   mowgli_alloc.h		\
