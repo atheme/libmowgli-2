@@ -1,3 +1,3 @@
-SUBDIRS = randomtest listsort formattertest dicttest lineardict
+SUBDIRS = randomtest listsort formattertest dicttest
 
 include ../../buildsys.mk
