@@ -23,7 +23,11 @@
 
 #include "mowgli.h"
 
+#ifndef _WIN32
 #include <dlfcn.h>
+#else
+#include <win32_dlfcn.h>
+#endif
 
 #ifndef RTLD_NOW
 #define RTLD_NOW RTLD_LAZY

@@ -22,7 +22,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "dlfcn.h"
+#include "win32_dlfcn.h"
 
 /* Note:
  * MSDN says these functions are not thread-safe. We make no efforts to have
