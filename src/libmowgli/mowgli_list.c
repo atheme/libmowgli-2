@@ -34,7 +34,7 @@ void mowgli_node_init(void)
 	if (mowgli_node_heap == NULL || mowgli_list_heap == NULL)
 	{
 		mowgli_log("heap allocator failure.");
-		exit(EXIT_FAILURE);
+		abort();
 	}
 }
 
