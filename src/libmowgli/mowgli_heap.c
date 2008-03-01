@@ -154,8 +154,7 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, heap->blocks.head)
 	{
-		mowgli_node_delete(n, &heap->blocks); 
-		mowgli_free(n);
+		mowgli_heap_shrink(n->data);
 	}
 
 	/* everything related to heap has gone, time for itself */
