@@ -25,6 +25,7 @@ SRCS = mowgli_alloc.c			\
        mowgli_object_class.c		\
        mowgli_object_messaging.c	\
        mowgli_object_metadata.c		\
+       mowgli_patricia.c		\
        mowgli_queue.c			\
        mowgli_random.c			\
        mowgli_signal.c			\
@@ -59,6 +60,7 @@ INCLUDES = mowgli.h			\
 	   mowgli_object_class.h	\
 	   mowgli_object_messaging.h	\
 	   mowgli_object_metadata.h	\
+	   mowgli_patricia.h		\
 	   mowgli_queue.h		\
 	   mowgli_random.h		\
 	   mowgli_signal.h		\
