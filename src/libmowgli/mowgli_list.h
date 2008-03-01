@@ -41,7 +41,7 @@ struct mowgli_node_
 {
 	struct mowgli_node_ *next, *prev; 
 	void *data;                   /* pointer to real structure */
-	mowgli_list_t *parent;
+	mowgli_list_t *do_not_use;    /* remove when it's ok to break abi */
 };
 
 /* node list struct */
@@ -63,7 +63,6 @@ extern int mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l);
 extern mowgli_node_t *mowgli_node_find(void *data, mowgli_list_t *l);
 extern void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist);
-extern mowgli_list_t *mowgli_node_parent(mowgli_node_t *n);
 extern mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos);
 extern void *mowgli_node_nth_data(mowgli_list_t *l, int pos);
 
