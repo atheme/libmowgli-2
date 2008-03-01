@@ -130,13 +130,16 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 	bh->alloc_size = bh->elem_size + sizeof(mowgli_heap_elem_header_t);
 
 	/* don't waste part of a page */
+	if (allocator == NULL)
+	{
 #ifdef HAVE_MMAP
-	pagesize = getpagesize();
+		pagesize = getpagesize();
 #else
-	pagesize = 4096;
+		pagesize = 4096;
 #endif
-	numpages = (sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems) + pagesize - 1) / pagesize;
-	bh->mowgli_heap_elems = (numpages * pagesize - sizeof(mowgli_block_t)) / bh->alloc_size;
+		numpages = (sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems) + pagesize - 1) / pagesize;
+		bh->mowgli_heap_elems = (numpages * pagesize - sizeof(mowgli_block_t)) / bh->alloc_size;
+	}
 	
 	bh->flags = flags;
 
