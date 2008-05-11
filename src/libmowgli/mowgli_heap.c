@@ -33,6 +33,42 @@
 # endif
 #endif
 
+/* A block of memory allocated to the allocator */
+struct mowgli_block_
+{
+	mowgli_node_t node;
+	
+	/* link back to our heap */
+	mowgli_heap_t *heap;
+	
+	/* pointer to the first item */
+	void *data;
+	
+	/* singly linked list of free items */
+	void *first_free;
+
+	int num_allocated;
+};
+
+/* A pile of blocks */
+struct mowgli_heap_
+{
+	mowgli_node_t node;
+	
+	unsigned int elem_size;
+	unsigned int mowgli_heap_elems;
+	unsigned int free_elems;
+	
+	unsigned int alloc_size;
+	
+	unsigned int flags;
+	
+	mowgli_list_t blocks;
+
+	mowgli_allocation_policy_t *allocator;
+	mowgli_boolean_t use_mmap;
+};
+
 typedef struct mowgli_heap_elem_header_ mowgli_heap_elem_header_t;
 
 struct mowgli_heap_elem_header_
