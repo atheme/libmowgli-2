@@ -63,10 +63,12 @@ struct mowgli_heap_
 	
 	unsigned int flags;
 	
-	mowgli_list_t blocks;
+	mowgli_list_t blocks; /* list of non-empty blocks */
 
 	mowgli_allocation_policy_t *allocator;
 	mowgli_boolean_t use_mmap;
+
+	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
 };
 
 typedef struct mowgli_heap_elem_header_ mowgli_heap_elem_header_t;
@@ -91,6 +93,8 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 	int a;
 
 	size_t blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
+
+	return_if_fail(bh->empty_block == NULL);
 	
 #if defined(HAVE_MMAP) && defined(MAP_ANON)
 	if (bh->use_mmap)
@@ -123,23 +127,20 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 	
 	block->first_free = prev;
 
-	mowgli_node_add_head(block, &block->node, &bh->blocks);
-
+	bh->empty_block = block;
 	bh->free_elems += bh->mowgli_heap_elems;
 }
 
 /* shrinks a mowgli_heap_t by 1 block. */
 static void
-mowgli_heap_shrink(mowgli_block_t *b)
+mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 {
-	mowgli_heap_t *heap;
-
 	return_if_fail(b != NULL);
-	return_if_fail(b->heap != NULL);
 
-	heap = b->heap;
-
-	mowgli_node_delete(&b->node, &heap->blocks);
+	if (b == heap->empty_block)
+		heap->empty_block = NULL;
+	else
+		mowgli_node_delete(&b->node, &heap->blocks);
 
 #ifdef HAVE_MMAP
 	if (heap->use_mmap)
@@ -161,6 +162,9 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 
 	bh->elem_size = elem_size;
 	bh->mowgli_heap_elems = mowgli_heap_elems;
+	/* at least 2, this avoids some silly special cases */
+	if (bh->mowgli_heap_elems < 2)
+		bh->mowgli_heap_elems = 2;
 	bh->free_elems = 0;
 	
 	bh->alloc_size = bh->elem_size + sizeof(mowgli_heap_elem_header_t);
@@ -205,8 +209,10 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, heap->blocks.head)
 	{
-		mowgli_heap_shrink(n->data);
+		mowgli_heap_shrink(heap, n->data);
 	}
+	if (heap->empty_block)
+		mowgli_heap_shrink(heap, heap->empty_block);
 
 	/* everything related to heap has gone, time for itself */
 	mowgli_free(heap);
@@ -228,36 +234,47 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 		return_val_if_fail(heap->free_elems != 0, NULL);
 	}
 
-	MOWGLI_LIST_FOREACH(n, heap->blocks.head)
-	{
-		b = (mowgli_block_t *) n->data;
+	/* try a partially used block before using a fully free block */
+	n = heap->blocks.head;
+	b = n != NULL ? n->data : NULL;
+	if (b == NULL || b->first_free == NULL)
+		b = heap->empty_block;
+	/* due to above check */
+	return_val_if_fail(b != NULL, NULL);
 
-		/* pull the first free node from the list */
-		h = b->first_free;
-		
-		if (h == NULL)
-			continue;
-		
-		/* mark it as used */
-		b->first_free = h->un.next;
-		h->un.block = b;
-		
-		/* keep count */
-		heap->free_elems--;
-		b->num_allocated++;
+	/* pull the first free node from the list */
+	h = b->first_free;
+	return_val_if_fail(h != NULL, NULL);
+
+	/* mark it as used */
+	b->first_free = h->un.next;
+	h->un.block = b;
+
+	/* keep count */
+	heap->free_elems--;
+	b->num_allocated++;
+
+	/* move it between the lists if needed */
+	/* note that a block has at least two items in it, so these cases
+	 * cannot both occur in the same allocation */
+	if (b->num_allocated == 1)
+	{
+		heap->empty_block = NULL;
+		mowgli_node_add_head(b, &b->node, &heap->blocks);
+	}
+	else if (b->first_free == NULL)
+	{
+		/* move full blocks to the end of the list */
+		mowgli_node_delete(&b->node, &heap->blocks);
+		mowgli_node_add(b, &b->node, &heap->blocks);
+	}
 
 #ifdef HEAP_DEBUG		
-		/* debug */
-		mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
+	/* debug */
+	mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
 #endif
-		/* return pointer to it */
-		return (char *)h + sizeof(mowgli_heap_elem_header_t);
-	}
-	
-	/* this should never happen */
-	mowgli_throw_exception_fatal(mowgli.heap.internal_error_exception);
-	
-	return NULL;
+	/* return pointer to it */
+	return (char *)h + sizeof(mowgli_heap_elem_header_t);
 }
 
 /* frees an item back to the mowgli_heap_t */
@@ -284,7 +301,17 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	/* debug */
 	mowgli_log("mowgli_heap_free(heap = @%p, data = %p)", heap, data);
 #endif
-	/* if this block is entirely unfree, free it. */
-	if (b->num_allocated == 0 && MOWGLI_LIST_LENGTH(&heap->blocks) > 2)
-		mowgli_heap_shrink(b);
+	/* move it between the lists if needed */
+	if (b->num_allocated == 0)
+	{
+		if (heap->empty_block != NULL)
+			mowgli_heap_shrink(heap, heap->empty_block);
+		mowgli_node_delete(&b->node, &heap->blocks);
+		heap->empty_block = b;
+	}
+	else if (b->num_allocated == heap->mowgli_heap_elems - 1)
+	{
+		mowgli_node_delete(&b->node, &heap->blocks);
+		mowgli_node_add_head(b, &b->node, &heap->blocks);
+	}
 }
