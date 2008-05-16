@@ -1,5 +1,5 @@
 LIB = ${LIB_PREFIX}mowgli${LIB_SUFFIX}
-LIB_MAJOR = 1
+LIB_MAJOR = 2
 LIB_MINOR = 0
 DISTCLEAN = mowgli_config.h
 
