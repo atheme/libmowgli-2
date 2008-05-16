@@ -41,7 +41,6 @@ struct mowgli_node_
 {
 	struct mowgli_node_ *next, *prev; 
 	void *data;                   /* pointer to real structure */
-	mowgli_list_t *do_not_use;    /* remove when it's ok to break abi */
 };
 
 /* node list struct */
