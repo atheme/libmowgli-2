@@ -25,7 +25,7 @@
 
 void mowgli_log_cb_default(const char *buf)
 {
-	printf("%s\n", buf);
+	fprintf(stderr, "%s\n", buf);
 }
 
 static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
