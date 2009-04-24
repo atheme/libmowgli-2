@@ -1,5 +1,7 @@
 dnl
-dnl Copyright (c) 2007, Jonathan Schleifer <js-buildsys@webkeks.org>
+dnl Copyright (c) 2007 - 2009, Jonathan Schleifer <js@webkeks.org>
+dnl
+dnl https://webkeks.org/hg/buildsys/
 dnl
 dnl Permission to use, copy, modify, and/or distribute this software for any
 dnl purpose with or without fee is hereby granted, provided that the above
@@ -18,11 +20,41 @@ dnl ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 dnl POSSIBILITY OF SUCH DAMAGE.
 dnl
 
+AC_DEFUN([BUILDSYS_LIB], [
+	AC_ARG_ENABLE(shared,
+		AS_HELP_STRING([--disable-shared], [don't build shared libraries]))
+
+	AS_IF([test x"$enable_shared" = x"no"],
+		BUILDSYS_STATIC_LIB_ONLY,
+		BUILDSYS_SHARED_LIB)
+])
+
+AC_DEFUN([BUILDSYS_PROG_IMPLIB], [
+	AC_REQUIRE([AC_CANONICAL_HOST])
+	AC_MSG_CHECKING(whether we need an implib)
+	case "$host" in
+		*-*-cygwin* | *-*-mingw*)
+			AC_MSG_RESULT(yes)
+			PROG_IMPLIB_NEEDED='yes'
+			PROG_IMPLIB_LDFLAGS='-Wl,-export-all-symbols,--out-implib,lib${PROG}.a'
+			;;
+		*)
+			AC_MSG_RESULT(no)
+			PROG_IMPLIB_NEEDED='no'
+			PROG_IMPLIB_LDFLAGS=''
+			;;
+	esac
+
+	AC_SUBST(PROG_IMPLIB_NEEDED)
+	AC_SUBST(PROG_IMPLIB_LDFLAGS)
+])
+
 AC_DEFUN([BUILDSYS_SHARED_LIB], [
+	AC_REQUIRE([AC_CANONICAL_HOST])
 	AC_MSG_CHECKING(for shared library system)
-	case "$target" in
+	case "$host" in
 		intel-apple-*)
-			AC_MSG_RESULT([Mac OS X (Intel)])
+			AC_MSG_RESULT([MacOS X (Intel)])
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
@@ -37,7 +69,7 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			CLEAN_LIB=''
 			;;
 		*-apple-*)
-			AC_MSG_RESULT(Mac OS X)
+			AC_MSG_RESULT(MacOS X)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
 			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
@@ -51,11 +83,11 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib'
 			CLEAN_LIB=''
 			;;
-		*-*-solaris* | *-openbsd-* | *-mirbsd-*)
+		*-*-solaris*)
 			AC_MSG_RESULT(Solaris)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
-			LIB_LDFLAGS='-shared -fPIC -Wl,-soname=${LIB}.${LIB_MAJOR}'
+			LIB_LDFLAGS='-shared -fPIC -Wl,-soname=${LIB}.${LIB_MAJOR}.${LIB_MINOR}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so'
 			PLUGIN_CPPFLAGS='-DPIC'
@@ -66,7 +98,22 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}'
 			CLEAN_LIB=''
 			;;
-		*-*-cygwin | *-*-mingw32)
+		*-*-openbsd* | *-*-mirbsd*)
+			AC_MSG_RESULT(Solaris)
+			LIB_CPPFLAGS='-DPIC'
+			LIB_CFLAGS='-fPIC'
+			LIB_LDFLAGS='-shared -fPIC'
+			LIB_PREFIX='lib'
+			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
+			PLUGIN_CPPFLAGS='-DPIC'
+			PLUGIN_CFLAGS='-fPIC'
+			PLUGIN_LDFLAGS='-shared -fPIC'
+			PLUGIN_SUFFIX='.so'
+			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$$i'
+			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i'
+			CLEAN_LIB=''
+			;;
+		*-*-cygwin* | *-*-mingw*)
 			AC_MSG_RESULT(Win32)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
@@ -77,12 +124,12 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-shared'
 			PLUGIN_SUFFIX='.dll'
-			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i && ${INSTALL} -m 755 $$i.a ${DESTDIR}${libdir}/$$i.a'
+			INSTALL_LIB='${MKDIR_P} ${DESTDIR}${bindir} && ${INSTALL} -m 755 $$i ${DESTDIR}${bindir}/$$i && ${INSTALL} -m 755 $$i.a ${DESTDIR}${libdir}/$$i.a'
 			UNINSTALL_LIB='rm -f ${DESTDIR}${bindir}/$$i ${DESTDIR}${libdir}/$$i.a'
 			CLEAN_LIB='${LIB}.a'
 			;;
 		*)
-			AC_MSG_RESULT(POSIX)
+			AC_MSG_RESULT(GNU)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC -Wl,-soname=${LIB}.${LIB_MAJOR}'
@@ -110,4 +157,36 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 	AC_SUBST(INSTALL_LIB)
 	AC_SUBST(UNINSTALL_LIB)
 	AC_SUBST(CLEAN_LIB)
+])
+
+AC_DEFUN([BUILDSYS_STATIC_LIB_ONLY], [
+	AC_REQUIRE([AC_PROG_RANLIB])
+	AC_PATH_TOOL(AR, ar)
+
+	LIB_CPPFLAGS=''
+	LIB_CFLAGS=''
+	LIB_LDFLAGS=''
+	LIB_PREFIX='lib'
+	LIB_SUFFIX='.a'
+	INSTALL_LIB='${INSTALL} -m 644 $$i ${DESTDIR}${libdir}/$$i'
+	UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i'
+	CLEAN_LIB=''
+
+	AC_SUBST(LIB_CPPFLAGS)
+	AC_SUBST(LIB_CFLAGS)
+	AC_SUBST(LIB_LDFLAGS)
+	AC_SUBST(LIB_PREFIX)
+	AC_SUBST(LIB_SUFFIX)
+	AC_SUBST(INSTALL_LIB)
+	AC_SUBST(UNINSTALL_LIB)
+	AC_SUBST(CLEAN_LIB)
+])
+
+AC_DEFUN([BUILDSYS_TOUCH_DEPS], [
+	${as_echo:="echo"} "${as_me:="configure"}: touching .deps files"
+	for i in $(find . -name Makefile); do
+		DEPSFILE="$(dirname $i)/.deps"
+		test -f "$DEPSFILE" && rm "$DEPSFILE"
+		touch -t 0001010000 "$DEPSFILE"
+	done
 ])

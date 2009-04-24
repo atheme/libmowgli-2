@@ -55,6 +55,8 @@ fi
 
 AC_SUBST(EXAMPLES_BUILD)
 
+BUILDSYS_TOUCH_DEPS
+
 AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli.pc])
 AC_OUTPUT
 
