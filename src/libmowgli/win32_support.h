@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_module.c: Loadable modules.
+ * win32_support.h: Support functions and values for Win32 platform.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2009 SystemInPlace, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,49 +21,29 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
+#ifndef __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
+#define __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
 
-#ifndef _WIN32
-#include <dlfcn.h>
-#else
-#include "win32_dlfcn.h"
+#ifdef _WIN32
+
+#include <time.h>
+
+#ifdef _MSC_VER
+# define WIN32_MSC
 #endif
 
-#ifndef RTLD_NOW
-#define RTLD_NOW RTLD_LAZY
+#define strcasecmp			stricmp
+#define snprintf			sprintf_s
+#define vsnprintf			vsprintf_s
+#define usleep				Sleep
+
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+extern int gettimeofday(struct timeval *tv, struct timezone *tz);
+
 #endif
 
-mowgli_module_t mowgli_module_open(const char *path)
-{
-	void *handle = dlopen(path, RTLD_NOW);
-
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
-
-	return handle;
-}
-
-void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
-{
-	void *handle;
-
-	return_val_if_fail(module != NULL, NULL);
-
-	handle = dlsym(module, symbol);
-
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
-
-	return handle;
-}
-
-void mowgli_module_close(mowgli_module_t module)
-{
-	return_if_fail(module != NULL);
-
-	dlclose(module);
-}
+#endif

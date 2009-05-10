@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_module.c: Loadable modules.
+ * win32_support.c: Support functions and values for Win32 platform.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2009 SystemInPlace, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -23,47 +23,43 @@
 
 #include "mowgli.h"
 
-#ifndef _WIN32
-#include <dlfcn.h>
+#ifdef _MSC_EXTENSIONS
+# define EPOCH_TIME_IN_MICROSECS	11644473600000000Ui64
 #else
-#include "win32_dlfcn.h"
+# define EPOCH_TIME_IN_MICROSECS	11644473600000000ULL
 #endif
 
-#ifndef RTLD_NOW
-#define RTLD_NOW RTLD_LAZY
-#endif
-
-mowgli_module_t mowgli_module_open(const char *path)
+int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
-	void *handle = dlopen(path, RTLD_NOW);
+	FILETIME ft;
+	unsigned int tmpres = 0;
+	static mowgli_boolean_t tz_init_done = FALSE;
 
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
+	if (tv != NULL)
+	{
+		GetSystemTimeAsFileTime(&ft);
 
-	return handle;
-}
+		tmpres |= ft.dwHighDateTime;
+		tmpres <<= 32;
+		tmpres |= ft.dwLowDateTime;
 
-void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
-{
-	void *handle;
+		tmpres /= 10;
+		tmpres -= EPOCH_TIME_IN_MICROSECS;
+		tv->tv_sec = (long) (tmpres / 1000000UL);
+		tv->tv_usec = (long) (tmpres % 1000000UL);
+	}
 
-	return_val_if_fail(module != NULL, NULL);
+	if (tz != NULL)
+	{
+		if (!tz_init_done)
+		{
+			_tzset();
+			tz_init_done = TRUE;
+		}
 
-	handle = dlsym(module, symbol);
+		tz->tz_minuteswest = _timezone / 60;
+		tz->tz_dsttime = _daylight;
+	}
 
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
-
-	return handle;
-}
-
-void mowgli_module_close(mowgli_module_t module)
-{
-	return_if_fail(module != NULL);
-
-	dlclose(module);
+	return 0;
 }
