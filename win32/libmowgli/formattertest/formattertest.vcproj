@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="formattertest"
 	ProjectGUID="{6C94E593-E1A7-4BA7-9465-4EF2CDC1FE3D}"
 	RootNamespace="formattertest"

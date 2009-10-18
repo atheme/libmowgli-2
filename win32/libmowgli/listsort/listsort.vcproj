@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="listsort"
 	ProjectGUID="{4868661C-ED5B-4C08-BE53-661BE8DB4E78}"
 	RootNamespace="listsort"

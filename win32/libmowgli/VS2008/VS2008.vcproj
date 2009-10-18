@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="libmowgli"
 	ProjectGUID="{69282042-6A25-4FAA-A895-D9ADC1C8578A}"
 	RootNamespace="VS2008"

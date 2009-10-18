@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="dicttest"
 	ProjectGUID="{6FF42EB1-2309-4BC1-8555-6E908D8C3456}"
 	RootNamespace="dicttest"
