@@ -25,15 +25,15 @@ AC_DEFUN([BUILDSYS_LIB], [
 		AS_HELP_STRING([--disable-shared], [don't build shared libraries]))
 
 	AS_IF([test x"$enable_shared" = x"no"],
-		BUILDSYS_STATIC_LIB_ONLY,
-		BUILDSYS_SHARED_LIB)
+		[BUILDSYS_STATIC_LIB_ONLY],
+		[BUILDSYS_SHARED_LIB])
 ])
 
 AC_DEFUN([BUILDSYS_PROG_IMPLIB], [
 	AC_REQUIRE([AC_CANONICAL_HOST])
 	AC_MSG_CHECKING(whether we need an implib)
-	case "$host" in
-		*-*-cygwin* | *-*-mingw*)
+	case "$host_os" in
+		cygwin* | mingw*)
 			AC_MSG_RESULT(yes)
 			PROG_IMPLIB_NEEDED='yes'
 			PROG_IMPLIB_LDFLAGS='-Wl,-export-all-symbols,--out-implib,lib${PROG}.a'
@@ -52,44 +52,31 @@ AC_DEFUN([BUILDSYS_PROG_IMPLIB], [
 AC_DEFUN([BUILDSYS_SHARED_LIB], [
 	AC_REQUIRE([AC_CANONICAL_HOST])
 	AC_MSG_CHECKING(for shared library system)
-	case "$host" in
-		intel-apple-*)
-			AC_MSG_RESULT([MacOS X (Intel)])
+	case "$host_os" in
+		darwin*)
+			AC_MSG_RESULT(Darwin)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
-			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
+			LIB_LDFLAGS='-dynamiclib -flat_namespace'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.dylib'
-			PLUGIN_CPPFLAGS=''
-			PLUGIN_CFLAGS=''
-			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
+			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
+			PLUGIN_CPPFLAGS='-DPIC'
+			PLUGIN_CFLAGS='-fPIC'
+			PLUGIN_LDFLAGS='-bundle -flat_namespace -undefined suppress'
 			PLUGIN_SUFFIX='.impl'
 			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$$i'
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib'
 			CLEAN_LIB=''
 			;;
-		*-apple-*)
-			AC_MSG_RESULT(MacOS X)
-			LIB_CPPFLAGS='-DPIC'
-			LIB_CFLAGS=''
-			LIB_LDFLAGS='-dynamiclib -fPIC -install_name ${libdir}/${LIB}'
-			LIB_PREFIX='lib'
-			LIB_SUFFIX='.dylib'
-			PLUGIN_CPPFLAGS=''
-			PLUGIN_CFLAGS=''
-			PLUGIN_LDFLAGS='-bundle -fno-common -flat_namespace -undefined suppress'
-			PLUGIN_SUFFIX='.impl'
-			INSTALL_LIB='${INSTALL} -m 755 $$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib && ${LN_S} -f $${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib ${DESTDIR}${libdir}/$$i'
-			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.dylib ${DESTDIR}${libdir}/$${i%.dylib}.${LIB_MAJOR}.${LIB_MINOR}.dylib'
-			CLEAN_LIB=''
-			;;
-		*-*-solaris*)
+		solaris*)
 			AC_MSG_RESULT(Solaris)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC -Wl,-soname=${LIB}.${LIB_MAJOR}.${LIB_MINOR}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so'
+			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
 			PLUGIN_CPPFLAGS='-DPIC'
 			PLUGIN_CFLAGS='-fPIC'
 			PLUGIN_LDFLAGS='-shared -fPIC'
@@ -98,13 +85,14 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i ${DESTDIR}${libdir}/$$i.${LIB_MAJOR}.${LIB_MINOR}'
 			CLEAN_LIB=''
 			;;
-		*-*-openbsd* | *-*-mirbsd*)
-			AC_MSG_RESULT(Solaris)
+		openbsd* | mirbsd*)
+			AC_MSG_RESULT(OpenBSD)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS='-fPIC'
 			LIB_LDFLAGS='-shared -fPIC'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so.${LIB_MAJOR}.${LIB_MINOR}'
+			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
 			PLUGIN_CPPFLAGS='-DPIC'
 			PLUGIN_CFLAGS='-fPIC'
 			PLUGIN_LDFLAGS='-shared -fPIC'
@@ -113,13 +101,14 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i'
 			CLEAN_LIB=''
 			;;
-		*-*-cygwin* | *-*-mingw*)
+		cygwin* | mingw*)
 			AC_MSG_RESULT(Win32)
 			LIB_CPPFLAGS='-DPIC'
 			LIB_CFLAGS=''
 			LIB_LDFLAGS='-shared -Wl,--out-implib,${LIB}.a'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.dll'
+			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
 			PLUGIN_CPPFLAGS=''
 			PLUGIN_CFLAGS=''
 			PLUGIN_LDFLAGS='-shared'
@@ -135,6 +124,7 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 			LIB_LDFLAGS='-shared -fPIC -Wl,-soname=${LIB}.${LIB_MAJOR}'
 			LIB_PREFIX='lib'
 			LIB_SUFFIX='.so'
+			LDFLAGS_RPATH='-Wl,-rpath,${libdir}'
 			PLUGIN_CPPFLAGS='-DPIC'
 			PLUGIN_CFLAGS='-fPIC'
 			PLUGIN_LDFLAGS='-shared -fPIC'
@@ -150,6 +140,7 @@ AC_DEFUN([BUILDSYS_SHARED_LIB], [
 	AC_SUBST(LIB_LDFLAGS)
 	AC_SUBST(LIB_PREFIX)
 	AC_SUBST(LIB_SUFFIX)
+	AC_SUBST(LDFLAGS_RPATH)
 	AC_SUBST(PLUGIN_CPPFLAGS)
 	AC_SUBST(PLUGIN_CFLAGS)
 	AC_SUBST(PLUGIN_LDFLAGS)
@@ -168,6 +159,7 @@ AC_DEFUN([BUILDSYS_STATIC_LIB_ONLY], [
 	LIB_LDFLAGS=''
 	LIB_PREFIX='lib'
 	LIB_SUFFIX='.a'
+	LDFLAGS_RPATH=''
 	INSTALL_LIB='${INSTALL} -m 644 $$i ${DESTDIR}${libdir}/$$i'
 	UNINSTALL_LIB='rm -f ${DESTDIR}${libdir}/$$i'
 	CLEAN_LIB=''
@@ -177,6 +169,7 @@ AC_DEFUN([BUILDSYS_STATIC_LIB_ONLY], [
 	AC_SUBST(LIB_LDFLAGS)
 	AC_SUBST(LIB_PREFIX)
 	AC_SUBST(LIB_SUFFIX)
+	AC_SUBST(LDFLAGS_RPATH)
 	AC_SUBST(INSTALL_LIB)
 	AC_SUBST(UNINSTALL_LIB)
 	AC_SUBST(CLEAN_LIB)
