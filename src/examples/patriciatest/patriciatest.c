@@ -52,8 +52,10 @@ static void check_all_retrievable(mowgli_patricia_t *dtree)
 	void *elem, *elem2;
 	unsigned int n1 = 0, n2;
 
+	mowgli_patricia_stats(dtree, statscb, NULL);
 	printf("Checking consistency...");
 	fflush(stdout);
+	n2 = mowgli_patricia_size(dtree);
 	MOWGLI_PATRICIA_FOREACH(elem, &state, dtree)
 	{
 		elem2 = mowgli_patricia_retrieve(dtree, (const char *)elem);
@@ -74,14 +76,16 @@ static void check_all_retrievable(mowgli_patricia_t *dtree)
 			printf(".");
 		fflush(stdout);
 		n1++;
+		if (n1 > n2 * 2)
+			break;
 	}
-	n2 = mowgli_patricia_size(dtree);
 	if (n1 != n2)
 	{
 		errors++;
 		printf("number of iterated elements %u != size %u\n", n1, n2);
 	}
 	printf("\n");
+	fflush(stdout);
 }
 
 void test_patricia(void)
@@ -91,9 +95,11 @@ void test_patricia(void)
 	void *elem;
 
 	dtree = mowgli_patricia_create(str_canon);
-#define ADD(x) mowgli_patricia_add(dtree, x, x); check_all_retrievable(dtree)
+#define ADD(x) printf("Adding %s\n", x); mowgli_patricia_add(dtree, x, x); check_all_retrievable(dtree)
 	ADD("\1\1");
 	ADD("alias");
+	ADD("\377");
+	ADD("\377\377\377");
 	ADD("foo");
 	ADD("bar");
 	ADD("baz");
