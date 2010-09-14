@@ -606,7 +606,7 @@ mowgli_boolean_t mowgli_patricia_add(mowgli_patricia_t *dict, const char *key, v
 	union patricia_elem *delem, *prev, *newnode;
 	union patricia_elem **place1;
 	int val, keylen;
-	int i;
+	int i, j;
 
 	return_val_if_fail(dict != NULL, FALSE);
 	return_val_if_fail(key != NULL, FALSE);
@@ -678,6 +678,8 @@ mowgli_boolean_t mowgli_patricia_add(mowgli_patricia_t *dict, const char *key, v
 		newnode->nibnum = i;
 		newnode->node.parent = prev;
 		newnode->node.parent_val = val;
+		for (j = 0; j < POINTERS_PER_NODE; j++)
+			newnode->node.down[j] = NULL;
 		if (prev == NULL)
 		{
 			newnode->node.down[NIBBLE_VAL(delem->leaf.key, i)] = dict->root;
