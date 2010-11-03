@@ -9,7 +9,7 @@
 #define HAVE_DIRENT_H 1
 
 /* Define to 1 if you have the `epoll_ctl' function. */
-#define HAVE_EPOLL_CTL 1
+/*#define HAVE_EPOLL_CTL 1*/
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -33,7 +33,7 @@
 #define HAVE_MEMSET 1
 
 /* Define to 1 if you have the `mmap' function. */
-#define HAVE_MMAP 1
+/*#define HAVE_MMAP 1*/
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
