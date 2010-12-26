@@ -547,7 +547,8 @@ void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
 static struct patricia_leaf *mowgli_patricia_find(mowgli_patricia_t *dict, const char *key)
 {
 	char ckey_store[256];
-	char *ckey;
+	char *ckey_buf = NULL;
+	const char *ckey;
 	union patricia_elem *delem;
 	int val, keylen;
 
@@ -557,17 +558,21 @@ static struct patricia_leaf *mowgli_patricia_find(mowgli_patricia_t *dict, const
 	keylen = strlen(key);
 
 	if (dict->canonize_cb == NULL)
-		ckey = (char *)key;
+		ckey = key;
 	else
 	{
 		if (keylen >= sizeof ckey_store)
-			ckey = strdup(key);
+		{
+			ckey_buf = strdup(key);
+			dict->canonize_cb(ckey_buf);
+			ckey = ckey_buf;
+		}
 		else
 		{
 			strcpy(ckey_store, key);
+			dict->canonize_cb(ckey_store);
 			ckey = ckey_store;
 		}
-		dict->canonize_cb(ckey);
 	}
 
 	delem = dict->root;
@@ -583,8 +588,7 @@ static struct patricia_leaf *mowgli_patricia_find(mowgli_patricia_t *dict, const
 	if (delem != NULL && strcmp(delem->leaf.key, ckey))
 		delem = NULL;
 
-	if (ckey != (char *)key && ckey != ckey_store)
-		free(ckey);
+	free(ckey_buf);
 
 	return &delem->leaf;
 }
@@ -763,7 +767,8 @@ void *mowgli_patricia_delete(mowgli_patricia_t *dict, const char *key)
 {
 	void *data;
 	char ckey_store[256];
-	char *ckey;
+	char *ckey_buf = NULL;
+	const char *ckey;
 	union patricia_elem *delem, *prev, *next;
 	int val, i, keylen, used;
 
@@ -773,17 +778,21 @@ void *mowgli_patricia_delete(mowgli_patricia_t *dict, const char *key)
 	keylen = strlen(key);
 
 	if (dict->canonize_cb == NULL)
-		ckey = (char *)key;
+		ckey = key;
 	else
 	{
 		if (keylen >= sizeof ckey_store)
-			ckey = strdup(key);
+		{
+			ckey_buf = strdup(key);
+			dict->canonize_cb(ckey_buf);
+			ckey = ckey_buf;
+		}
 		else
 		{
 			strcpy(ckey_store, key);
+			dict->canonize_cb(ckey_store);
 			ckey = ckey_store;
 		}
-		dict->canonize_cb(ckey);
 	}
 
 	val = POINTERS_PER_NODE + 2; /* trap value */
@@ -800,8 +809,7 @@ void *mowgli_patricia_delete(mowgli_patricia_t *dict, const char *key)
 	if (delem != NULL && strcmp(delem->leaf.key, ckey))
 		delem = NULL;
 
-	if (ckey != (char *)key && ckey != ckey_store)
-		free(ckey);
+	free(ckey_buf);
 
 	if (delem == NULL)
 		return NULL;
