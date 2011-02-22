@@ -17,6 +17,7 @@ SRCS = mowgli_alloc.c			\
        mowgli_hash.c			\
        mowgli_heap.c			\
        mowgli_hook.c			\
+       mowgli_index.c			\
        mowgli_init.c			\
        mowgli_ioevent.c			\
        mowgli_list.c			\
@@ -50,6 +51,7 @@ INCLUDES = mowgli.h			\
 	   mowgli_hash.h		\
 	   mowgli_heap.h		\
 	   mowgli_hook.h		\
+	   mowgli_index.h		\
 	   mowgli_init.h		\
 	   mowgli_ioevent.h		\
 	   mowgli_iterator.h		\
