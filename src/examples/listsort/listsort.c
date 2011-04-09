@@ -33,6 +33,10 @@
 
 #include <mowgli.h>
 
+#ifdef _WIN32
+#define strcasecmp			_stricmp
+#endif
+
 int str_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
 {
 	int ret; 

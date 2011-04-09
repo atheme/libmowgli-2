@@ -32,18 +32,8 @@
 #define strcasecmp			_stricmp
 #define strdup				_strdup
 #define usleep(_usecs)		Sleep((_usecs)/1000L)
-
-/* Functions with security enhancements are
- * available only on VISUAL .NET 2005 and later!
- * Also not available on MinGW W32API yet...
- */
-#if defined _MSC_VER && _MSC_VER >= 1400
-# define snprintf			_snprintf_s
-# define vsnprintf			_vsnprintf_s
-#else
-# define snprintf			_snprintf
-# define vsnprintf			_vsnprintf
-#endif
+#define snprintf			_snprintf
+#define vsnprintf			_vsnprintf
 
 struct timezone {
 	int tz_minuteswest;

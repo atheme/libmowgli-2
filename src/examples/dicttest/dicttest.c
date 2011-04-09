@@ -33,6 +33,11 @@
 
 #include <mowgli.h>
 
+#ifdef _WIN32
+#define strcasecmp			_stricmp
+#define snprintf			_snprintf
+#endif
+
 int main(int argc, const char *argv[])
 {
 	mowgli_dictionary_t *test_dict;
