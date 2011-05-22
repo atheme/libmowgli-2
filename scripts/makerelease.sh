@@ -30,7 +30,7 @@ if [ "x$2" = "x--automatic" ]; then
 	AUTOMATIC="yes"
 fi
 
-TIP=`hg tip --template "#rev#:#node|short#"`
+TIP=`git log -1 --pretty=oneline | cut -d" " -f1`
 
 WRKDIR=`pwd`
 
@@ -43,10 +43,11 @@ echo "Making release named $RELEASENAME (tip $TIP)"
 
 echo
 echo "Building root: $RELEASENAME/"
-hg archive $RELEASENAME
+git archive $RELEASENAME
 cd $RELEASENAME
 sh autogen.sh
 rm -rf autogen.sh autom4te.cache
+rm -rf .gitignore
 
 # Run application specific instructions here.
 if [ -x "$WRKDIR/application.sh" ]; then
@@ -95,6 +96,6 @@ fi
 
 echo
 echo "Done. If you have any bugs to report, report them against"
-echo "the distfiles.atheme.org component at http://bugzilla.atheme.org"
+echo "the distfiles.atheme.org component at http://jira.atheme.org"
 echo "Thanks!"
 echo
