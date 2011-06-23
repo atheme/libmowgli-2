@@ -3,7 +3,6 @@ autom4te.cache
 buildsys.mk
 config.log
 config.status
-configure
 extra.mk
 libmowgli.pc
 src/examples/dicttest/dicttest
