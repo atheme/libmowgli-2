@@ -12,7 +12,6 @@ src/examples/randomtest/randomtest
 src/examples/patriciatest/patriciatest
 src/examples/patriciatest2/patriciatest2
 src/libmowgli/mowgli_config.h
-src/libmowgli/mowgli_config.h.in
 .deps
 *.dylib
 *.o
