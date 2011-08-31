@@ -193,7 +193,7 @@ mowgli_mempool_strdup(mowgli_mempool_t * pool, char * src)
 	size_t sz = strlen(src) + 1;
 
 	out = mowgli_mempool_allocate(pool, sz);
-	strncpy(out, src, sz);
+	mowgli_strlcpy(out, src, sz);
 
 	return out;
 }
