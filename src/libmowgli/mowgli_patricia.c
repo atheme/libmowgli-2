@@ -573,7 +573,7 @@ struct patricia_leaf *mowgli_patricia_elem_find(mowgli_patricia_t *dict, const c
 		}
 		else
 		{
-			strcpy(ckey_store, key);
+			mowgli_strlcpy(ckey_store, key, sizeof ckey_store);
 			dict->canonize_cb(ckey_store);
 			ckey = ckey_store;
 		}
