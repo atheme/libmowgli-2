@@ -83,4 +83,14 @@ typedef enum { FALSE, TRUE } mowgli_boolean_t;
 # define MAX(a,b) (((a)>(b))?(a):(b))
 #endif
 
+#if defined(__GNUC__) || defined(_INTEL_COMPILER)
+#define MOWGLI_DEPRECATED \
+	__attribute__((deprecated))
+#elif defined(_MSC_VER)
+#define MOWGLI_DEPRECATED \
+	__declspec(deprecated)
+#else
+#define MOWGLI_DEPRECATED
+#endif
+
 #endif
