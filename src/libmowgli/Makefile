@@ -5,7 +5,7 @@ LIB_MAJOR = 2
 LIB_MINOR = 0
 DISTCLEAN = mowgli_config.h
 
-SUBDIRS = platform
+SUBDIRS = platform object
 
 SRCS = mowgli_alloc.c			\
        mowgli_allocation_policy.c	\
@@ -26,10 +26,6 @@ SRCS = mowgli_alloc.c			\
        mowgli_logger.c			\
        mowgli_mempool.c			\
        $(MOWGLI_MODULE)			\
-       mowgli_object.c			\
-       mowgli_object_class.c		\
-       mowgli_object_messaging.c	\
-       mowgli_object_metadata.c		\
        mowgli_patricia.c		\
        mowgli_queue.c			\
        mowgli_random.c			\
@@ -61,10 +57,6 @@ INCLUDES = mowgli.h			\
 	   mowgli_logger.h		\
 	   mowgli_mempool.h		\
 	   mowgli_module.h		\
-	   mowgli_object.h		\
-	   mowgli_object_class.h	\
-	   mowgli_object_messaging.h	\
-	   mowgli_object_metadata.h	\
 	   mowgli_patricia.h		\
 	   mowgli_queue.h		\
 	   mowgli_random.h		\
@@ -78,4 +70,5 @@ include ../../buildsys.mk
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
 
-LIBS += platform/win32/mowgli.platform.win32.a
+LIBS += platform/win32/mowgli.platform.win32.a \
+	object/mowgli.object.a
