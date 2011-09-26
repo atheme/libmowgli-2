@@ -24,8 +24,8 @@
 #ifndef __MOWGLI_ALLOCATOR_H__
 #define __MOWGLI_ALLOCATOR_H__
 
-void mowgli_allocator_init(void) MOWGLI_DEPRECATED;
-extern mowgli_allocation_policy_t *mowgli_allocator_malloc MOWGLI_DEPRECATED;
+void mowgli_allocator_init(void);
+extern mowgli_allocation_policy_t *mowgli_allocator_malloc;
 
 #endif
 
