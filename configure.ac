@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([libmowgli], [0.9.95], [bugs+libmowgli@atheme.org])
+AC_INIT([libmowgli], [1.9.0], [bugs+libmowgli@atheme.org])
 AC_CONFIG_SRCDIR([src/libmowgli/mowgli_alloc.c])
 AC_CONFIG_HEADER([src/libmowgli/mowgli_config.h])
 
@@ -37,7 +37,7 @@ AC_C_CONST
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
 AC_CHECK_FUNCS([memset setlocale strcasecmp strchr strdup strerror strtol strtod])
-AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup strlcpy strlcat epoll_ctl port_create])
+AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup])
 AC_FUNC_STAT
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
@@ -71,7 +71,7 @@ AC_SUBST(EXAMPLES_BUILD)
 
 BUILDSYS_TOUCH_DEPS
 
-AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli.pc])
+AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli-2.pc])
 AC_OUTPUT
 
 cat << _EOF_

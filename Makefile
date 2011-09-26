@@ -1,10 +1,10 @@
 SUBDIRS = src
-DISTCLEAN = extra.mk buildsys.mk config.log config.status libmowgli.pc
+DISTCLEAN = extra.mk buildsys.mk config.log config.status libmowgli-2.pc
 
 include buildsys.mk
 
 install-extra:
-	i="libmowgli.pc"; \
+	i="libmowgli-2.pc"; \
 	${INSTALL_STATUS}; \
 	if ${MKDIR_P} ${DESTDIR}${libdir}/pkgconfig && ${INSTALL} -m 644 $$i ${DESTDIR}${libdir}/pkgconfig/$$i; then \
 		${INSTALL_OK}; \
@@ -13,7 +13,7 @@ install-extra:
 	fi
 
 uninstall-extra:
-	i="libmowgli.pc"; \
+	i="libmowgli-2.pc"; \
 	if [ -f ${DESTDIR}${libdir}/pkgconfig/$$i ]; then \
 		if rm -f ${DESTDIR}${libdir}/pkgconfig/$$i; then \
 			${DELETE_OK}; \
