@@ -33,8 +33,8 @@
 #endif
 
 #ifdef MOWGLI_CORE
-# include "win32_support.h"
-# include "mowgli_config.h"
+# include "platform/win32/win32_stdinc.h"
+# include "platform/autoconf.h"
 #endif
 
 #include "mowgli_stdinc.h"

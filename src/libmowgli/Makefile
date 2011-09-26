@@ -1,9 +1,11 @@
 include ../../extra.mk
 
-LIB = ${LIB_PREFIX}mowgli${LIB_SUFFIX}
+SHARED_LIB = ${LIB_PREFIX}mowgli${LIB_SUFFIX}
 LIB_MAJOR = 2
 LIB_MINOR = 0
 DISTCLEAN = mowgli_config.h
+
+SUBDIRS = platform
 
 SRCS = mowgli_alloc.c			\
        mowgli_allocation_policy.c	\
@@ -75,3 +77,5 @@ include ../../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
+
+LIBS += platform/win32/mowgli.platform.win32.a

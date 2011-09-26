@@ -29,6 +29,7 @@
 # define EPOCH_TIME_IN_MICROSECS	11644473600000000ULL
 #endif
 
+#ifdef _WIN32
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	FILETIME ft;
@@ -62,3 +63,4 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 	return 0;
 }
+#endif
