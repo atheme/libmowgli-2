@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_spinlock.h: Spinlocks.
+ * win32_support.h: Support functions and values for Win32 platform.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2009 SystemInPlace, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,24 +21,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_SPINLOCK_H__
-#define __MOWGLI_SPINLOCK_H__
+#ifndef __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
+#define __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
 
-typedef struct {
-	void *read_owner;	/* opaque data representing a spinlock's owner */
-	void *write_owner;	/* opaque data representing a spinlock's owner */
-} mowgli_spinlock_t;
+#ifdef _WIN32
 
-typedef enum {
-	MOWGLI_SPINLOCK_READ,
-	MOWGLI_SPINLOCK_WRITE,
-	MOWGLI_SPINLOCK_READWRITE
-} mowgli_spinlock_lock_param_t;
+#include <winsock.h> // just for struct timeval declaration
+#include <time.h>
 
-extern mowgli_spinlock_t *mowgli_spinlock_create(void) MOWGLI_DEPRECATED;
-extern void mowgli_spinlock_lock(mowgli_spinlock_t *self, void *r, void *w) MOWGLI_DEPRECATED;
-extern void mowgli_spinlock_unlock(mowgli_spinlock_t *self, void *r, void *w) MOWGLI_DEPRECATED;
-extern void mowgli_spinlock_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param) MOWGLI_DEPRECATED;
-extern void mowgli_spinlock_timed_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param, struct timeval *tv) MOWGLI_DEPRECATED;
+#define strcasecmp			_stricmp
+#define strdup				_strdup
+#define usleep(_usecs)		Sleep((_usecs)/1000L)
+#define snprintf			_snprintf
+#define vsnprintf			_vsnprintf
+
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+extern int gettimeofday(struct timeval *tv, struct timezone *tz);
+
+#endif
 
 #endif

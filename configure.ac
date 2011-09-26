@@ -4,13 +4,15 @@
 AC_PREREQ(2.59)
 AC_INIT([libmowgli], [1.9.0], [bugs+libmowgli@atheme.org])
 AC_CONFIG_SRCDIR([src/libmowgli/mowgli_alloc.c])
-AC_CONFIG_HEADER([src/libmowgli/mowgli_config.h])
+AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 # Checks for programs.
 AC_PROG_CC
+AC_PATH_PROG(AR, ar)
+AC_PATH_PROG(RANLIB, ranlib)
 AC_PROG_LN_S
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
@@ -69,6 +71,8 @@ fi
 
 AC_SUBST(EXAMPLES_BUILD)
 
+BUILDSYS_INIT
+BUILDSYS_SHARED_LIB
 BUILDSYS_TOUCH_DEPS
 
 AC_CONFIG_FILES([buildsys.mk extra.mk libmowgli-2.pc])
