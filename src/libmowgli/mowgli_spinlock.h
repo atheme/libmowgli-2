@@ -35,10 +35,10 @@ typedef enum {
 	MOWGLI_SPINLOCK_READWRITE
 } mowgli_spinlock_lock_param_t;
 
-extern mowgli_spinlock_t *mowgli_spinlock_create(void);
-extern void mowgli_spinlock_lock(mowgli_spinlock_t *self, void *r, void *w);
-extern void mowgli_spinlock_unlock(mowgli_spinlock_t *self, void *r, void *w);
-extern void mowgli_spinlock_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param);
-extern void mowgli_spinlock_timed_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param, struct timeval *tv);
+extern mowgli_spinlock_t *mowgli_spinlock_create(void) MOWGLI_DEPRECATED;
+extern void mowgli_spinlock_lock(mowgli_spinlock_t *self, void *r, void *w) MOWGLI_DEPRECATED;
+extern void mowgli_spinlock_unlock(mowgli_spinlock_t *self, void *r, void *w) MOWGLI_DEPRECATED;
+extern void mowgli_spinlock_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param) MOWGLI_DEPRECATED;
+extern void mowgli_spinlock_timed_wait(mowgli_spinlock_t *self, mowgli_spinlock_lock_param_t param, struct timeval *tv) MOWGLI_DEPRECATED;
 
 #endif
