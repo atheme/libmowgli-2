@@ -44,12 +44,12 @@ typedef struct {
 #define MOWGLI_POLLHUP			0x04
 #define MOWGLI_POLLERR			0x08
 
-extern mowgli_ioevent_handle_t *mowgli_ioevent_create(void);
-extern void mowgli_ioevent_destroy(mowgli_ioevent_handle_t *self);
+extern mowgli_ioevent_handle_t *mowgli_ioevent_create(void) MOWGLI_DEPRECATED;
+extern void mowgli_ioevent_destroy(mowgli_ioevent_handle_t *self) MOWGLI_DEPRECATED;
 
-extern int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, size_t bufsize, unsigned int delay);
+extern int mowgli_ioevent_get(mowgli_ioevent_handle_t *self, mowgli_ioevent_t *buf, size_t bufsize, unsigned int delay) MOWGLI_DEPRECATED;
 
-extern void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object, unsigned int flags, void *opaque);
-extern void mowgli_ioevent_dissociate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object);
+extern void mowgli_ioevent_associate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object, unsigned int flags, void *opaque) MOWGLI_DEPRECATED;
+extern void mowgli_ioevent_dissociate(mowgli_ioevent_handle_t *self, mowgli_ioevent_source_t source, int object) MOWGLI_DEPRECATED;
 
 #endif
