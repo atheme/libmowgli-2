@@ -2,8 +2,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([libmowgli], [1.9.0], [bugs+libmowgli@atheme.org])
-AC_CONFIG_SRCDIR([src/libmowgli/mowgli_alloc.c])
+AC_INIT([libmowgli-2], [1.9.0], [bugs+libmowgli@atheme.org])
+AC_CONFIG_SRCDIR([src/libmowgli/core/alloc.c])
 AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
 
 AC_CANONICAL_HOST
@@ -21,7 +21,7 @@ AC_ISC_POSIX
 test x"$GCC" = x"yes" && CFLAGS="$CFLAGS -pipe -Wall"
 
 # XXX workaround
-PACKAGE="libmowgli"
+PACKAGE="libmowgli-2"
 AC_SUBST(PACKAGE)
 
 # Checks for libraries.
@@ -48,10 +48,10 @@ dnl Detect which loader to use
 AC_MSG_CHECKING(loader type)
 case "$target" in
 *-*-mingw32)
-    MOWGLI_MODULE='mowgli_module_win32.c'
+    MOWGLI_MODULE='loader_win32.c'
 	;;
 *)
-    MOWGLI_MODULE='mowgli_module_posix.c'
+    MOWGLI_MODULE='loader_posix.c'
 	;;
 esac
 AC_MSG_RESULT($MOWGLI_MODULE);

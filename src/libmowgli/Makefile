@@ -4,7 +4,7 @@ SHARED_LIB = ${LIB_PREFIX}mowgli-2${LIB_SUFFIX}
 LIB_MAJOR = 2
 LIB_MINOR = 0
 
-SUBDIRS = core platform object
+SUBDIRS = core platform module object
 
 SRCS = \
        mowgli_argstack.c		\
@@ -17,7 +17,6 @@ SRCS = \
        mowgli_index.c			\
        mowgli_list.c			\
        mowgli_mempool.c			\
-       $(MOWGLI_MODULE)			\
        mowgli_patricia.c		\
        mowgli_queue.c			\
        mowgli_random.c			\
@@ -37,7 +36,6 @@ INCLUDES = mowgli.h			\
 	   mowgli_iterator.h		\
 	   mowgli_list.h		\
 	   mowgli_mempool.h		\
-	   mowgli_module.h		\
 	   mowgli_patricia.h		\
 	   mowgli_queue.h		\
 	   mowgli_random.h		\
@@ -52,4 +50,5 @@ CFLAGS += ${LIB_CFLAGS}
 
 LIBS += core/mowgli.core.a \
 	platform/win32/mowgli.platform.win32.a \
+	module/mowgli.module.a \
 	object/mowgli.object.a

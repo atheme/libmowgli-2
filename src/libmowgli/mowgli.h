@@ -54,7 +54,7 @@ MOWGLI_DECLS_START
 #include "core/allocation_policy.h"
 #include "mowgli_patricia.h"
 #include "mowgli_mempool.h"
-#include "mowgli_module.h"
+#include "module/module.h"
 #include "mowgli_queue.h"
 #include "mowgli_hash.h"
 #include "core/heap.h"
