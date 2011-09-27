@@ -48,14 +48,14 @@ MOWGLI_DECLS_START
 
 #include "core/alloc.h"
 #include "mowgli_spinlock.h"
-#include "mowgli_list.h"
+#include "container/list.h"
 #include "object/class.h"
 #include "object/object.h"
 #include "core/allocation_policy.h"
-#include "mowgli_patricia.h"
+#include "container/patricia.h"
 #include "mowgli_mempool.h"
 #include "module/module.h"
-#include "mowgli_queue.h"
+#include "container/queue.h"
 #include "mowgli_hash.h"
 #include "core/heap.h"
 #include "core/init.h"
@@ -63,7 +63,7 @@ MOWGLI_DECLS_START
 #include "mowgli_hook.h"
 #include "mowgli_signal.h"
 #include "mowgli_error_backtrace.h"
-#include "mowgli_random.h"
+#include "base/random.h"
 #include "mowgli_argstack.h"
 #include "object/message.h"
 #include "object/metadata.h"
@@ -71,7 +71,7 @@ MOWGLI_DECLS_START
 #include "core/mowgli_string.h"
 #include "core/allocator.h"
 #include "mowgli_formatter.h"
-#include "mowgli_index.h"
+#include "container/index.h"
 
 MOWGLI_DECLS_END
 
