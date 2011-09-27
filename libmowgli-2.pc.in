@@ -7,9 +7,9 @@ version=@PACKAGE_VERSION@
 include_dir=@includedir@/@PACKAGE_NAME@
 lib_dir=@libdir@
 
-Name: libmowgli
+Name: libmowgli-2
 Description: A library which contains many utility functions and classes.
 Version: @PACKAGE_VERSION@
-Libs: -L${lib_dir} -lmowgli
+Libs: -L${lib_dir} -lmowgli-2
 Cflags: -I${include_dir}
 
