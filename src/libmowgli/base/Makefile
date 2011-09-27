@@ -2,13 +2,25 @@ include ../../../extra.mk
 
 STATIC_PIC_LIB_NOINST = mowgli.base.a
 
-SRCS = random.c			\
+SRCS = argstack.c		\
+       bitvector.c 		\
+       formatter.c		\
+       hash.c			\
+       hook.c			\
+       mempool.c			\
+       random.c			\
 
-INCLUDES = random.h		\
+INCLUDES = argstack.h		\
+	   bitvector.h		\
+	   formatter.h		\
+	   hash.h		\
+	   hook.h		\
+	   mempool.h		\
+	   random.h		\
+
+includesubdir = $(PACKAGE)/base
 
 include ../../../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
-
-includesubdir += /base

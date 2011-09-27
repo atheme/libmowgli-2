@@ -6,9 +6,9 @@ SRCS = ${MOWGLI_MODULE}
 
 INCLUDES = module.h		\
 
+includesubdir = $(PACKAGE)/module
+
 include ../../../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
-
-includesubdir += /module

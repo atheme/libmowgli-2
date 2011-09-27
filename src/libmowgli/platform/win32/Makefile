@@ -9,6 +9,8 @@ SRCS = gettimeofday.c
 
 INCLUDES = win32_stdinc.h
 
+includesubdir = $(PACKAGE)/platform/win32
+
 include ../../../../buildsys.mk
 
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../.. -DMOWGLI_CORE
