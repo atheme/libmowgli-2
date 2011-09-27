@@ -23,6 +23,7 @@
 
 #ifndef _WIN32
 
+#include <signal.h>
 #include "mowgli.h"
 
 static mowgli_signal_handler_t
