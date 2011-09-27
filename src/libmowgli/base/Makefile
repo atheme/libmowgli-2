@@ -7,8 +7,9 @@ SRCS = argstack.c		\
        formatter.c		\
        hash.c			\
        hook.c			\
-       mempool.c			\
+       mempool.c		\
        random.c			\
+       signal.c			\
 
 INCLUDES = argstack.h		\
 	   bitvector.h		\
@@ -17,6 +18,7 @@ INCLUDES = argstack.h		\
 	   hook.h		\
 	   mempool.h		\
 	   random.h		\
+	   signal.h		\
 
 includesubdir = $(PACKAGE)/base
 
