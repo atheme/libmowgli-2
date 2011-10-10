@@ -33,7 +33,6 @@
 #define strdup				_strdup
 #define usleep(_usecs)		Sleep((_usecs)/1000L)
 #define snprintf			_snprintf
-#define vsnprintf			_vsnprintf
 
 struct timezone {
 	int tz_minuteswest;
