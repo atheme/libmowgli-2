@@ -206,6 +206,31 @@ mowgli_patricia_t *mowgli_patricia_create_named(const char *name,
 }
 
 /*
+ * mowgli_patricia_shutdown(void)
+ *
+ * Clean up after patricia to ensure all memory is released as soon as
+ * possible (destroys both heaps).
+ *
+ * Inputs:
+ *     - nothing
+ *
+ * Outputs:
+ *     - nothing
+ *
+ * Side Effects:
+ *     - patricia's internal heaps are destroyed and deallocated
+ */
+void mowgli_patricia_shutdown(void)
+{
+	if(leaf_heap)
+		mowgli_heap_destroy(leaf_heap);
+	if(node_heap)
+		mowgli_heap_destroy(node_heap);
+
+	return;
+}
+
+/*
  * mowgli_patricia_destroy(mowgli_patricia_t *dtree,
  *     void (*destroy_cb)(const char *key, void *data, void *privdata),
  *     void *privdata);
@@ -669,6 +694,7 @@ struct patricia_leaf *mowgli_patricia_elem_add(mowgli_patricia_t *dict, const ch
 		soft_assert(dict->count == 0);
 		place1 = &dict->root;
 		*place1 = mowgli_heap_alloc(leaf_heap);
+		return_val_if_fail(*place1 != NULL, NULL);
 		(*place1)->nibnum = -1;
 		(*place1)->leaf.data = data;
 		(*place1)->leaf.key = ckey;
@@ -691,6 +717,7 @@ struct patricia_leaf *mowgli_patricia_elem_add(mowgli_patricia_t *dict, const ch
 	{
 		/* Insert new node below prev */
 		newnode = mowgli_heap_alloc(node_heap);
+		return_val_if_fail(newnode != NULL, NULL);
 		newnode->nibnum = i;
 		newnode->node.parent = prev;
 		newnode->node.parent_val = val;
@@ -738,6 +765,7 @@ struct patricia_leaf *mowgli_patricia_elem_add(mowgli_patricia_t *dict, const ch
 	place1 = &newnode->node.down[val];
 	soft_assert(*place1 == NULL);
 	*place1 = mowgli_heap_alloc(leaf_heap);
+	return_val_if_fail(*place1 != NULL, NULL);
 	(*place1)->nibnum = -1;
 	(*place1)->leaf.data = data;
 	(*place1)->leaf.key = ckey;
