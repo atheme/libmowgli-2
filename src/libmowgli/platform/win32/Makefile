@@ -5,7 +5,7 @@ LIB_MAJOR = 2
 LIB_MINOR = 0
 DISTCLEAN = mowgli_config.h
 
-SRCS = gettimeofday.c
+SRCS = gettimeofday.c thread.c
 
 INCLUDES = win32_stdinc.h
 
