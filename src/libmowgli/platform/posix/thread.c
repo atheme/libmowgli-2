@@ -23,6 +23,8 @@
 
 #include "mowgli.h"
 
+#ifndef _WIN32
+
 /*************
  * This implements native Sun/UnixWare threads.  Some other SVR4-based
  * environments attempted to make work-alikes, but those aren't guaranteed
@@ -95,5 +97,7 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 	return pthread_mutex_destroy(mutex);
 }
 
+
+#endif
 
 #endif
