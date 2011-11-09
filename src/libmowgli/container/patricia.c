@@ -407,7 +407,9 @@ void *mowgli_patricia_search(mowgli_patricia_t *dtree,
 void mowgli_patricia_foreach_start(mowgli_patricia_t *dtree,
 	mowgli_patricia_iteration_state_t *state)
 {
-	return_if_fail(dtree != NULL);
+	if (dtree == NULL)
+		return;
+
 	return_if_fail(state != NULL);
 
 	if (dtree->root != NULL)
@@ -444,7 +446,9 @@ void mowgli_patricia_foreach_start(mowgli_patricia_t *dtree,
 void *mowgli_patricia_foreach_cur(mowgli_patricia_t *dtree,
 	mowgli_patricia_iteration_state_t *state)
 {
-	return_val_if_fail(dtree != NULL, NULL);
+	if (dtree == NULL)
+		return NULL;
+
 	return_val_if_fail(state != NULL, NULL);
 
 	return STATE_CUR(state) != NULL ?
@@ -474,7 +478,9 @@ void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
 	union patricia_elem *delem, *next;
 	int val;
 
-	return_if_fail(dtree != NULL);
+	if (dtree == NULL)
+		return NULL;
+
 	return_if_fail(state != NULL);
 
 	if (STATE_CUR(state) == NULL)
