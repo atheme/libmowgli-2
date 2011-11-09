@@ -33,8 +33,10 @@
 #endif
 
 #ifdef MOWGLI_CORE
-# include "platform/win32/win32_stdinc.h"
 # include "platform/autoconf.h"
+#endif
+#ifdef _WIN32
+# include "platform/win32/win32_stdinc.h"
 #endif
 
 #include "core/stdinc.h"
@@ -72,6 +74,7 @@ MOWGLI_DECLS_START
 #include "core/allocator.h"
 #include "base/formatter.h"
 #include "container/index.h"
+#include "core/thread.h"
 
 MOWGLI_DECLS_END
 

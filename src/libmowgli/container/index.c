@@ -20,7 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <mowgli.h>
+#include "mowgli.h"
 
 struct mowgli_index_
 {

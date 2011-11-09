@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * win32_support.h: Support functions and values for Win32 platform.
+ * mowgli_thread.h: Cross-platform threading helper routines.
  *
- * Copyright (c) 2009 SystemInPlace, Inc.
+ * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,26 +21,32 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
-#define __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
+#ifndef __MOWGLI_THREAD_H__
+#define __MOWGLI_THREAD_H__
 
-#ifdef _WIN32
+#if defined(_WIN32)				/* Windows threading */
 
-#include <winsock.h> // just for struct timeval declaration
-#include <time.h>
+	typedef HANDLE mowgli_mutex_t;
 
-#define strcasecmp			_stricmp
-#define strdup				_strdup
-#define usleep(_usecs)		Sleep((_usecs)/1000L)
-#define snprintf			_snprintf
+#elif defined(__sun)				/* Solaris/UnixWare threading */
 
-struct timezone {
-	int tz_minuteswest;
-	int tz_dsttime;
-};
+#	include <thread.h>
+#	include <synch.h>
+	typedef mutex_t mowgli_mutex_t;
 
-extern int gettimeofday(struct timeval *tv, struct timezone *tz);
+#else						/* pthreads */
+
+#	include <pthread.h>
+	typedef pthread_mutex_t mowgli_mutex_t;
 
 #endif
 
-#endif
+
+int mowgli_mutex_create(mowgli_mutex_t *mutex);
+int mowgli_mutex_lock(mowgli_mutex_t *mutex);
+int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
+int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
+int mowgli_mutex_destroy(mowgli_mutex_t *mutex);
+
+
+#endif /* !__MOWGLI_THREAD_H__ */

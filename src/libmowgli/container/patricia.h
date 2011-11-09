@@ -69,6 +69,13 @@ typedef struct mowgli_patricia_iteration_state_ mowgli_patricia_iteration_state_
 extern mowgli_patricia_t *mowgli_patricia_create(void (*canonize_cb)(char *key));
 
 /*
+ * mowgli_patricia_shutdown() deallocates all heaps used in patricia trees. This is
+ * useful on embedded devices with little memory, and/or when you know you won't need
+ * any more patricia trees.
+ */
+extern void mowgli_patricia_shutdown(void);
+
+/*
  * mowgli_patricia_destroy() destroys all entries in a dtree, and also optionally calls
  * a defined callback function to destroy any data attached to it.
  */

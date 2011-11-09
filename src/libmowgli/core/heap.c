@@ -4,6 +4,7 @@
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Copyright (c) 2005-2006 Theo Julienne <terminal -at- atheme.org>
+ * Copyright (c) 2011 Andrew Wilcox <awilcox -at- wilcox-tech.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -67,6 +68,8 @@ struct mowgli_heap_
 
 	mowgli_allocation_policy_t *allocator;
 	mowgli_boolean_t use_mmap;
+	
+	mowgli_mutex_t mutex;
 
 	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
 };
@@ -91,10 +94,18 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 	mowgli_heap_elem_header_t *node, *prev;
 	char *offset;
 	unsigned int a;
+	size_t blp_size;
+	
+	if(mowgli_mutex_lock(&(bh->mutex)) != 0)
+		mowgli_throw_exception_fatal("heap mutex can't be locked");
 
-	size_t blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
+	blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
 
-	return_if_fail(bh->empty_block == NULL);
+	if(bh->empty_block != NULL)
+	{
+		mowgli_mutex_unlock(&(bh->mutex));
+		return;
+	}
 
 #if defined(HAVE_MMAP) && defined(MAP_ANON)
 	if (bh->use_mmap)
@@ -129,6 +140,8 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 
 	bh->empty_block = block;
 	bh->free_elems += bh->mowgli_heap_elems;
+	
+	mowgli_mutex_unlock(&(bh->mutex));
 }
 
 /* shrinks a mowgli_heap_t by 1 block. */
@@ -136,6 +149,9 @@ static void
 mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 {
 	return_if_fail(b != NULL);
+	
+	if(mowgli_mutex_lock(&heap->mutex) != 0)
+		mowgli_throw_exception_fatal("heap mutex can't be locked");
 
 	if (b == heap->empty_block)
 		heap->empty_block = NULL;
@@ -153,6 +169,8 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 		mowgli_free(b);
 
 	heap->free_elems -= heap->mowgli_heap_elems;
+	
+	mowgli_mutex_unlock(&heap->mutex);
 }
 
 /* creates a new mowgli_heap_t */
@@ -191,6 +209,9 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 #ifdef HAVE_MMAP
 	bh->use_mmap = allocator != NULL ? FALSE : TRUE;
 #endif
+	
+	if(mowgli_mutex_create(&(bh->mutex)) != 0)
+		mowgli_throw_exception_fatal("heap mutex can't be created");
 
 	if (flags & BH_NOW)
 		mowgli_heap_expand(bh);
@@ -216,6 +237,8 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	}
 	if (heap->empty_block)
 		mowgli_heap_shrink(heap, heap->empty_block);
+	
+	mowgli_mutex_destroy(&heap->mutex);
 
 	/* everything related to heap has gone, time for itself */
 	mowgli_free(heap);
@@ -228,13 +251,20 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	mowgli_node_t *n;
 	mowgli_block_t *b;
 	mowgli_heap_elem_header_t *h;
+	
+	if(mowgli_mutex_lock(&heap->mutex) != 0)
+		mowgli_throw_exception_fatal("heap mutex can't be locked");
 
 	/* no free space? */
 	if (heap->free_elems == 0)
 	{
 		mowgli_heap_expand(heap);
 
-		return_val_if_fail(heap->free_elems != 0, NULL);
+		if(heap->free_elems == 0)
+		{
+			mowgli_mutex_unlock(&heap->mutex);
+			return NULL;
+		}
 	}
 
 	/* try a partially used block before using a fully free block */
@@ -276,6 +306,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	/* debug */
 	mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
 #endif
+	mowgli_mutex_unlock(&heap->mutex);
 	/* return pointer to it */
 	return (char *)h + sizeof(mowgli_heap_elem_header_t);
 }
@@ -286,6 +317,9 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 {
 	mowgli_block_t *b;
 	mowgli_heap_elem_header_t *h;
+	
+	if(mowgli_mutex_lock(&heap->mutex) != 0)
+		mowgli_throw_exception_fatal("heap mutex can't be locked");
 
 	h = (mowgli_heap_elem_header_t *)((char *)data - sizeof(mowgli_heap_elem_header_t));
 	b = h->un.block;
@@ -320,4 +354,6 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 		mowgli_node_delete(&b->node, &heap->blocks);
 		mowgli_node_add_head(b, &b->node, &heap->blocks);
 	}
+	
+	mowgli_mutex_unlock(&heap->mutex);
 }

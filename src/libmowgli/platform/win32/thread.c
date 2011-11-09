@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * win32_support.h: Support functions and values for Win32 platform.
+ * mowgli_thread.c: Cross-platform threading helper routines.
  *
- * Copyright (c) 2009 SystemInPlace, Inc.
+ * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,26 +21,47 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
-#define __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
+#include "mowgli.h"
 
-#ifdef _WIN32
 
-#include <winsock.h> // just for struct timeval declaration
-#include <time.h>
+/*************
+ * This Windows implementation is guaranteed to work on Windows 95,
+ * Windows NT 4, and anything later.
+ *************/
+#if defined(_WIN32)
 
-#define strcasecmp			_stricmp
-#define strdup				_strdup
-#define usleep(_usecs)		Sleep((_usecs)/1000L)
-#define snprintf			_snprintf
 
-struct timezone {
-	int tz_minuteswest;
-	int tz_dsttime;
-};
+int mowgli_mutex_create(mowgli_mutex_t *mutex)
+{
+	*mutex = CreateMutex(NULL, FALSE, NULL);
+	if(*mutex == NULL)
+		return GetLastError();
 
-extern int gettimeofday(struct timeval *tv, struct timezone *tz);
+	return 0;
+}
 
-#endif
+int mowgli_mutex_lock(mowgli_mutex_t *mutex)
+{
+	return WaitForSingleObject(*mutex, INFINITE);
+}
+
+int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
+{
+	return WaitForSingleObject(*mutex, 0);
+}
+
+int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
+{
+	if(ReleaseMutex(*mutex) != 0)
+		return 0;
+
+	return GetLastError();
+}
+
+int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+{
+	CloseHandle(*mutex);
+	return 0;
+}
 
 #endif

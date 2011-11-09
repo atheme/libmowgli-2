@@ -1,15 +1,11 @@
 include ../../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.platform.win32.a
+STATIC_PIC_LIB_NOINST = mowgli.platform.posix.a
 LIB_MAJOR = 2
 LIB_MINOR = 0
 DISTCLEAN = mowgli_config.h
 
-SRCS = gettimeofday.c thread.c
-
-INCLUDES = win32_stdinc.h
-
-includesubdir = $(PACKAGE)/platform/win32
+SRCS = thread.c
 
 include ../../../../buildsys.mk
 
