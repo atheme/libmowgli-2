@@ -16,6 +16,7 @@ CFLAGS += ${LIB_CFLAGS}
 
 LIB_OBJS += core/mowgli.core.a \
 	base/mowgli.base.a \
+	platform/posix/mowgli.platform.posix.a \
 	platform/win32/mowgli.platform.win32.a \
 	module/mowgli.module.a \
 	object/mowgli.object.a \
