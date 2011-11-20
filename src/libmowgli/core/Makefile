@@ -14,8 +14,14 @@ INCLUDES = init.h		\
 	   alloc.h		\
 	   allocation_policy.h	\
 	   allocator.h		\
+	   assert.h		\
+	   exception.h		\
+	   heap.h		\
+	   iterator.h		\
 	   logger.h		\
-	   mowgli_string.h \
+	   mowgli_string.h	\
+	   stdinc.h		\
+	   thread.h
 
 includesubdir = $(PACKAGE)/core
 
