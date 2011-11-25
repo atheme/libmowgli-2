@@ -75,6 +75,7 @@ MOWGLI_DECLS_START
 #include "base/formatter.h"
 #include "container/index.h"
 #include "core/thread.h"
+#include "ext/confparse.h"
 
 MOWGLI_DECLS_END
 
