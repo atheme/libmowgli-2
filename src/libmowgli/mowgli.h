@@ -76,6 +76,7 @@ MOWGLI_DECLS_START
 #include "container/index.h"
 #include "core/thread.h"
 #include "ext/confparse.h"
+#include "eventloop/eventloop.h"
 
 MOWGLI_DECLS_END
 
