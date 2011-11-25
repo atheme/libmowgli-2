@@ -14,25 +14,25 @@ typedef struct _mowgli_configentry mowgli_config_file_entry_t;
 
 struct _mowgli_configfile
 {
-	char *cf_filename;
-	mowgli_config_file_entry_t *cf_entries;
-	mowgli_config_file_t *cf_next;
-	int cf_curline;
-	char *cf_mem;
+	char *filename;
+	mowgli_config_file_entry_t *entries;
+	mowgli_config_file_t *next;
+	int curline;
+	char *mem;
 };
 
 struct _mowgli_configentry
 {
-	mowgli_config_file_t *ce_fileptr;
+	mowgli_config_file_t *fileptr;
 
-	int ce_varlinenum;
-	char *ce_varname;
-	char *ce_vardata;
-	int ce_sectlinenum; /* line containing closing brace */
+	int varlinenum;
+	char *varname;
+	char *vardata;
+	int sectlinenum; /* line containing closing brace */
 
-	mowgli_config_file_entry_t *ce_entries;
-	mowgli_config_file_entry_t *ce_prevlevel;
-	mowgli_config_file_entry_t *ce_next;
+	mowgli_config_file_entry_t *entries;
+	mowgli_config_file_entry_t *prevlevel;
+	mowgli_config_file_entry_t *next;
 };
 
 /* confp.c */
