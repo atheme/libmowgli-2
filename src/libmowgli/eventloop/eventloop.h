@@ -65,4 +65,12 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 extern mowgli_eventloop_t *mowgli_eventloop_create(void);
 extern void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop);
 
+/* timer.c */
+extern mowgli_eventloop_timer_t *mowgli_timer_add(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when);
+extern mowgli_eventloop_timer_t *mowgli_timer_add_once(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when);
+extern void mowgli_timer_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_timer_t *timer);
+extern void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop);
+extern time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop);
+extern mowgli_eventloop_timer_t *mowgli_timer_find(mowgli_eventloop_t *eventloop, mowgli_event_dispatch_func_t *func, void *arg);
+
 #endif
