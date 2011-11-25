@@ -2,7 +2,7 @@ include ../../../extra.mk
 
 STATIC_PIC_LIB_NOINST = mowgli.eventloop.a
 
-SRCS = timer.c
+SRCS = eventloop.c timer.c
 
 INCLUDES = eventloop.h
 

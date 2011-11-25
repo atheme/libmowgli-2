@@ -18,51 +18,25 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
-#define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
+#include "mowgli.h"
 
-typedef void mowgli_event_dispatch_func_t(void *);
+static mowgli_heap_t *eventloop_heap = NULL;
 
-typedef struct {
-	mowgli_node_t node;
-
-	mowgli_event_dispatch_func_t *func;
-	void *arg;
-	const char *name;
-	time_t frequency;
-	time_t when;
-	bool active;
-} mowgli_eventloop_timer_t;
-
-typedef struct {
-	time_t currtime;
-	time_t time_min;
-
-	const char *last_ran;
-
-	mowgli_list_t timer_list;
-} mowgli_eventloop_t;
-
-static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t time)
+mowgli_eventloop_t *mowgli_eventloop_create(void)
 {
-	return_if_fail(eventloop != NULL);
+	mowgli_eventloop_t *eventloop;
 
-	eventloop->currtime = time;
+	if (eventloop_heap == NULL)
+		eventloop_heap = mowgli_heap_create(sizeof(mowgli_eventloop_t), 16, BH_NOW);
+
+	eventloop = mowgli_heap_alloc(eventloop_heap);
+
+	mowgli_eventloop_synchronize(eventloop);
+
+	return eventloop;
 }
 
-static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
+void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
-	return_val_if_fail(eventloop != NULL, 0);
-
-	return eventloop->currtime;
+	mowgli_heap_free(eventloop_heap, eventloop);
 }
-
-static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
-{
-	mowgli_eventloop_set_time(eventloop, time(NULL));
-}
-
-extern mowgli_eventloop_t *mowgli_eventloop_create(void);
-extern void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop);
-
-#endif
