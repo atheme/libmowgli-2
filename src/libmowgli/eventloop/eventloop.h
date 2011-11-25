@@ -45,21 +45,21 @@ typedef struct {
 	mowgli_list_t timer_list;
 } mowgli_eventloop_t;
 
-inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t time)
+static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t time)
 {
 	return_if_fail(eventloop != NULL);
 
 	eventloop->currtime = time;
 }
 
-inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
+static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
 {
 	return_val_if_fail(eventloop != NULL, 0);
 
 	return eventloop->currtime;
 }
 
-inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
+static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 {
 	mowgli_eventloop_set_time(eventloop, time(NULL));
 }
