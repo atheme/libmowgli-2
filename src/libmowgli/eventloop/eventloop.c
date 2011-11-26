@@ -43,6 +43,8 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 	eventloop->eventloop_ops = &_mowgli_poll_pollops;
 #endif
 
+	eventloop->eventloop_ops->pollsetup(eventloop);
+
 	mowgli_eventloop_synchronize(eventloop);
 
 	return eventloop;
@@ -50,6 +52,8 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
+	eventloop->eventloop_ops->pollshutdown(eventloop);
+
 	mowgli_heap_free(eventloop_heap, eventloop);
 }
 

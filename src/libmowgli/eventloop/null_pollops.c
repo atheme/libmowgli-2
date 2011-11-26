@@ -28,6 +28,8 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	return_if_fail(eventloop != NULL);
 	return_if_fail(eventloop->eventloop_ops != NULL);
 
+	mowgli_eventloop_synchronize(eventloop);
+
 	currtime = mowgli_eventloop_get_time(eventloop);
 	delay = mowgli_eventloop_next_timer(eventloop);
 
@@ -44,6 +46,10 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 		t = 250;
 	else
 		t = (delay - currtime) * 1000;
+
+#ifdef DEBUG
+	mowgli_log("delay: %ld, currtime: %ld, select period: %d", delay, currtime, t);
+#endif
 
 	eventloop->eventloop_ops->select(eventloop, t);
 }
