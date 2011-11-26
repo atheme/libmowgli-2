@@ -38,6 +38,7 @@ typedef struct _mowgli_pollable mowgli_eventloop_pollable_t;
 typedef enum {
 	MOWGLI_EVENTLOOP_POLL_READ,
 	MOWGLI_EVENTLOOP_POLL_WRITE,
+	MOWGLI_EVENTLOOP_POLL_ERROR,
 } mowgli_eventloop_pollable_dir_t;
 
 typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
@@ -48,6 +49,7 @@ struct _mowgli_pollable {
 
 	mowgli_pollevent_dispatch_func_t *read_function;
 	mowgli_pollevent_dispatch_func_t *write_function;
+	mowgli_pollevent_dispatch_func_t *error_function;
 
 	void *userdata;
 
