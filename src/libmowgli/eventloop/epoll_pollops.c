@@ -148,6 +148,9 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 
 	if (num < 0)
 	{
+		if (mowgli_eventloop_ignore_errno(errno))
+			return;
+
 		mowgli_log("mowgli_epoll_eventloop_select(): epoll_wait failed: %d (%s)", o_errno, strerror(o_errno));
 		return;
 	}
