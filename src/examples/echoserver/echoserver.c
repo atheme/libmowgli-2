@@ -59,18 +59,7 @@ static int setup_listener(void)
 	return fd;
 }
 
-static void __read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
-{
-	client_t *client = userdata;
-
-	printf("read_data\n");
-
-	read(pollable->fd, client->buf, sizeof(client->buf));
-
-	printf("read(%d): %s", pollable->fd, client->buf);
-}
-
-static void __write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+static void write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
 {
 	client_t *client = userdata;
 
@@ -81,6 +70,38 @@ static void __write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollabl
 	}
 
 	memset(client->buf, '\0', sizeof(client->buf));
+
+	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_WRITE, NULL);
+}
+
+static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+{
+	int ret;
+
+	client_t *client = userdata;
+
+	printf("read_data\n");
+
+	if ((ret = read(pollable->fd, client->buf, sizeof(client->buf))) <= 0)
+	{
+		mowgli_free(client);
+		mowgli_pollable_destroy(eventloop, pollable);
+
+		return;
+	}
+
+	printf("read(%d, %d): %s", pollable->fd, ret, client->buf);
+
+	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_WRITE, write_data);
+}
+
+static void client_error(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+{
+	printf("client died\n");
+
+	mowgli_free(userdata);
+
+	mowgli_pollable_destroy(eventloop, pollable);
 }
 
 static void accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
@@ -98,8 +119,8 @@ static void accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollab
 	client = mowgli_alloc(sizeof(client_t));
 	client->pollable = mowgli_pollable_create(eventloop, new_fd, client);
 
-	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_READ, __read_data);
-	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_WRITE, __write_data);
+	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_READ, read_data);
+	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_ERROR, client_error);
 }
 
 int main(int argc, char *argv[])
