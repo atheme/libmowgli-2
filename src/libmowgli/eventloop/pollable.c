@@ -28,6 +28,9 @@ mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloo
 
 	return_val_if_fail(eventloop != NULL, NULL);
 
+	if (pollable_heap == NULL)
+		pollable_heap = mowgli_heap_create(sizeof(mowgli_eventloop_pollable_t), 16, BH_NOW);
+
 	pollable = mowgli_heap_alloc(pollable_heap);
 
 	pollable->fd = fd;

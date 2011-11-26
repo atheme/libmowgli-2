@@ -39,7 +39,7 @@ typedef struct {
 
 static nfds_t update_poll_fds(mowgli_eventloop_t *eventloop)
 {
-	mowgli_node_t *n;
+	mowgli_node_t *n, *tn;
 	mowgli_poll_eventloop_private_t *priv;
 	nfds_t slot = 0;
 
@@ -47,11 +47,15 @@ static nfds_t update_poll_fds(mowgli_eventloop_t *eventloop)
 
 	priv = eventloop->poller;
 
-        MOWGLI_ITER_FOREACH(n, priv->pollable_list.head)
+        MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
         {
 		mowgli_eventloop_pollable_t *pollable = n->data;
 
-                if (pollable->read_function || pollable->write_function)
+#ifdef DEBUG
+		mowgli_log("considering fd %d pollable %p count %d", pollable->fd, pollable, priv->pollable_list.count);
+#endif
+
+		if (pollable->read_function || pollable->write_function)
 		{
 			priv->pollfds[slot].fd = pollable->fd;
 
@@ -63,11 +67,11 @@ static nfds_t update_poll_fds(mowgli_eventloop_t *eventloop)
 
 			priv->pollfds[slot].revents = 0;
 			pollable->slot = slot;
-                        slot++;
-                }
-                else
-                        pollable->slot = -1;
-        }
+			slot++;
+		}
+		else
+			pollable->slot = -1;
+	}
 
         return slot;
 }
@@ -102,6 +106,20 @@ static void mowgli_poll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 
 static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
 {
+	mowgli_poll_eventloop_private_t *priv;
+
+	return_if_fail(eventloop != NULL);
+	return_if_fail(pollable != NULL);
+
+	priv = eventloop->poller;
+
+#ifdef DEBUG
+	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
+#endif
+
+	if (pollable->read_function || pollable->write_function)
+		mowgli_node_delete(&pollable->node, &priv->pollable_list);
+
 	switch (dir)
 	{
 	case MOWGLI_EVENTLOOP_POLL_READ:
@@ -114,6 +132,9 @@ static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 		mowgli_log("unhandled pollable direction %d", dir);
 		break;
 	}
+
+	if (pollable->read_function || pollable->write_function)
+		mowgli_node_add(pollable, &pollable->node, &priv->pollable_list);
 
 	return;
 }
@@ -147,6 +168,10 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 
 			if (priv->pollfds[slot].revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR) && pollable->read_function)
 			{
+#ifdef DEBUG
+				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
+#endif
+
 				priv->pollfds[slot].events &= ~(POLLRDNORM | POLLIN | POLLHUP | POLLERR);
 				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
 			}
@@ -162,6 +187,10 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 
 			if (priv->pollfds[slot].revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR) && pollable->write_function)
 			{
+#ifdef DEBUG
+				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
+#endif
+
 				priv->pollfds[slot].events &= ~(POLLWRNORM | POLLOUT | POLLHUP | POLLERR);
 				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
 			}
