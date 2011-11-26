@@ -31,19 +31,19 @@ typedef struct {
 	char buf[1024];
 } client_t;
 
+#ifdef DEBUG
 static void timer_tick(void *unused)
 {
 	static int ticks = 0;
 
 	printf("tick: %d\n", ++ticks);
 }
+#endif
 
 static int setup_listener(void)
 {
 	struct sockaddr_in in = {};
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
-
-	fcntl(fd, F_SETFL, O_NONBLOCK);
 
 	in.sin_family = AF_INET;
 	in.sin_port = htons(1337);
@@ -64,10 +64,7 @@ static void write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_
 	client_t *client = userdata;
 
 	if (*client->buf)
-	{
 		write(pollable->fd, client->buf, strlen(client->buf));
-		printf("write(%d): %s", pollable->fd, client->buf);
-	}
 
 	memset(client->buf, '\0', sizeof(client->buf));
 
@@ -80,8 +77,6 @@ static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t
 
 	client_t *client = userdata;
 
-	printf("read_data\n");
-
 	if ((ret = read(pollable->fd, client->buf, sizeof(client->buf))) <= 0)
 	{
 		mowgli_free(client);
@@ -90,17 +85,12 @@ static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t
 		return;
 	}
 
-	printf("read(%d, %d): %s", pollable->fd, ret, client->buf);
-
 	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_WRITE, write_data);
 }
 
 static void client_error(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
 {
-	printf("client died\n");
-
 	mowgli_free(userdata);
-
 	mowgli_pollable_destroy(eventloop, pollable);
 }
 
@@ -109,15 +99,14 @@ static void accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollab
 	client_t *client;
 	mowgli_descriptor_t new_fd, listener_fd;
 
-	printf("new client!\n");
-
 	listener_fd = pollable->fd;
 
 	new_fd = accept(listener_fd, NULL, NULL);
-	fcntl(new_fd, F_SETFL, O_NONBLOCK);
 
 	client = mowgli_alloc(sizeof(client_t));
+
 	client->pollable = mowgli_pollable_create(eventloop, new_fd, client);
+	mowgli_pollable_set_nonblocking(client->pollable, true);
 
 	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_READ, read_data);
 	mowgli_pollable_setselect(base_eventloop, client->pollable, MOWGLI_EVENTLOOP_POLL_ERROR, client_error);
@@ -131,11 +120,14 @@ int main(int argc, char *argv[])
 
 	base_eventloop = mowgli_eventloop_create();
 
+#ifdef DEBUG
 	mowgli_timer_add(base_eventloop, "timer_tick", timer_tick, NULL, 1);
+#endif
 
 	fd = setup_listener();
 
 	listener = mowgli_pollable_create(base_eventloop, fd, NULL);
+	mowgli_pollable_set_nonblocking(listener, true);
 	mowgli_pollable_setselect(base_eventloop, listener, MOWGLI_EVENTLOOP_POLL_READ, accept_client);
 
 	mowgli_eventloop_run(base_eventloop);
