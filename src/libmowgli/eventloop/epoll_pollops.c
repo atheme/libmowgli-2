@@ -165,7 +165,7 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
 
 		if (priv->pfd[i].events & (EPOLLOUT) && pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
+			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
 
 		pollable->slot = 0;
 
