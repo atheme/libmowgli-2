@@ -59,3 +59,19 @@ void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_p
 
 	eventloop->eventloop_ops->setselect(eventloop, pollable, dir, event_function);
 }
+
+void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking)
+{
+	unsigned long flags;
+
+	return_if_fail(pollable != NULL);
+
+	flags = fcntl(pollable->fd, F_GETFL);
+
+	if (nonblocking)
+		flags |= O_NONBLOCK;
+	else
+		flags &= ~O_NONBLOCK;
+
+	fcntl(pollable->fd, F_SETFL, flags);
+}
