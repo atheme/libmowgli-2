@@ -28,6 +28,10 @@ extern mowgli_eventloop_ops_t _mowgli_null_pollops;
 extern mowgli_eventloop_ops_t _mowgli_poll_pollops;
 #endif
 
+#ifdef HAVE_SYS_EPOLL_H
+extern mowgli_eventloop_ops_t _mowgli_epoll_pollops;
+#endif
+
 mowgli_eventloop_t *mowgli_eventloop_create(void)
 {
 	mowgli_eventloop_t *eventloop;
@@ -41,6 +45,10 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 #ifdef HAVE_POLL_H
 	eventloop->eventloop_ops = &_mowgli_poll_pollops;
+#endif
+
+#ifdef HAVE_SYS_EPOLL_H
+	eventloop->eventloop_ops = &_mowgli_epoll_pollops;
 #endif
 
 	eventloop->eventloop_ops->pollsetup(eventloop);
