@@ -56,7 +56,7 @@ typedef struct {
 	void (*pollsetup)(mowgli_eventloop_t *eventloop);
 	void (*pollshutdown)(mowgli_eventloop_t *eventloop);
 	void (*setselect)(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function);
-	void (*select)(mowgli_eventloop_t *eventloop);
+	void (*select)(mowgli_eventloop_t *eventloop, int time);
 } mowgli_eventloop_ops_t;
 
 struct _mowgli_eventloop {
@@ -104,6 +104,9 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 {
 	mowgli_eventloop_set_time(eventloop, time(NULL));
 }
+
+/* null_pollops.c */
+extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
 
 /* eventloop.c */
 extern mowgli_eventloop_t *mowgli_eventloop_create(void);

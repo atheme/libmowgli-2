@@ -20,19 +20,32 @@
 
 #include "mowgli.h"
 
-static void mowgli_null_eventloop_run_once(mowgli_eventloop_t *eventloop)
+void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 {
-	time_t delay;
+	time_t delay, currtime;
+	int t;
 
-	mowgli_eventloop_synchronize(eventloop);
+	return_if_fail(eventloop != NULL);
+	return_if_fail(eventloop->eventloop_ops != NULL);
 
+	currtime = mowgli_eventloop_get_time(eventloop);
 	delay = mowgli_eventloop_next_timer(eventloop);
-	delay -= mowgli_eventloop_get_time(eventloop);
 
-	if (delay <= 0)
+	if (delay <= currtime)
+	{
 		mowgli_eventloop_run_timers(eventloop);
+		mowgli_eventloop_synchronize(eventloop);
+
+		currtime = mowgli_eventloop_get_time(eventloop);
+		delay = mowgli_eventloop_next_timer(eventloop);
+	}
+
+	if (delay <= currtime)
+		t = 250;
 	else
-		sleep(delay);
+		t = (delay - currtime) * 1000;
+
+	eventloop->eventloop_ops->select(eventloop, t);
 }
 
 static void mowgli_null_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
@@ -65,13 +78,13 @@ static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 	return;
 }
 
-static void mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop)
+static void mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 {
-	return;
+	usleep(time);
 }
 
 mowgli_eventloop_ops_t _mowgli_null_pollops = {
-	.run_once = mowgli_null_eventloop_run_once,
+	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_null_eventloop_pollsetup,
 	.pollshutdown = mowgli_null_eventloop_pollshutdown,
 	.setselect = mowgli_null_eventloop_setselect,
