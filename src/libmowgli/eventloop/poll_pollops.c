@@ -47,6 +47,8 @@ static nfds_t update_poll_fds(mowgli_eventloop_t *eventloop)
 
 	priv = eventloop->poller;
 
+	memset(priv->pollfds, '\0', sizeof(priv->pollfds));
+
         MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
         {
 		mowgli_eventloop_pollable_t *pollable = n->data;
@@ -136,6 +138,10 @@ static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 		break;
 	}
 
+#ifdef DEBUG
+	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
+#endif
+
 	if (pollable->read_function || pollable->write_function)
 		mowgli_node_add(pollable, &pollable->node, &priv->pollable_list);
 
@@ -161,6 +167,25 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 		mowgli_eventloop_synchronize(eventloop);
 
 		/* iterate twice so we don't touch freed memory if a pollable is destroyed */
+		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
+		{
+			pollable = n->data;
+			slot = pollable->slot;
+
+			if (slot == -1 || priv->pollfds[slot].revents == 0)
+				continue;
+
+			if (priv->pollfds[slot].revents & (POLLHUP | POLLERR) && pollable->error_function)
+			{
+#ifdef DEBUG
+				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_ERROR, %p)\n", pollable->error_function, eventloop, pollable, pollable->userdata);
+#endif
+
+				priv->pollfds[slot].events &= ~(POLLHUP | POLLERR);
+				pollable->error_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_ERROR, pollable->userdata);
+			}
+		}
+
 		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
 		{
 			pollable = n->data;
@@ -196,25 +221,6 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 
 				priv->pollfds[slot].events &= ~(POLLWRNORM | POLLOUT);
 				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
-			}
-		}
-
-		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
-		{
-			pollable = n->data;
-			slot = pollable->slot;
-
-			if (slot == -1 || priv->pollfds[slot].revents == 0)
-				continue;
-
-			if (priv->pollfds[slot].revents & (POLLHUP | POLLERR) && pollable->error_function)
-			{
-#ifdef DEBUG
-				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
-#endif
-
-				priv->pollfds[slot].events &= ~(POLLHUP | POLLERR);
-				pollable->error_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_ERROR, pollable->userdata);
 			}
 		}
 	}
