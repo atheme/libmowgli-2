@@ -31,6 +31,8 @@ typedef HANDLE mowgli_descriptor_t;
 
 #endif
 
+typedef struct _mowgli_eventloop mowgli_eventloop_t;
+
 typedef struct _mowgli_pollable mowgli_eventloop_pollable_t;
 
 typedef enum {
@@ -38,18 +40,19 @@ typedef enum {
 	MOWGLI_EVENTLOOP_POLL_WRITE,
 } mowgli_eventloop_pollable_dir_t;
 
-typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
+typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
 
 struct _mowgli_pollable {
 	mowgli_descriptor_t fd;
+	unsigned int slot;
 
 	mowgli_pollevent_dispatch_func_t *read_function;
 	mowgli_pollevent_dispatch_func_t *write_function;
 
 	void *userdata;
-};
 
-typedef struct _mowgli_eventloop mowgli_eventloop_t;
+	mowgli_node_t node;
+};
 
 typedef struct {
 	void (*run_once)(mowgli_eventloop_t *eventloop);

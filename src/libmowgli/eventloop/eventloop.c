@@ -24,6 +24,10 @@ static mowgli_heap_t *eventloop_heap = NULL;
 
 extern mowgli_eventloop_ops_t _mowgli_null_pollops;
 
+#ifdef HAVE_POLL_H
+extern mowgli_eventloop_ops_t _mowgli_poll_pollops;
+#endif
+
 mowgli_eventloop_t *mowgli_eventloop_create(void)
 {
 	mowgli_eventloop_t *eventloop;
@@ -34,6 +38,10 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 	eventloop = mowgli_heap_alloc(eventloop_heap);
 
 	eventloop->eventloop_ops = &_mowgli_null_pollops;
+
+#ifdef HAVE_POLL_H
+	eventloop->eventloop_ops = &_mowgli_poll_pollops;
+#endif
 
 	mowgli_eventloop_synchronize(eventloop);
 
