@@ -21,7 +21,59 @@
 #ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 #define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 
-typedef void mowgli_event_dispatch_func_t(void *);
+#ifndef _WIN32
+
+typedef int mowgli_descriptor_t;
+
+#else
+
+typedef HANDLE mowgli_descriptor_t;
+
+#endif
+
+typedef struct _mowgli_pollable mowgli_eventloop_pollable_t;
+
+typedef enum {
+	MOWGLI_EVENTLOOP_POLL_READ,
+	MOWGLI_EVENTLOOP_POLL_WRITE,
+} mowgli_eventloop_pollable_dir_t;
+
+typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
+
+struct _mowgli_pollable {
+	mowgli_descriptor_t fd;
+
+	mowgli_pollevent_dispatch_func_t *read_function;
+	mowgli_pollevent_dispatch_func_t *write_function;
+
+	void *userdata;
+};
+
+typedef struct _mowgli_eventloop mowgli_eventloop_t;
+
+typedef struct {
+	void (*run_once)(mowgli_eventloop_t *eventloop);
+	void (*pollsetup)(mowgli_eventloop_t *eventloop);
+	void (*pollshutdown)(mowgli_eventloop_t *eventloop);
+	void (*setselect)(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function);
+	void (*select)(mowgli_eventloop_t *eventloop);
+} mowgli_eventloop_ops_t;
+
+struct _mowgli_eventloop {
+	time_t currtime;
+	time_t time_min;
+
+	const char *last_ran;
+
+	mowgli_list_t timer_list;
+
+	mowgli_eventloop_ops_t *eventloop_ops;
+	void *poller;
+
+	bool death_requested;
+};
+
+typedef void mowgli_event_dispatch_func_t(void *userdata);
 
 typedef struct {
 	mowgli_node_t node;
@@ -33,15 +85,6 @@ typedef struct {
 	time_t when;
 	bool active;
 } mowgli_eventloop_timer_t;
-
-typedef struct {
-	time_t currtime;
-	time_t time_min;
-
-	const char *last_ran;
-
-	mowgli_list_t timer_list;
-} mowgli_eventloop_t;
 
 static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t time)
 {
@@ -62,8 +105,13 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	mowgli_eventloop_set_time(eventloop, time(NULL));
 }
 
+/* eventloop.c */
 extern mowgli_eventloop_t *mowgli_eventloop_create(void);
 extern void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_run(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_break(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop);
 
 /* timer.c */
 extern mowgli_eventloop_timer_t *mowgli_timer_add(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when);
@@ -72,5 +120,10 @@ extern void mowgli_timer_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop
 extern void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop);
 extern time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop);
 extern mowgli_eventloop_timer_t *mowgli_timer_find(mowgli_eventloop_t *eventloop, mowgli_event_dispatch_func_t *func, void *arg);
+
+/* pollable.c */
+extern mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloop, mowgli_descriptor_t fd, void *userdata);
+extern void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
+extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function);
 
 #endif

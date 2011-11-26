@@ -22,6 +22,8 @@
 
 static mowgli_heap_t *eventloop_heap = NULL;
 
+extern mowgli_eventloop_ops_t _mowgli_null_pollops;
+
 mowgli_eventloop_t *mowgli_eventloop_create(void)
 {
 	mowgli_eventloop_t *eventloop;
@@ -31,6 +33,8 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 	eventloop = mowgli_heap_alloc(eventloop_heap);
 
+	eventloop->eventloop_ops = &_mowgli_null_pollops;
+
 	mowgli_eventloop_synchronize(eventloop);
 
 	return eventloop;
@@ -39,4 +43,36 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
 	mowgli_heap_free(eventloop_heap, eventloop);
+}
+
+void mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
+{
+	return_if_fail(eventloop != NULL);
+
+	eventloop->death_requested = false;
+
+	while (!eventloop->death_requested)
+		eventloop->eventloop_ops->run_once(eventloop);
+}
+
+void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
+{
+	return_if_fail(eventloop != NULL);
+
+	eventloop->eventloop_ops->run_once(eventloop);
+}
+
+void mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
+{
+	return_if_fail(eventloop != NULL);
+
+	eventloop->death_requested = true;
+}
+
+/* convenience function to request null pollops */
+void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop)
+{
+	return_if_fail(eventloop != NULL);
+
+	eventloop->eventloop_ops = &_mowgli_null_pollops;
 }
