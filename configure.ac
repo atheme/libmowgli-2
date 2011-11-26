@@ -31,7 +31,7 @@ LIBS="$LIBS $DYNAMIC_LD_LIBS"
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h locale.h stdarg.h sys/types.h sys/stat.h errno.h poll.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h unistd.h locale.h stdarg.h sys/types.h sys/stat.h errno.h poll.h sys/epoll.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
