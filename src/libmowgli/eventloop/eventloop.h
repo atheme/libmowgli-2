@@ -112,6 +112,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
+extern void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
 
 /* eventloop.c */
 extern mowgli_eventloop_t *mowgli_eventloop_create(void);
