@@ -158,13 +158,13 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 
 		old_flags = pollable->slot;
 
-		if (priv->pfd[i].events & (EPOLLHUP | EPOLLERR))
+		if (priv->pfd[i].events & (EPOLLHUP | EPOLLERR) && pollable->error_function != NULL)
 			pollable->error_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_ERROR, pollable->userdata);
 
-		if (priv->pfd[i].events & (EPOLLIN))
+		if (priv->pfd[i].events & (EPOLLIN) && pollable->read_function != NULL)
 			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
 
-		if (priv->pfd[i].events & (EPOLLOUT))
+		if (priv->pfd[i].events & (EPOLLOUT) && pollable->write_function != NULL)
 			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
 
 		pollable->slot = 0;
