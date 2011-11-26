@@ -110,6 +110,39 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	mowgli_eventloop_set_time(eventloop, time(NULL));
 }
 
+static inline bool mowgli_eventloop_ignore_errno(int error)
+{
+	switch (error)
+	{
+#ifdef EINPROGRESS
+	case EINPROGRESS:
+#endif
+#if defined(EWOULDBLOCK)
+	case EWOULDBLOCK:
+#endif
+#if defined(EAGAIN) && (EWOULDBLOCK != EAGAIN)
+	case EAGAIN:
+#endif
+#ifdef EINTR
+	case EINTR:
+#endif
+#ifdef ERESTART
+	case ERESTART:
+#endif
+#ifdef ENOBUFS
+	case ENOBUFS:
+#endif
+#ifdef ENOENT
+	case ENOENT:
+#endif
+		return true;
+	default:
+		break;
+	}
+
+	return false;
+}
+
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
 extern void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
