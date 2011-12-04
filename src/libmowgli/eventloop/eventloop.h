@@ -91,11 +91,11 @@ typedef struct {
 	bool active;
 } mowgli_eventloop_timer_t;
 
-static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t time)
+static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t newtime)
 {
 	return_if_fail(eventloop != NULL);
 
-	eventloop->currtime = time;
+	eventloop->currtime = newtime;
 }
 
 static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
