@@ -56,4 +56,17 @@ int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex);
 
+typedef enum {
+	MOWGLI_THREAD_POLICY_DEFAULT,
+	MOWGLI_THREAD_POLICY_DISABLED,
+} mowgli_thread_policy_t;
+
+void mowgli_mutex_set_policy(mowgli_thread_policy_t policy);
+
+/* simple dispatch function to set the ops up for the various subsystems. */
+static inline void mowgli_thread_set_policy(mowgli_thread_policy_t policy)
+{
+	mowgli_mutex_set_policy(policy);
+}
+
 #endif /* !__MOWGLI_THREAD_H__ */

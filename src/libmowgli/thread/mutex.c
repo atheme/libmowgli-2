@@ -96,3 +96,16 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 
 	return mutex_ops->mutex_destroy(mutex);
 }
+
+void mowgli_mutex_set_policy(mowgli_thread_policy_t policy)
+{
+	switch (policy)
+	{
+	case MOWGLI_THREAD_POLICY_DISABLED:
+		_mowgli_mutex_ops = &_mowgli_null_mutex_ops;
+		break;
+	case MOWGLI_THREAD_POLICY_DEFAULT:
+	default:
+		_mowgli_mutex_ops = NULL;
+	}
+}
