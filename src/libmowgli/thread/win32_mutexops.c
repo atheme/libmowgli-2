@@ -30,8 +30,7 @@
  *************/
 #if defined(_WIN32)
 
-
-int mowgli_mutex_create(mowgli_mutex_t *mutex)
+static int mowgli_win32_mutex_create(mowgli_mutex_t *mutex)
 {
 	mutex->mutex = CreateMutex(NULL, FALSE, NULL);
 	if(mutex->mutex == NULL)
@@ -40,17 +39,17 @@ int mowgli_mutex_create(mowgli_mutex_t *mutex)
 	return 0;
 }
 
-int mowgli_mutex_lock(mowgli_mutex_t *mutex)
+static int mowgli_win32_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return WaitForSingleObject(mutex->mutex, INFINITE);
 }
 
-int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
+static int mowgli_win32_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return WaitForSingleObject(mutex->mutex, 0);
 }
 
-int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
+static int mowgli_win32_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	if(ReleaseMutex(mutex->mutex) != 0)
 		return 0;
@@ -58,10 +57,18 @@ int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 	return GetLastError();
 }
 
-int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+static int mowgli_win32_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	CloseHandle(mutex->mutex);
 	return 0;
 }
+
+mowgli_mutex_ops_t _mowgli_win32_mutex_ops = {
+	.mutex_create = mowgli_win32_mutex_create,
+	.mutex_lock = mowgli_win32_mutex_lock,
+	.mutex_trylock = mowgli_win32_mutex_trylock,
+	.mutex_unlock = mowgli_win32_mutex_unlock,
+	.mutex_destroy = mowgli_win32_mutex_destroy
+};
 
 #endif

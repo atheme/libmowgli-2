@@ -33,30 +33,38 @@
  *************/
 #if defined(__sun) || defined(__sco)
 
-int mowgli_mutex_create(mowgli_mutex_t *mutex)
+static int mowgli_sun_mutex_create(mowgli_mutex_t *mutex)
 {
 	return mutex_init(&mutex->mutex, USYNC_THREAD, NULL);
 }
 
-int mowgli_mutex_lock(mowgli_mutex_t *mutex)
+static int mowgli_sun_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return mutex_lock(&mutex->mutex);
 }
 
-int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
+static int mowgli_sun_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return mutex_trylock(&mutex->mutex);
 }
 
-int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
+static int mowgli_sun_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	return mutex_unlock(&mutex->mutex);
 }
 
-int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+static int mowgli_sun_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	return mutex_destroy(&mutex->mutex);
 }
+
+mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
+	.mutex_create = mowgli_sun_mutex_create,
+	.mutex_lock = mowgli_sun_mutex_lock,
+	.mutex_trylock = mowgli_sun_mutex_trylock,
+	.mutex_unlock = mowgli_sun_mutex_unlock,
+	.mutex_destroy = mowgli_sun_mutex_destroy,
+};
 
 /*************
  * This "default" implementation uses pthreads.  Care has been taken to
@@ -69,30 +77,38 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
  *************/
 #else
 
-int mowgli_mutex_create(mowgli_mutex_t *mutex)
+static int mowgli_posix_mutex_create(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_init(&mutex->mutex, NULL);
 }
 
-int mowgli_mutex_lock(mowgli_mutex_t *mutex)
+static int mowgli_posix_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_lock(&mutex->mutex);
 }
 
-int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
+static int mowgli_posix_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_trylock(&mutex->mutex);
 }
 
-int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
+static int mowgli_posix_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_unlock(&mutex->mutex);
 }
 
-int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+static int mowgli_posix_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_destroy(&mutex->mutex);
 }
+
+mowgli_mutex_ops_t _mowgli_posix_mutex_ops = {
+	.mutex_create = mowgli_posix_mutex_create,
+	.mutex_lock = mowgli_posix_mutex_lock,
+	.mutex_trylock = mowgli_posix_mutex_trylock,
+	.mutex_unlock = mowgli_posix_mutex_unlock,
+	.mutex_destroy = mowgli_posix_mutex_destroy,
+};
 
 #endif
 

@@ -2,7 +2,8 @@ include ../../../extra.mk
 
 STATIC_PIC_LIB_NOINST = mowgli.thread.a
 
-SRCS = null_mutexops.c		\
+SRCS = mutex.c			\
+       null_mutexops.c		\
        posix_mutexops.c		\
        win32_mutexops.c
 

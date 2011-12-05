@@ -23,27 +23,35 @@
 
 #include "mowgli.h"
 
-int mowgli_null_mutex_create(mowgli_mutex_t *mutex)
+static int mowgli_null_mutex_create(mowgli_mutex_t *mutex)
 {
 	return 0;
 }
 
-int mowgli_null_mutex_lock(mowgli_mutex_t *mutex)
+static int mowgli_null_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return 0;
 }
 
-int mowgli_null_mutex_trylock(mowgli_mutex_t *mutex)
+static int mowgli_null_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return 0;
 }
 
-int mowgli_null_mutex_unlock(mowgli_mutex_t *mutex)
+static int mowgli_null_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	return 0;
 }
 
-int mowgli_null_mutex_destroy(mowgli_mutex_t *mutex)
+static int mowgli_null_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	return 0;
 }
+
+mowgli_mutex_ops_t _mowgli_null_mutex_ops = {
+	.mutex_create = mowgli_null_mutex_create,
+	.mutex_lock = mowgli_null_mutex_lock,
+	.mutex_trylock = mowgli_null_mutex_trylock,
+	.mutex_unlock = mowgli_null_mutex_unlock,
+	.mutex_destroy = mowgli_null_mutex_destroy
+};
