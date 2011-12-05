@@ -33,8 +33,8 @@
 
 int mowgli_mutex_create(mowgli_mutex_t *mutex)
 {
-	*mutex = CreateMutex(NULL, FALSE, NULL);
-	if(*mutex == NULL)
+	mutex->mutex = CreateMutex(NULL, FALSE, NULL);
+	if(mutex->mutex == NULL)
 		return GetLastError();
 
 	return 0;
@@ -42,17 +42,17 @@ int mowgli_mutex_create(mowgli_mutex_t *mutex)
 
 int mowgli_mutex_lock(mowgli_mutex_t *mutex)
 {
-	return WaitForSingleObject(*mutex, INFINITE);
+	return WaitForSingleObject(mutex->mutex, INFINITE);
 }
 
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 {
-	return WaitForSingleObject(*mutex, 0);
+	return WaitForSingleObject(mutex->mutex, 0);
 }
 
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 {
-	if(ReleaseMutex(*mutex) != 0)
+	if(ReleaseMutex(mutex->mutex) != 0)
 		return 0;
 
 	return GetLastError();
@@ -60,7 +60,7 @@ int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 {
-	CloseHandle(*mutex);
+	CloseHandle(mutex->mutex);
 	return 0;
 }
 

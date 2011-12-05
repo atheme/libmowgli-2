@@ -33,32 +33,30 @@
  *************/
 #if defined(__sun) || defined(__sco)
 
-
 int mowgli_mutex_create(mowgli_mutex_t *mutex)
 {
-	return mutex_init(mutex, USYNC_THREAD, NULL);
+	return mutex_init(&mutex->mutex, USYNC_THREAD, NULL);
 }
 
 int mowgli_mutex_lock(mowgli_mutex_t *mutex)
 {
-	return mutex_lock(mutex);
+	return mutex_lock(&mutex->mutex);
 }
 
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 {
-	return mutex_trylock(mutex);
+	return mutex_trylock(&mutex->mutex);
 }
 
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 {
-	return mutex_unlock(mutex);
+	return mutex_unlock(&mutex->mutex);
 }
 
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 {
-	return mutex_destroy(mutex);
+	return mutex_destroy(&mutex->mutex);
 }
-
 
 /*************
  * This "default" implementation uses pthreads.  Care has been taken to
@@ -71,32 +69,30 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
  *************/
 #else
 
-
 int mowgli_mutex_create(mowgli_mutex_t *mutex)
 {
-	return pthread_mutex_init(mutex, NULL);
+	return pthread_mutex_init(&mutex->mutex, NULL);
 }
 
 int mowgli_mutex_lock(mowgli_mutex_t *mutex)
 {
-	return pthread_mutex_lock(mutex);
+	return pthread_mutex_lock(&mutex->mutex);
 }
 
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 {
-	return pthread_mutex_trylock(mutex);
+	return pthread_mutex_trylock(&mutex->mutex);
 }
 
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 {
-	return pthread_mutex_unlock(mutex);
+	return pthread_mutex_unlock(&mutex->mutex);
 }
 
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 {
-	return pthread_mutex_destroy(mutex);
+	return pthread_mutex_destroy(&mutex->mutex);
 }
-
 
 #endif
 

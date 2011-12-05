@@ -3,6 +3,7 @@
  * mowgli_thread.h: Cross-platform threading helper routines.
  *
  * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
+ * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,29 +25,35 @@
 #ifndef __MOWGLI_THREAD_H__
 #define __MOWGLI_THREAD_H__
 
-#if defined(_WIN32)				/* Windows threading */
-
-	typedef HANDLE mowgli_mutex_t;
-
-#elif defined(__sun)				/* Solaris/UnixWare threading */
-
-#	include <thread.h>
-#	include <synch.h>
-	typedef mutex_t mowgli_mutex_t;
-
-#else						/* pthreads */
-
-#	include <pthread.h>
-	typedef pthread_mutex_t mowgli_mutex_t;
-
+#if defined(__sun) || defined(__sco)
+# include <thread.h>
+# include <synch.h>
+#elif !defined(_WIN32)
+# include <pthread.h>
 #endif
 
+typedef struct {
+#if defined(_WIN32)				/* Windows threading */
+	HANDLE mutex;
+#elif defined(__sun) || defined(__sco)		/* Solaris/UnixWare threading */
+	mutex_t mutex;
+#else						/* pthreads */
+	pthread_mutex_t mutex;
+#endif
+} mowgli_mutex_t;
+
+typedef struct {
+	int (*mutex_create)(mowgli_mutex_t *mutex);
+	int (*mutex_lock)(mowgli_mutex_t *mutex);
+	int (*mutex_trylock)(mowgli_mutex_t *mutex);
+	int (*mutex_unlock)(mowgli_mutex_t *mutex);
+	int (*mutex_destroy)(mowgli_mutex_t *mutex);
+} mowgli_mutex_ops_t;
 
 int mowgli_mutex_create(mowgli_mutex_t *mutex);
 int mowgli_mutex_lock(mowgli_mutex_t *mutex);
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex);
-
 
 #endif /* !__MOWGLI_THREAD_H__ */
