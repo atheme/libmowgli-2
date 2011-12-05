@@ -54,8 +54,6 @@ struct mowgli_block_
 /* A pile of blocks */
 struct mowgli_heap_
 {
-	mowgli_node_t node;
-
 	unsigned int elem_size;
 	unsigned int mowgli_heap_elems;
 	unsigned int free_elems;
@@ -68,7 +66,7 @@ struct mowgli_heap_
 
 	mowgli_allocation_policy_t *allocator;
 	mowgli_boolean_t use_mmap;
-	
+
 	mowgli_mutex_t mutex;
 
 	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
