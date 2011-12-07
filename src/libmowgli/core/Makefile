@@ -20,8 +20,7 @@ INCLUDES = init.h		\
 	   iterator.h		\
 	   logger.h		\
 	   mowgli_string.h	\
-	   stdinc.h		\
-	   thread.h
+	   stdinc.h
 
 includesubdir = $(PACKAGE)/core
 
