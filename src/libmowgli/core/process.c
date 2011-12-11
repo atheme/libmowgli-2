@@ -42,6 +42,8 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
 {
 	mowgli_process_t *out;
 
+	return_val_if_fail(start_fn != NULL, NULL);
+
 	out = mowgli_alloc(sizeof(mowgli_process_t));
 	out->userdata = userdata;
 
@@ -72,6 +74,9 @@ mowgli_process_spawn(const char *path, char *const argv[])
 {
 	size_t i;
 	mowgli_process_execv_req_t *req;
+
+	return_val_if_fail(path != NULL, NULL);
+	return_val_if_fail(argv != NULL, NULL);
 
 	req = mowgli_alloc(sizeof(mowgli_process_execv_req_t));
 	req->path = strdup(path);
