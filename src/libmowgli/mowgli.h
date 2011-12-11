@@ -74,6 +74,7 @@ MOWGLI_DECLS_START
 #include "core/allocator.h"
 #include "base/formatter.h"
 #include "container/index.h"
+#include "core/process.h"
 #include "thread/thread.h"
 #include "ext/confparse.h"
 #include "eventloop/eventloop.h"

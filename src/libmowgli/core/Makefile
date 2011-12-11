@@ -8,7 +8,8 @@ SRCS = init.c			\
        allocator.c		\
        heap.c			\
        logger.c			\
-       mowgli_string.c
+       mowgli_string.c		\
+       process.c
 
 INCLUDES = init.h		\
 	   alloc.h		\
@@ -20,7 +21,8 @@ INCLUDES = init.h		\
 	   iterator.h		\
 	   logger.h		\
 	   mowgli_string.h	\
-	   stdinc.h
+	   stdinc.h		\
+	   process.h
 
 includesubdir = $(PACKAGE)/core
 
