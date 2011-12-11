@@ -504,7 +504,7 @@ void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
 	int val;
 
 	if (dtree == NULL)
-		return NULL;
+		return;
 
 	return_if_fail(state != NULL);
 
