@@ -2,7 +2,7 @@
  * libmowgli: A collection of useful routines for programming.
  * mowgli_global_storage.c: Simple key->value global storage tool.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007, 2011 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,7 +24,7 @@
 #include "mowgli.h"
 
 static mowgli_patricia_t *mowgli_global_storage_dict = NULL;
-static mowgli_spinlock_t *mowgli_global_storage_lock = NULL;
+static mowgli_mutex_t mowgli_global_storage_lock;
 
 static void _storage_key_canon(char *key)
 {
@@ -35,7 +35,8 @@ void
 mowgli_global_storage_init(void)
 {
 	mowgli_global_storage_dict = mowgli_patricia_create(_storage_key_canon);
-	mowgli_global_storage_lock = mowgli_spinlock_create();
+
+	mowgli_mutex_create(&mowgli_global_storage_lock);
 }
 
 void *
@@ -43,10 +44,9 @@ mowgli_global_storage_get(char *name)
 {
 	void *ret;
 
-	/* name serves as lock token */
-	mowgli_spinlock_lock(mowgli_global_storage_lock, name, NULL);
+	mowgli_mutex_lock(&mowgli_global_storage_lock);
 	ret = mowgli_patricia_retrieve(mowgli_global_storage_dict, name);
-	mowgli_spinlock_unlock(mowgli_global_storage_lock, name, NULL);
+	mowgli_mutex_unlock(&mowgli_global_storage_lock);
 
 	return ret;
 }
@@ -54,15 +54,16 @@ mowgli_global_storage_get(char *name)
 void
 mowgli_global_storage_put(char *name, void *value)
 {
-	mowgli_spinlock_lock(mowgli_global_storage_lock, NULL, name);
+	mowgli_mutex_lock(&mowgli_global_storage_lock);
 	mowgli_patricia_add(mowgli_global_storage_dict, name, value);
-	mowgli_spinlock_unlock(mowgli_global_storage_lock, NULL, name);
+	mowgli_mutex_unlock(&mowgli_global_storage_lock);
 }
 
 void
 mowgli_global_storage_free(char *name)
 {
-	mowgli_spinlock_lock(mowgli_global_storage_lock, name, name);
+	mowgli_mutex_lock(&mowgli_global_storage_lock);
 	mowgli_patricia_delete(mowgli_global_storage_dict, name);
-	mowgli_spinlock_unlock(mowgli_global_storage_lock, name, name);
+	mowgli_mutex_unlock(&mowgli_global_storage_lock);
 }
+
