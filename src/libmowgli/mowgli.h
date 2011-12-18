@@ -43,6 +43,8 @@
 
 MOWGLI_DECLS_START
 
+#include "platform/constructor.h"
+
 #include "core/logger.h"
 #include "core/assert.h"
 #include "core/exception.h"
