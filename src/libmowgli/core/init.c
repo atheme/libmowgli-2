@@ -23,13 +23,8 @@
 
 #include "mowgli.h"
 
-void mowgli_init(void)
+MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 {
-	static int mowgli_initted_ = 0;
-
-	if (mowgli_initted_)
-		return;
-
 	/* initial bootstrap */
 	mowgli_node_init();
 	mowgli_queue_init();
@@ -44,6 +39,9 @@ void mowgli_init(void)
 	/* now that we're bootstrapped, we can use a more optimised allocator
 	   if one is available. */
 	mowgli_allocator_set_policy(mowgli_allocator_malloc);
+}
 
-	mowgli_initted_++;
+void mowgli_init(void)
+{
+	mowgli_log("mowgli_init() is a deprecated function, provided only for backwards compatibility with Mowgli-1.  You should remove it if you no longer support using Mowgli-1.");
 }
