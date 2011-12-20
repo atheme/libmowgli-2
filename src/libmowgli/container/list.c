@@ -319,8 +319,12 @@ void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
 	return_if_fail(l != NULL);
 	return_if_fail(l2 != NULL);
 
-	l->tail->next = l2->head;
-	l->tail->next->prev = l->tail;
+	if (l->tail != NULL)
+		l->tail->next = l2->head;
+
+	if (l->tail->next != NULL)
+		l->tail->next->prev = l->tail;
+
 	l->tail = l2->tail;
 	l->count += l2->count;
 
