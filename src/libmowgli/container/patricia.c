@@ -824,6 +824,9 @@ void mowgli_patricia_elem_delete(mowgli_patricia_t *dict, struct patricia_leaf *
 	union patricia_elem *delem, *prev, *next;
 	int val, i, used;
 
+	return_if_fail(dict != NULL);
+	return_if_fail(leaf != NULL);
+
 	delem = (union patricia_elem *)leaf;
 
 	val = delem->leaf.parent_val;
@@ -906,16 +909,22 @@ void *mowgli_patricia_retrieve(mowgli_patricia_t *dtree, const char *key)
 
 const char *mowgli_patricia_elem_get_key(struct patricia_leaf *leaf)
 {
+	return_val_if_fail(leaf != NULL, NULL);
+
 	return leaf->key;
 }
 
 void mowgli_patricia_elem_set_data(struct patricia_leaf *leaf, void *data)
 {
+	return_if_fail(leaf != NULL);
+
 	leaf->data = data;
 }
 
 void *mowgli_patricia_elem_get_data(struct patricia_leaf *leaf)
 {
+	return_val_if_fail(leaf != NULL, NULL);
+
 	return leaf->data;
 }
 
