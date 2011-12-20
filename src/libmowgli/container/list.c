@@ -141,7 +141,10 @@ void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowg
 		n->prev = before->prev;
 		n->next = before;
 		before->prev = n;
-		n->prev->next = n;
+
+		if (n->prev != NULL)
+			n->prev->next = n;
+
 		l->count++;
 	}
 }
