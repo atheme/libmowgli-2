@@ -47,7 +47,7 @@
 
 #else
 
-#warning MOWGLI_INITIALIZER_FUNC not implemented for your platform :(
+#error MOWGLI_INITIALIZER_FUNC not implemented for your platform :(
 
 #endif
 
