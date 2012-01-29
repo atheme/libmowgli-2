@@ -130,8 +130,8 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	priv = eventloop->poller;
 
 	num = kevent(priv->kqueue_fd, NULL, 0, priv->events, priv->nevents,
-			&(const struct timespec){ .tv_sec = delay / 1000,
-			.tv_nsec = delay % 1000 * 1000000 });
+			delay >= 0 ? &(const struct timespec){ .tv_sec = delay / 1000,
+			.tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);

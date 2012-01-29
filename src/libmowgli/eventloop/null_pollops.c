@@ -43,7 +43,7 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	}
 
 	if (delay <= currtime)
-		t = 250;
+		t = -1;
 	else
 		t = (delay - currtime) * 1000;
 
