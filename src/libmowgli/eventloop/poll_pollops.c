@@ -106,6 +106,18 @@ static void mowgli_poll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
+static void mowgli_poll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+{
+	mowgli_poll_eventloop_private_t *priv;
+
+	return_if_fail(eventloop != NULL);
+	return_if_fail(pollable != NULL);
+
+	priv = eventloop->poller;
+
+	mowgli_node_delete(&pollable->node, &priv->pollable_list);
+}
+
 static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
 {
 	mowgli_poll_eventloop_private_t *priv;
@@ -213,6 +225,7 @@ mowgli_eventloop_ops_t _mowgli_poll_pollops = {
 	.pollshutdown = mowgli_poll_eventloop_pollshutdown,
 	.setselect = mowgli_poll_eventloop_setselect,
 	.select = mowgli_poll_eventloop_select,
+	.destroy = mowgli_poll_eventloop_destroy,
 };
 
 #endif
