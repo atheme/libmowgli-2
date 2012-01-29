@@ -69,6 +69,11 @@ static void mowgli_null_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
+static void mowgli_null_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+{
+	return;
+}
+
 static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
 {
 	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", pollable);
@@ -100,4 +105,5 @@ mowgli_eventloop_ops_t _mowgli_null_pollops = {
 	.pollshutdown = mowgli_null_eventloop_pollshutdown,
 	.setselect = mowgli_null_eventloop_setselect,
 	.select = mowgli_null_eventloop_select,
+	.destroy = mowgli_null_eventloop_destroy,
 };
