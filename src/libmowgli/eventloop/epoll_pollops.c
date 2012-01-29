@@ -156,9 +156,7 @@ static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_epoll_eventloop_private_t *priv;
-	int i, num, o_errno, op = -1;
-	unsigned int old_flags;
-	struct epoll_event ep_event;
+	int i, num, o_errno;
 
 	return_if_fail(eventloop != NULL);
 
@@ -182,40 +180,11 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->pfd[i].data.ptr;
 
-		old_flags = pollable->slot;
-
 		if (priv->pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR) && pollable->read_function != NULL)
 			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
 
 		if (priv->pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR) && pollable->write_function != NULL)
 			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
-
-		pollable->slot = 0;
-
-		if (pollable->read_function != NULL)
-			pollable->slot |= EPOLLIN;
-
-		if (pollable->write_function != NULL)
-			pollable->slot |= EPOLLOUT;
-
-		if (old_flags != pollable->slot)
-		{
-			if (pollable->slot == 0)
-				op = EPOLL_CTL_DEL;
-			else
-				op = EPOLL_CTL_MOD;
-
-			ep_event.events = pollable->slot;
-			ep_event.data.ptr = pollable;
-
-			if (epoll_ctl(priv->epoll_fd, op, pollable->fd, &ep_event) != 0)
-			{
-				if (mowgli_eventloop_ignore_errno(errno))
-					continue;
-
-				mowgli_log("mowgli_epoll_eventloop_select(): epoll_ctl failed: %d (%s)", errno, strerror(errno));
-			}
-		}
 	}
 }
 
