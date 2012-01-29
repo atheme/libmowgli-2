@@ -223,6 +223,7 @@ main (int argc, char **argv)
 		exit(1);
 	}
 
+	mowgli_thread_set_policy(MOWGLI_THREAD_POLICY_DISABLED);
 	base_eventloop = mowgli_eventloop_create();
 
 	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2) {
