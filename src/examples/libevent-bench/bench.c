@@ -170,7 +170,7 @@ run_once(void)
 
 	timersub(&te, &ta, &ta);
 	timersub(&te, &ts, &ts);
-	fprintf(stdout, "%8ld %8ld\n",
+	fprintf(stdout, "%ld\t%ld\n",
 		ta.tv_sec * 1000000L + ta.tv_usec,
 		ts.tv_sec * 1000000L + ts.tv_usec
                );
