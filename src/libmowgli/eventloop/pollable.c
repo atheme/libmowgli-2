@@ -45,8 +45,13 @@ void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pol
 	return_if_fail(pollable != NULL);
 
 	/* unregister any interest in the pollable. */
-	mowgli_pollable_setselect(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, NULL);
-	mowgli_pollable_setselect(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, NULL);
+	if (eventloop->eventloop_ops->destroy != NULL)
+		eventloop->eventloop_ops->destroy(eventloop, pollable);
+	else
+	{
+		mowgli_pollable_setselect(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, NULL);
+		mowgli_pollable_setselect(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, NULL);
+	}
 
 	mowgli_heap_free(pollable_heap, pollable);
 }

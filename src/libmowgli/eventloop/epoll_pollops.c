@@ -59,6 +59,29 @@ static void mowgli_epoll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
+static void mowgli_epoll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+{
+	mowgli_epoll_eventloop_private_t *priv;
+	struct epoll_event ep_event;
+
+	return_if_fail(eventloop != NULL);
+	return_if_fail(pollable != NULL);
+
+	priv = eventloop->poller;
+	pollable->slot = 0;
+
+	ep_event.events = pollable->slot;
+	ep_event.data.ptr = pollable;
+
+	if (epoll_ctl(priv->epoll_fd, EPOLL_CTL_DEL, pollable->fd, &ep_event) != 0)
+	{
+		if (mowgli_eventloop_ignore_errno(errno))
+			return;
+
+		mowgli_log("mowgli_epoll_eventloop_destroy(): epoll_ctl failed: %d (%s)", errno, strerror(errno));
+	}
+}
+
 static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
 {
 	mowgli_epoll_eventloop_private_t *priv;
@@ -202,6 +225,7 @@ mowgli_eventloop_ops_t _mowgli_epoll_pollops = {
 	.pollshutdown = mowgli_epoll_eventloop_pollshutdown,
 	.setselect = mowgli_epoll_eventloop_setselect,
 	.select = mowgli_epoll_eventloop_select,
+	.destroy = mowgli_epoll_eventloop_destroy,
 };
 
 #endif
