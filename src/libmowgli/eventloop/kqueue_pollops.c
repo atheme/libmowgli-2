@@ -60,6 +60,25 @@ static void mowgli_kqueue_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
+static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+{
+	mowgli_kqueue_eventloop_private_t *priv;
+	struct kevent event;
+
+	return_if_fail(eventloop != NULL);
+	return_if_fail(pollable != NULL);
+
+	priv = eventloop->poller;
+
+	EV_SET(&event, pollable->fd, EVFILT_READ | EVFILT_WRITE, EV_ADD : EV_DELETE, 0, 0, pollable);
+	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
+			&(const struct timespec){ .tv_sec = 0, .tv_nsec = 0}
+			) != 0)
+	{
+		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
+	}
+}
+
 static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
@@ -115,8 +134,6 @@ static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 	{
 		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
 	}
-
-	return;
 }
 
 static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
@@ -169,6 +186,7 @@ mowgli_eventloop_ops_t _mowgli_kqueue_pollops = {
 	.pollshutdown = mowgli_kqueue_eventloop_pollshutdown,
 	.setselect = mowgli_kqueue_eventloop_setselect,
 	.select = mowgli_kqueue_eventloop_select,
+	.destroy = mowgli_kqueue_eventloop_destroy,
 };
 
 #endif
