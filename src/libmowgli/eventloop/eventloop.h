@@ -133,9 +133,6 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 #ifdef ENOBUFS
 	case ENOBUFS:
 #endif
-#ifdef EPERM
-	case EPERM:
-#endif
 #ifdef ENOENT
 	case ENOENT:
 #endif
