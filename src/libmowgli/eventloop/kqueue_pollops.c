@@ -70,7 +70,7 @@ static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgl
 
 	priv = eventloop->poller;
 
-	EV_SET(&event, pollable->fd, EVFILT_READ | EVFILT_WRITE, EV_ADD : EV_DELETE, 0, 0, pollable);
+	EV_SET(&event, pollable->fd, EVFILT_READ | EVFILT_WRITE, EV_DELETE, 0, 0, pollable);
 	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
 			&(const struct timespec){ .tv_sec = 0, .tv_nsec = 0}
 			) != 0)
