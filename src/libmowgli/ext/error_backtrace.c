@@ -39,7 +39,7 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 	{
 		bt_msg = (char *) n->data;
 
-		printf("%s%s", bt_msg, n->next != NULL ? delim : "\n");
+		fprintf(stderr, "%s%s", bt_msg, n->next != NULL ? delim : "\n");
 	}
 }
 
@@ -71,9 +71,9 @@ void
 mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error)
 {
 	mowgli_error_context_display(e, delim);
-	printf("Error: %s\n", error);
+	fprintf(stderr, "Error: %s\n", error);
 
-	exit(EXIT_FAILURE);
+	_exit(EXIT_FAILURE);
 }
 
 void
