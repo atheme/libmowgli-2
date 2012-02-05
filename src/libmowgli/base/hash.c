@@ -33,7 +33,11 @@ int mowgli_fnv_hash_string(const char *p)
         unsigned int hval = HASHINIT;
 
 	if (htoast == 0)
-		htoast = rand();
+	{
+		mowgli_random_t *r = mowgli_random_create();
+		htoast = mowgli_random_int(r);
+		mowgli_object_unref(r);
+	}
 
         if (!p)
                 return (0);
@@ -52,7 +56,11 @@ int mowgli_fnv_hash(unsigned int *p)
         unsigned int hval = HASHINIT;
 
 	if (htoast == 0)
-		htoast = rand();
+	{
+		mowgli_random_t *r = mowgli_random_create();
+		htoast = mowgli_random_int(r);
+		mowgli_object_unref(r);
+	}
 
         if (!p)
                 return (0);
