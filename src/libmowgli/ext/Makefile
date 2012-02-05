@@ -4,10 +4,12 @@ STATIC_PIC_LIB_NOINST = mowgli.ext.a
 
 SRCS = confparse.c 			\
        error_backtrace.c		\
+       getopt_long.c			\
        global_storage.c 		\
 
 INCLUDES = confparse.h			\
 	   error_backtrace.h		\
+	   getopt_long.h		\
 	   global_storage.h		\
 
 includesubdir = $(PACKAGE)/ext
