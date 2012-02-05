@@ -4,6 +4,7 @@ STATIC_PIC_LIB_NOINST = mowgli.thread.a
 
 SRCS = mutex.c			\
        null_mutexops.c		\
+       linux-futex_mutexops.c	\
        posix_mutexops.c		\
        win32_mutexops.c
 

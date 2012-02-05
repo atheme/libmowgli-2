@@ -27,6 +27,8 @@
 extern mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
 #elif defined(_sun) || defined(_sco)
 extern mowgli_mutex_ops_t _mowgli_sun_mutex_ops;
+#elif defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
+extern mowgli_mutex_ops_t _mowgli_linux_mutex_ops;
 #else
 extern mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 #endif
@@ -49,7 +51,15 @@ static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 	return &_mowgli_sun_mutex_ops;
 #endif
 
+#if defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
+	return &_mowgli_linux_mutex_ops;
+#endif
+
+#if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
 	return &_mowgli_posix_mutex_ops;
+#endif
+
+	return &_mowgli_null_mutex_ops;
 }
 
 int mowgli_mutex_create(mowgli_mutex_t *mutex)

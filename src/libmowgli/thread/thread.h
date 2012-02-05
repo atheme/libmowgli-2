@@ -28,19 +28,30 @@
 #if defined(__sun) || defined(__sco)
 # include <thread.h>
 # include <synch.h>
-#elif !defined(_WIN32)
+# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+# define MOWGLI_NATIVE_MUTEX_DECL(name) mutex_t (name)
+#elif defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
+# include <linux/futex.h>
+# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+# define MOWGLI_NATIVE_MUTEX_DECL(name) void * (name)
+#elif defined(_WIN32)
+# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+# define MOWGLI_NATIVE_MUTEX_DECL(name) HANDLE (name)
+#else
 # include <pthread.h>
 #endif
 
 typedef struct {
-#if defined(_WIN32)				/* Windows threading */
-	HANDLE mutex;
-#elif defined(__sun) || defined(__sco)		/* Solaris/UnixWare threading */
-	mutex_t mutex;
-#else						/* pthreads */
+#ifdef MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+	MOWGLI_NATIVE_MUTEX_DECL(mutex);
+#else
 	pthread_mutex_t mutex;
 #endif
 } mowgli_mutex_t;
+
+#ifdef MOWGLI_NATIVE_MUTEX_DECL
+# undef MOWGLI_NATIVE_MUTEX_DECL
+#endif
 
 typedef struct {
 	int (*mutex_create)(mowgli_mutex_t *mutex);

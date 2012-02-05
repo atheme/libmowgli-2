@@ -75,7 +75,7 @@ mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
  * it should be relatively easy to maintian d4 compatibility without
  * sacrificing any functionality.
  *************/
-#else
+#elif !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
 
 static int mowgli_posix_mutex_create(mowgli_mutex_t *mutex)
 {
