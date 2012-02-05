@@ -34,6 +34,8 @@ typedef struct {
 
 #if defined(__i386__) || defined(__x86_64__)
 
+#define MOWGLI_FEATURE_HAVE_ATOMIC_OPS
+
 static inline void mowgli_atomic_add(mowgli_atomic_t *a, int b)
 {
 	return_if_fail(a != NULL);
