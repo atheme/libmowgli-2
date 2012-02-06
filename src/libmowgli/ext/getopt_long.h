@@ -54,6 +54,8 @@ typedef struct {
 	int *flag;
 	/* if flag not NULL, value to set *flag to; else return value */
 	int val;
+	/* internal value */
+	int iflag;
 } mowgli_getopt_option_t;
 
 extern int mowgli_getopt_long(int, char * const *, const char *,

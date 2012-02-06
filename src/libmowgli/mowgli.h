@@ -81,6 +81,8 @@ MOWGLI_DECLS_START
 #include "core/process.h"
 #include "thread/thread.h"
 #include "ext/confparse.h"
+#include "ext/getopt_long.h"
+#include "ext/program_opts.h"
 #include "eventloop/eventloop.h"
 
 MOWGLI_DECLS_END
