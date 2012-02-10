@@ -219,3 +219,18 @@ mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper
 	helper->read_function = read_fn;
 	mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_POLL_READ, mowgli_helper_io_trampoline);
 }
+
+void
+mowgli_helper_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper)
+{
+	return_if_fail(eventloop != NULL);
+	return_if_fail(helper != NULL);
+
+	mowgli_process_kill(helper->child);
+	mowgli_pollable_destroy(eventloop, helper->in_pfd);
+	mowgli_pollable_destroy(eventloop, helper->out_pfd);
+	close(helper->in_fd);
+	close(helper->out_fd);
+
+	mowgli_free(helper);
+}

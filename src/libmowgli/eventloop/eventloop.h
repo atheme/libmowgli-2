@@ -173,6 +173,7 @@ extern mowgli_eventloop_helper_proc_t *mowgli_helper_setup(mowgli_eventloop_t *e
 
 /* synchronization of helpers happens on reading from mowgli_eventloop_helper_proc_t::in_pfd. */
 extern void mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, mowgli_eventloop_helper_cb_t *read_fn);
+extern void mowgli_helper_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper);
 
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
