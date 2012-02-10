@@ -23,6 +23,8 @@
 
 #include <mowgli.h>
 
+int helper_count = 0;
+
 void timer_oneshot(mowgli_eventloop_helper_proc_t *helper)
 {
 	mowgli_writef(helper->out_fd, "oneshot timer hit\n");
@@ -34,7 +36,7 @@ void timer_tick(mowgli_eventloop_helper_proc_t *helper)
 
 	mowgli_writef(helper->out_fd, "tick: %d\n", ++ticks);
 
-	if (ticks > 20)
+	if (ticks > 10)
 		mowgli_eventloop_break(helper->eventloop);
 }
 
@@ -60,8 +62,13 @@ void helper_spawn(mowgli_eventloop_t *eventloop)
 {
 	mowgli_eventloop_helper_proc_t *helper;
 
+	if (helper_count >= 100)
+		return;
+
 	helper = mowgli_helper_create(eventloop, helper_start, NULL);
 	mowgli_helper_set_read_cb(eventloop, helper, helper_read);
+
+	helper_count++;
 }
 
 void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, void *userdata)
@@ -75,9 +82,13 @@ void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *
 	if (r > 0)
 		printf("helper %p [%d/%d]: %s", helper, helper->child->pid, helper->in_fd, buf);
 	else if (r <= 0)
-		mowgli_helper_destroy(helper);
+	{
+		helper_count--;
+		mowgli_helper_destroy(eventloop, helper);
+	}
 
-	helper_spawn(eventloop);
+	if ((rand() % helper_count) == 0)
+		helper_spawn(eventloop);
 }
 
 int main(int argc, char *argv[])
@@ -85,7 +96,9 @@ int main(int argc, char *argv[])
 	mowgli_eventloop_t *base_eventloop;
 
 	base_eventloop = mowgli_eventloop_create();
+
 	helper_spawn(base_eventloop);
+
 	mowgli_eventloop_run(base_eventloop);
 
 	return EXIT_SUCCESS;
