@@ -91,10 +91,10 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	pipe(out_fd);
 
 	/* set up helper/child fd mapping */
-	helper->in_fd = in_fd[0];
-	helper->out_fd = out_fd[1];
-	child.in_fd = in_fd[1];
-	child.out_fd = out_fd[0];
+	helper->in_fd = out_fd[0];
+	helper->out_fd = in_fd[1];
+	child.in_fd = in_fd[0];
+	child.out_fd = out_fd[1];
 
 	/* make pollables and make them non-blocking */
 	helper->in_pfd = mowgli_pollable_create(eventloop, helper->in_fd, helper);
@@ -142,8 +142,8 @@ mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const
 	pipe(out_fd);
 
 	/* set up helper/child fd mapping */
-	helper->in_fd = in_fd[0];
-	helper->out_fd = out_fd[1];
+	helper->in_fd = out_fd[0];
+	helper->out_fd = in_fd[1];
 
 	/* make pollables and make them non-blocking */
 	helper->in_pfd = mowgli_pollable_create(eventloop, helper->in_fd, helper);
@@ -151,10 +151,10 @@ mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const
 	mowgli_pollable_set_nonblocking(helper->in_pfd, true);
 	mowgli_pollable_set_nonblocking(helper->out_pfd, true);
 
-	snprintf(buf, sizeof buf, "%d", in_fd[1]);
+	snprintf(buf, sizeof buf, "%d", out_fd[1]);
 	setenv("IN_FD", buf, 1);
 
-	snprintf(buf, sizeof buf, "%d", out_fd[0]);
+	snprintf(buf, sizeof buf, "%d", in_fd[0]);
 	setenv("OUT_FD", buf, 1);
 
 	/* Spawn helper process using mowgli_process_spawn(), helper will get
