@@ -47,7 +47,7 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
 	out = mowgli_alloc(sizeof(mowgli_process_t));
 	out->userdata = userdata;
 
-	out->pid = vfork();
+	out->pid = fork();
 	switch (out->pid)
 	{
 	default:
