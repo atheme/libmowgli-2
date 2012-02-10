@@ -30,14 +30,37 @@ static void
 mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 {
 	mowgli_eventloop_helper_proc_t *helper;
+#ifndef _WIN32
+	int i, x;
+#endif
 
 	return_if_fail(req != NULL);
 	return_if_fail(req->start_fn != NULL);
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
-	helper->eventloop = mowgli_eventloop_create();
 	helper->in_fd = req->in_fd;
 	helper->out_fd = req->out_fd;
+
+#ifndef _WIN32
+	for (i = 0; i < 1024; i++)
+	{
+		if (i != req->in_fd && i != req->out_fd)
+			close(i);
+	}
+
+	x = open("/dev/null", O_RDWR);
+
+	for (i = 0; i < 2; i++)
+	{
+		if (req->in_fd != i && req->out_fd != i)
+			dup2(x, i);
+	}
+
+	if (x > 2)
+		close(x);
+#endif
+
+	helper->eventloop = mowgli_eventloop_create();
 	helper->in_pfd = mowgli_pollable_create(helper->eventloop, helper->in_fd, helper);
 	helper->out_pfd = mowgli_pollable_create(helper->eventloop, helper->out_fd, helper);
 	helper->userdata = req->userdata;
