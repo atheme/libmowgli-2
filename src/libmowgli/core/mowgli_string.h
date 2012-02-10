@@ -44,5 +44,6 @@ extern void mowgli_string_append_char(mowgli_string_t *self, const char c);
 
 extern size_t mowgli_strlcat(char *dest, const char *src, size_t count);
 extern size_t mowgli_strlcpy(char *dest, const char *src, size_t count);
+extern ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...);
 
 #endif

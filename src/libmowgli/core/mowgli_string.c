@@ -119,3 +119,18 @@ size_t mowgli_strlcpy(char *dest, const char *src, size_t size)
 
 	return ret;
 }
+
+ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
+{
+	size_t len;
+	va_list va;
+	char buf[16384];
+
+	return_val_if_fail(fmt != NULL, -1);
+
+	va_start(va, fmt);
+	len = vsnprintf(buf, sizeof buf, fmt, va);
+	va_end(va);
+
+	return write(fd, buf, len);
+}

@@ -74,16 +74,16 @@ MOWGLI_DECLS_START
 #include "object/message.h"
 #include "object/metadata.h"
 #include "ext/global_storage.h"
+#include "core/process.h"
+#include "eventloop/eventloop.h"
 #include "core/mowgli_string.h"
 #include "core/allocator.h"
 #include "base/formatter.h"
 #include "container/index.h"
-#include "core/process.h"
 #include "thread/thread.h"
 #include "ext/confparse.h"
 #include "ext/getopt_long.h"
 #include "ext/program_opts.h"
-#include "eventloop/eventloop.h"
 
 MOWGLI_DECLS_END
 
