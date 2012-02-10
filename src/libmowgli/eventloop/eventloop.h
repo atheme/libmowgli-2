@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>.
+ * Copyright (c) 2011, 2012 William Pitcock <nenolod@dereferenced.org>.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -143,6 +143,36 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 
 	return false;
 }
+
+typedef struct _mowgli_helper mowgli_eventloop_helper_proc_t;
+
+typedef void mowgli_eventloop_helper_start_fn_t(mowgli_eventloop_helper_proc_t *helper, void *userdata);
+typedef void mowgli_eventloop_helper_cb_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, void *userdata);
+
+struct _mowgli_helper {
+	mowgli_process_t *child;
+	mowgli_eventloop_t *eventloop;
+
+	mowgli_descriptor_t in_fd;
+	mowgli_descriptor_t out_fd;
+
+	mowgli_eventloop_pollable_t *in_pfd;
+	mowgli_eventloop_pollable_t *out_pfd;
+
+	mowgli_eventloop_helper_cb_t *read_function;
+
+	void *userdata;
+};
+
+/* helper.c */
+extern mowgli_eventloop_helper_proc_t *mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_start_fn_t *start_fn, void *userdata);
+
+/* creation of helpers inside other executable images */
+extern mowgli_eventloop_helper_proc_t *mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const argv[]);
+extern mowgli_eventloop_helper_proc_t *mowgli_helper_setup(mowgli_eventloop_t *eventloop);
+
+/* synchronization of helpers happens on reading from mowgli_eventloop_helper_proc_t::in_pfd. */
+extern void mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, mowgli_eventloop_helper_cb_t *read_fn);
 
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
