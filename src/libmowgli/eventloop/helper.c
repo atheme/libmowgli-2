@@ -191,7 +191,7 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 	const char *env_in_fd, *env_out_fd;
 
 	env_in_fd = getenv("IN_FD");
-	env_out_fd = getenv("IN_FD");
+	env_out_fd = getenv("OUT_FD");
 
 	/* this shouldn't be a hard-fail because some idiot may run the helper from
 	 * the cmdline.  allow the helper to error out gracefully if not spawned as
