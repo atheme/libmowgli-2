@@ -43,10 +43,14 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if (timer->when < eventloop->time_min && eventloop->time_min != -1)
+	if (eventloop->time_min < mowgli_eventloop_get_time(eventloop) || timer->when < eventloop->time_min)
 		eventloop->time_min = timer->when;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
+
+#ifdef DEBUG
+	mowgli_log("[timer(%p) add when:%d active:%d] [eventloop time_min:%d]", timer, timer->when, timer->active, eventloop->time_min);
+#endif
 
 	return timer;
 }
@@ -128,8 +132,16 @@ time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 
 			if (timer->active && (timer->when < eventloop->time_min || eventloop->time_min == -1))
 				eventloop->time_min = timer->when;
+
+#ifdef DEBUG
+			mowgli_log("timer %p active:%d when:%ld time_min:%ld", timer, timer->active, timer->when, eventloop->time_min);
+#endif
 		}
 	}
+
+#ifdef DEBUG
+	mowgli_log("eventloop time_min:%ld", eventloop->time_min);
+#endif
 
 	return eventloop->time_min;
 }
