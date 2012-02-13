@@ -106,10 +106,13 @@ timer_cb(void *unused)
 }
 
 void
-read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *arg)
+read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *arg)
 {
+	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	int idx = (int) (long) arg, widx = idx + 1;
 	u_char ch;
+
+	printf("io:%p, io->type:%d\n", io, ((mowgli_eventloop_io_obj_t *)io)->tag);
 
 	count += read(pollable->fd, &ch, sizeof(ch));
 	if (writes) {
@@ -147,7 +150,7 @@ run_once(void)
 			mowgli_pollable_destroy(base_eventloop, events[i]);
 
 		events[i] = mowgli_pollable_create(base_eventloop, cp[0], (void *) (long) i);
-		mowgli_pollable_setselect(base_eventloop, events[i], MOWGLI_EVENTLOOP_POLL_READ, read_cb);
+		mowgli_pollable_setselect(base_eventloop, events[i], MOWGLI_EVENTLOOP_IO_READ, read_cb);
 	}
 
 	fired = 0;
