@@ -56,7 +56,7 @@ void helper_start(mowgli_eventloop_helper_proc_t *helper, void *userdata)
 	mowgli_eventloop_destroy(eventloop);
 }
 
-void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, void *userdata);
+void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 
 void helper_spawn(mowgli_eventloop_t *eventloop)
 {
@@ -71,10 +71,11 @@ void helper_spawn(mowgli_eventloop_t *eventloop)
 	helper_count++;
 }
 
-void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, void *userdata)
+void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	size_t r;
 	char buf[16384];
+	mowgli_eventloop_helper_proc_t *helper = mowgli_eventloop_io_helper(io);
 
 	bzero(buf, sizeof buf);
 	r = read(helper->in_fd, buf, sizeof buf);
