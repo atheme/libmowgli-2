@@ -36,7 +36,6 @@
 int main(int argc, char *argv[])
 {
 	char buf[65535];
-	mowgli_init();
 
 	mowgli_formatter_format(buf, 65535, "%1! %2 %3 %4.", "sdpb", "Hello World", 1, 0xDEADBEEF, TRUE);
 

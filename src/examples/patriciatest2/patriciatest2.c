@@ -145,8 +145,6 @@ void test_patricia(void)
 
 int main(int argc, char *argv[])
 {
-	mowgli_init();
-
 	test_patricia();
 
 	return errors == 0 ? 0 : 1;

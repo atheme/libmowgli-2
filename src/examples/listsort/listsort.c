@@ -109,9 +109,7 @@ void test_integers(void)
 
 int main(int argc, char *argv[])
 {
-	mowgli_init();
-
 	test_strings();
 	test_integers();
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }

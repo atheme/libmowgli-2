@@ -42,8 +42,6 @@ void timer_tick(void *unused)
 
 int main(int argc, char *argv[])
 {
-	mowgli_init();
-
 	eventloop = mowgli_eventloop_create();
 
 	mowgli_timer_add(eventloop, "timer_tick", timer_tick, NULL, 1);
