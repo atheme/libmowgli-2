@@ -45,6 +45,8 @@ typedef struct _mowgli_eventloop mowgli_eventloop_t;
 typedef struct _mowgli_pollable mowgli_eventloop_pollable_t;
 typedef struct _mowgli_helper mowgli_eventloop_helper_proc_t;
 
+typedef struct _mowgli_linebuf mowgli_linebuf_t;
+
 typedef enum {
 	MOWGLI_EVENTLOOP_IO_READ,
 	MOWGLI_EVENTLOOP_IO_WRITE,
@@ -243,5 +245,39 @@ extern mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *e
 extern void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
 extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function);
 extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking);
+
+/* linebuf.c */
+typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
+typedef struct _mowgli_linebuf mowgli_linebuf_t;
+
+typedef int mowgli_linebuf_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, char *, size_t, void *);
+typedef int mowgli_linebuf_io_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, mowgli_linebuf_t *, char *);
+
+extern mowgli_linebuf_t *mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_cb_t *cb);
+extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
+extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
+
+struct _mowgli_linebuf_buf {
+	char *buffer;
+	size_t buflen;
+	size_t maxbuflen;
+};
+
+struct _mowgli_linebuf {
+	mowgli_linebuf_cb_t *readline_cb;
+	mowgli_linebuf_io_cb_t *read_cb;
+	mowgli_linebuf_io_cb_t *write_cb;
+
+	const char *delim;
+
+	bool remote_hangup;
+	bool read_buffer_full;
+	int err;
+
+	mowgli_linebuf_buf_t readbuf;
+	mowgli_linebuf_buf_t writebuf;
+
+	void *userdata;
+};
 
 #endif
