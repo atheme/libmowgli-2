@@ -144,9 +144,7 @@ static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli
 		return 0;
 	}
 	else if (ret < buffer->buflen)
-	{
 		memmove(bufpos, bufpos + ret, buffer->buflen - ret);
-	}
 
 	return ret;
 }
@@ -183,6 +181,19 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	buffer->buflen -= ret;
 }
 
+void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
+{
+	char *ptr = linebuf->writebuf.buffer + linebuf->writebuf.buflen;
+	int delim_len = strlen(linebuf->delim);
+
+	return_if_fail(linebuf->writebuf.buflen + len + delim_len <= linebuf->writebuf.maxbuflen);
+
+	memcpy((void *)ptr, data, len);
+	memcpy((void *)(ptr + len), linebuf->delim, delim_len);
+
+	linebuf->writebuf.buflen += len + delim_len;
+}
+
 static void mowgli_linebuf_process(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf)
 {
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
@@ -191,7 +202,11 @@ static void mowgli_linebuf_process(mowgli_eventloop_t *eventloop, mowgli_eventlo
 	char *buf_end = buffer->buffer + buffer->buflen;
 	char *cptr;
 
-	for (cptr = line_start; cptr != buf_end; cptr++)
+	printf("Debug: buflen %d\n", buffer->buflen);
+
+	return_if_fail(buffer->buflen > 0);
+
+	for (cptr = line_start; cptr < buf_end; cptr++)
 	{
 		int c = memcmp((void *)cptr, linebuf->delim, delim_len);
 		if (c != 0)
