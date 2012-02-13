@@ -112,8 +112,6 @@ read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventlo
 	int idx = (int) (long) arg, widx = idx + 1;
 	u_char ch;
 
-	printf("io:%p, io->type:%d\n", io, ((mowgli_eventloop_io_obj_t *)io)->tag);
-
 	count += read(pollable->fd, &ch, sizeof(ch));
 	if (writes) {
 		if (widx >= num_pipes)
