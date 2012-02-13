@@ -208,7 +208,7 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
 	helper->tag.tag = MOWGLI_EVENTLOOP_HELPER_TAG;
-	helper->eventloop = mowgli_eventloop_create();
+	helper->eventloop = eventloop;
 	helper->in_fd = atoi(env_in_fd);
 	helper->out_fd = atoi(env_out_fd);
 	helper->in_pfd = mowgli_pollable_create(helper->eventloop, helper->in_fd, helper);
