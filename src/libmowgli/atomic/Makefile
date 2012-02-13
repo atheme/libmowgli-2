@@ -4,7 +4,7 @@ STATIC_PIC_LIB_NOINST = mowgli.atomic.a
 
 SRCS = spinlock.c		\
 
-INCLUDES = spinlock.h		\
+INCLUDES = atomic.h spinlock.h		\
 
 includesubdir = $(PACKAGE)/atomic
 
