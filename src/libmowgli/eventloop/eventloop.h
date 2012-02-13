@@ -31,9 +31,19 @@ typedef HANDLE mowgli_descriptor_t;
 
 #endif
 
+typedef enum {
+	MOWGLI_EVENTLOOP_POLLABLE_TAG,
+	MOWGLI_EVENTLOOP_HELPER_TAG,
+} mowgli_eventloop_io_tag_t;
+
+typedef struct {
+	mowgli_eventloop_io_tag_t tag;
+} mowgli_eventloop_io_obj_t;
+
 typedef struct _mowgli_eventloop mowgli_eventloop_t;
 
 typedef struct _mowgli_pollable mowgli_eventloop_pollable_t;
+typedef struct _mowgli_helper mowgli_eventloop_helper_proc_t;
 
 typedef enum {
 	MOWGLI_EVENTLOOP_POLL_READ,
@@ -41,9 +51,35 @@ typedef enum {
 	MOWGLI_EVENTLOOP_POLL_ERROR,
 } mowgli_eventloop_pollable_dir_t;
 
-typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
+typedef void mowgli_eventloop_io_t;
+
+/* checked casts */
+static inline mowgli_eventloop_pollable_t *mowgli_eventloop_io_pollable(mowgli_eventloop_io_t *io)
+{
+	mowgli_eventloop_io_obj_t *obj = io;
+
+	return_val_if_fail(io != NULL, NULL);
+	return_val_if_fail(obj->tag == MOWGLI_EVENTLOOP_POLLABLE_TAG, NULL);
+
+	return io;
+}
+
+static inline mowgli_eventloop_helper_proc_t *mowgli_eventloop_io_helper(mowgli_eventloop_io_t *io)
+{
+	mowgli_eventloop_io_obj_t *obj = io;
+
+	return_val_if_fail(io != NULL, NULL);
+	return_val_if_fail(obj->tag == MOWGLI_EVENTLOOP_HELPER_TAG, NULL);
+
+	return io;
+}
+
+
+typedef void mowgli_pollevent_dispatch_func_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata);
 
 struct _mowgli_pollable {
+	mowgli_eventloop_io_obj_t tag;
+
 	mowgli_descriptor_t fd;
 	unsigned int slot;
 
@@ -144,12 +180,12 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 	return false;
 }
 
-typedef struct _mowgli_helper mowgli_eventloop_helper_proc_t;
-
 typedef void mowgli_eventloop_helper_start_fn_t(mowgli_eventloop_helper_proc_t *helper, void *userdata);
 typedef void mowgli_eventloop_helper_cb_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, void *userdata);
 
 struct _mowgli_helper {
+	mowgli_eventloop_io_obj_t tag;
+
 	mowgli_process_t *child;
 	mowgli_eventloop_t *eventloop;
 
@@ -177,7 +213,7 @@ extern void mowgli_helper_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloo
 
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
-extern void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata);
+extern void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata);
 
 /* eventloop.c */
 extern mowgli_eventloop_t *mowgli_eventloop_create(void);

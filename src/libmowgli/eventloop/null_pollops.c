@@ -54,9 +54,12 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	eventloop->eventloop_ops->select(eventloop, t);
 }
 
-void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata)
 {
-	mowgli_pollable_destroy(eventloop, pollable);
+	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
+
+	if (pollable != NULL)
+		mowgli_pollable_destroy(eventloop, pollable);
 }
 
 static void mowgli_null_eventloop_pollsetup(mowgli_eventloop_t *eventloop)

@@ -38,6 +38,7 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 	return_if_fail(req->start_fn != NULL);
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper->tag.tag = MOWGLI_EVENTLOOP_HELPER_TAG;
 	helper->in_fd = req->in_fd;
 	helper->out_fd = req->out_fd;
 
@@ -85,6 +86,7 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	child.userdata = userdata;
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper->tag.tag = MOWGLI_EVENTLOOP_HELPER_TAG;
 	helper->eventloop = eventloop;
 
 	pipe(in_fd);
@@ -136,6 +138,7 @@ mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const
 	return_val_if_fail(path != NULL, NULL);
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper->tag.tag = MOWGLI_EVENTLOOP_HELPER_TAG;
 	helper->eventloop = eventloop;
 
 	pipe(in_fd);
@@ -204,6 +207,7 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 		return NULL;
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper->tag.tag = MOWGLI_EVENTLOOP_HELPER_TAG;
 	helper->eventloop = mowgli_eventloop_create();
 	helper->in_fd = atoi(env_in_fd);
 	helper->out_fd = atoi(env_out_fd);
@@ -217,7 +221,7 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 }
 
 static void
-mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_helper_proc_t *helper = userdata;
 
