@@ -54,7 +54,7 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	eventloop->eventloop_ops->select(eventloop, t);
 }
 
-void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 
@@ -77,16 +77,16 @@ static void mowgli_null_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_
 	return;
 }
 
-static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
+static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", pollable);
 
 	switch (dir)
 	{
-	case MOWGLI_EVENTLOOP_POLL_READ:
+	case MOWGLI_EVENTLOOP_IO_READ:
 		pollable->read_function = event_function;
 		break;
-	case MOWGLI_EVENTLOOP_POLL_WRITE:
+	case MOWGLI_EVENTLOOP_IO_WRITE:
 		pollable->write_function = event_function;
 		break;
 	default:

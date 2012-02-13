@@ -118,7 +118,7 @@ static void mowgli_poll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_
 	mowgli_node_delete(&pollable->node, &priv->pollable_list);
 }
 
-static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
+static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_poll_eventloop_private_t *priv;
 
@@ -136,14 +136,11 @@ static void mowgli_poll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 
 	switch (dir)
 	{
-	case MOWGLI_EVENTLOOP_POLL_READ:
+	case MOWGLI_EVENTLOOP_IO_READ:
 		pollable->read_function = event_function;
 		break;
-	case MOWGLI_EVENTLOOP_POLL_WRITE:
+	case MOWGLI_EVENTLOOP_IO_WRITE:
 		pollable->write_function = event_function;
-		break;
-	case MOWGLI_EVENTLOOP_POLL_ERROR:
-		pollable->error_function = event_function != NULL ? event_function : mowgli_simple_eventloop_error_handler;
 		break;
 	default:
 		mowgli_log("unhandled pollable direction %d", dir);
@@ -190,11 +187,11 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 			if (priv->pollfds[slot].revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR) && pollable->read_function)
 			{
 #ifdef DEBUG
-				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
+				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
 #endif
 
 				priv->pollfds[slot].events &= ~(POLLRDNORM | POLLIN);
-				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
+				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
 			}
 		}
 
@@ -209,11 +206,11 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 			if (priv->pollfds[slot].revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR) && pollable->write_function)
 			{
 #ifdef DEBUG
-				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_POLL_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
+				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
 #endif
 
 				priv->pollfds[slot].events &= ~(POLLWRNORM | POLLOUT);
-				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
+				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
 			}
 		}
 	}

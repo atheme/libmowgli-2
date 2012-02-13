@@ -79,7 +79,7 @@ static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgl
 	}
 }
 
-static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
+static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 	mowgli_pollevent_dispatch_func_t **fptr;
@@ -99,17 +99,14 @@ static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 
 	switch (dir)
 	{
-	case MOWGLI_EVENTLOOP_POLL_READ:
+	case MOWGLI_EVENTLOOP_IO_READ:
 		fptr = &pollable->read_function;
 		filter = EVFILT_READ;
 		break;
-	case MOWGLI_EVENTLOOP_POLL_WRITE:
+	case MOWGLI_EVENTLOOP_IO_WRITE:
 		fptr = &pollable->write_function;
 		filter = EVFILT_WRITE;
 		break;
-	case MOWGLI_EVENTLOOP_POLL_ERROR:
-		pollable->error_function = event_function != NULL ? event_function : mowgli_simple_eventloop_error_handler;
-		return;
 	default:
 		mowgli_log("unhandled pollable direction %d", dir);
 		return;
@@ -168,11 +165,11 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 
 		if (priv->events[i].filter == EVFILT_READ &&
 				pollable->read_function != NULL)
-			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_READ, pollable->userdata);
+			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
 
 		if (priv->events[i].filter == EVFILT_WRITE &&
 				pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_POLL_WRITE, pollable->userdata);
+			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
 
 		/* XXX Perhaps we need to recheck read_function and
 		 * write_function now.

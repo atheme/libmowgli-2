@@ -221,30 +221,30 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 }
 
 static void
-mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_pollable_dir_t dir, void *userdata)
+mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_helper_proc_t *helper = userdata;
 
 	switch (dir) {
-	case MOWGLI_EVENTLOOP_POLL_READ:
+	case MOWGLI_EVENTLOOP_IO_READ:
 		if (helper->read_function != NULL)
-			return helper->read_function(eventloop, helper, helper->userdata);
+			return helper->read_function(eventloop, helper, MOWGLI_EVENTLOOP_IO_READ, helper->userdata);
 	default:
 		break;
 	}
 }
 
 void
-mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, mowgli_eventloop_helper_cb_t *read_fn)
+mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_proc_t *helper, mowgli_eventloop_io_cb_t *read_fn)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(helper != NULL);
 
 	if (read_fn == NULL)
-		mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_POLL_READ, NULL);
+		mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_IO_READ, NULL);
 
 	helper->read_function = read_fn;
-	mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_POLL_READ, mowgli_helper_io_trampoline);
+	mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_IO_READ, mowgli_helper_io_trampoline);
 }
 
 void

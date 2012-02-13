@@ -51,7 +51,7 @@ void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pol
 	mowgli_heap_free(pollable_heap, pollable);
 }
 
-void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_pollable_dir_t dir, mowgli_pollevent_dispatch_func_t *event_function)
+void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(pollable != NULL);
