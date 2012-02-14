@@ -25,8 +25,8 @@
 
 static mowgli_heap_t *linebuf_heap = NULL;
 
-static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *bufpos);
-static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *bufpos);
+static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf);
+static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf);
 static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 static void mowgli_linebuf_process(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf);
@@ -98,7 +98,7 @@ void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
 }
 
 /* This will be going away after VIO is integrated */
-static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *bufpos)
+static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
@@ -110,7 +110,7 @@ static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_
 		return 0; /* Ugh, buffer full :( */
 	}
 
-	if ((ret = read(pollable->fd, bufpos, buffer->maxbuflen)) == 0)
+	if ((ret = read(pollable->fd, buffer->buffer + buffer->buflen, buffer->maxbuflen - buffer->buflen)) == 0)
 	{
 		linebuf->remote_hangup = true;
 		return 0; /* Connection reset by peer */
@@ -127,7 +127,7 @@ static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_
 }
 
 /* This will be going away after VIO is integrated */
-static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *bufpos)
+static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
@@ -136,7 +136,7 @@ static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli
 	if (buffer->buflen == 0)
 		return 0; /* Nothing to do */
 
-	if ((ret = write(pollable->fd, bufpos, buffer->buflen)) == -1)
+	if ((ret = write(pollable->fd, buffer->buffer, buffer->buflen)) == -1)
 	{
 		if (errno != EAGAIN)
 			linebuf->err = errno;
@@ -144,7 +144,7 @@ static int mowgli_linebuf_default_write_cb(mowgli_eventloop_t *eventloop, mowgli
 		return 0;
 	}
 	else if (ret < buffer->buflen)
-		memmove(bufpos, bufpos + ret, buffer->buflen - ret);
+		memmove(buffer->buffer, buffer->buffer + ret, buffer->buflen - ret);
 
 	return ret;
 }
@@ -159,7 +159,7 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 	if (dir != MOWGLI_EVENTLOOP_IO_READ)
 		return; /* We're not here to do anything else you dolt */
 
-	if ((ret = linebuf->read_cb(eventloop, io, linebuf, buffer->buffer + buffer->buflen)) == 0)
+	if ((ret = linebuf->read_cb(eventloop, io, linebuf)) == 0)
 		return;
 
 	buffer->buflen += ret;
@@ -175,7 +175,7 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	if (dir != MOWGLI_EVENTLOOP_IO_WRITE)
 		return; /* We're not here to do anything else you dolt */
 
-	if ((ret = linebuf->write_cb(eventloop, io, linebuf, buffer->buffer)) == 0)
+	if ((ret = linebuf->write_cb(eventloop, io, linebuf)) == 0)
 		return;
 
 	buffer->buflen -= ret;
@@ -198,28 +198,29 @@ static void mowgli_linebuf_process(mowgli_eventloop_t *eventloop, mowgli_eventlo
 {
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
 	size_t delim_len = strlen(linebuf->delim);
+
 	char *line_start = buffer->buffer;
 	char *buf_end = buffer->buffer + buffer->buflen;
-	char *cptr;
-
-	printf("Debug: buflen %d\n", buffer->buflen);
-
+	char *cptr = line_start;
 	return_if_fail(buffer->buflen > 0);
 
-	for (cptr = line_start; cptr < buf_end; cptr++)
+	while (cptr++ < buf_end)
 	{
 		int c = memcmp((void *)cptr, linebuf->delim, delim_len);
 		if (c != 0)
 			continue;
 
-		linebuf->readline_cb(eventloop, io, line_start, cptr - line_start, linebuf->userdata);
-		cptr += delim_len;
+		linebuf->readline_cb(eventloop, io, linebuf, line_start, cptr - line_start, linebuf->userdata);
+
+		if ((cptr + delim_len) <= buf_end)
+			cptr += delim_len;
+
 		line_start = cptr;
 	}
 
-	if (cptr - line_start > 0)
+	if ((cptr - line_start) > 0)
 	{
-		memmove(buffer->buffer, cptr, cptr - line_start);
+		memmove(buffer->buffer, line_start, cptr - line_start);
 		buffer->buflen = cptr - line_start;
 	}
 	else

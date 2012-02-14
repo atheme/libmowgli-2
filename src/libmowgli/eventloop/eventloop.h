@@ -250,8 +250,8 @@ extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollabl
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 typedef struct _mowgli_linebuf mowgli_linebuf_t;
 
-typedef int mowgli_linebuf_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, char *, size_t, void *);
-typedef int mowgli_linebuf_io_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, mowgli_linebuf_t *, char *);
+typedef int mowgli_linebuf_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, mowgli_linebuf_t *, char *, size_t, void *);
+typedef int mowgli_linebuf_io_cb_t(mowgli_eventloop_t *, mowgli_eventloop_io_t *, mowgli_linebuf_t *);
 
 extern mowgli_linebuf_t *mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_cb_t *cb);
 extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
