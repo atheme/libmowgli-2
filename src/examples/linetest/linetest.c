@@ -27,7 +27,6 @@ mowgli_eventloop_t *base_eventloop;
 char buf[512];
 
 typedef struct {
-	char buf[1024];
 	mowgli_linebuf_t *linebuf;
 	bool connected;
 } client_t;
@@ -58,10 +57,12 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 		exit(EXIT_FAILURE);
 	}
 
-	/* Create client and I/O objects */
 	client = mowgli_alloc(sizeof(client_t));
+
+	client->connected = true;
+
 	io = mowgli_pollable_create(base_eventloop, fd, client);
-	mowgli_pollable_set_nonblocking(io, true);
+	
 	client->linebuf = mowgli_linebuf_create(base_eventloop, io, eat_line);
 
 	/* Initiate connection */
@@ -70,6 +71,8 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 		perror("connect");
 		exit(EXIT_FAILURE);
 	}
+
+	mowgli_pollable_set_nonblocking(io, true);
 
 	/* Write IRC handshake */
 	snprintf(buf, 512, "USER %s * 8 :%s", user, realname);
@@ -84,6 +87,7 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 void connection_error(mowgli_linebuf_t *linebuf, mowgli_eventloop_io_dir_t dir)
 {
 	const char *errtype;
+	client_t *client = linebuf->userdata;
 
 	if (dir == MOWGLI_EVENTLOOP_IO_READ)
 		errtype = "Read";
@@ -101,6 +105,7 @@ void connection_error(mowgli_linebuf_t *linebuf, mowgli_eventloop_io_dir_t dir)
 	else if (linebuf->write_buffer_full)
 		fprintf(stderr, "Send buffer exceeded\n");
 
+	client->connected = false;
 	mowgli_linebuf_destroy(linebuf);
 
 	exit(EXIT_SUCCESS);
