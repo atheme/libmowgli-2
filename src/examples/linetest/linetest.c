@@ -27,62 +27,93 @@ mowgli_eventloop_t *base_eventloop;
 char buf[512];
 
 typedef struct {
-	mowgli_eventloop_io_t *io;
 	char buf[1024];
+	mowgli_linebuf_t *linebuf;
+	bool connected;
 } client_t;
 
-int eat_line(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata);
+void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata);
 
-client_t * create_client(mowgli_linebuf_t *linebuf, const char *server, const char *port, const char *nick, const char *user, const char *realname)
+client_t * create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
 {
 	int fd, status;
 	struct addrinfo hints;
 	struct addrinfo *res;
 	client_t *client;
+	mowgli_eventloop_io_t *io;
 
+	/* Do name resolution */
 	memset(&hints, 0, sizeof hints);
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
 	if ((status = getaddrinfo(server, port, &hints, &res)) != 0) {
 		fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-		exit(1);
+		exit(EXIT_FAILURE);
 	}
 
-	fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-	if (fd == -1)
+	if ((fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
+	{
 		perror("socket");
+		exit(EXIT_FAILURE);
+	}
 
-	if (connect(fd, res->ai_addr, res->ai_addrlen) == -1)
-		perror("connect");
-
-	freeaddrinfo(res);
-
+	/* Create client and I/O objects */
 	client = mowgli_alloc(sizeof(client_t));
-	client->io = mowgli_pollable_create(base_eventloop, fd, client);
-	mowgli_pollable_set_nonblocking(client->io, true);
+	io = mowgli_pollable_create(base_eventloop, fd, client);
+	mowgli_pollable_set_nonblocking(io, true);
+	client->linebuf = mowgli_linebuf_create(base_eventloop, io, eat_line);
 
-	linebuf = mowgli_linebuf_create(base_eventloop, client->io, eat_line);
-	mowgli_linebuf_setbuflen(&(linebuf->readbuf), 65536);
-	mowgli_linebuf_setbuflen(&(linebuf->writebuf), 65536);
+	/* Initiate connection */
+	if (connect(fd, res->ai_addr, res->ai_addrlen) == -1)
+	{
+		perror("connect");
+		exit(EXIT_FAILURE);
+	}
 
+	/* Write IRC handshake */
 	snprintf(buf, 512, "USER %s * 8 :%s", user, realname);
-	mowgli_linebuf_write(linebuf, buf, strlen(buf));
+	mowgli_linebuf_write(client->linebuf, buf, strlen(buf));
 
 	snprintf(buf, 512, "NICK %s", nick);
-	mowgli_linebuf_write(linebuf, buf, strlen(buf));
+	mowgli_linebuf_write(client->linebuf, buf, strlen(buf));
 
 	return client;
 }
 
-int eat_line(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
+void connection_error(mowgli_linebuf_t *linebuf, mowgli_eventloop_io_dir_t dir)
+{
+	const char *errtype;
+
+	if (dir == MOWGLI_EVENTLOOP_IO_READ)
+		errtype = "Read";
+	else if (dir == MOWGLI_EVENTLOOP_IO_WRITE)
+		errtype = "Write";
+	else /* ??? */
+		errtype = "Socket";
+
+	if (linebuf->err)
+		fprintf(stderr, "%s error: %s\n", errtype, strerror(linebuf->err));
+	else if (linebuf->remote_hangup)
+		fprintf(stderr, "Remote host closed the socket\n");
+	else if (linebuf->read_buffer_full)
+		fprintf(stderr, "Recieve buffer exceeded\n");
+	else if (linebuf->write_buffer_full)
+		fprintf(stderr, "Send buffer exceeded\n");
+
+	mowgli_linebuf_destroy(linebuf);
+
+	exit(EXIT_SUCCESS);
+}
+
+void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 {
 	char str[512];
 
-	/* Note: if bad servers send \0's you'll see weirdness like truncated lines.
-	 * You'll want to filter them somehow unless you want them.
-	 * in this case, not terribly concerned.
-	 */
+	/* Avoid malicious lines -- servers shouldn't send them */
+	if (linebuf->line_has_nullchar)
+		return;
+
 	strncpy(str, line, sizeof(str));
 	str[len + 1] = '\0';
 
@@ -100,12 +131,12 @@ int eat_line(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_li
 		}
 	}
 
-	return 0;
+	return;
 }
 
 int main(int argc, const char *argv[])
 {
-	mowgli_linebuf_t *linebuf = NULL;
+	client_t *client;
 
 	if (argc < 3)
 	{
@@ -116,10 +147,11 @@ int main(int argc, const char *argv[])
 
 	base_eventloop = mowgli_eventloop_create();
 
-	create_client(linebuf, argv[1], argv[2], "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
-
+	client = create_client(argv[1], argv[2], "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
+	
 	mowgli_eventloop_run(base_eventloop);
-	mowgli_linebuf_destroy(linebuf);
+
+	mowgli_free(client);
 	mowgli_eventloop_destroy(base_eventloop);
 
 	return EXIT_SUCCESS;
