@@ -3,6 +3,7 @@
  * lineserver.c: Testing of the linebuffer
  *
  * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
+ * Copyright (c) 2012 Elizabeth J. Myers <elizabeth@sporksmoo.net>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
