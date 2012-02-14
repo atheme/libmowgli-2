@@ -110,7 +110,7 @@ static int mowgli_linebuf_default_read_cb(mowgli_eventloop_t *eventloop, mowgli_
 		return 0; /* Ugh, buffer full :( */
 	}
 
-	if ((ret = read(pollable->fd, buffer->buffer + buffer->buflen, buffer->maxbuflen - buffer->buflen)) == 0)
+	if ((ret = read(pollable->fd, buffer->buffer + buffer->buflen, buffer->maxbuflen - buffer->buflen + 1)) == 0)
 	{
 		linebuf->remote_hangup = true;
 		return 0; /* Connection reset by peer */
@@ -160,7 +160,10 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 		return; /* We're not here to do anything else you dolt */
 
 	if ((ret = linebuf->read_cb(eventloop, io, linebuf)) == 0)
+	{
+		exit(1);
 		return;
+	}
 
 	buffer->buflen += ret;
 	mowgli_linebuf_process(eventloop, pollable, linebuf);
@@ -199,29 +202,34 @@ static void mowgli_linebuf_process(mowgli_eventloop_t *eventloop, mowgli_eventlo
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
 	size_t delim_len = strlen(linebuf->delim);
 
-	char *line_start = buffer->buffer;
-	char *buf_end = buffer->buffer + buffer->buflen;
-	char *cptr = line_start;
-	return_if_fail(buffer->buflen > 0);
+	char *line_start;
+	char *cptr;
+	int len = 0;
 
-	while (cptr++ < buf_end)
+	line_start = cptr = buffer->buffer;
+
+	while (len < buffer->buflen)
 	{
-		int c = memcmp((void *)cptr, linebuf->delim, delim_len);
-		if (c != 0)
+		if (memcmp((void *)cptr, linebuf->delim, delim_len) != 0)
+		{
+			cptr++;
+			len++;
 			continue;
+		}
 
+		/* We now have a line */
 		linebuf->readline_cb(eventloop, io, linebuf, line_start, cptr - line_start, linebuf->userdata);
 
-		if ((cptr + delim_len) <= buf_end)
-			cptr += delim_len;
-
+		/* Next line starts here; begin scanning and set the start of it */
+		len += delim_len;
+		cptr += delim_len;
 		line_start = cptr;
 	}
 
-	if ((cptr - line_start) > 0)
+	if (line_start != cptr)
 	{
-		memmove(buffer->buffer, line_start, cptr - line_start);
 		buffer->buflen = cptr - line_start;
+		memmove(buffer->buffer, line_start, cptr - line_start);
 	}
 	else
 		buffer->buflen = 0;
