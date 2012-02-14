@@ -34,6 +34,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf);
 mowgli_linebuf_t *
 mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_linebuf_readline_cb_t *cb)
 {
+	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	mowgli_linebuf_t *linebuf;
 
 	if (linebuf_heap == NULL)
