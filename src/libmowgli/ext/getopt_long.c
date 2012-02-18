@@ -31,8 +31,6 @@
 
 #include <mowgli.h>
 
-#include <sys/cdefs.h>
-
 #include <assert.h>
 #include <err.h>
 #include <errno.h>
