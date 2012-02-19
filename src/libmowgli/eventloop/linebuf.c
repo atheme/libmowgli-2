@@ -145,7 +145,7 @@ static int mowgli_linebuf_default_write_cb(mowgli_linebuf_t *linebuf, mowgli_eve
 	if (buffer->buflen == 0)
 		return 0; /* Nothing to do */
 
-	if ((ret = write(pollable->fd, buffer->buffer, buffer->buflen)) == -1)
+	if ((ret = send(pollable->fd, buffer->buffer, buffer->buflen, 0)) == -1)
 	{
 		if (errno != EAGAIN)
 		{

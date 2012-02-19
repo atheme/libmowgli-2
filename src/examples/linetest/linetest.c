@@ -63,7 +63,6 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	client->connected = true;
 
 	io = mowgli_pollable_create(base_eventloop, fd, client);
-	
 	client->linebuf = mowgli_linebuf_create(base_eventloop, io, eat_line);
 
 	/* Initiate connection */
