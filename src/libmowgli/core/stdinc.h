@@ -52,7 +52,7 @@
 # include <libgen.h>
 # include <dirent.h>
 #else
-# define WINVER WindowsXP
+# define WINVER 0x0501
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 # include <winsock2.h>
