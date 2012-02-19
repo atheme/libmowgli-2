@@ -62,7 +62,7 @@ void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_p
 
 void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking)
 {
-#ifdef HAVE_FCNTL
+#if defined(HAVE_FCNTL)
 	unsigned long flags;
 
 	return_if_fail(pollable != NULL);
@@ -75,7 +75,7 @@ void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool
 		flags &= ~O_NONBLOCK;
 
 	fcntl(pollable->fd, F_SETFL, flags);
-#elif HAVE_IOCTLSOCKET
+#elif defined(HAVE_WINSOCK2_H)
 	u_long mode;
 
 	return_if_fail(pollable != NULL);
