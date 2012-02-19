@@ -24,6 +24,9 @@ static mowgli_heap_t *eventloop_heap = NULL;
 
 extern mowgli_eventloop_ops_t _mowgli_null_pollops;
 
+#ifdef HAVE_SELECT
+extern mowgli_eventloop_ops_t _mowgli_select_pollops;
+#endif
 #ifdef HAVE_POLL_H
 extern mowgli_eventloop_ops_t _mowgli_poll_pollops;
 #endif
@@ -45,6 +48,9 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 	eventloop->eventloop_ops = &_mowgli_null_pollops;
 
+#ifdef HAVE_SELECT
+	eventloop->eventloop_ops = &_mowgli_select_pollops;
+#endif
 #ifdef HAVE_POLL_H
 	eventloop->eventloop_ops = &_mowgli_poll_pollops;
 #endif

@@ -49,6 +49,8 @@ extern int pipe(int pipefd[2]);
 #define HAVE_WINSOCK2_H
 #endif
 
+#define HAVE_SELECT
+
 #endif
 
 #endif
