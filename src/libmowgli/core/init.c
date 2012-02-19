@@ -25,6 +25,17 @@
 
 MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 {
+#ifdef _WIN32
+	int r;
+	WSADATA w;
+
+	r = WSAStartup((short) 0x202, &w);
+	if (r != 0) {
+		printf("mowgli bootstrap failure (win32): %d\n", r);
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	/* initial bootstrap */
 	mowgli_node_init();
 	mowgli_queue_init();
