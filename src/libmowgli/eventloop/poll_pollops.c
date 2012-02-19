@@ -21,10 +21,8 @@
 #include "mowgli.h"
 
 #ifdef HAVE_POLL_H
-# include <poll.h>
-#endif
 
-#if defined(HAVE_POLL_H) || defined(HAVE_WINSOCK2_H)
+#include <poll.h>
 
 #ifndef POLLRDNORM
 #define POLLRDNORM POLLIN
@@ -33,21 +31,8 @@
 #define POLLWRNORM POLLOUT
 #endif
 
-#ifdef HAVE_WINSOCK2_H
-
-typedef WSAPOLLFD mowgli_pollfd_t;
-#define POLL_FUNC WSAPoll
-#warning WSAPoll support is experimental
-
-#else
-
-typedef struct pollfd mowgli_pollfd_t;
-#define POLL_FUNC poll
-
-#endif
-
 typedef struct {
-	mowgli_pollfd_t pollfds[FD_SETSIZE];
+	struct pollfd pollfds[FD_SETSIZE];
 	nfds_t nfds;
 	mowgli_list_t pollable_list;
 } mowgli_poll_eventloop_private_t;
@@ -186,7 +171,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 
 	nfds = update_poll_fds(eventloop);
 
-	if ((sr = POLL_FUNC(priv->pollfds, nfds, time)) > 0)
+	if ((sr = poll(priv->pollfds, nfds, time)) > 0)
 	{
 		mowgli_eventloop_synchronize(eventloop);
 
