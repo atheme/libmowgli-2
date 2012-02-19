@@ -44,16 +44,13 @@ AC_CHECK_FUNCS([kqueue fcntl])
 AC_FUNC_STAT
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
-AC_CHECK_LIB(wsock32, ioctlsocket, [
-	     LIBS="$LIBS -lwsock32 -lws2_32"
-	     AC_DEFINE([HAVE_IOCTLSOCKET], [], [Define to 1 if you have ioctlsocket])
-	     ])
 
 dnl Detect which loader to use
 AC_MSG_CHECKING(loader type)
 case "$target" in
 *-*-mingw32)
     MOWGLI_MODULE='loader_win32.c'
+    LIBS="$LIBS -lwsock32 -lws2_32"
 	;;
 *)
     MOWGLI_MODULE='loader_posix.c'

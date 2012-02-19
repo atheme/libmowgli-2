@@ -4311,57 +4311,13 @@ if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
   LIBS="$LIBS -ldl"
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ioctlsocket in -lwsock32" >&5
-$as_echo_n "checking for ioctlsocket in -lwsock32... " >&6; }
-if ${ac_cv_lib_wsock32_ioctlsocket+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lwsock32  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char ioctlsocket ();
-int
-main ()
-{
-return ioctlsocket ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_wsock32_ioctlsocket=yes
-else
-  ac_cv_lib_wsock32_ioctlsocket=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_wsock32_ioctlsocket" >&5
-$as_echo "$ac_cv_lib_wsock32_ioctlsocket" >&6; }
-if test "x$ac_cv_lib_wsock32_ioctlsocket" = xyes; then :
-
-	     LIBS="$LIBS -lwsock32 -lws2_32"
-
-$as_echo "#define HAVE_IOCTLSOCKET /**/" >>confdefs.h
-
-
-fi
-
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking loader type" >&5
 $as_echo_n "checking loader type... " >&6; }
 case "$target" in
 *-*-mingw32)
     MOWGLI_MODULE='loader_win32.c'
+    LIBS="$LIBS -lwsock32 -lws2_32"
 	;;
 *)
     MOWGLI_MODULE='loader_posix.c'
