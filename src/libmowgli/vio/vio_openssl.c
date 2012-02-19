@@ -21,9 +21,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_OPENSSL
-
 #include "mowgli.h"
+
+#ifdef HAVE_OPENSSL
 
 #define MOWGLI_VIO_RETURN_SSLERR_ERRCODE(v, e) {	\
 	(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;	\
