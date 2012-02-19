@@ -42,7 +42,7 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
+void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
 {
 	/* Allocate */
 	vio->privdata = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
@@ -163,7 +163,7 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 
 #else
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
+void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
 {
 	mowgli_log("OpenSSL requested on a VIO object, but mowgli was built without OpenSSL support...");
 	return -1;

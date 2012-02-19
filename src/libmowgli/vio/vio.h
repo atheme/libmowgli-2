@@ -93,7 +93,7 @@ extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
-extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags);
+extern void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags);
 
 #define mowgli_vio_set_op(vio, operation, func) (vio)->op.operation = func;
 
