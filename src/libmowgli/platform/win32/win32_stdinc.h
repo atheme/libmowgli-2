@@ -27,6 +27,7 @@
 #ifdef _WIN32
 
 #include <winsock.h> // just for struct timeval declaration
+#include <winsock2.h>
 #include <time.h>
 
 #define strcasecmp			_stricmp
@@ -42,6 +43,11 @@ struct timezone {
 extern int gettimeofday(struct timeval *tv, struct timezone *tz);
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int pipe(int pipefd[2]);
+
+/* MSYS autoconf is fucko. */
+#ifndef HAVE_WINSOCK2_H
+#define HAVE_WINSOCK2_H
+#endif
 
 #endif
 
