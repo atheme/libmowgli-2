@@ -49,7 +49,7 @@ typedef struct _mowgli_vio_error {
 	mowgli_vio_error_op_t op;
 	mowgli_vio_error_type_t type;
 	int code;
-	char string[32];
+	char string[128];
 } mowgli_vio_error_t;
 
 typedef struct _mowgli_vio_ops {
@@ -72,6 +72,7 @@ typedef struct _mowgli_vio {
 
 	mowgli_vio_error_t error;
 
+	void *privdata;
 	void *userdata;
 } mowgli_vio_t;
 

@@ -98,4 +98,11 @@ typedef enum { FALSE, TRUE } mowgli_boolean_t;
 #define MOWGLI_DEPRECATED
 #endif
 
+/* OpenSSL stuff */
+#ifdef HAVE_OPENSSL
+# include <openssl/rand.h>
+# include <openssl/ssl.h>
+# include <openssl/err.h>
+#endif
+
 #endif
