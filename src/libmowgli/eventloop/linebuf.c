@@ -122,7 +122,7 @@ static int mowgli_linebuf_default_read_cb(mowgli_linebuf_t *linebuf, mowgli_even
 	}
 	else if(ret < 0)
 	{
-		if (errno != EAGAIN)  /* Try again (can happen on Linux) */
+		if (!mowgli_eventloop_ignore_errno(errno))
 			linebuf->err = errno;
 
 		return 0;
@@ -143,7 +143,7 @@ static int mowgli_linebuf_default_write_cb(mowgli_linebuf_t *linebuf, mowgli_eve
 
 	if ((ret = send(pollable->fd, buffer->buffer, buffer->buflen, 0)) == -1)
 	{
-		if (errno != EAGAIN)
+		if (!mowgli_eventloop_ignore_errno(errno))
 		{
 			linebuf->err = errno;
 			linebuf->error_cb(linebuf, MOWGLI_EVENTLOOP_IO_WRITE);
