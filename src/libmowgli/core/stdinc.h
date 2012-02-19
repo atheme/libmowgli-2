@@ -53,7 +53,8 @@
 # include <dirent.h>
 #else
 # include <windows.h>
-# include <winsock.h>
+# include <winsock2.h>
+# include <ws2tcpip.h>
 # include <sys/timeb.h>
 # include <direct.h>
 # include <io.h>

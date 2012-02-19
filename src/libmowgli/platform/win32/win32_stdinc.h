@@ -26,7 +26,6 @@
 
 #ifdef _WIN32
 
-#include <winsock.h> // just for struct timeval declaration
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <time.h>
