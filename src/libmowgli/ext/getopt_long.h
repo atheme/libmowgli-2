@@ -55,6 +55,8 @@ typedef struct {
 	int iflag;
 } mowgli_getopt_option_t;
 
+extern int mowgli_getopt(int nargc, char * const *nargv, const char *options);
+
 extern int mowgli_getopt_long(int, char * const *, const char *,
     const mowgli_getopt_option_t *, int *);
 
