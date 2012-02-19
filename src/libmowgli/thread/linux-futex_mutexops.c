@@ -21,12 +21,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/syscall.h>
-
 #include "mowgli.h"
 
 #if defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
 #warning the futex implementation of mowgli_mutex_t is experimental
+
+#include <sys/syscall.h>
 
 typedef struct {
 	mowgli_atomic_t atom;
