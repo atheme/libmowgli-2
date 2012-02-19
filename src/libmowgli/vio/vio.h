@@ -52,6 +52,13 @@ typedef struct _mowgli_vio_error {
 	char string[128];
 } mowgli_vio_error_t;
 
+#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {    \
+		v->error.type = MOWGLI_VIO_ERR_ERRCODE; \
+		v->error.code = e;		      \
+		mowgli_strlcpy(v->error.string, s(e), sizeof(vio->error.string)); \
+		return mowgli_vio_error(vio); }
+
+
 typedef struct _mowgli_vio_ops {
 	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_resolve_func_t *resolve;

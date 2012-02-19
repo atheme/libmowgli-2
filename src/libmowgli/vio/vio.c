@@ -33,12 +33,6 @@
 
 static mowgli_heap_t *vio_heap = NULL;
 
-#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {	\
-	v->error.type = MOWGLI_VIO_ERR_ERRCODE;	\
-	v->error.code = e;			\
-	mowgli_strlcpy(v->error.string, s(e), sizeof(vio->error.string)); \
-	return mowgli_vio_error(vio); }
-
 mowgli_vio_t * mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
@@ -183,6 +177,7 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
 	close(vio->fd);
+	mowgli_heap_free(vio_heap, vio);
 	return 0;
 }
 
