@@ -132,5 +132,5 @@ ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
 	len = vsnprintf(buf, sizeof buf, fmt, va);
 	va_end(va);
 
-	return write(fd, buf, len);
+	return send(fd, buf, len, 0);
 }
