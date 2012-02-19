@@ -66,7 +66,6 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, 
 	linebuf->return_normal_strings = true; /* This is generally what you want, but beware of malicious \0's in input data! */
 
 	mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
-	mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 
 	return linebuf;
 }
@@ -78,9 +77,6 @@ void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 	mowgli_heap_free(linebuf_heap, linebuf);
 }
 
-/* Call this before using 
- * A "one size fits all" approach is inadequate here, so you DIY
- */
 void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
 {
 	return_if_fail(buffer != NULL);
@@ -184,18 +180,31 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	int ret;
 
 	if (buffer->buflen == 0)
+	{
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 		return;
+	}
 
 	if ((ret = linebuf->write_cb(linebuf, MOWGLI_EVENTLOOP_IO_WRITE)) == 0)
+	{
+		if (linebuf->err != 0)
+			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 		return;
+	}
 
 	buffer->buflen -= ret;
+
+	if (buffer->buflen == 0)
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 }
 
 void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 {
 	char *ptr = linebuf->writebuf.buffer + linebuf->writebuf.buflen;
 	int delim_len = strlen(linebuf->delim);
+
+	return_if_fail(len > 0);
+	return_if_fail(data != NULL);
 
 	if (linebuf->writebuf.buflen + len + delim_len > linebuf->writebuf.maxbuflen)
 	{
@@ -208,6 +217,8 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	memcpy((void *)(ptr + len), linebuf->delim, delim_len);
 
 	linebuf->writebuf.buflen += len + delim_len;
+
+	mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
