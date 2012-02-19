@@ -43,6 +43,26 @@ AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup])
 AC_CHECK_FUNCS([kqueue fcntl select])
 AC_FUNC_STAT
 
+# Check for OpenSSL
+AC_ARG_ENABLE(openssl,
+	AC_HELP_STRING([--disable-ssl], [don't enable OpenSSL conveinence functions]),
+	,
+	enable_openssl=yes)
+
+OPENSSL=no
+if test "$enable_openssl" = "yes"; then
+	AC_CHECK_LIB(ssl, SSL_read, [
+		AC_CHECK_HEADERS(openssl/ssl.h openssl/err.h, [
+			SSL_LIBS="-lssl -lcrypto"
+			AC_SUBST(SSL_LIBS)
+			OPENSSL=yes
+			],,[-])
+		],, -lcrypto)
+	if test "$OPENSSL" = "yes"; then
+		AC_DEFINE(HAVE_OPENSSL,, Define to 1 if OpenSSL is available)
+	fi
+fi
+
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
 
 dnl Detect which loader to use
@@ -85,7 +105,7 @@ AC_OUTPUT
 cat << _EOF_
 
 Configuration:
-	No special features yet.
+	OpenSSL support	: ${OPENSSL}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.

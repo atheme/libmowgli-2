@@ -615,6 +615,7 @@ TPUT
 EXAMPLES_BUILD
 PTHREAD_LIBS
 MOWGLI_MODULE
+SSL_LIBS
 LIBOBJS
 EGREP
 GREP
@@ -698,6 +699,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_openssl
 enable_examples
 '
       ac_precious_vars='build_alias
@@ -1325,6 +1327,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --disable-ssl           don't enable OpenSSL conveinence functions
   --enable-examples        build and install example programs
 
 Some influential environment variables:
@@ -1768,6 +1771,35 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_func
+
+# ac_fn_c_check_header_preproc LINENO HEADER VAR
+# ----------------------------------------------
+# Tests whether HEADER is present, setting the cache variable VAR accordingly.
+ac_fn_c_check_header_preproc ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $2" >&5
+$as_echo_n "checking for $2... " >&6; }
+if eval \${$3+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <$2>
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"; then :
+  eval "$3=yes"
+else
+  eval "$3=no"
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+fi
+eval ac_res=\$$3
+	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
+$as_echo "$ac_res" >&6; }
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+
+} # ac_fn_c_check_header_preproc
 cat >config.log <<_ACEOF
 This file contains any messages produced by compilers while
 running configure, to aid debugging if configure makes a mistake.
@@ -4271,6 +4303,82 @@ _ACEOF
 fi
 
 
+# Check for OpenSSL
+# Check whether --enable-openssl was given.
+if test "${enable_openssl+set}" = set; then :
+  enableval=$enable_openssl;
+else
+  enable_openssl=yes
+fi
+
+
+OPENSSL=no
+if test "$enable_openssl" = "yes"; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SSL_read in -lssl" >&5
+$as_echo_n "checking for SSL_read in -lssl... " >&6; }
+if ${ac_cv_lib_ssl_SSL_read+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lssl -lcrypto $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char SSL_read ();
+int
+main ()
+{
+return SSL_read ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ssl_SSL_read=yes
+else
+  ac_cv_lib_ssl_SSL_read=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ssl_SSL_read" >&5
+$as_echo "$ac_cv_lib_ssl_SSL_read" >&6; }
+if test "x$ac_cv_lib_ssl_SSL_read" = xyes; then :
+
+		for ac_header in openssl/ssl.h openssl/err.h
+do :
+  as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ac_fn_c_check_header_preproc "$LINENO" "$ac_header" "$as_ac_Header"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
+  cat >>confdefs.h <<_ACEOF
+#define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
+_ACEOF
+
+			SSL_LIBS="-lssl -lcrypto"
+
+			OPENSSL=yes
+
+fi
+
+done
+
+
+fi
+
+	if test "$OPENSSL" = "yes"; then
+
+$as_echo "#define HAVE_OPENSSL /**/" >>confdefs.h
+
+	fi
+fi
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
 $as_echo_n "checking for dlopen in -ldl... " >&6; }
 if ${ac_cv_lib_dl_dlopen+:} false; then :
@@ -5860,7 +5968,7 @@ fi
 cat << _EOF_
 
 Configuration:
-	No special features yet.
+	OpenSSL support	: ${OPENSSL}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.
