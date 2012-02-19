@@ -27,7 +27,7 @@ typedef int mowgli_descriptor_t;
 
 #else
 
-typedef HANDLE mowgli_descriptor_t;
+typedef SOCKET mowgli_descriptor_t;
 
 #endif
 
