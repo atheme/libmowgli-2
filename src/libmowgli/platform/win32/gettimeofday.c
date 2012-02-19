@@ -33,7 +33,7 @@
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
 	FILETIME ft;
-	ULARGE_INTEGER tmpres = { 0 };
+	ULARGE_INTEGER tmpres;
 	static mowgli_boolean_t tz_init_done = FALSE;
 
 	if (tv != NULL)
