@@ -72,22 +72,6 @@
 			(vvp)->tv_usec += 1000000;			\
 		}							\
 	} while (0)
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/socket.h>
-#include <sys/signal.h>
-#include <sys/resource.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <errno.h>
 
 #include <mowgli.h>
 
