@@ -28,6 +28,7 @@
 
 #include <winsock.h> // just for struct timeval declaration
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #include <time.h>
 
 #define strcasecmp			_stricmp
