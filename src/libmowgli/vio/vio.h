@@ -23,6 +23,7 @@
 typedef struct _mowgli_vio mowgli_vio_t;
 
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, char *, char *);
 typedef int mowgli_vio_resolve_func_t(mowgli_vio_t *, char *, char *, void *);
@@ -36,10 +37,11 @@ typedef enum {
 
 typedef enum {
 	MOWGLI_VIO_ERR_OP_NONE,
-	MOWGLI_VIO_ERR_OP_READ,
-	MOWGLI_VIO_ERR_OP_WRITE,
+	MOWGLI_VIO_ERR_OP_SOCKET,
 	MOWGLI_VIO_ERR_OP_RESOLVE,
 	MOWGLI_VIO_ERR_OP_CONNECT,
+	MOWGLI_VIO_ERR_OP_READ,
+	MOWGLI_VIO_ERR_OP_WRITE,
 	MOWGLI_VIO_ERR_OP_OTHER,
 } mowgli_vio_error_op_t;
 
@@ -51,6 +53,7 @@ typedef struct _mowgli_vio_error {
 } mowgli_vio_error_t;
 
 typedef struct _mowgli_vio_ops {
+	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_resolve_func_t *resolve;
 	mowgli_vio_connect_func_t *connect;
 	mowgli_vio_rw_func_t *read;
@@ -63,18 +66,31 @@ typedef struct _mowgli_vio {
 	mowgli_vio_ops_t ops;
 
 	mowgli_descriptor_t fd;
+	int sock_family;
+	int sock_type;
+	int sock_proto;
 
 	mowgli_vio_error_t error;
 
 	void *userdata;
 } mowgli_vio_t;
 
+extern mowgli_vio_t * mowgli_vio_create(void *userdata);
+
+extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int domain, int type);
 extern int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
+
+#define mowgli_vio_set_op(vio, operation, func) (vio)->op.operation = func;
+
+static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type)
+{
+	return vio->ops.socket(vio, family, type);
+}
 
 static inline int mowgli_vio_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data)
 {
@@ -105,6 +121,5 @@ static inline int mowgli_vio_close(mowgli_vio_t *vio)
 {
 	return vio->ops.close(vio);
 }
-
 
 #endif

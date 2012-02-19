@@ -25,37 +25,39 @@
 
 /* How the VIO API works:
  *
- * - Return 0 in your error callback if you have a non-fatal error
+ * - Return 0 in your error callback if you have nothing to report (non-fatal error or no error)
  * - Return -1 in your callback if you have a fatal error
  * - Return the length of bytes written or read, similar to the semantics of
- *   the read(3) or write(3) calls.
+ *   the read(3) or write(3) calls, if you are a read/write callback.
  */
 
 static mowgli_heap_t *vio_heap = NULL;
 
-static inline int mowgli_vio_errcode(mowgli_vio_t *vio, const char *errstr, int errcode)
-{
-	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
-	vio->error.code = errcode;
-	mowgli_strlcpy(vio->error.string, errstr, sizeof(vio->error.string));
-	return mowgli_vio_error(vio);
-}
+#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {	\
+	v->error.type = MOWGLI_VIO_ERR_ERRCODE;	\
+	v->error.code = e;			\
+	mowgli_strlcpy(v->error.string, s(e), sizeof(vio->error.string)); \
+	return mowgli_vio_error(vio); }
 
-mowgli_vio_t * mowgli_vio_create(mowgli_descriptor_t fd, void *userdata)
+mowgli_vio_t * mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
-
-	return_val_if_fail(fd >= 0, NULL);
 
 	if (!vio_heap)
 		vio_heap = mowgli_heap_create(sizeof(mowgli_vio_t), 16, BH_NOW);
 
 	vio = mowgli_heap_alloc(vio_heap);
 
-	vio->fd = fd;
+	vio->fd = -1;
 	vio->userdata = userdata;
 
+	/* Use TCP by default and don't care if IPv4 or IPv6 */
+	vio->sock_family = AF_UNSPEC;
+	vio->sock_type = SOCK_STREAM;
+	vio->sock_proto = 0; /* Odds are you aren't using this */
+
 	/* Default ops */
+	vio->ops.socket = mowgli_vio_default_socket;
 	vio->ops.resolve = mowgli_vio_default_resolve;
 	vio->ops.connect = mowgli_vio_default_connect;
 	vio->ops.read = mowgli_vio_default_read;
@@ -65,6 +67,21 @@ mowgli_vio_t * mowgli_vio_create(mowgli_descriptor_t fd, void *userdata)
 
 	return vio;
 }
+
+int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type)
+{
+	int fd;
+
+	if ((fd = socket(family, type, vio->sock_proto)) == -1)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+
+	vio->sock_family = family;
+	vio->sock_type = type;
+	vio->fd = fd;
+
+	return 0;
+}
+
 int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data)
 {
 	int ret;
@@ -74,11 +91,11 @@ int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, voi
 	vio->error.op = MOWGLI_VIO_ERR_OP_RESOLVE;
 
 	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_family = vio->sock_family;
+	hints.ai_socktype = vio->sock_type;
 
 	if ((ret = getaddrinfo(addr, service, &hints, &res)) != 0)
-		return mowgli_vio_errcode(vio, gai_strerror(ret), ret);
+		MOWGLI_VIO_RETURN_ERRCODE(vio, gai_strerror, ret);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -94,10 +111,16 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service)
 	if ((ret = mowgli_vio_resolve(vio, addr, service, res)) != 0)
 		return ret;
 
+	if (vio->fd < 0)
+	{
+		if ((ret = mowgli_vio_socket(vio, vio->sock_family, vio->sock_type)) != 0)
+			return ret;
+	}
+
 	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-			return mowgli_vio_errcode(vio, strerror(errno), errno);
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 	}
 
 	return 0;
@@ -109,13 +132,12 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
-	while ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
+	if ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			return mowgli_vio_errcode(vio, strerror(errno), errno);
-		}
-		else if (ret == 0)
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		
+		if (ret == 0)
 		{
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
@@ -132,12 +154,9 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
-	/* Interruptable syscalls suck */
-	while ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
-	{
+	if ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
 		if (!mowgli_eventloop_ignore_errno(errno))
-			return mowgli_vio_errcode(vio, strerror(errno), errno);
-	}
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
