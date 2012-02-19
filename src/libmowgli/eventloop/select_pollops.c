@@ -154,8 +154,7 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 		}
 	}
 
-	tv.tv_sec = delay / 1000;
-	tv.tv_usec = (delay % 1000) * 100;
+	tv.tv_sec = 1;
 
 	if ((sr = select(highest_fd + 1, &rfds, &wfds, &efds, &tv)) > 0)
 	{
