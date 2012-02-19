@@ -57,6 +57,7 @@
 # include <sys/timeb.h>
 # include <direct.h>
 # include <io.h>
+# include <process.h>
 # include <fcntl.h>
 #endif
 
