@@ -58,4 +58,10 @@ typedef struct {
 extern int mowgli_getopt_long(int, char * const *, const char *,
     const mowgli_getopt_option_t *, int *);
 
+extern int opterr;
+extern int optind;
+extern int optopt;
+extern int optreset;
+extern char *optarg;
+
 #endif /* !_GETOPT_H_ */
