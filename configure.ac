@@ -44,8 +44,8 @@ AC_CHECK_FUNCS([kqueue fcntl])
 AC_FUNC_STAT
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
-AC_CHECK_LIB(ws2_32, ioctlsocket, [
-	     LIBS="$LIBS -lws2_32"
+AC_CHECK_LIB(wsock32, ioctlsocket, [
+	     LIBS="$LIBS -lwsock32 -lws2_32"
 	     AC_DEFINE([HAVE_IOCTLSOCKET], [], [Define to 1 if you have ioctlsocket])
 	     ])
 
