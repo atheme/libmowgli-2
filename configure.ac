@@ -57,10 +57,12 @@ case "$target" in
 	;;
 *)
     MOWGLI_MODULE='loader_posix.c'
+    PTHREAD_LIBS='-pthread'
 	;;
 esac
 AC_MSG_RESULT($MOWGLI_MODULE);
 AC_SUBST(MOWGLI_MODULE)
+AC_SUBST(PTHREAD_LIBS)
 
 # Check for optional features.
 EXAMPLES_BUILD=""

@@ -613,6 +613,7 @@ TERM_SGR0
 TERM_EL
 TPUT
 EXAMPLES_BUILD
+PTHREAD_LIBS
 MOWGLI_MODULE
 LIBOBJS
 EGREP
@@ -4364,10 +4365,12 @@ case "$target" in
 	;;
 *)
     MOWGLI_MODULE='loader_posix.c'
+    PTHREAD_LIBS='-pthread'
 	;;
 esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MOWGLI_MODULE" >&5
 $as_echo "$MOWGLI_MODULE" >&6; };
+
 
 
 # Check for optional features.
