@@ -218,7 +218,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 
 	linebuf->writebuf.buflen += len + delim_len;
 
-	mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
+	mowgli_pollable_setselect(linebuf->eventloop, linebuf->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
