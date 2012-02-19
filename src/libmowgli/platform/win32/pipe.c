@@ -1,8 +1,8 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * win32_support.h: Support functions and values for Win32 platform.
+ * pipe.c: UNIX pipe emulation
  *
- * Copyright (c) 2009 SystemInPlace, Inc.
+ * Copyright (c) 2012 TortoiseLabs, LLC.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,28 +21,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
-#define __LIBMOWGLI_SRC_LIBMOWGLI_WIN32_SUPPORT_H__GUARD
+#include "mowgli.h"
 
 #ifdef _WIN32
-
-#include <winsock.h> // just for struct timeval declaration
-#include <time.h>
-
-#define strcasecmp			_stricmp
-#define strdup				_strdup
-#define usleep(_usecs)		Sleep((_usecs)/1000L)
-#define snprintf			_snprintf
-
-struct timezone {
-	int tz_minuteswest;
-	int tz_dsttime;
-};
-
-extern int gettimeofday(struct timeval *tv, struct timezone *tz);
-extern int setenv(const char *name, const char *value, int overwrite);
-extern int pipe(int pipefd[2]);
-
-#endif
-
+int pipe(int pipefd[2])
+{
+#warning implement me :(
+	return -ENOSYS;
+}
 #endif
