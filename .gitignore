@@ -22,4 +22,5 @@ src/libmowgli/platform/autoconf.h
 *.so.*
 *~
 *.core
+*.swp
 core
