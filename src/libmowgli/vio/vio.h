@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) 2012 Elizabeth J. Myers. All rights reserved. 
+ *
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#ifndef __MOWGLI_VIO_H__
+#define __MOWGLI_VIO_H__
+
+/* vio.c */
+typedef struct _mowgli_vio mowgli_vio_t;
+
+typedef int mowgli_vio_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
+typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, char *, char *);
+typedef int mowgli_vio_resolve_func_t(mowgli_vio_t *, char *, char *, void *);
+
+typedef enum {
+	MOWGLI_VIO_ERR_NONE,
+	MOWGLI_VIO_ERR_REMOTE_HANGUP,
+	MOWGLI_VIO_ERR_BUFFER_FULL,
+	MOWGLI_VIO_ERR_ERRCODE,
+} mowgli_vio_error_type_t;
+
+typedef enum {
+	MOWGLI_VIO_ERR_OP_NONE,
+	MOWGLI_VIO_ERR_OP_READ,
+	MOWGLI_VIO_ERR_OP_WRITE,
+	MOWGLI_VIO_ERR_OP_RESOLVE,
+	MOWGLI_VIO_ERR_OP_CONNECT,
+	MOWGLI_VIO_ERR_OP_OTHER,
+} mowgli_vio_error_op_t;
+
+typedef struct _mowgli_vio_error {
+	mowgli_vio_error_op_t op;
+	mowgli_vio_error_type_t type;
+	int code;
+	char string[32];
+} mowgli_vio_error_t;
+
+typedef struct _mowgli_vio_ops {
+	mowgli_vio_resolve_func_t *resolve;
+	mowgli_vio_connect_func_t *connect;
+	mowgli_vio_rw_func_t *read;
+	mowgli_vio_rw_func_t *write;
+	mowgli_vio_func_t *error;
+	mowgli_vio_func_t *close;
+} mowgli_vio_ops_t;
+
+typedef struct _mowgli_vio {
+	mowgli_vio_ops_t ops;
+
+	mowgli_descriptor_t fd;
+
+	mowgli_vio_error_t error;
+
+	void *userdata;
+} mowgli_vio_t;
+
+extern int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data);
+extern int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service);
+extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
+extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
+extern int mowgli_vio_default_error(mowgli_vio_t *vio);
+extern int mowgli_vio_default_close(mowgli_vio_t *vio);
+
+static inline int mowgli_vio_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data)
+{
+	return vio->ops.resolve(vio, addr, service, data);
+}
+
+static inline int mowgli_vio_connect(mowgli_vio_t *vio, char *addr, char *service)
+{
+	return vio->ops.connect(vio, addr, service);
+}
+
+static inline int mowgli_vio_read(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	return vio->ops.read(vio, buffer, len);
+}
+
+static inline int mowgli_vio_write(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	return vio->ops.write(vio, buffer, len);
+}
+
+static inline int mowgli_vio_error(mowgli_vio_t *vio)
+{
+	return vio->ops.error(vio);
+}
+
+static inline int mowgli_vio_close(mowgli_vio_t *vio)
+{
+	return vio->ops.close(vio);
+}
+
+
+#endif

@@ -4,7 +4,7 @@ SHARED_LIB = ${LIB_PREFIX}mowgli-2${LIB_SUFFIX}
 LIB_MAJOR = 0
 LIB_MINOR = 0
 
-SUBDIRS = core base atomic container eventloop ext platform module object thread
+SUBDIRS = core base atomic container eventloop vio ext platform module object thread
 
 INCLUDES = mowgli.h
 
@@ -21,6 +21,7 @@ LIB_OBJS += core/mowgli.core.a \
 	object/mowgli.object.a \
 	container/mowgli.container.a \
 	eventloop/mowgli.eventloop.a \
+	vio/mowgli.vio.a \
 	ext/mowgli.ext.a \
 	atomic/mowgli.atomic.a \
 	thread/mowgli.thread.a

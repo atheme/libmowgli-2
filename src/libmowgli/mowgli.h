@@ -73,6 +73,7 @@ MOWGLI_DECLS_START
 #include "ext/global_storage.h"
 #include "core/process.h"
 #include "eventloop/eventloop.h"
+#include "vio/vio.h"
 #include "core/mowgli_string.h"
 #include "core/allocator.h"
 #include "base/formatter.h"
