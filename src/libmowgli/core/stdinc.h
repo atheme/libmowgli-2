@@ -35,6 +35,7 @@
 #include <setjmp.h>
 #include <sys/stat.h>
 #include <ctype.h>
+#include <sys/types.h>
 
 /* socket stuff */
 #ifndef _WIN32
@@ -58,8 +59,6 @@
 # include <io.h>
 # include <fcntl.h>
 #endif
-
-#include <sys/types.h>
 
 #ifdef _MSC_VER
 # pragma warning (disable: 4996)

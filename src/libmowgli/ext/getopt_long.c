@@ -31,13 +31,6 @@
 
 #include <mowgli.h>
 
-#include <assert.h>
-#include <err.h>
-#include <errno.h>
-#include "getopt_long.h"
-#include <stdlib.h>
-#include <string.h>
-
 int	opterr = 1;		/* if error message should be printed */
 int	optind = 1;		/* index into parent argv vector */
 int	optopt = '?';		/* character checked for validity */
@@ -62,6 +55,15 @@ char    *optarg;		/* argument associated with option */
 #define INORDER (int)1
 
 #define	EMSG	""
+
+static inline void
+warnx(const char *fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	vfprintf(stderr, fmt, ap);
+	va_end(ap);
+}
 
 static int getopt_internal(int, char **, const char *);
 static int gcd(int, int);
