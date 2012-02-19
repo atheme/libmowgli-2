@@ -119,7 +119,7 @@ static int mowgli_linebuf_default_read_cb(mowgli_linebuf_t *linebuf, mowgli_even
 		return 0; /* Ugh, buffer full :( */
 	}
 
-	if ((ret = read(pollable->fd, buffer->buffer + buffer->buflen, buffer->maxbuflen - buffer->buflen + 1)) == 0)
+	if ((ret = recv(pollable->fd, buffer->buffer + buffer->buflen, buffer->maxbuflen - buffer->buflen + 1, 0)) == 0)
 	{
 		linebuf->remote_hangup = true;
 		return 0; /* Connection reset by peer */
