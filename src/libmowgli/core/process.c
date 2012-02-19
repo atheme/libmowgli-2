@@ -28,6 +28,7 @@ typedef struct {
 static void
 mowgli_process_cloned_execv(mowgli_process_execv_req_t *execv_req)
 {
+#ifndef _WIN32
 	return_if_fail(execv_req != NULL);
 	return_if_fail(execv_req->path != NULL);
 	return_if_fail(execv_req->argv != NULL);
@@ -35,11 +36,15 @@ mowgli_process_cloned_execv(mowgli_process_execv_req_t *execv_req)
 	execv(execv_req->path, execv_req->argv);
 
 	mowgli_free(execv_req);
+#else
+# warning implement me :(
+#endif
 }
 
 mowgli_process_t *
 mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
 {
+#ifndef _WIN32
 	mowgli_process_t *out;
 
 	return_val_if_fail(start_fn != NULL, NULL);
@@ -67,6 +72,10 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
 	}
 
 	return out;
+#else
+# warning implement me :(
+	return NULL;
+#endif
 }
 
 mowgli_process_t *
@@ -95,7 +104,11 @@ mowgli_process_spawn(const char *path, char *const argv[])
 void
 mowgli_process_kill(mowgli_process_t *process)
 {
+#ifndef _WIN32
 	return_if_fail(process != NULL);
 
 	kill(process->pid, SIGKILL);
+#else
+# warning implement me :(
+#endif
 }
