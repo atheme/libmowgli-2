@@ -4149,7 +4149,7 @@ _ACEOF
 fi
 done
 
-for ac_func in kqueue fcntl ioctlsocket
+for ac_func in kqueue fcntl
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -4308,6 +4308,51 @@ fi
 $as_echo "$ac_cv_lib_dl_dlopen" >&6; }
 if test "x$ac_cv_lib_dl_dlopen" = xyes; then :
   LIBS="$LIBS -ldl"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ioctlsocket in -lws2_32" >&5
+$as_echo_n "checking for ioctlsocket in -lws2_32... " >&6; }
+if ${ac_cv_lib_ws2_32_ioctlsocket+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lws2_32  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char ioctlsocket ();
+int
+main ()
+{
+return ioctlsocket ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_ws2_32_ioctlsocket=yes
+else
+  ac_cv_lib_ws2_32_ioctlsocket=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ws2_32_ioctlsocket" >&5
+$as_echo "$ac_cv_lib_ws2_32_ioctlsocket" >&6; }
+if test "x$ac_cv_lib_ws2_32_ioctlsocket" = xyes; then :
+
+	     LIBS="$LIBS -lws2_32"
+
+$as_echo "#define HAVE_IOCTLSOCKET /**/" >>confdefs.h
+
+
 fi
 
 

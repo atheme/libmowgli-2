@@ -19,7 +19,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `ioctlsocket' function. */
+/* Define to 1 if you have ioctlsocket */
 #undef HAVE_IOCTLSOCKET
 
 /* Define to 1 if you have the `kqueue' function. */
