@@ -37,6 +37,7 @@
 
 typedef WSAPOLLFD mowgli_pollfd_t;
 #define POLL_FUNC WSAPoll
+#warning WSAPoll support is experimental
 
 #else
 
