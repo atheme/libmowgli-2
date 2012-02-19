@@ -82,7 +82,7 @@ static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgl
 static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
-	mowgli_pollevent_dispatch_func_t **fptr;
+	mowgli_eventloop_io_cb_t **fptr;
 	struct kevent event;
 	int filter;
 	bool change;
