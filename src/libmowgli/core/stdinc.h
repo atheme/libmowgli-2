@@ -61,6 +61,7 @@
 # include <io.h>
 # include <process.h>
 # include <fcntl.h>
+# include "platform/win32/win32_stdinc.h"
 #endif
 
 #ifdef _MSC_VER

@@ -35,9 +35,6 @@
 #ifdef MOWGLI_CORE
 # include "platform/autoconf.h"
 #endif
-#ifdef _WIN32
-# include "platform/win32/win32_stdinc.h"
-#endif
 
 #include "core/stdinc.h"
 
