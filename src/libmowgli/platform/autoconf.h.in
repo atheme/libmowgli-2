@@ -49,6 +49,9 @@
 /* Define to 1 if you have the `printf' function. */
 #undef HAVE_PRINTF
 
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
 /* Define to 1 if you have the `setlocale' function. */
 #undef HAVE_SETLOCALE
 

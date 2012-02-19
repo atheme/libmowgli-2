@@ -40,7 +40,7 @@ AC_C_CONST
 AC_FUNC_CLOSEDIR_VOID
 AC_CHECK_FUNCS([memset setlocale strcasecmp strchr strdup strerror strtol strtod])
 AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup])
-AC_CHECK_FUNCS([kqueue fcntl])
+AC_CHECK_FUNCS([kqueue fcntl select])
 AC_FUNC_STAT
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
