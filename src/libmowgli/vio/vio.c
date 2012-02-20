@@ -61,6 +61,11 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	return vio;
 }
 
+mowgli_vio_t mowgli_vio_destroy(mowgli_vio_t *vio)
+{
+	mowgli_heap_free(vio_heap, vio);
+}	
+
 int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type)
 {
 	int fd;
@@ -180,7 +185,6 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
 	close(vio->fd);
-	mowgli_heap_free(vio_heap, vio);
 	return 0;
 }
 

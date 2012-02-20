@@ -82,6 +82,7 @@ typedef struct _mowgli_vio {
 } mowgli_vio_t;
 
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
+extern mowgli_vio_t * mowgli_vio_destroy(mowgli_vio_t *vio);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int domain, int type);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service);
