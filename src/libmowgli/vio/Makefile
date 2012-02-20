@@ -4,7 +4,7 @@ STATIC_PIC_LIB_NOINST = mowgli.vio.a
 
 SRCS = vio.c vio_openssl.c
 
-INCLUDES = vio.h
+INCLUDES = vio.h vio-types.h
 
 includesubdir = $(PACKAGE)/vio
 

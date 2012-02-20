@@ -247,8 +247,7 @@ extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_even
 extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking);
 
 /* linebuf.c */
-struct _mowgli_vio;
-typedef struct _mowgli_vio mowgli_vio_t;
+#include "vio/vio-types.h"
 
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
