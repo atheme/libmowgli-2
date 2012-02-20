@@ -26,7 +26,6 @@ typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, char *, char *);
-typedef int mowgli_vio_resolve_func_t(mowgli_vio_t *, char *, char *, void *);
 
 typedef enum {
 	MOWGLI_VIO_ERR_NONE,
@@ -57,7 +56,6 @@ typedef struct _mowgli_vio_error {
 		mowgli_strlcpy(v->error.string, s(e), sizeof(vio->error.string)); \
 		return mowgli_vio_error(vio); }
 
-
 typedef struct _mowgli_vio_ops {
 	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_connect_func_t *connect;
@@ -82,7 +80,7 @@ typedef struct _mowgli_vio {
 } mowgli_vio_t;
 
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
-extern mowgli_vio_t * mowgli_vio_destroy(mowgli_vio_t *vio);
+extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int domain, int type);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service);
