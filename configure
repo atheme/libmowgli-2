@@ -4372,6 +4372,7 @@ done
 
 fi
 
+	LIBS+=$SSL_LIBS
 	if test "$OPENSSL" = "yes"; then
 
 $as_echo "#define HAVE_OPENSSL /**/" >>confdefs.h

@@ -58,6 +58,7 @@ if test "$enable_openssl" = "yes"; then
 			OPENSSL=yes
 			],,[-])
 		],, -lcrypto)
+	LIBS+=$SSL_LIBS
 	if test "$OPENSSL" = "yes"; then
 		AC_DEFINE(HAVE_OPENSSL,, Define to 1 if OpenSSL is available)
 	fi
