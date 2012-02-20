@@ -34,86 +34,36 @@ typedef struct {
 
 void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata);
 
+void write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
+{
+	printf("> %s\n", buf);
+	mowgli_linebuf_write(linebuf, buf, len);
+}
+
 client_t * create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
 {
-	int fd, status;
-	struct addrinfo hints;
-	struct addrinfo *res;
 	client_t *client;
-	mowgli_eventloop_io_t *io;
-
-	/* Do name resolution */
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-
-	if ((status = getaddrinfo(server, port, &hints, &res)) != 0) {
-		fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-		exit(EXIT_FAILURE);
-	}
-
-	if ((fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) == -1)
-	{
-		perror("socket");
-		exit(EXIT_FAILURE);
-	}
 
 	client = mowgli_alloc(sizeof(client_t));
-
-	client->connected = true;
-
-	io = mowgli_pollable_create(base_eventloop, fd, client);
-	client->linebuf = mowgli_linebuf_create(base_eventloop, io, eat_line);
-
-	/* Initiate connection */
-	if (connect(fd, res->ai_addr, res->ai_addrlen) == -1)
-	{
-		perror("connect");
-		exit(EXIT_FAILURE);
-	}
-
-	mowgli_pollable_set_nonblocking(io, true);
+	client->linebuf = mowgli_linebuf_create(base_eventloop, eat_line, client);
+	mowgli_vio_set_tcp(client->linebuf->vio);
+	mowgli_linebuf_connect(client->linebuf, server, port);
 
 	/* Write IRC handshake */
 	snprintf(buf, 512, "USER %s * 8 :%s", user, realname);
-	mowgli_linebuf_write(client->linebuf, buf, strlen(buf));
+	write_line(client->linebuf, buf, strlen(buf));
 
 	snprintf(buf, 512, "NICK %s", nick);
-	mowgli_linebuf_write(client->linebuf, buf, strlen(buf));
+	write_line(client->linebuf, buf, strlen(buf));
 
 	return client;
-}
-
-void connection_error(mowgli_linebuf_t *linebuf, mowgli_eventloop_io_dir_t dir)
-{
-	const char *errtype;
-	client_t *client = linebuf->userdata;
-
-	if (dir == MOWGLI_EVENTLOOP_IO_READ)
-		errtype = "Read";
-	else if (dir == MOWGLI_EVENTLOOP_IO_WRITE)
-		errtype = "Write";
-	else /* ??? */
-		errtype = "Socket";
-
-	if (linebuf->err)
-		fprintf(stderr, "%s error: %s\n", errtype, strerror(linebuf->err));
-	else if (linebuf->remote_hangup)
-		fprintf(stderr, "Remote host closed the socket\n");
-	else if (linebuf->read_buffer_full)
-		fprintf(stderr, "Recieve buffer exceeded\n");
-	else if (linebuf->write_buffer_full)
-		fprintf(stderr, "Send buffer exceeded\n");
-
-	client->connected = false;
-	mowgli_linebuf_destroy(linebuf);
-
-	exit(EXIT_SUCCESS);
 }
 
 void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 {
 	char str[512];
+
+	printf("Ate line\n");
 
 	/* Avoid malicious lines -- servers shouldn't send them */
 	if (linebuf->line_has_nullchar)
@@ -152,8 +102,10 @@ int main(int argc, const char *argv[])
 
 	base_eventloop = mowgli_eventloop_create();
 
+	printf("Creating client...\n");
 	client = create_client(argv[1], argv[2], "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
-	
+	printf("Client created.\n");
+
 	mowgli_eventloop_run(base_eventloop);
 
 	mowgli_free(client);
