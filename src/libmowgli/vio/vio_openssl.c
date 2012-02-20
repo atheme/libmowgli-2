@@ -37,7 +37,7 @@ typedef struct {
 	int flags;
 } mowgli_ssl_connection_t;
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, char *addr, char *service);
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const char *addr, const char *service);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
@@ -54,7 +54,7 @@ void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
 	vio->ops.close = mowgli_vio_openssl_close;
 }
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, char *addr, char *service)
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const char *addr, const char *service)
 {
 	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
 	struct addrinfo hints, *res;

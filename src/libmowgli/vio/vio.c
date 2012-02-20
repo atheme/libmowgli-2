@@ -61,7 +61,7 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 
 int mowgli_vio_set_tcp(mowgli_vio_t *vio)
 {
-	return_val_if_fail(vio->fd != -1, -1);
+	return_val_if_fail(vio->fd == -1, -1);
 
 	vio->sock_family = AF_UNSPEC;
 	vio->sock_type = SOCK_STREAM;
@@ -72,7 +72,7 @@ int mowgli_vio_set_tcp(mowgli_vio_t *vio)
 
 int mowgli_vio_set_udp(mowgli_vio_t *vio)
 {
-	return_val_if_fail(vio->fd != -1, -1);
+	return_val_if_fail(vio->fd == -1, -1);
 
 	vio->sock_family = AF_UNSPEC;
 	vio->sock_type = SOCK_DGRAM;
@@ -102,7 +102,7 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio)
 	return 0;
 }
 
-int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service)
+int mowgli_vio_default_connect(mowgli_vio_t *vio, const char *addr, const char *service)
 {
 	struct addrinfo hints, *res;
 	int ret;
