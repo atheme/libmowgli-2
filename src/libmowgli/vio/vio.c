@@ -61,7 +61,7 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	return vio;
 }
 
-mowgli_vio_t mowgli_vio_destroy(mowgli_vio_t *vio)
+mowgli_vio_t * mowgli_vio_destroy(mowgli_vio_t *vio)
 {
 	mowgli_heap_free(vio_heap, vio);
 }	
