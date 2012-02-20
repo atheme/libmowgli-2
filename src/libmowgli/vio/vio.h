@@ -38,7 +38,6 @@ typedef enum {
 typedef enum {
 	MOWGLI_VIO_ERR_OP_NONE,
 	MOWGLI_VIO_ERR_OP_SOCKET,
-	MOWGLI_VIO_ERR_OP_RESOLVE,
 	MOWGLI_VIO_ERR_OP_CONNECT,
 	MOWGLI_VIO_ERR_OP_READ,
 	MOWGLI_VIO_ERR_OP_WRITE,
@@ -61,7 +60,6 @@ typedef struct _mowgli_vio_error {
 
 typedef struct _mowgli_vio_ops {
 	mowgli_vio_socket_func_t *socket;
-	mowgli_vio_resolve_func_t *resolve;
 	mowgli_vio_connect_func_t *connect;
 	mowgli_vio_rw_func_t *read;
 	mowgli_vio_rw_func_t *write;
@@ -86,7 +84,6 @@ typedef struct _mowgli_vio {
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int domain, int type);
-extern int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
@@ -100,11 +97,6 @@ extern void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags);
 static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type)
 {
 	return vio->ops.socket(vio, family, type);
-}
-
-static inline int mowgli_vio_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data)
-{
-	return vio->ops.resolve(vio, addr, service, data);
 }
 
 static inline int mowgli_vio_connect(mowgli_vio_t *vio, char *addr, char *service)

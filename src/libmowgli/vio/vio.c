@@ -52,7 +52,6 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 
 	/* Default ops */
 	vio->ops.socket = mowgli_vio_default_socket;
-	vio->ops.resolve = mowgli_vio_default_resolve;
 	vio->ops.connect = mowgli_vio_default_connect;
 	vio->ops.read = mowgli_vio_default_read;
 	vio->ops.write = mowgli_vio_default_write;
@@ -80,47 +79,36 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type)
 	return 0;
 }
 
-int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, void *data)
-{
-	int ret;
-	struct addrinfo hints;
-	struct addrinfo *res = (struct addrinfo *)data;
-
-	vio->error.op = MOWGLI_VIO_ERR_OP_RESOLVE;
-
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = vio->sock_family;
-	hints.ai_socktype = vio->sock_type;
-
-	if ((ret = getaddrinfo(addr, service, &hints, &res)) != 0)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, gai_strerror, ret);
-
-	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
-	return 0;
-}
-
 int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service)
 {
-	struct addrinfo res;
+	struct addrinfo hints, *res;
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if ((ret = mowgli_vio_resolve(vio, addr, service, &res)) != 0)
-		return ret;
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = vio->sock_family;
+	hints.ai_socktype = vio->sock_type;
+	hints.ai_flags = AI_PASSIVE;
+
+	if ((ret = getaddrinfo(addr, service, &hints, &res)) != 0)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, gai_strerror, ret);
 
 	if (vio->fd < 0)
 	{
-		if ((ret = mowgli_vio_socket(vio, res.ai_family, res.ai_socktype)) != 0)
+		if ((ret = mowgli_vio_socket(vio, res->ai_family, res->ai_socktype)) != 0)
 			return ret;
 	}
 
-	if ((ret = connect(vio->fd, res.ai_addr, res.ai_addrlen)) < 0)
+	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 	}
 
+	freeaddrinfo(res);
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
 }
 
@@ -171,9 +159,6 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 		break;
 	case MOWGLI_VIO_ERR_OP_WRITE:
 		errtype = "Write";
-		break;
-	case MOWGLI_VIO_ERR_OP_RESOLVE:
-		errtype = "Resolver";
 		break;
 	case MOWGLI_VIO_ERR_OP_CONNECT:
 		errtype = "Connect";
