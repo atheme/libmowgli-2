@@ -1328,7 +1328,7 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-ssl           don't enable OpenSSL conveinence functions
-  --enable-examples        build and install example programs
+  --enable-examples	build and install example programs
 
 Some influential environment variables:
   CC          C compiler command

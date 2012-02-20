@@ -84,7 +84,7 @@ AC_SUBST(PTHREAD_LIBS)
 # Check for optional features.
 EXAMPLES_BUILD=""
 AC_ARG_ENABLE(examples,
-    [  --enable-examples        build and install example programs],
+    [  --enable-examples	build and install example programs],
     [enable_examples=$enableval],
     [enable_examples="no"]
 )
