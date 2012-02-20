@@ -171,6 +171,9 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 	case MOWGLI_VIO_ERR_OP_SOCKET:
 		errtype = "Socket";
 		break;
+	case MOWGLI_VIO_ERR_OP_OTHER:
+		errtype = "Application";
+		break;
 	default:
 		errtype = "Generic";
 	}
