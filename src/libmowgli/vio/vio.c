@@ -66,12 +66,16 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type)
 {
 	int fd;
 
+	vio->error.op = MOWGLI_VIO_ERR_OP_SOCKET;
+
 	if ((fd = socket(family, type, vio->sock_proto)) == -1)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
 	vio->sock_family = family;
 	vio->sock_type = type;
 	vio->fd = fd;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 
 	return 0;
 }
@@ -80,7 +84,7 @@ int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, voi
 {
 	int ret;
 	struct addrinfo hints;
-	struct addrinfo *res = data;
+	struct addrinfo *res = (struct addrinfo *)data;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_RESOLVE;
 
@@ -97,21 +101,21 @@ int mowgli_vio_default_resolve(mowgli_vio_t *vio, char *addr, char *service, voi
 
 int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service)
 {
-	struct addrinfo *res = NULL;
+	struct addrinfo res;
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if ((ret = mowgli_vio_resolve(vio, addr, service, res)) != 0)
+	if ((ret = mowgli_vio_resolve(vio, addr, service, &res)) != 0)
 		return ret;
 
 	if (vio->fd < 0)
 	{
-		if ((ret = mowgli_vio_socket(vio, vio->sock_family, vio->sock_type)) != 0)
+		if ((ret = mowgli_vio_socket(vio, res.ai_family, res.ai_socktype)) != 0)
 			return ret;
 	}
 
-	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
+	if ((ret = connect(vio->fd, res.ai_addr, res.ai_addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
@@ -160,12 +164,26 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 {
 	const char *errtype;
 
-	if (vio->error.op == MOWGLI_VIO_ERR_OP_READ)
+	switch (vio->error.op)
+	{
+	case MOWGLI_VIO_ERR_OP_READ:
 		errtype = "Read";
-	else if (vio->error.op == MOWGLI_VIO_ERR_OP_WRITE)
+		break;
+	case MOWGLI_VIO_ERR_OP_WRITE:
 		errtype = "Write";
-	else /* ??? */
+		break;
+	case MOWGLI_VIO_ERR_OP_RESOLVE:
+		errtype = "Resolver";
+		break;
+	case MOWGLI_VIO_ERR_OP_CONNECT:
+		errtype = "Connect";
+		break;
+	case MOWGLI_VIO_ERR_OP_SOCKET:
 		errtype = "Socket";
+		break;
+	default:
+		errtype = "Generic";
+	}
 
 	fprintf(stderr, "%s error: %s\n", errtype, vio->error.string);
 

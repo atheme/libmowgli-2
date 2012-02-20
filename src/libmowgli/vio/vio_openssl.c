@@ -57,21 +57,21 @@ void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, char *addr, char *service)
 {
 	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
-	struct addrinfo *res = NULL;
+	struct addrinfo res;
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if ((ret = mowgli_vio_resolve(vio, addr, service, res)) != 0)
+	if ((ret = mowgli_vio_resolve(vio, addr, service, &res)) != 0)
 		return ret;
 
 	if (vio->fd < 0)
 	{
-		if ((ret = mowgli_vio_socket(vio, vio->sock_family, vio->sock_type)) != 0)
+		if ((ret = mowgli_vio_socket(vio, res.ai_family, res.ai_socktype)) != 0)
 			return ret;
 	}
 
-	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
+	if ((ret = connect(vio->fd, res.ai_addr, res.ai_addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
