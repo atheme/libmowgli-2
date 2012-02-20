@@ -92,6 +92,10 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_SOCKET;
 
+	/* We can't call socket with AF_UNSPEC on most platforms >_> */
+	if (vio->sock_family == AF_UNSPEC)
+		vio->sock_family = AF_INET;
+
 	if ((fd = socket(vio->sock_family, vio->sock_type, vio->sock_proto)) == -1)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
