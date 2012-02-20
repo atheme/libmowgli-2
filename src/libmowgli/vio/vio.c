@@ -45,10 +45,8 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio->fd = -1;
 	vio->userdata = userdata;
 
-	/* Use TCP by default and don't care if IPv4 or IPv6 */
-	vio->sock_family = AF_UNSPEC;
-	vio->sock_type = SOCK_STREAM;
-	vio->sock_proto = 0; /* Odds are you aren't using this */
+	/* Use TCP by default */
+	mowgli_vio_set_tcp(vio);
 
 	/* Default ops */
 	vio->ops.socket = mowgli_vio_default_socket;
@@ -61,22 +59,42 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	return vio;
 }
 
+int mowgli_vio_set_tcp(mowgli_vio_t *vio)
+{
+	return_val_if_fail(vio->fd != -1, -1);
+
+	vio->sock_family = AF_UNSPEC;
+	vio->sock_type = SOCK_STREAM;
+	vio->sock_proto = 0;
+
+	return 0;
+}
+
+int mowgli_vio_set_udp(mowgli_vio_t *vio)
+{
+	return_val_if_fail(vio->fd != -1, -1);
+
+	vio->sock_family = AF_UNSPEC;
+	vio->sock_type = SOCK_DGRAM;
+	vio->sock_proto = 0;
+
+	return 0;
+}
+
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
 	mowgli_heap_free(vio_heap, vio);
 }	
 
-int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type)
+int mowgli_vio_default_socket(mowgli_vio_t *vio)
 {
 	int fd;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_SOCKET;
 
-	if ((fd = socket(family, type, vio->sock_proto)) == -1)
+	if ((fd = socket(vio->sock_family, vio->sock_type, vio->sock_proto)) == -1)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
-	vio->sock_family = family;
-	vio->sock_type = type;
 	vio->fd = fd;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
@@ -101,7 +119,9 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, char *addr, char *service)
 
 	if (vio->fd < 0)
 	{
-		if ((ret = mowgli_vio_socket(vio, res->ai_family, res->ai_socktype)) != 0)
+		vio->sock_family = res->ai_family;
+		vio->sock_type = res->ai_socktype;
+		if ((ret = mowgli_vio_socket(vio)) != 0)
 			return ret;
 	}
 

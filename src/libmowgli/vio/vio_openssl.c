@@ -72,7 +72,9 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, char *addr, char *servi
 
 	if (vio->fd < 0)
 	{
-		if ((ret = mowgli_vio_socket(vio, res->ai_family, res->ai_socktype)) != 0)
+		vio->sock_family = res->ai_family;
+		vio->sock_type = res->ai_socktype;
+		if ((ret = mowgli_vio_socket(vio)) != 0)
 			return ret;
 	}
 
