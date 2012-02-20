@@ -43,11 +43,7 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio = mowgli_heap_alloc(vio_heap);
 
 	vio->fd = -1;
-	vio->userdata = userdata;
-
-	/* Use TCP by default */
-	mowgli_vio_set_tcp(vio);
-
+	
 	/* Default ops */
 	vio->ops.socket = mowgli_vio_default_socket;
 	vio->ops.connect = mowgli_vio_default_connect;
@@ -56,86 +52,66 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio->ops.error = mowgli_vio_default_error;
 	vio->ops.close = mowgli_vio_default_close;
 
+	vio->userdata = userdata;
+
 	return vio;
 }
 
-int mowgli_vio_set_tcp(mowgli_vio_t *vio)
+int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
-	return_val_if_fail(vio->fd == -1, -1);
+	return_val_if_fail(vio->fd >= 0, -1);
+	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
+	vio->eventloop = eventloop;
 
-	vio->sock_family = AF_UNSPEC;
-	vio->sock_type = SOCK_STREAM;
-	vio->sock_proto = 0;
+	/* You're probably going to want this */
+	mowgli_pollable_set_nonblocking(vio->io, true);
 
 	return 0;
 }
 
-int mowgli_vio_set_udp(mowgli_vio_t *vio)
+void mowgli_vio_pollable_destroy(mowgli_vio_t *vio)
 {
-	return_val_if_fail(vio->fd == -1, -1);
+	return_if_fail(vio->io != NULL);
 
-	vio->sock_family = AF_UNSPEC;
-	vio->sock_type = SOCK_DGRAM;
-	vio->sock_proto = 0;
-
-	return 0;
+	mowgli_pollable_destroy(vio->eventloop, vio->io);
 }
 
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
+	mowgli_vio_pollable_destroy(vio);
 	mowgli_heap_free(vio_heap, vio);
 }	
 
-int mowgli_vio_default_socket(mowgli_vio_t *vio)
+int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto)
 {
 	int fd;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_SOCKET;
 
 	/* We can't call socket with AF_UNSPEC on most platforms >_> */
-	if (vio->sock_family == AF_UNSPEC)
-		vio->sock_family = AF_INET;
+	if (family == AF_UNSPEC)
+		family = AF_INET;
 
-	if ((fd = socket(vio->sock_family, vio->sock_type, vio->sock_proto)) == -1)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+	if ((fd = socket(family, type, proto)) == -1)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno)
 
 	vio->fd = fd;
-
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 
 	return 0;
 }
 
-int mowgli_vio_default_connect(mowgli_vio_t *vio, const char *addr, const char *service)
+int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
 {
-	struct addrinfo hints, *res;
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = vio->sock_family;
-	hints.ai_socktype = vio->sock_type;
-	hints.ai_flags = AI_PASSIVE;
-
-	if ((ret = getaddrinfo(addr, service, &hints, &res)) != 0)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, gai_strerror, ret);
-
-	if (vio->fd < 0)
-	{
-		vio->sock_family = res->ai_family;
-		vio->sock_type = res->ai_socktype;
-		if ((ret = mowgli_vio_socket(vio)) != 0)
-			return ret;
-	}
-
-	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
+	if ((ret = connect(vio->fd, addr, len)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 	}
-
-	freeaddrinfo(res);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;

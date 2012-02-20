@@ -43,11 +43,53 @@ void write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
 client_t * create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
 {
 	client_t *client;
+	mowgli_vio_t *vio;
+	struct addrinfo hints, *res;
+	bool use_ssl = false;
+	int ret;
+
+	if (*port == '+')
+	{
+		port++;
+		use_ssl = true;
+	}
 
 	client = mowgli_alloc(sizeof(client_t));
 	client->linebuf = mowgli_linebuf_create(base_eventloop, eat_line, client);
-	mowgli_vio_set_tcp(client->linebuf->vio);
-	mowgli_linebuf_connect(client->linebuf, server, port);
+	vio = client->linebuf->vio;
+
+	/* Do name res */
+	memset(&hints, 0, sizeof hints);
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if ((ret = getaddrinfo(server, port, &hints, &res)) != 0)
+	{
+		vio->error.op = MOWGLI_VIO_ERR_OP_OTHER;
+		vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
+		vio->error.code = ret;
+		mowgli_strlcpy(vio->error.string, gai_strerror(ret), sizeof(vio->error.string));
+		mowgli_vio_error(vio);
+		return NULL;
+	}
+
+	/* We have to have a socket before starting the linebuf */
+	if (mowgli_vio_socket(vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
+		return NULL;
+
+	/* Start the linebuf */
+	mowgli_linebuf_start(client->linebuf);
+
+	/* Wrap the VIO object */
+	if (use_ssl)
+	{
+		if (mowgli_vio_openssl_setssl(vio) != 0)
+			return NULL;
+	}
+
+	/* Do the connect */
+	if (mowgli_vio_connect(vio, res->ai_addr, res->ai_addrlen) != 0)
+		return NULL;
 
 	/* Write IRC handshake */
 	snprintf(buf, 512, "USER %s * 8 :%s", user, realname);
@@ -62,8 +104,6 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 {
 	char str[512];
-
-	printf("Ate line\n");
 
 	/* Avoid malicious lines -- servers shouldn't send them */
 	if (linebuf->line_has_nullchar)
@@ -92,19 +132,22 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 int main(int argc, const char *argv[])
 {
 	client_t *client;
+	const char *serv, *port;
 
 	if (argc < 3)
 	{
 		fprintf(stderr, "Not enough arguments\n");
-		fprintf(stderr, "Usage: %s [server] [port]\n", argv[0]);
+		fprintf(stderr, "Usage: %s [server] [(+)port]\n", argv[0]);
+		fprintf(stderr, "For SSL, put a + in front of port\n");
 		return EXIT_FAILURE;
 	}
 
 	base_eventloop = mowgli_eventloop_create();
 
-	printf("Creating client...\n");
-	client = create_client(argv[1], argv[2], "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
-	printf("Client created.\n");
+	serv = argv[1];
+	port = argv[2];
+
+	client = create_client(serv, port, "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
 
 	mowgli_eventloop_run(base_eventloop);
 

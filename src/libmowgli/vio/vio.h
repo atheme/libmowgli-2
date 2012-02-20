@@ -22,10 +22,6 @@
 /* vio.c */
 typedef struct _mowgli_vio mowgli_vio_t;
 
-typedef int mowgli_vio_func_t(mowgli_vio_t *);
-typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
-typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, const char *, const char *);
-
 typedef enum {
 	MOWGLI_VIO_ERR_NONE,
 	MOWGLI_VIO_ERR_REMOTE_HANGUP,
@@ -52,11 +48,16 @@ typedef struct _mowgli_vio_error {
 #define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {    \
 		v->error.type = MOWGLI_VIO_ERR_ERRCODE; \
 		v->error.code = e;		      \
-		mowgli_strlcpy(v->error.string, s(e), sizeof(vio->error.string)); \
-		return mowgli_vio_error(vio); }
+		mowgli_strlcpy(v->error.string, s(e), sizeof((v)->error.string)); \
+		return mowgli_vio_error((v)); }
+
+typedef int mowgli_vio_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
+typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, const struct sockaddr *, socklen_t);
+typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
 
 typedef struct _mowgli_vio_ops {
-	mowgli_vio_func_t *socket;
+	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_connect_func_t *connect;
 	mowgli_vio_rw_func_t *read;
 	mowgli_vio_rw_func_t *write;
@@ -67,42 +68,42 @@ typedef struct _mowgli_vio_ops {
 typedef struct _mowgli_vio {
 	mowgli_vio_ops_t ops;
 
+	mowgli_eventloop_t *eventloop;
+	mowgli_eventloop_io_t *io;
 	mowgli_descriptor_t fd;
-	int sock_family;
-	int sock_type;
-	int sock_proto;
 
 	mowgli_vio_error_t error;
-
-	void *privdata;
+	
 	void *userdata;
+	void *privdata;
 } mowgli_vio_t;
 
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
+extern int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
+extern void mowgli_vio_pollable_destroy(mowgli_vio_t *vio);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
-extern int mowgli_vio_default_socket(mowgli_vio_t *vio);
-extern int mowgli_vio_default_connect(mowgli_vio_t *vio, const char *addr, const char *service);
+extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
+extern int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
-extern int mowgli_vio_set_tcp(mowgli_vio_t *vio);
-extern int mowgli_vio_set_udp(mowgli_vio_t *vio);
-
-extern void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags);
+extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio);
+extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
+extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 
 #define mowgli_vio_set_op(vio, operation, func) (vio)->op.operation = func;
 
-static inline int mowgli_vio_socket(mowgli_vio_t *vio)
+static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type, int flags)
 {
-	return vio->ops.socket(vio);
+	return vio->ops.socket(vio, family, type, flags);
 }
 
-static inline int mowgli_vio_connect(mowgli_vio_t *vio, const char *addr, const char *service)
+static inline int mowgli_vio_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
 {
-	return vio->ops.connect(vio, addr, service);
+	return vio->ops.connect(vio, addr, len);
 }
 
 static inline int mowgli_vio_read(mowgli_vio_t *vio, void *buffer, size_t len)

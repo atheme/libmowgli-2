@@ -41,8 +41,8 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_
 	
 	linebuf = mowgli_heap_alloc(linebuf_heap);
 
-	linebuf->eventloop = eventloop;
 	linebuf->vio = mowgli_vio_create(linebuf);
+	linebuf->vio->eventloop = eventloop;
 
 	linebuf->delim = "\r\n"; /* Sane default */
 	linebuf->readline_cb = cb;
@@ -55,32 +55,27 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_
 	mowgli_linebuf_setbuflen(&(linebuf->readbuf), 65536);
 	mowgli_linebuf_setbuflen(&(linebuf->writebuf), 65536);
 
-	linebuf->userdata = userdata;
-
 	linebuf->return_normal_strings = true; /* This is generally what you want, but beware of malicious \0's in input data! */
+
+	linebuf->userdata = userdata;
 
 	return linebuf;
 }
 
-void mowgli_linebuf_connect(mowgli_linebuf_t *linebuf, const char *host, const char *port)
+/* Note: this must be called after you've created the VIO socket */
+void mowgli_linebuf_start(mowgli_linebuf_t *linebuf)
 {
-	/* Let connect() make our socket */
-	if (mowgli_vio_connect(linebuf->vio, host, port) != 0)
-		return;
+	mowgli_vio_t *vio = linebuf->vio;
 
-	mowgli_linebuf_on_fd(linebuf, linebuf->vio->fd);
-}
+	return_if_fail(linebuf->vio->fd > -1);
 
-void mowgli_linebuf_on_fd(mowgli_linebuf_t *linebuf, mowgli_descriptor_t fd)
-{
-	linebuf->io = mowgli_pollable_create(linebuf->eventloop, fd, linebuf);
-	mowgli_pollable_set_nonblocking(linebuf->io, true);
-	mowgli_pollable_setselect(linebuf->eventloop, linebuf->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
+	mowgli_vio_pollable_create(vio, vio->eventloop);
+	mowgli_pollable_set_nonblocking(vio->io, true);
+	mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 }
 
 void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 {
-	mowgli_pollable_destroy(linebuf->eventloop, linebuf->io);
 	mowgli_vio_destroy(linebuf->vio);
 
 	mowgli_free(linebuf->readbuf.buffer);
@@ -193,7 +188,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	linebuf->writebuf.buflen += len + delim_len;
 
 	/* Schedule our write */
-	mowgli_pollable_setselect(linebuf->eventloop, linebuf->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
+	mowgli_pollable_setselect(linebuf->vio->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)

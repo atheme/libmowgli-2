@@ -37,54 +37,64 @@ typedef struct {
 	int flags;
 } mowgli_ssl_connection_t;
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const char *addr, const char *service);
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
-void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
 {
-	/* Allocate */
-	vio->privdata = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
+	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
+	vio->privdata = connection;
 
 	/* Change ops */
 	vio->ops.connect = mowgli_vio_openssl_connect;
 	vio->ops.read = mowgli_vio_openssl_read;
 	vio->ops.write = mowgli_vio_openssl_write;
 	vio->ops.close = mowgli_vio_openssl_close;
+
+	SSL_load_error_strings();
+	SSL_library_init();
+
+	/* Good default; most stuff isn't using TLSv1 or above yet (unfortunately)
+	 * The library will negotiate something better if supported.
+	 */
+	connection->ssl_context = SSL_CTX_new(SSLv3_client_method());
+	if (connection->ssl_context == NULL)
+		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+
+	connection->ssl_handle = SSL_new(connection->ssl_context);
+	if (connection->ssl_handle == NULL)
+		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+	
+	return 0;
 }
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const char *addr, const char *service)
+/* Returns void so they can be stubs */
+void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
+{
+	mowgli_ssl_connection_t *connection = vio->privdata;
+	return connection->ssl_handle;
+}
+
+void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
+{
+	mowgli_ssl_connection_t *connection = vio->privdata;
+	return connection->ssl_context;
+}
+
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
 {
 	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
-	struct addrinfo hints, *res;
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 	
-	memset(&hints, 0, sizeof hints);
-	hints.ai_family = vio->sock_family;
-	hints.ai_socktype = vio->sock_type;
-	hints.ai_flags = AI_PASSIVE;
-
-	if ((ret = getaddrinfo(addr, service, &hints, &res)) != 0)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, gai_strerror, ret);
-
-	if (vio->fd < 0)
-	{
-		vio->sock_family = res->ai_family;
-		vio->sock_type = res->ai_socktype;
-		if ((ret = mowgli_vio_socket(vio)) != 0)
-			return ret;
-	}
-
-	if ((ret = connect(vio->fd, res->ai_addr, res->ai_addrlen)) < 0)
+	if ((ret = connect(vio->fd, addr, len)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 	}
-
-	freeaddrinfo(res);
 
 	SSL_load_error_strings();
 	SSL_library_init();
@@ -106,6 +116,10 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const char *addr, const
 	if (SSL_connect(connection->ssl_handle) != 1)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
+	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
+
+	printf("ssl_handle %p\nssl_context %p\n", connection->ssl_handle, connection->ssl_context);
+
 	vio->privdata = connection;
 
 	return 0;
@@ -122,7 +136,7 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	{
 		unsigned long err = ERR_get_error();
 
-		if (err != SSL_ERROR_WANT_READ)
+		if (err != SSL_ERROR_WANT_READ && err != SSL_ERROR_WANT_WRITE)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 
 		if (ret == 0)
@@ -148,7 +162,7 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	{
 		unsigned long err = ERR_get_error();
 		
-		if (err != SSL_ERROR_WANT_WRITE)
+		if (err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_READ)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 	}
 
@@ -176,6 +190,18 @@ void mowgli_vio_openssl_setssl(mowgli_vio_t *vio, int flags)
 {
 	mowgli_log("OpenSSL requested on a VIO object, but mowgli was built without OpenSSL support...");
 	return -1;
+}
+
+void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
+{
+	mowgli_log("Cannot get VIO SSL handle as libmowgli was built without OpenSSL support");
+	return NULL;
+}
+
+void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
+{
+	mowgli_log("Cannot get VIO SSL context as libmowgli was built without OpenSSL support");
+	return NULL;
 }
 
 #endif
