@@ -104,6 +104,11 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 		blp = mmap(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
 			PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	else
+#elif defined (_WIN32)
+	if (bh->use_mmap)
+		blp = VirtualAlloc(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
+			MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	else
 #endif
 	{
 		if (bh->allocator)
@@ -145,9 +150,13 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 	else
 		mowgli_node_delete(&b->node, &heap->blocks);
 
-#ifdef HAVE_MMAP
+#if defined(HAVE_MMAP)
 	if (heap->use_mmap)
 		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
+	else
+#elif defined(_WIN32)
+	if (heap->use_mmap)
+		VirtualFree(b, 0, MEM_RELEASE);
 	else
 #endif
 	if (heap->allocator)
