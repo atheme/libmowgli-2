@@ -21,6 +21,8 @@
 #ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 #define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 
+#include "thread/thread.h"
+
 #ifndef _WIN32
 
 typedef int mowgli_descriptor_t;
@@ -118,6 +120,7 @@ struct _mowgli_eventloop {
 	const char *last_ran;
 
 	mowgli_list_t timer_list;
+	mowgli_mutex_t mutex;
 
 	mowgli_eventloop_ops_t *eventloop_ops;
 	void *poller;

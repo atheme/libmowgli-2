@@ -61,6 +61,12 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 	eventloop->eventloop_ops = &_mowgli_kqueue_pollops;
 #endif
 
+	if (mowgli_mutex_create(&eventloop->mutex) != 0)
+	{
+		mowgli_log("couldn't create mutex for eventloop %p, aborting...", eventloop);
+		abort();
+	}
+
 	eventloop->eventloop_ops->pollsetup(eventloop);
 
 	mowgli_eventloop_synchronize(eventloop);
@@ -72,6 +78,7 @@ void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
 	eventloop->eventloop_ops->pollshutdown(eventloop);
 
+	mowgli_mutex_destroy(&eventloop->mutex);
 	mowgli_heap_free(eventloop_heap, eventloop);
 }
 
@@ -79,17 +86,25 @@ void mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
+	mowgli_mutex_lock(&eventloop->mutex);
+
 	eventloop->death_requested = false;
 
 	while (!eventloop->death_requested)
 		eventloop->eventloop_ops->run_once(eventloop);
+
+	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
 void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
+	mowgli_mutex_lock(&eventloop->mutex);
+
 	eventloop->eventloop_ops->run_once(eventloop);
+
+	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
 void mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
