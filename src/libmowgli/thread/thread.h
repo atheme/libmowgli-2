@@ -47,6 +47,9 @@ typedef struct {
 #else
 	pthread_mutex_t mutex;
 #endif
+
+	/* track all mutexes for fork-safety */
+	mowgli_node_t node;
 } mowgli_mutex_t;
 
 #ifdef MOWGLI_NATIVE_MUTEX_DECL
@@ -59,6 +62,7 @@ typedef struct {
 	int (*mutex_trylock)(mowgli_mutex_t *mutex);
 	int (*mutex_unlock)(mowgli_mutex_t *mutex);
 	int (*mutex_destroy)(mowgli_mutex_t *mutex);
+	void (*setup_fork_safety)(void);
 } mowgli_mutex_ops_t;
 
 int mowgli_mutex_create(mowgli_mutex_t *mutex);
@@ -73,6 +77,10 @@ typedef enum {
 } mowgli_thread_policy_t;
 
 void mowgli_mutex_set_policy(mowgli_thread_policy_t policy);
+
+/* fork() synchronization primitives. */
+void mowgli_mutex_lock_all(void);
+void mowgli_mutex_unlock_all(void);
 
 /* simple dispatch function to set the ops up for the various subsystems. */
 static inline void mowgli_thread_set_policy(mowgli_thread_policy_t policy)

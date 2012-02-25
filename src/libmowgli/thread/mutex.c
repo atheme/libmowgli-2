@@ -23,6 +23,8 @@
 
 #include "mowgli.h"
 
+static mowgli_list_t mutex_list;
+
 #if defined(_WIN32)
 extern mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
 #elif defined(_sun) || defined(_sco)
@@ -35,7 +37,31 @@ extern mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 
 extern mowgli_mutex_ops_t _mowgli_null_mutex_ops;
 
-mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
+static mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
+
+void mowgli_mutex_lock_all(void)
+{
+	mowgli_node_t *iter;
+
+	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
+	{
+		mowgli_mutex_t *mutex = iter->data;
+
+		mowgli_mutex_lock(mutex);
+	}
+}
+
+void mowgli_mutex_unlock_all(void)
+{
+	mowgli_node_t *iter;
+
+	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
+	{
+		mowgli_mutex_t *mutex = iter->data;
+
+		mowgli_mutex_unlock(mutex);
+	}
+}
 
 static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 {
@@ -64,9 +90,18 @@ static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 
 int mowgli_mutex_create(mowgli_mutex_t *mutex)
 {
+	static bool initialized = false;
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
 
 	return_val_if_fail(mutex != NULL, -1);
+
+	if (!initialized)
+	{
+		mutex_ops->setup_fork_safety();
+		initialized = true;
+	}
+
+	mowgli_node_add(mutex, &mutex->node, &mutex_list);
 
 	return mutex_ops->mutex_create(mutex);
 }
@@ -103,6 +138,8 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
 
 	return_val_if_fail(mutex != NULL, -1);
+
+	mowgli_node_delete(&mutex->node, &mutex_list);
 
 	return mutex_ops->mutex_destroy(mutex);
 }
