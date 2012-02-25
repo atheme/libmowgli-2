@@ -87,6 +87,27 @@ typedef struct {
 # undef MOWGLI_NATIVE_THREAD_DECL
 #endif
 
+typedef void *(*mowgli_thread_start_fn_t)(mowgli_thread_t *thread, void *userdata);
+
+/*
+ * Note: we should keep our thread interface light and minimal for best possible
+ * portability.  Creating, ending, killing and cleanup functions are presently implemented,
+ * and cover approximately 99.999% of uses of thread APIs.  --nenolod
+ */
+typedef struct {
+	int (*thread_create)(mowgli_thread_t *thread, mowgli_thread_start_fn_t start_fn, void *userdata);
+	void (*thread_exit)(mowgli_thread_t *thread);
+	void *(*thread_join)(mowgli_thread_t *thread);
+	void (*thread_kill)(mowgli_thread_t *thread);
+	void (*thread_destroy)(mowgli_thread_t *thread);
+} mowgli_thread_ops_t;
+
+int mowgli_thread_create(mowgli_thread_t *thread, mowgli_thread_start_fn_t start_fn, void *userdata);
+void mowgli_thread_exit(mowgli_thread_t *thread);
+void *mowgli_thread_join(mowgli_thread_t *thread);
+void mowgli_thread_kill(mowgli_thread_t *thread);
+void mowgli_thread_destroy(mowgli_thread_t *thread);
+
 typedef enum {
 	MOWGLI_THREAD_POLICY_DEFAULT,
 	MOWGLI_THREAD_POLICY_DISABLED,
