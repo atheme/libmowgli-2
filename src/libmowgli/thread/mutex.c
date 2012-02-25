@@ -97,7 +97,9 @@ int mowgli_mutex_create(mowgli_mutex_t *mutex)
 
 	if (!initialized)
 	{
-		mutex_ops->setup_fork_safety();
+		if (mutex_ops->setup_fork_safety != NULL)
+			mutex_ops->setup_fork_safety();
+
 		initialized = true;
 	}
 
