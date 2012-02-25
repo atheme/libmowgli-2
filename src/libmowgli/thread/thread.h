@@ -3,7 +3,7 @@
  * mowgli_thread.h: Cross-platform threading helper routines.
  *
  * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
- * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
+ * Copyright (c) 2011, 2012 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -29,14 +29,18 @@
 # include <thread.h>
 # include <synch.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) mutex_t (name)
+# define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
+# define MOWGLI_NATIVE_MUTEX_DECL(name) 	mutex_t (name)
+# define MOWGLI_NATIVE_THREAD_DECL(name)	thread_t (name)
 #elif defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
 # include <linux/futex.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) void * (name)
+# define MOWGLI_NATIVE_MUTEX_DECL(name) 	void * (name)
 #elif defined(_WIN32)
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) HANDLE (name)
+# define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
+# define MOWGLI_NATIVE_MUTEX_DECL(name) 	HANDLE (name)
+# define MOWGLI_NATIVE_THREAD_DECL(name) 	HANDLE (name)
 #else
 # include <pthread.h>
 #endif
@@ -70,6 +74,18 @@ int mowgli_mutex_lock(mowgli_mutex_t *mutex);
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
 int mowgli_mutex_destroy(mowgli_mutex_t *mutex);
+
+typedef struct {
+#ifdef MOWGLI_FEATURE_HAVE_NATIVE_THREADS
+	MOWGLI_NATIVE_THREAD_DECL(thread);
+#else
+	pthread_t thread;
+#endif
+} mowgli_thread_t;
+
+#ifdef MOWGLI_NATIVE_THREAD_DECL
+# undef MOWGLI_NATIVE_THREAD_DECL
+#endif
 
 typedef enum {
 	MOWGLI_THREAD_POLICY_DEFAULT,
