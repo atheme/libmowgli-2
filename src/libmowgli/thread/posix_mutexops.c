@@ -58,12 +58,23 @@ static int mowgli_sun_mutex_destroy(mowgli_mutex_t *mutex)
 	return mutex_destroy(&mutex->mutex);
 }
 
+#if defined(__sun)
+static void mowgli_sun_mutex_setup_fork_safety(void)
+{
+	/* this allows us to synchronize lock states between children */
+	pthread_atfork(mowgli_mutex_lock_all, mowgli_mutex_unlock_all, mowgli_mutex_unlock_all);
+}
+#endif
+
 mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
 	.mutex_create = mowgli_sun_mutex_create,
 	.mutex_lock = mowgli_sun_mutex_lock,
 	.mutex_trylock = mowgli_sun_mutex_trylock,
 	.mutex_unlock = mowgli_sun_mutex_unlock,
 	.mutex_destroy = mowgli_sun_mutex_destroy,
+#if defined(__sun)
+	.setup_thread_safety = mowgli_sun_mutex_setup_thread_safety,
+#endif
 };
 
 /*************
