@@ -10,7 +10,7 @@ INCLUDES = mowgli.h
 
 include ../../buildsys.mk
 
-LIBS += ${PTHREAD_LIBS}
+LIBS += ${PTHREAD_LIBS} ${SSL_LIBS}
 CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
 
