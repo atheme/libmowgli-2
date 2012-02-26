@@ -1,0 +1,68 @@
+Design concepts for Mowgli
+--------------------------
+
+1. Object orientation
+
+First and foremost, Mowgli is a base development framework that you can build higher level
+development frameworks ontop of.  To facilitate this in a way that most people can understand,
+we use a somewhat LISP-like form of OO.
+
+What does this mean?
+
+In LISP, it is common for objects to be made up of smaller, more primitive objects that help
+to facilitate the implementation of the object.  What this means is that, for example, we
+have mowgli_heap_t (which is a private object):
+
+	struct mowgli_heap_
+	{
+	        unsigned int elem_size;
+        	unsigned int mowgli_heap_elems;
+	        unsigned int free_elems;
+
+	        unsigned int alloc_size;
+
+        	unsigned int flags;
+
+	        mowgli_list_t blocks; /* list of non-empty blocks */
+
+	        mowgli_allocation_policy_t *allocator;
+        	mowgli_boolean_t use_mmap;
+
+	        mowgli_mutex_t mutex;
+
+        	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
+	};
+
+This is an object which keeps state.  It also depends on other objects, such as allocation
+policies and lists.  There is a need for a destructor, it has member objects which have
+destructors, etc.
+
+C allows you to make a pointer out of anything -- block-level variables, for example can
+be "dereferenced" using the & operator.  This means that if the heap above did not require
+initialization, you could just write something like:
+
+	{
+		mowgli_heap_t heap;
+		void *ptr;
+
+		ptr = mowgli_heap_alloc(&heap);
+		mowgli_heap_free(&heap, ptr);
+	}
+
+However, we have a need to initialize this object, so we provide a constructor for it,
+mowgli_heap_create().  We also need to tear down the object specifically, so we provide
+mowgli_heap_destroy().
+
+While it is easy to provide a separate initializer function, we feel this would be a bad
+idea for objects which keep state, because odds are likely the destructor would not be
+called.  There is also a stack memory limit -- which is very small on embedded systems,
+where Mowgli is intended to be used.
+
+There is also the possibility that the library may depend on the reference remaining
+past the time it was used, such as an internal dependency (caching, for example).  So
+we want to enforce that a destructor is called when needed, or at least make sure we
+don't crash because the object is no longer on the stack.
+
+[Yes, I know you can put objects in BSS by making them 'static.'  There is limited
+space for BSS on many systems, so putting 100MB worth of objects there is kind of insane
+and makes your program not look so great either.]
