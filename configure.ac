@@ -23,7 +23,10 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
    AC_MSG_ERROR([C compiler does not support C99], 1)
 ])
 
-test x"$GCC" = x"yes" && CFLAGS="$CFLAGS -pipe -Wall"
+MORECFLAGS="-pipe -pedantic -Wall -Wextra"
+AS_IF([test "x$GCC" = "xyes"], [
+   CFLAGS="$CFLAGS $MORECFLAGS"
+])
 
 # XXX workaround
 PACKAGE="libmowgli-2"

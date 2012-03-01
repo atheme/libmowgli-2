@@ -3523,7 +3523,12 @@ if test "x$ac_cv_prog_cc_c99" = "xno"; then :
 
 fi
 
-test x"$GCC" = x"yes" && CFLAGS="$CFLAGS -pipe -Wall"
+MORECFLAGS="-pipe -pedantic -Wall -Wextra"
+if test "x$GCC" = "xyes"; then :
+
+   CFLAGS="$CFLAGS $MORECFLAGS"
+
+fi
 
 # XXX workaround
 PACKAGE="libmowgli-2"
