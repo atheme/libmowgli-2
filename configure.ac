@@ -44,25 +44,13 @@ AC_CHECK_FUNCS([kqueue fcntl select])
 AC_FUNC_STAT
 
 # Check for OpenSSL
-AC_ARG_ENABLE(openssl,
-	AC_HELP_STRING([--disable-ssl], [don't enable OpenSSL conveinence functions]),
-	,
-	enable_openssl=yes)
-
-OPENSSL=no
-if test "$enable_openssl" = "yes"; then
-	AC_CHECK_LIB(ssl, SSL_read, [
-		AC_CHECK_HEADERS(openssl/ssl.h openssl/err.h, [
-			SSL_LIBS="-lssl -lcrypto"
-			AC_SUBST(SSL_LIBS)
-			OPENSSL=yes
-			],,[-])
-		],, -lcrypto)
-	LIBS+=$SSL_LIBS
-	if test "$OPENSSL" = "yes"; then
-		AC_DEFINE(HAVE_OPENSSL,, Define to 1 if OpenSSL is available)
-	fi
-fi
+OPENSSL="no"
+AX_CHECK_OPENSSL([
+   LIBS="$LIBS $OPENSSL_LIBS"
+   LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
+   CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
+	 OPENSSL="yes"
+])
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
 
