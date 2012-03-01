@@ -81,15 +81,12 @@ AC_SUBST(MOWGLI_MODULE)
 
 # Check for optional features.
 EXAMPLES_BUILD=""
-AC_ARG_ENABLE(examples,
-    [  --enable-examples	build and install example programs],
-    [enable_examples=$enableval],
-    [enable_examples="no"]
-)
-
-if test "x$enable_examples" = "xyes"; then
+EXAMPLES="no"
+AC_ARG_ENABLE([examples], [AS_HELP_STRING([--enable-examples], [build examples])])
+AS_IF([test x"$enable_examples" = x"yes"], [
 	EXAMPLES_BUILD="examples"
-fi
+	EXAMPLES="yes"
+])
 
 AC_SUBST(EXAMPLES_BUILD)
 
@@ -104,6 +101,7 @@ cat << _EOF_
 
 Configuration:
 	OpenSSL support	: ${OPENSSL}
+	Examples : ${EXAMPLES}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.

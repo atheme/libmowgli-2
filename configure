@@ -1332,7 +1332,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-examples	build and install example programs
+  --enable-examples       build examples
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -4972,17 +4972,17 @@ $as_echo "$MOWGLI_MODULE" >&6; };
 
 # Check for optional features.
 EXAMPLES_BUILD=""
+EXAMPLES="no"
 # Check whether --enable-examples was given.
 if test "${enable_examples+set}" = set; then :
-  enableval=$enable_examples; enable_examples=$enableval
-else
-  enable_examples="no"
-
+  enableval=$enable_examples;
 fi
 
+if test x"$enable_examples" = x"yes"; then :
 
-if test "x$enable_examples" = "xyes"; then
 	EXAMPLES_BUILD="examples"
+	EXAMPLES="yes"
+
 fi
 
 
@@ -6502,6 +6502,7 @@ cat << _EOF_
 
 Configuration:
 	OpenSSL support	: ${OPENSSL}
+	Examples : ${EXAMPLES}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.
