@@ -65,12 +65,12 @@ case "$target" in
 
    LIBS="$LIBS -lwsock32 -lws2_32"
 
-   AS_IF([test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"], [
-      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.lib.a"
+   AS_IF([test x$"LIBMOWGLI_SHARED_MODULES" = x"yes"], [
+      LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
    ])
 
-   AS_IF([test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"], [
-      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.a"
+   AS_IF([test x$"LIBMOWGLI_STATIC_MODULES" = x"yes"], [
+      LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
    ])
    ;;
 *)

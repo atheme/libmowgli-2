@@ -4041,15 +4041,15 @@ $as_echo "win32" >&6; }
 
    LIBS="$LIBS -lwsock32 -lws2_32"
 
-   if test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"; then :
+   if test x$"LIBMOWGLI_SHARED_MODULES" = x"yes"; then :
 
-      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.lib.a"
+      LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
 
 fi
 
-   if test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"; then :
+   if test x$"LIBMOWGLI_STATIC_MODULES" = x"yes"; then :
 
-      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.a"
+      LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
 
 fi
    ;;
