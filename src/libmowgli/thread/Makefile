@@ -14,5 +14,5 @@ includesubdir = $(PACKAGE)/thread
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
+CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../../.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}

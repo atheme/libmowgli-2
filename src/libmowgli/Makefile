@@ -1,8 +1,6 @@
 include ../../extra.mk
 
 SHARED_LIB = ${LIB_PREFIX}mowgli-2${LIB_SUFFIX}
-LIB_MAJOR = 0
-LIB_MINOR = 0
 
 SUBDIRS = core base atomic container eventloop vio ext platform module object thread
 
@@ -11,7 +9,7 @@ INCLUDES = mowgli.h
 include ../../buildsys.mk
 
 LIBS += ${PTHREAD_LIBS}
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
+CPPFLAGS += ${LIB_CPPFLAGS} -I. -I../.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
 
 LIB_OBJS += core/mowgli.core.a \

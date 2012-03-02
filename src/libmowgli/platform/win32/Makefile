@@ -13,5 +13,5 @@ includesubdir = $(PACKAGE)/platform/win32
 
 include ../../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../.. -DMOWGLI_CORE
+CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../.. -I../../../.. -DMOWGLI_CORE
 CFLAGS += ${LIB_CFLAGS}
