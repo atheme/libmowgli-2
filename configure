@@ -4609,7 +4609,10 @@ $as_echo "yes" >&6; }
    LIBS="$LIBS $OPENSSL_LIBS"
    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
    CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
-	 OPENSSL="yes"
+   OPENSSL="yes"
+
+$as_echo "#define HAVE_OPENSSL /**/" >>confdefs.h
+
 
 
 else
@@ -4675,11 +4678,11 @@ fi
 $as_echo_n "checking loader type... " >&6; }
 case "$target" in
 *-*-mingw32)
-    MOWGLI_MODULE='loader_win32.c'
-    LIBS="$LIBS -lwsock32 -lws2_32"
-	;;
+   MOWGLI_MODULE='loader_win32.c'
+   LIBS="$LIBS -lwsock32 -lws2_32"
+   ;;
 *)
-    MOWGLI_MODULE='loader_posix.c'
+   MOWGLI_MODULE='loader_posix.c'
 
 
 acx_pthread_ok=no
@@ -4962,9 +4965,9 @@ else
 
 fi
 
-    CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS"
+   CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS"
 
-	;;
+   ;;
 esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $MOWGLI_MODULE" >&5
 $as_echo "$MOWGLI_MODULE" >&6; };
@@ -4980,8 +4983,8 @@ fi
 
 if test x"$enable_examples" = x"yes"; then :
 
-	EXAMPLES_BUILD="examples"
-	EXAMPLES="yes"
+   EXAMPLES_BUILD="examples"
+   EXAMPLES="yes"
 
 fi
 
@@ -6501,8 +6504,8 @@ fi
 cat << _EOF_
 
 Configuration:
-	OpenSSL support	: ${OPENSSL}
-	Examples : ${EXAMPLES}
+   OpenSSL support: ${OPENSSL}
+   Examples: ${EXAMPLES}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.

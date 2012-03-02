@@ -57,7 +57,8 @@ AX_CHECK_OPENSSL([
    LIBS="$LIBS $OPENSSL_LIBS"
    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
    CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
-	 OPENSSL="yes"
+   OPENSSL="yes"
+   AC_DEFINE(HAVE_OPENSSL,, [Define to 1 if OpenSSL is available])
 ])
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
@@ -66,15 +67,15 @@ dnl Detect which loader to use
 AC_MSG_CHECKING(loader type)
 case "$target" in
 *-*-mingw32)
-    MOWGLI_MODULE='loader_win32.c'
-    LIBS="$LIBS -lwsock32 -lws2_32"
-	;;
+   MOWGLI_MODULE='loader_win32.c'
+   LIBS="$LIBS -lwsock32 -lws2_32"
+   ;;
 *)
-    MOWGLI_MODULE='loader_posix.c'
-    ACX_PTHREAD
-    CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS"
-    AC_SUBST(PTHREAD_LIBS)
-	;;
+   MOWGLI_MODULE='loader_posix.c'
+   ACX_PTHREAD
+   CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS"
+   AC_SUBST(PTHREAD_LIBS)
+   ;;
 esac
 AC_MSG_RESULT($MOWGLI_MODULE);
 AC_SUBST(MOWGLI_MODULE)
@@ -84,8 +85,8 @@ EXAMPLES_BUILD=""
 EXAMPLES="no"
 AC_ARG_ENABLE([examples], [AS_HELP_STRING([--enable-examples], [build examples])])
 AS_IF([test x"$enable_examples" = x"yes"], [
-	EXAMPLES_BUILD="examples"
-	EXAMPLES="yes"
+   EXAMPLES_BUILD="examples"
+   EXAMPLES="yes"
 ])
 
 AC_SUBST(EXAMPLES_BUILD)
@@ -100,8 +101,8 @@ AC_OUTPUT
 cat << _EOF_
 
 Configuration:
-	OpenSSL support	: ${OPENSSL}
-	Examples : ${EXAMPLES}
+   OpenSSL support: ${OPENSSL}
+   Examples: ${EXAMPLES}
 
 Now type "make" to build, and "make install" to install.
 Thank you for using libmowgli.
