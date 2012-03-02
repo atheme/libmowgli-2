@@ -51,14 +51,15 @@ AC_CHECK_FUNCS([printf sprintf snprintf vsnprintf mmap gettimeofday strndup])
 AC_CHECK_FUNCS([kqueue fcntl select])
 AC_FUNC_STAT
 
-# Check for OpenSSL
 OPENSSL="no"
 AX_CHECK_OPENSSL([
+   OPENSSL="yes"
+   AC_DEFINE(HAVE_OPENSSL,, [Define to 1 if OpenSSL is available])
+])
+AS_IF([test x"$OPENSSL" = x"yes"], [
    LIBS="$LIBS $OPENSSL_LIBS"
    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
    CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
-   OPENSSL="yes"
-   AC_DEFINE(HAVE_OPENSSL,, [Define to 1 if OpenSSL is available])
 ])
 
 AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])

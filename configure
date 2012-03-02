@@ -4471,7 +4471,6 @@ _ACEOF
 fi
 
 
-# Check for OpenSSL
 OPENSSL="no"
 
     found=false
@@ -4606,9 +4605,6 @@ if ac_fn_c_try_link "$LINENO"; then :
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
-   LIBS="$LIBS $OPENSSL_LIBS"
-   LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
-   CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
    OPENSSL="yes"
 
 $as_echo "#define HAVE_OPENSSL /**/" >>confdefs.h
@@ -4632,6 +4628,13 @@ rm -f core conftest.err conftest.$ac_objext \
 
 
 
+if test x"$OPENSSL" = x"yes"; then :
+
+   LIBS="$LIBS $OPENSSL_LIBS"
+   LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
+   CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
+
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dlopen in -ldl" >&5
 $as_echo_n "checking for dlopen in -ldl... " >&6; }
