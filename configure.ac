@@ -24,13 +24,68 @@ AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
 
+AC_CHECK_HEADERS([poll.h winsock2.h linux/futex.h sys/epoll.h sys/select.h])
+AC_CHECK_FUNCS([fcntl kqueue mmap select])
+
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
 
-BUILDSYS_SHARED_LIB
+LIBMOWGLI_MODULES="core base atomic container eventloop ext module object thread vio"
+AC_SUBST(LIBMOWGLI_MODULES)
 
-AC_CHECK_HEADERS([poll.h winsock2.h linux/futex.h sys/epoll.h sys/select.h])
-AC_CHECK_FUNCS([fcntl kqueue mmap select])
+LIBMOWGLI_SHARED_MODULES=""
+AC_ARG_ENABLE([shared], [AS_HELP_STRING([--disable-shared], [do not build shared library])]) 
+AS_IF([test x"$enable_shared" != x"no"], [ 
+   BUILDSYS_SHARED_LIB
+   BUILDSYS_PROG_IMPLIB
+   AC_SUBST([LIBMOWGLI_SHARED_LIB], [${LIB_PREFIX}mowgli-2${LIB_SUFFIX}])
+
+   for i in $LIBMOWGLI_MODULES
+   do
+      LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES $i/mowgli.$i.lib.a"
+   done
+])
+
+LIBMOWGLI_STATIC_MODULES=""
+AC_ARG_ENABLE([static], [AS_HELP_STRING([--enable-static], [build static library])])
+AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
+   AC_SUBST([LIBMOWGLI_STATIC_LIB], [libmowgli-2.a])
+
+   for i in $LIBMOWGLI_MODULES
+   do
+      LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES $i/mowgli.$i.a"
+   done
+])
+
+AC_MSG_CHECKING(OS type)
+case "$target" in
+*-*-mingw32)
+   AC_MSG_RESULT([win32])
+   LIBMOWGLI_OS="win32"
+
+   LIBS="$LIBS -lwsock32 -lws2_32"
+
+   AS_IF([test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"], [
+      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.lib.a"
+   ])
+
+   AS_IF([test x$"LIB_MOWGLI_SHARED_MODULES" = x"yes"], [
+      LIBMOWGLI_SHARED_MODULES += "platform/win32/mowgli.platform.win32.a"
+   ])
+   ;;
+*)
+   AC_MSG_RESULT([posix])
+   LIBMOWGLI_OS="posix"
+
+   ACX_PTHREAD
+   CPPFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+   LIBS="$PTHREAD_LIBS $LIBS"
+   AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
+   ;;
+esac
+AC_SUBST([LIBMOWGLI_OS])
+AC_SUBST([LIBMOWGLI_SHARED_MODULES])
+AC_SUBST([LIBMOWGLI_STATIC_MODULES])
 
 OPENSSL="no"
 AX_CHECK_OPENSSL([
@@ -42,24 +97,6 @@ AS_IF([test x"$OPENSSL" = x"yes"], [
    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
    CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
 ])
-
-AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
-
-AC_MSG_CHECKING(loader type)
-case "$target" in
-*-*-mingw32)
-   MOWGLI_MODULE='loader_win32.c'
-   LIBS="$LIBS -lwsock32 -lws2_32"
-   ;;
-*)
-   MOWGLI_MODULE='loader_posix.c'
-   ACX_PTHREAD
-   CPPFLAGS="$CPPFLAGS $PTHREAD_CFLAGS"
-   AC_SUBST(PTHREAD_LIBS)
-   ;;
-esac
-AC_MSG_RESULT($MOWGLI_MODULE);
-AC_SUBST(MOWGLI_MODULE)
 
 EXAMPLES_BUILD=""
 EXAMPLES="no"

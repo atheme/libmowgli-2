@@ -1,14 +1,13 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.module.a
+STATIC_PIC_LIB_NOINST = mowgli.module.lib.a
+STATIC_LIB_NOINST = mowgli.module.a
 
-SRCS = ${MOWGLI_MODULE}
+SRCS = loader_${LIBMOWGLI_OS}.c
 
-INCLUDES = module.h		\
-
-includesubdir = $(PACKAGE)/module
+INCLUDES = module.h
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../../.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+

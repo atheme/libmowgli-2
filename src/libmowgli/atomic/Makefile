@@ -1,14 +1,13 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.atomic.a
+STATIC_PIC_LIB_NOINST = mowgli.atomic.lib.a
+STATIC_LIB_NOINST = mowgli.atomic.a
 
-SRCS = spinlock.c		\
+SRCS = spinlock.c
 
-INCLUDES = atomic.h spinlock.h		\
-
-includesubdir = $(PACKAGE)/atomic
+INCLUDES = atomic.h spinlock.h
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../../.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+

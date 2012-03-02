@@ -1,6 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.core.a
+STATIC_PIC_LIB_NOINST = mowgli.core.lib.a
+STATIC_LIB_NOINST = mowgli.core.a
 
 SRCS = init.c			\
        alloc.c			\
@@ -24,9 +25,7 @@ INCLUDES = init.h		\
 	   stdinc.h		\
 	   process.h
 
-includesubdir = $(PACKAGE)/core
-
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -I../../.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+
