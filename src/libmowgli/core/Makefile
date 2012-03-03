@@ -25,6 +25,8 @@ INCLUDES = init.h		\
 	   stdinc.h		\
 	   process.h
 
+includesubdir = $(PACKAGE)/core
+
 include ../../../buildsys.mk
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE

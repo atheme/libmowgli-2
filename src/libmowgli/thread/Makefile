@@ -11,6 +11,8 @@ SRCS = mutex.c			\
 
 INCLUDES = thread.h
 
+includesubdir = $(PACKAGE)/thread
+
 include ../../../buildsys.mk
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE

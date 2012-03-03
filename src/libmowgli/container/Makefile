@@ -13,6 +13,8 @@ INCLUDES = list.h	\
 	   index.h	\
 	   patricia.h
 
+includesubdir = $(PACKAGE)/container
+
 include ../../../buildsys.mk
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE

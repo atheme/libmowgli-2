@@ -7,6 +7,8 @@ SRCS = spinlock.c
 
 INCLUDES = atomic.h spinlock.h
 
+includesubdir = $(PACKAGE)/atomic
+
 include ../../../buildsys.mk
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
