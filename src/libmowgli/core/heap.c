@@ -48,7 +48,7 @@ struct mowgli_block_
 	/* singly linked list of free items */
 	void *first_free;
 
-	int num_allocated;
+	unsigned int num_allocated;
 };
 
 /* A pile of blocks */
