@@ -3879,6 +3879,7 @@ fi
 LIBMOWGLI_MODULES="core base atomic container eventloop ext module object thread vio"
 
 
+BUILD_SHARED_MODULES=""
 LIBMOWGLI_SHARED_MODULES=""
 # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
@@ -4011,8 +4012,11 @@ $as_echo "no" >&6; }
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES $i/mowgli.$i.lib.a"
    done
 
+   BUILD_SHARED_MODULES="yes"
+
 fi
 
+BUILD_STATIC_MODULES=""
 LIBMOWGLI_STATIC_MODULES=""
 # Check whether --enable-static was given.
 if test "${enable_static+set}" = set; then :
@@ -4029,6 +4033,8 @@ if test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"; then :
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES $i/mowgli.$i.a"
    done
 
+   BUILD_STATIC_MODULES="yes"
+
 fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking OS type" >&5
@@ -4041,13 +4047,13 @@ $as_echo "win32" >&6; }
 
    LIBS="$LIBS -lwsock32 -lws2_32"
 
-   if test x$"LIBMOWGLI_SHARED_MODULES" = x"yes"; then :
+   if test x"$BUILD_SHARED_MODULES" = x"yes"; then :
 
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
 
 fi
 
-   if test x$"LIBMOWGLI_STATIC_MODULES" = x"yes"; then :
+   if test x"$BUILD_STATIC_MODULES" = x"yes"; then :
 
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
 
