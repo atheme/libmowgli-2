@@ -29,6 +29,8 @@
 
 #include "mowgli.h"
 
+#ifdef NOTYET
+
 #ifdef _WIN32
 
 #ifndef _WIN32_WINNT
@@ -156,6 +158,8 @@ int fork(void)
 
 	return (int) cid.UniqueProcess;
 }
+
+#endif
 
 #endif
 
