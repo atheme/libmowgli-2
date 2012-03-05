@@ -29,8 +29,6 @@ MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 	int r;
 	WSADATA w;
 
-	printf("booting\n");
-
 	r = WSAStartup((short) 0x202, &w);
 	if (r != 0) {
 		printf("mowgli bootstrap failure (win32): %d\n", r);
