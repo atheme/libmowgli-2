@@ -169,15 +169,12 @@ void mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgl
 }
 
 /* retrieves a node at `position` position. */
-mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
+mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, size_t pos)
 {
-	int iter;
+	size_t iter;
 	mowgli_node_t *n;
 
 	return_val_if_fail(l != NULL, NULL);
-
-	if (pos < 0)
-		return NULL;
 
 	/* locate the proper position. */
 	if (pos < MOWGLI_LIST_LENGTH(l) / 2)
@@ -190,7 +187,7 @@ mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, int pos)
 }
 
 /* returns the data from node at `position` position, or NULL. */
-void *mowgli_node_nth_data(mowgli_list_t *l, int pos)
+void *mowgli_node_nth_data(mowgli_list_t *l, size_t pos)
 {
 	mowgli_node_t *n;
 
@@ -205,7 +202,7 @@ void *mowgli_node_nth_data(mowgli_list_t *l, int pos)
 }
 
 /* inserts a node at `position` position. */
-void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int pos)
+void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, size_t pos)
 {
 	mowgli_node_t *tn;
 
@@ -219,9 +216,9 @@ void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, int pos)
 }
 
 /* retrieves the index position of a node in a list. */
-int mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
+ssize_t mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
 {
-	int iter;
+	ssize_t iter;
 	mowgli_node_t *tn;
 
 	return_val_if_fail(n != NULL, -1);
@@ -230,7 +227,7 @@ int mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
 	/* locate the proper position. */
 	for (iter = 0, tn = l->head; tn != n && tn != NULL; iter++, tn = tn->next);
 
-	return iter < MOWGLI_LIST_LENGTH(l) ? iter : -1;
+	return iter < (ssize_t) MOWGLI_LIST_LENGTH(l) ? iter : -1;
 }
 
 /* deletes a link between a node and a list. */

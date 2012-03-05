@@ -596,7 +596,7 @@ struct patricia_leaf *mowgli_patricia_elem_find(mowgli_patricia_t *dict, const c
 		ckey = key;
 	else
 	{
-		if (keylen >= sizeof ckey_store)
+		if (keylen >= (int) sizeof(ckey_store))
 		{
 			ckey_buf = strdup(key);
 			dict->canonize_cb(ckey_buf);

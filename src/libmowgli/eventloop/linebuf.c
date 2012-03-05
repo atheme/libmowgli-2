@@ -198,7 +198,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 
 	char *line_start;
 	char *cptr;
-	int len = 0;
+	size_t len = 0;
 	int linecount = 0;
 
 	line_start = cptr = buffer->buffer;
