@@ -1,29 +1,17 @@
 include ../../extra.mk
 
-SHARED_LIB = ${LIB_PREFIX}mowgli-2${LIB_SUFFIX}
-LIB_MAJOR = 0
-LIB_MINOR = 0
+SHARED_LIB = ${LIBMOWGLI_SHARED_LIB}
+STATIC_LIB = ${LIBMOWGLI_STATIC_LIB}
 
-SUBDIRS = core base atomic container eventloop vio ext platform module object thread
+SUBDIRS = ${LIBMOWGLI_MODULES} platform
 
 INCLUDES = mowgli.h
 
 include ../../buildsys.mk
 
 LIBS += ${PTHREAD_LIBS}
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I../.. -DMOWGLI_CORE
 
-LIB_OBJS += core/mowgli.core.a \
-	base/mowgli.base.a \
-	platform/win32/mowgli.platform.win32.a \
-	module/mowgli.module.a \
-	object/mowgli.object.a \
-	container/mowgli.container.a \
-	eventloop/mowgli.eventloop.a \
-	vio/mowgli.vio.a \
-	ext/mowgli.ext.a \
-	atomic/mowgli.atomic.a \
-	thread/mowgli.thread.a
-
+LIB_OBJS := ${LIB_OBJS} ${LIBMOWGLI_SHARED_MODULES}
+OBJS += ${LIBMOWGLI_STATIC_MODULES}
 

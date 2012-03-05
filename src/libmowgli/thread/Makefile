@@ -1,6 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.thread.a
+STATIC_PIC_LIB_NOINST = mowgli.thread.lib.a
+STATIC_LIB_NOINST = mowgli.thread.a
 
 SRCS = mutex.c			\
        null_mutexops.c		\
@@ -14,5 +15,5 @@ includesubdir = $(PACKAGE)/thread
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+

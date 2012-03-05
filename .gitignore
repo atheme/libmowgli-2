@@ -1,6 +1,7 @@
 aclocal.m4
 autom4te.cache
 buildsys.mk
+config.h
 config.log
 config.status
 extra.mk
@@ -13,7 +14,9 @@ src/examples/patriciatest/patriciatest
 src/examples/patriciatest2/patriciatest2
 src/examples/echoserver/echoserver
 src/examples/timertest/timertest
-src/libmowgli/platform/autoconf.h
+src/examples/helpertest/helpertest
+src/examples/libevent-bench/bench
+src/examples/linetest/linetest
 .deps
 *.dylib
 *.o
@@ -23,4 +26,3 @@ src/libmowgli/platform/autoconf.h
 *~
 *.core
 *.swp
-core

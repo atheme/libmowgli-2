@@ -1,6 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.base.a
+STATIC_PIC_LIB_NOINST = mowgli.base.lib.a
+STATIC_LIB_NOINST = mowgli.base.a
 
 SRCS = argstack.c		\
        bitvector.c 		\
@@ -9,7 +10,7 @@ SRCS = argstack.c		\
        hook.c			\
        mempool.c		\
        random.c			\
-       mowgli_signal.c		\
+       mowgli_signal.c
 
 INCLUDES = argstack.h		\
 	   bitvector.h		\
@@ -18,11 +19,11 @@ INCLUDES = argstack.h		\
 	   hook.h		\
 	   mempool.h		\
 	   random.h		\
-	   mowgli_signal.h	\
+	   mowgli_signal.h
 
 includesubdir = $(PACKAGE)/base
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+

@@ -1,6 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.container.a
+STATIC_PIC_LIB_NOINST = mowgli.container.lib.a
+STATIC_LIB_NOINST = mowgli.container.a
 
 SRCS = list.c 		\
        queue.c		\
@@ -16,5 +17,5 @@ includesubdir = $(PACKAGE)/container
 
 include ../../../buildsys.mk
 
-CPPFLAGS += ${LIB_CPPFLAGS} -I. -I.. -DMOWGLI_CORE
-CFLAGS += ${LIB_CFLAGS}
+CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
+
