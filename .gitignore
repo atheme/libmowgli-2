@@ -1,7 +1,7 @@
 aclocal.m4
 autom4te.cache
 buildsys.mk
-config.h
+src/libmowgli/platform/autoconf.h
 config.log
 config.status
 extra.mk

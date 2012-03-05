@@ -33,7 +33,7 @@
 #endif
 
 #ifdef MOWGLI_CORE
-# include "config.h"
+# include "platform/autoconf.h"
 #endif
 
 #include "core/stdinc.h"

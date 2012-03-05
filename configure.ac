@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 AC_INIT([libmowgli-2], [2.0.0-alpha1], [http://jira.atheme.org/])
 AC_CONFIG_SRCDIR([src])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET

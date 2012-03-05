@@ -2143,7 +2143,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers config.h"
+ac_config_headers="$ac_config_headers src/libmowgli/platform/autoconf.h"
 
 
 ac_aux_dir=
@@ -5397,7 +5397,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+    "src/libmowgli/platform/autoconf.h") CONFIG_HEADERS="$CONFIG_HEADERS src/libmowgli/platform/autoconf.h" ;;
     "buildsys.mk") CONFIG_FILES="$CONFIG_FILES buildsys.mk" ;;
     "extra.mk") CONFIG_FILES="$CONFIG_FILES extra.mk" ;;
     "libmowgli-2.pc") CONFIG_FILES="$CONFIG_FILES libmowgli-2.pc" ;;
