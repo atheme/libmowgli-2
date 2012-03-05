@@ -3501,7 +3501,7 @@ if test "x$ac_cv_prog_cc_c99" = "xno"; then :
 
 fi
 
-MORECFLAGS="-pipe -pedantic -Wall -Wextra"
+MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers"
 if test "x$GCC" = "xyes"; then :
 
    CFLAGS="$CFLAGS $MORECFLAGS"

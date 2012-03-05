@@ -19,7 +19,7 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
    AC_MSG_ERROR([C compiler does not support C99], 1)
 ])
 
-MORECFLAGS="-pipe -pedantic -Wall -Wextra"
+MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers"
 AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
