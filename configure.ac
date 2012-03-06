@@ -33,7 +33,6 @@ AC_PATH_PROG(RANLIB, ranlib)
 LIBMOWGLI_MODULES="core base atomic container eventloop ext module object thread vio"
 AC_SUBST(LIBMOWGLI_MODULES)
 
-BUILD_SHARED_MODULES=""
 LIBMOWGLI_SHARED_MODULES=""
 AC_ARG_ENABLE([shared], [AS_HELP_STRING([--disable-shared], [do not build shared library])]) 
 AS_IF([test x"$enable_shared" != x"no"], [ 
@@ -49,7 +48,6 @@ AS_IF([test x"$enable_shared" != x"no"], [
    BUILD_SHARED_MODULES="yes"
 ])
 
-BUILD_STATIC_MODULES=""
 LIBMOWGLI_STATIC_MODULES=""
 AC_ARG_ENABLE([static], [AS_HELP_STRING([--enable-static], [build static library])])
 AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
@@ -71,11 +69,11 @@ case "$target" in
 
    LIBS="$LIBS -lwsock32 -lws2_32"
 
-   AS_IF([test x"$BUILD_SHARED_MODULES" = x"yes"], [
+   AS_IF([test x"$LIBMOWGLI_SHARED_MODULES" != x""], [
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
    ])
 
-   AS_IF([test x"$BUILD_STATIC_MODULES" = x"yes"], [
+   AS_IF([test x"$LIBMOWGLI_STATIC_MODULES" != x""], [
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
    ])
    ;;
