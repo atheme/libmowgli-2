@@ -47,8 +47,7 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_
 	linebuf->delim = "\r\n"; /* Sane default */
 	linebuf->readline_cb = cb;
 
-	linebuf->read_buffer_full = false;
-	linebuf->write_buffer_full = false;
+	linebuf->flags = 0;
 
 	linebuf->readbuf.buffer = NULL;
 	linebuf->writebuf.buffer = NULL;
@@ -118,7 +117,7 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 
 	if (buffer->maxbuflen - buffer->buflen == 0)
 	{
-		linebuf->read_buffer_full = true;
+		linebuf->flags |= MOWGLI_LINEBUF_ERR_READBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
 		return;
 	}
@@ -177,7 +176,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 
 	if (linebuf->writebuf.buflen + len + delim_len > linebuf->writebuf.maxbuflen)
 	{
-		linebuf->write_buffer_full = true;
+		linebuf->flags |= MOWGLI_LINEBUF_ERR_WRITEBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
 		return;
 	}
@@ -204,7 +203,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 	line_start = cptr = buffer->buffer;
 
 	/* Initalise */
-	linebuf->line_has_nullchar = false;
+	linebuf->flags &= ~MOWGLI_LINEBUF_LINE_HASNULLCHAR;
 
 	while (len < buffer->buflen)
 	{
@@ -212,7 +211,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 		{
 			if (*cptr == '\0')
 				/* Warn about unexpected null chars in the string */
-				linebuf->line_has_nullchar = true;
+				linebuf->flags |= MOWGLI_LINEBUF_LINE_HASNULLCHAR;
 			cptr++;
 			len++;
 			continue;
@@ -232,14 +231,14 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 		line_start = cptr;
 
 		/* Reset this for next line */
-		linebuf->line_has_nullchar = false;
+		linebuf->flags &= ~MOWGLI_LINEBUF_LINE_HASNULLCHAR;
 	}
 
 	if (linecount == 0 && (buffer->buflen == buffer->maxbuflen))
 	{
 		/* No more chars will fit in the buffer and we don't have a line 
 		 * We're really screwed, let's trigger an error. */
-		linebuf->read_buffer_full = true;
+		linebuf->flags |= MOWGLI_LINEBUF_ERR_READBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
 		return;
 	}
@@ -258,16 +257,16 @@ static int mowgli_linebuf_error(mowgli_vio_t *vio)
 	mowgli_linebuf_t *linebuf = vio->userdata;
 	mowgli_vio_error_t *error = &(linebuf->vio->error);
 
-	if (linebuf->read_buffer_full)
+	if (linebuf->flags & MOWGLI_LINEBUF_ERR_READBUF_FULL)
 	{
 		error->op = MOWGLI_VIO_ERR_OP_READ;
-		error->type = MOWGLI_VIO_ERR_BUFFER_FULL;
+		error->type = MOWGLI_VIO_ERR_CUSTOM;
 		mowgli_strlcpy(error->string, "Read buffer full", sizeof(error->string));
 	}
-	else if (linebuf->write_buffer_full)
+	else if (linebuf->flags & MOWGLI_LINEBUF_ERR_WRITEBUF_FULL)
 	{
 		error->op = MOWGLI_VIO_ERR_OP_WRITE;
-		error->type = MOWGLI_VIO_ERR_BUFFER_FULL;
+		error->type = MOWGLI_VIO_ERR_CUSTOM;
 		mowgli_strlcpy(error->string, "Write buffer full", sizeof(error->string));
 	}
 

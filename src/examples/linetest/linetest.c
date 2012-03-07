@@ -106,7 +106,7 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 	char str[512];
 
 	/* Avoid malicious lines -- servers shouldn't send them */
-	if (linebuf->line_has_nullchar)
+	if (linebuf->flags & MOWGLI_LINEBUF_LINE_HASNULLCHAR)
 		return;
 
 	strncpy(str, line, sizeof(str));

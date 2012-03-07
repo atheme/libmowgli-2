@@ -25,8 +25,8 @@ typedef struct _mowgli_vio mowgli_vio_t;
 typedef enum {
 	MOWGLI_VIO_ERR_NONE,
 	MOWGLI_VIO_ERR_REMOTE_HANGUP,
-	MOWGLI_VIO_ERR_BUFFER_FULL,
 	MOWGLI_VIO_ERR_ERRCODE,
+	MOWGLI_VIO_ERR_CUSTOM,
 } mowgli_vio_error_type_t;
 
 typedef enum {

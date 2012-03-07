@@ -269,6 +269,15 @@ struct _mowgli_linebuf_buf {
 	size_t maxbuflen;
 };
 
+/* Errors */
+#define MOWGLI_LINEBUF_ERR_NONE			0x0000
+#define MOWGLI_LINEBUF_ERR_READBUF_FULL		0x0001
+#define MOWGLI_LINEBUF_ERR_WRITEBUF_FULL	0x0002
+
+/* Informative */
+#define MOWGLI_LINEBUF_LINE_HASNULLCHAR		0x0004
+
+
 struct _mowgli_linebuf {
 	mowgli_linebuf_readline_cb_t *readline_cb;
 
@@ -276,16 +285,14 @@ struct _mowgli_linebuf {
 
 	const char *delim;
 
-	bool read_buffer_full;
-	bool write_buffer_full;
+	int flags;
 
 	mowgli_linebuf_buf_t readbuf;
 	mowgli_linebuf_buf_t writebuf;
 
 	bool return_normal_strings;
-	bool line_has_nullchar;
 
 	void *userdata;
 };
 
-#endif
+#endif        
