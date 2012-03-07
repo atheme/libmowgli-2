@@ -23,6 +23,8 @@
 
 #include "mowgli.h"
 
+#include "ext/getopt_long.h"
+
 #ifndef __MOWGLI_PROGRAM_OPTS_H__
 #define __MOWGLI_PROGRAM_OPTS_H__
 

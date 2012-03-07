@@ -31,6 +31,8 @@
 
 #include <mowgli.h>
 
+#include "getopt_long.h"
+
 int	opterr = 1;		/* if error message should be printed */
 int	optind = 1;		/* index into parent argv vector */
 int	optopt = '?';		/* character checked for validity */

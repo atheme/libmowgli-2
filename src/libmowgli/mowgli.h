@@ -80,7 +80,6 @@ MOWGLI_DECLS_START
 #include "container/index.h"
 #include "thread/thread.h"
 #include "ext/confparse.h"
-#include "ext/getopt_long.h"
 #include "ext/program_opts.h"
 
 MOWGLI_DECLS_END
