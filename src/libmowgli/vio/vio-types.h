@@ -45,11 +45,21 @@ typedef struct _mowgli_vio_error {
 	char string[128];
 } mowgli_vio_error_t;
 
-#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {    \
+#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) {		\
 		v->error.type = MOWGLI_VIO_ERR_ERRCODE; \
-		v->error.code = e;		      \
+		v->error.code = e;			\
 		mowgli_strlcpy(v->error.string, s(e), sizeof((v)->error.string)); \
 		return mowgli_vio_error((v)); }
+
+#ifdef HAVE_OPENSSL
+#define MOWGLI_VIO_RETURN_SSLERR_ERRCODE(v, e) {		\
+		(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;	\
+		(v)->error.code = e;				\
+		ERR_error_string_n(e, (v)->error.string, sizeof((v)->error.string)); \
+		return mowgli_vio_error(v); }
+#else
+#define MOWGLI_VIO_RETURN_SSL_ERRCODE(v, e) MOWGLI_VIO_RETURN_ERRCODE(v, strerror, e)
+#endif
 
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);

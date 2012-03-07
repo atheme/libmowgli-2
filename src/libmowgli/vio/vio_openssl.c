@@ -23,13 +23,12 @@
 
 #include "mowgli.h"
 
-#ifdef HAVE_OPENSSL
+/* Note these routines are just defaults for clients -- if you have more
+ * specific needs, you should write your own implementation (that is the
+ * whole point of vio)
+ */
 
-#define MOWGLI_VIO_RETURN_SSLERR_ERRCODE(v, e) {	\
-	(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;	\
-	(v)->error.code = e;			\
-	ERR_error_string_n(e, (v)->error.string, sizeof((v)->error.string)); \
-	return mowgli_vio_error(v); }
+#ifdef HAVE_OPENSSL
 
 typedef struct {
 	SSL *ssl_handle;
@@ -48,10 +47,10 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
 	vio->privdata = connection;
 
 	/* Change ops */
-	vio->ops.connect = mowgli_vio_openssl_connect;
-	vio->ops.read = mowgli_vio_openssl_read;
-	vio->ops.write = mowgli_vio_openssl_write;
-	vio->ops.close = mowgli_vio_openssl_close;
+	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_connect);
+	mowgli_vio_set_op(vio, read, mowgli_vio_openssl_read);
+	mowgli_vio_set_op(vio, write, mowgli_vio_openssl_write);
+	mowgli_vio_set_op(vio, close, mowgli_vio_openssl_close);
 
 	SSL_load_error_strings();
 	SSL_library_init();
@@ -118,8 +117,6 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *
 
 	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
-	printf("ssl_handle %p\nssl_context %p\n", connection->ssl_handle, connection->ssl_context);
-
 	vio->privdata = connection;
 
 	return 0;
@@ -136,7 +133,8 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	{
 		unsigned long err = ERR_get_error();
 
-		if (err != SSL_ERROR_WANT_READ && err != SSL_ERROR_WANT_WRITE)
+		/* SSL_ERROR_WANT_WRITE is not caught -- the callee may need to schedule a write */
+		if (err != SSL_ERROR_WANT_READ)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 
 		if (ret == 0)
@@ -162,6 +160,7 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	{
 		unsigned long err = ERR_get_error();
 		
+		/* Can't write */
 		if (err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_READ)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 	}

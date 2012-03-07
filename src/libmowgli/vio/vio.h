@@ -37,7 +37,7 @@ extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 
-#define mowgli_vio_set_op(vio, operation, func) (vio)->op.operation = func;
+#define mowgli_vio_set_op(vio, operation, func) (vio)->ops.operation = func;
 
 static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type, int flags)
 {

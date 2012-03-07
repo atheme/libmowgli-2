@@ -29,6 +29,8 @@
  * - Return -1 in your callback if you have a fatal error
  * - Return the length of bytes written or read, similar to the semantics of
  *   the read(3) or write(3) calls, if you are a read/write callback.
+ *
+ *  These are just default implementations, you can change them to suit your needs.
  */
 
 static mowgli_heap_t *vio_heap = NULL;
@@ -45,12 +47,12 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio->fd = -1;
 	
 	/* Default ops */
-	vio->ops.socket = mowgli_vio_default_socket;
-	vio->ops.connect = mowgli_vio_default_connect;
-	vio->ops.read = mowgli_vio_default_read;
-	vio->ops.write = mowgli_vio_default_write;
-	vio->ops.error = mowgli_vio_default_error;
-	vio->ops.close = mowgli_vio_default_close;
+	mowgli_vio_set_op(vio, socket, mowgli_vio_default_socket);
+	mowgli_vio_set_op(vio, connect, mowgli_vio_default_connect);
+	mowgli_vio_set_op(vio, read, mowgli_vio_default_read);
+	mowgli_vio_set_op(vio, write, mowgli_vio_default_write);
+	mowgli_vio_set_op(vio, error, mowgli_vio_default_error);
+	mowgli_vio_set_op(vio, close, mowgli_vio_default_close);
 
 	vio->userdata = userdata;
 
