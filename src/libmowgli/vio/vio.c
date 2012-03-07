@@ -45,6 +45,8 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio = mowgli_heap_alloc(vio_heap);
 
 	vio->fd = -1;
+
+	vio->flags = 0;
 	
 	/* Default ops */
 	mowgli_vio_set_op(vio, socket, mowgli_vio_default_socket);
@@ -100,6 +102,9 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 	vio->fd = fd;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
+
 	return 0;
 }
 
@@ -114,6 +119,9 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, s
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 	}
+
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCONNECTING;
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -134,10 +142,15 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 		{
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
+			
+			vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+			vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+
 			return mowgli_vio_error(vio);
 		}
 	}
 
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -151,6 +164,7 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -189,6 +203,8 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
 	close(vio->fd);
 	return 0;
 }

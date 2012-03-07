@@ -119,6 +119,8 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *
 
 	vio->privdata = connection;
 
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCONNECTING;
+
 	return 0;
 }
 
@@ -141,10 +143,15 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 		{
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
+
+			vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+			vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+
 			return mowgli_vio_error(vio);
 		}
 	}
 
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -165,6 +172,7 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 	}
 
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -178,6 +186,9 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 	SSL_CTX_free(connection->ssl_context);
 
 	mowgli_free(connection);
+
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
 
 	close(vio->fd);
 	return 0;
