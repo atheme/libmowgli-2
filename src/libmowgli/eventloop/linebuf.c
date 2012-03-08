@@ -58,9 +58,7 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 	return linebuf;
 }
 
-/* Attach the linebuf instance to the eventloop and VIO instance 
- *
- * There should probably be a connector between eventloop and vio at some point */
+/* Attach the linebuf instance to the eventloop -- socket must be created first! */
 void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mowgli_linebuf_t *linebuf)
 {
 	return_if_fail(vio != NULL);
@@ -71,7 +69,6 @@ void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mow
 	linebuf->vio = vio;
 
 	mowgli_vio_pollable_create(vio, eventloop);
-	mowgli_pollable_set_nonblocking(vio->io, true);
 	mowgli_pollable_setselect(eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 }
 
