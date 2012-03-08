@@ -141,7 +141,7 @@ mowgli_program_opts_compute_optstr(const mowgli_program_opts_t *opts, size_t opt
 			*p++ = ':';
 	}
 
-	*p++ = '\0';
+	*p = '\0';
 
 	return buf;
 }
