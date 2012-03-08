@@ -32,7 +32,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf);
 static int mowgli_linebuf_error(mowgli_vio_t *vio);
 
 mowgli_linebuf_t *
-mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_t *cb, void *userdata)
+mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 {
 	mowgli_linebuf_t *linebuf;
 
@@ -40,9 +40,6 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_
 		linebuf_heap = mowgli_heap_create(sizeof(mowgli_linebuf_t), 16, BH_NOW);
 	
 	linebuf = mowgli_heap_alloc(linebuf_heap);
-
-	linebuf->vio = mowgli_vio_create(linebuf);
-	linebuf->vio->eventloop = eventloop;
 
 	linebuf->delim = "\r\n"; /* Sane default */
 	linebuf->readline_cb = cb;
@@ -61,16 +58,21 @@ mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_
 	return linebuf;
 }
 
-/* Note: this must be called after you've created the VIO socket */
-void mowgli_linebuf_start(mowgli_linebuf_t *linebuf)
+/* Attach the linebuf instance to the eventloop and VIO instance 
+ *
+ * There should probably be a connector between eventloop and vio at some point */
+void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mowgli_linebuf_t *linebuf)
 {
-	mowgli_vio_t *vio = linebuf->vio;
+	return_if_fail(vio != NULL);
+	return_if_fail(eventloop != NULL);
+	return_if_fail(linebuf != NULL);
+	return_if_fail((vio->flags & MOWGLI_VIO_FLAGS_ISCLOSED) == 0);
 
-	return_if_fail(linebuf->vio->fd > -1);
+	linebuf->vio = vio;
 
-	mowgli_vio_pollable_create(vio, vio->eventloop);
+	mowgli_vio_pollable_create(vio, eventloop);
 	mowgli_pollable_set_nonblocking(vio->io, true);
-	mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
+	mowgli_pollable_setselect(eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 }
 
 void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)

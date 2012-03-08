@@ -256,7 +256,8 @@ typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
 typedef void mowgli_linebuf_readline_cb_t(mowgli_linebuf_t *, char *, size_t, void *);
 
-extern mowgli_linebuf_t * mowgli_linebuf_create(mowgli_eventloop_t *eventloop, mowgli_linebuf_readline_cb_t *cb, void *userdata);
+extern mowgli_linebuf_t * mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata);
+extern void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_start(mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 
@@ -276,7 +277,6 @@ struct _mowgli_linebuf_buf {
 
 /* Informative */
 #define MOWGLI_LINEBUF_LINE_HASNULLCHAR		0x0004
-
 
 struct _mowgli_linebuf {
 	mowgli_linebuf_readline_cb_t *readline_cb;
