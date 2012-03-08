@@ -30,7 +30,7 @@ AC_CHECK_FUNCS([fcntl kqueue mmap select])
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
 
-LIBMOWGLI_MODULES="core base atomic container eventloop ext module object thread vio"
+LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio"
 AC_SUBST(LIBMOWGLI_MODULES)
 
 LIBMOWGLI_SHARED_MODULES=""

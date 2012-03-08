@@ -47,10 +47,7 @@ MOWGLI_DECLS_START
 #include "core/exception.h"
 #include "core/iterator.h"
 
-#include "atomic/atomic.h"
-
 #include "core/alloc.h"
-#include "atomic/spinlock.h"
 #include "container/list.h"
 #include "object/class.h"
 #include "object/object.h"
