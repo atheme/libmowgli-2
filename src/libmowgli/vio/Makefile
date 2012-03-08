@@ -3,7 +3,7 @@ include ../../../extra.mk
 STATIC_PIC_LIB_NOINST = mowgli.vio.lib.a
 STATIC_LIB_NOINST = mowgli.vio.a
 
-SRCS = vio.c vio_openssl.c
+SRCS = vio.c vio-openssl.c
 
 INCLUDES = vio.h vio-types.h
 
