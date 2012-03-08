@@ -7,9 +7,9 @@ SRCS = loader_${LIBMOWGLI_OS}.c
 
 INCLUDES = module.h
 
-includesubdir = $(PACKAGE)/module
-
 include ../../../buildsys.mk
+
+includesubdir = $(PACKAGE)/module
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

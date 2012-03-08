@@ -19,9 +19,9 @@ INCLUDES = argstack.h		\
 	   random.h		\
 	   mowgli_signal.h
 
-includesubdir = $(PACKAGE)/base
-
 include ../../../buildsys.mk
+
+includesubdir = $(PACKAGE)/base
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

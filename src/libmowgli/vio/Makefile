@@ -7,9 +7,9 @@ SRCS = vio.c vio-openssl.c
 
 INCLUDES = vio.h vio-types.h
 
-includesubdir = $(PACKAGE)/vio
-
 include ../../../buildsys.mk
+
+includesubdir = $(PACKAGE)/vio
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

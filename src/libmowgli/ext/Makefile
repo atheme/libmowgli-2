@@ -15,9 +15,9 @@ INCLUDES = confparse.h			\
 	   global_storage.h		\
 	   program_opts.h
 
-includesubdir = $(PACKAGE)/ext
-
 include ../../../buildsys.mk
+
+includesubdir = $(PACKAGE)/ext
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

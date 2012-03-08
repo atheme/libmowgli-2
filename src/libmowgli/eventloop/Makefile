@@ -7,9 +7,9 @@ SRCS = eventloop.c helper.c pollable.c timer.c null_pollops.c poll_pollops.c epo
 
 INCLUDES = eventloop.h
 
-includesubdir = $(PACKAGE)/eventloop
-
 include ../../../buildsys.mk
+
+includesubdir = $(PACKAGE)/eventloop
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 
