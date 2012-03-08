@@ -65,7 +65,7 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 	if (connection->ssl_handle == NULL)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
-	
+
 	return 0;
 }
 
@@ -85,11 +85,10 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
 {
 	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
-	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
-	
-	if ((ret = connect(vio->fd, addr, len)) < 0)
+
+	if (connect(vio->fd, addr, len) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
@@ -166,7 +165,7 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	if ((ret = (int)SSL_write(connection->ssl_handle, buffer, len)) == -1)
 	{
 		unsigned long err = ERR_get_error();
-		
+
 		/* Can't write */
 		if (err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_READ)
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
