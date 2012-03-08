@@ -1,5 +1,8 @@
 include ../../extra.mk
 
+LIB_MAJOR = 0
+LIB_MINOR = 0
+
 SHARED_LIB = ${LIBMOWGLI_SHARED_LIB}
 STATIC_LIB = ${LIBMOWGLI_STATIC_LIB}
 
