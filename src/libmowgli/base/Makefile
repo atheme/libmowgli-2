@@ -8,7 +8,6 @@ SRCS = argstack.c		\
        formatter.c		\
        hash.c			\
        hook.c			\
-       mempool.c		\
        random.c			\
        mowgli_signal.c
 
@@ -17,7 +16,6 @@ INCLUDES = argstack.h		\
 	   formatter.h		\
 	   hash.h		\
 	   hook.h		\
-	   mempool.h		\
 	   random.h		\
 	   mowgli_signal.h
 

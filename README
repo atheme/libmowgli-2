@@ -37,7 +37,6 @@ It contains:
     - mowgli_list: A high performance linked lists implementation with O(1) scalability
                    for most common operations.
     - mowgli_logger: An internal class for handling logging of exceptions.
-    - mowgli_memorypool: A class which allows for memory pooling.
     - mowgli_module: A wrapper around dlopen(3) and dlsym(3).
     - mowgli_object: A simple class which provides reference counted pointers and
                      polymorphism of structs.

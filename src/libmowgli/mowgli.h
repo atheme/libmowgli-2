@@ -56,7 +56,6 @@ MOWGLI_DECLS_START
 #include "object/object.h"
 #include "core/allocation_policy.h"
 #include "container/patricia.h"
-#include "base/mempool.h"
 #include "module/module.h"
 #include "container/queue.h"
 #include "base/hash.h"
