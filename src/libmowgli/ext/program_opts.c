@@ -100,7 +100,7 @@ static inline mowgli_getopt_option_t *
 mowgli_program_opts_convert(const mowgli_program_opts_t *opts, size_t opts_size)
 {
 	mowgli_getopt_option_t *g_opts;
-	int i;
+	size_t i;
 
 	return_val_if_fail(opts != NULL, NULL);
 
@@ -125,7 +125,7 @@ mowgli_program_opts_compute_optstr(const mowgli_program_opts_t *opts, size_t opt
 {
 	static char buf[256];
 	char *p = buf;
-	int i;
+	size_t i;
 
 	return_val_if_fail(opts != NULL, NULL);
 
@@ -165,7 +165,8 @@ mowgli_program_opts_parse(const mowgli_program_opts_t *opts, size_t opts_size, i
 {
 	mowgli_getopt_option_t *g_opts;
 	const char *shortops;
-	int c, i;
+	int c;
+	size_t i;
 	int opt_index;
 
 	return_if_fail(opts != NULL);
