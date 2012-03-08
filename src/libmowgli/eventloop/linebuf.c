@@ -55,21 +55,21 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 
 	linebuf->userdata = userdata;
 
+	linebuf->vio = mowgli_vio_create(linebuf);
+
 	return linebuf;
 }
 
-/* Attach the linebuf instance to the eventloop -- socket must be created first! */
-void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mowgli_linebuf_t *linebuf)
+/* Attach the linebuf instance to the eventloop -- socket must be created first with VIO instance! */
+void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventloop_t *eventloop)
 {
-	return_if_fail(vio != NULL);
 	return_if_fail(eventloop != NULL);
 	return_if_fail(linebuf != NULL);
-	return_if_fail((vio->flags & MOWGLI_VIO_FLAGS_ISCLOSED) == 0);
+	return_if_fail(linebuf->vio != NULL);
+	return_if_fail((linebuf->vio->flags & MOWGLI_VIO_FLAGS_ISCLOSED) == 0);
 
-	linebuf->vio = vio;
-
-	mowgli_vio_pollable_create(vio, eventloop);
-	mowgli_pollable_setselect(eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
+	mowgli_vio_pollable_create(linebuf->vio, eventloop);
+	mowgli_pollable_setselect(eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 }
 
 void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)

@@ -55,8 +55,9 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	}
 
 	client = mowgli_alloc(sizeof(client_t));
-	client->linebuf = mowgli_linebuf_create(base_eventloop, eat_line, client);
-	vio = client->linebuf->vio;
+
+	client->linebuf = mowgli_linebuf_create(eat_line, client);
+	vio = mowgli_linebuf_get_vio(client->linebuf);
 
 	/* Do name res */
 	memset(&hints, 0, sizeof hints);
@@ -77,8 +78,8 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	if (mowgli_vio_socket(vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
 		return NULL;
 
-	/* Start the linebuf */
-	mowgli_linebuf_start(client->linebuf);
+	/* Attach the linebuf */
+	mowgli_linebuf_attach_to_eventloop(client->linebuf, base_eventloop);
 
 	/* Wrap the VIO object */
 	if (use_ssl)

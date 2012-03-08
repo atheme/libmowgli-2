@@ -257,8 +257,7 @@ typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 typedef void mowgli_linebuf_readline_cb_t(mowgli_linebuf_t *, char *, size_t, void *);
 
 extern mowgli_linebuf_t * mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata);
-extern void mowgli_linebuf_attach(mowgli_eventloop_t *eventloop, mowgli_vio_t *vio, mowgli_linebuf_t *linebuf);
-extern void mowgli_linebuf_start(mowgli_linebuf_t *linebuf);
+extern void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventloop_t *eventloop);
 extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 
 extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
@@ -294,5 +293,12 @@ struct _mowgli_linebuf {
 
 	void *userdata;
 };
+
+static inline mowgli_vio_t * mowgli_linebuf_get_vio(mowgli_linebuf_t *linebuf)
+{
+	return_val_if_fail(linebuf != NULL, NULL);
+	return linebuf->vio;
+}
+
 
 #endif        
