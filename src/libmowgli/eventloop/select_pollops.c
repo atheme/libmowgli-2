@@ -115,7 +115,6 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	mowgli_eventloop_pollable_t *pollable;
 	mowgli_select_eventloop_private_t *priv;
 	int highest_fd = 0;
-	int sr;
 	fd_set rfds, wfds, efds;
 	struct timeval tv;
 
@@ -156,7 +155,7 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 
 	tv.tv_sec = 1;
 
-	if ((sr = select(highest_fd + 1, &rfds, &wfds, &efds, &tv)) > 0)
+	if (select(highest_fd + 1, &rfds, &wfds, &efds, &tv) > 0)
 	{
 		mowgli_eventloop_synchronize(eventloop);
 

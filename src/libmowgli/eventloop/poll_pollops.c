@@ -163,7 +163,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 	nfds_t nfds;
 	mowgli_eventloop_pollable_t *pollable;
 	mowgli_poll_eventloop_private_t *priv;
-	int sr, slot;
+	int slot;
 
 	return_if_fail(eventloop != NULL);
 
@@ -171,7 +171,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 
 	nfds = update_poll_fds(eventloop);
 
-	if ((sr = poll(priv->pollfds, nfds, time)) > 0)
+	if (poll(priv->pollfds, nfds, time) > 0)
 	{
 		mowgli_eventloop_synchronize(eventloop);
 
