@@ -64,6 +64,7 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
 	return_val_if_fail(vio->fd >= 0, -1);
+
 	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
 	vio->eventloop = eventloop;
 
@@ -94,7 +95,7 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 
 	/* We can't call socket with AF_UNSPEC on most platforms >_> */
 	if (family == AF_UNSPEC)
-		family = AF_INET;
+		family = AF_INET6;	/* This is fine, IPv4 will still work via a 6to4 mapping */
 
 	if ((fd = socket(family, type, proto)) == -1)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno)
