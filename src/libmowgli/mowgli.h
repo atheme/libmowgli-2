@@ -78,6 +78,8 @@ MOWGLI_DECLS_START
 #include "ext/confparse.h"
 #include "ext/program_opts.h"
 
+#include "linebuf/linebuf.h"
+
 MOWGLI_DECLS_END
 
 #endif

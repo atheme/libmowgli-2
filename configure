@@ -3875,7 +3875,7 @@ fi
 
 
 
-LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio"
+LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio linebuf"
 
 
 LIBMOWGLI_SHARED_MODULES=""
