@@ -36,7 +36,7 @@ typedef struct {
 	int flags;
 } mowgli_ssl_connection_t;
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len);
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
@@ -82,13 +82,13 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 	return connection->ssl_context;
 }
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 {
 	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, addr, len) < 0)
+	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);

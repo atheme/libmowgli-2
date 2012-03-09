@@ -78,8 +78,8 @@ typedef struct _mowgli_vio_error {
 
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
-typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, const struct sockaddr *, socklen_t);
-typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *, struct sockaddr *, socklen_t *);
+typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *);
 typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
 typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
 
@@ -100,6 +100,9 @@ struct _mowgli_vio {
 	mowgli_eventloop_t *eventloop;
 	mowgli_eventloop_io_t *io;
 	mowgli_descriptor_t fd;
+
+	struct sockaddr *addr;
+	socklen_t addrlen;
 
 	mowgli_vio_error_t error;
 

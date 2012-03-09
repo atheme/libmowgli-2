@@ -28,8 +28,8 @@ extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
 extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
-extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len);
-extern int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len);
+extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
+extern int mowgli_vio_default_connect(mowgli_vio_t *vio);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
@@ -51,14 +51,14 @@ static inline int mowgli_vio_listen(mowgli_vio_t *vio, int backlog)
 	return vio->ops.listen(vio, backlog);
 }
 
-static inline int mowgli_vio_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len)
+static inline int mowgli_vio_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
-	return vio->ops.accept(vio, newvio, addr, len);
+	return vio->ops.accept(vio, newvio);
 }
 
-static inline int mowgli_vio_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
+static inline int mowgli_vio_connect(mowgli_vio_t *vio)
 {
-	return vio->ops.connect(vio, addr, len);
+	return vio->ops.connect(vio);
 }
 
 static inline int mowgli_vio_read(mowgli_vio_t *vio, void *buffer, size_t len)

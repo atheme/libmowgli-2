@@ -126,7 +126,7 @@ int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 	return 0;
 }
 
-int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len)
+int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
 	int fd;
 
@@ -140,7 +140,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct so
 		return mowgli_vio_error(vio);
 	}
 
-	if ((fd = accept(vio->fd, addr, len)) < 0)
+	if ((fd = accept(vio->fd, newvio->addr, &(newvio->addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -158,11 +158,11 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct so
 	return 0;
 }
 
-int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)
+int mowgli_vio_default_connect(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, addr, len) < 0)
+	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
