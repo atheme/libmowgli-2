@@ -118,7 +118,7 @@ unsigned int mowgli_random_int(mowgli_random_t *self)
 
 int mowgli_random_int_ranged(mowgli_random_t *self, int begin, int end)
 {
-	int dist = end - begin;
+	unsigned int dist = end - begin;
 	unsigned int max, ret;
 
 	if (dist <= 0x80000000U)
