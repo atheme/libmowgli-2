@@ -42,6 +42,8 @@ main(int argc, char *argv[])
 	void **ptrs;
         struct timeval ts, te;
 
+	mowgli_thread_set_policy(MOWGLI_THREAD_POLICY_DISABLED);
+
 	objects = 128000;
 	ptrs = mowgli_alloc_array(sizeof(void *), objects);
 	obj_sizes = mowgli_alloc_array(sizeof(size_t), objects);
@@ -61,11 +63,11 @@ main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	printf("Going to allocate %zu objects of random sizes < PAGE_SIZE/2\n", objects);
+	printf("Going to allocate %zu objects of random sizes < 256\n", objects);
 
 	printf("Assigning sizes...\n");
 	for (i = 0; i < objects; i++) {
-		obj_sizes[i] = rand() % 2048;
+		obj_sizes[i] = rand() % 256;
 	}
 	printf("Done!  Lets benchmark.\n");
 
