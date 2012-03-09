@@ -57,6 +57,8 @@ mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t alloc
 	policy->allocate = allocator;
 	policy->deallocate = deallocator;
 
+	mowgli_patricia_add(mowgli_allocation_policy_dict, name, policy);
+
 	return policy;
 }
 
