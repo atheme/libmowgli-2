@@ -8,6 +8,7 @@ SRCS = argstack.c		\
        formatter.c		\
        hash.c			\
        hook.c			\
+       memslice.c		\
        random.c			\
        mowgli_signal.c
 
