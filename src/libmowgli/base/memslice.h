@@ -1,8 +1,5 @@
 /*
- * libmowgli: A collection of useful routines for programming.
- * mowgli_allocation_policy.h: Allocation policy management.
- *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2012 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -21,25 +18,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ALLOCATION_POLICY_H__
-#define __MOWGLI_ALLOCATION_POLICY_H__
+#ifndef __MOWGLI_MEMSLICE_H__
+#define __MOWGLI_MEMSLICE_H__
 
-typedef void *(*mowgli_allocation_func_t)(size_t size);
-typedef void (*mowgli_deallocation_func_t)(void *ptr);
-
-typedef struct {
-	mowgli_object_t parent;
-	mowgli_allocation_func_t allocate;
-	mowgli_deallocation_func_t deallocate;
-} mowgli_allocation_policy_t;
-
-void mowgli_allocation_policy_init(void);
-mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name,
-	mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
-mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);
-
-/* for mowgli_alloc, et. al */
-void mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy);
-void mowgli_allocator_set_policy_by_name(const char *name);
+void mowgli_memslice_init(void);
+mowgli_allocation_policy_t *mowgli_memslice_get_policy(void);
 
 #endif

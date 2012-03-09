@@ -47,11 +47,12 @@ MOWGLI_DECLS_START
 #include "core/exception.h"
 #include "core/iterator.h"
 
-#include "core/alloc.h"
 #include "container/list.h"
 #include "object/class.h"
 #include "object/object.h"
 #include "core/allocation_policy.h"
+#include "core/alloc.h"
+#include "base/memslice.h"
 #include "container/patricia.h"
 #include "module/module.h"
 #include "container/queue.h"

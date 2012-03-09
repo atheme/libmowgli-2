@@ -2,7 +2,7 @@
  * libmowgli: A collection of useful routines for programming.
  * mowgli_alloc.c: Safe, portable implementations of malloc, calloc, and free.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007, 2012 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,9 +26,12 @@
 /*
  * bootstrapped allocators so that we can initialise without blowing up
  */
+typedef struct {
+	mowgli_allocation_policy_t *allocator;
+} alloc_tag_t;
 
 static void *
-_mowgli_bootstrap_alloc(int size)
+_mowgli_bootstrap_alloc(size_t size)
 {
 	return calloc(size, 1);
 }
@@ -60,11 +63,51 @@ static mowgli_allocation_policy_t *_mowgli_allocator = &_mowgli_allocator_bootst
  * \return A pointer to a memory buffer.
  */
 void *
+mowgli_alloc_array_using_policy(mowgli_allocation_policy_t *policy, size_t size, size_t count)
+{
+	size_t adj_size;
+	void *r;
+
+	return_val_if_fail(policy != NULL, NULL);
+
+	adj_size = (size * count) + sizeof(alloc_tag_t);
+
+	r = policy->allocate(adj_size);
+	((alloc_tag_t *)r)->allocator = policy;
+
+	return r + sizeof(alloc_tag_t);
+}
+
+/*
+ * \brief Allocates an object of "size" size.
+ *
+ * This is the equivilant of calling mowgli_alloc_array(size, 1).
+ *
+ * \param size size of object to allocate.
+ *
+ * \return A pointer to a memory buffer.
+ */
+void *
+mowgli_alloc_using_policy(mowgli_allocation_policy_t *policy, size_t size)
+{
+	return mowgli_alloc_array_using_policy(policy, size, 1);
+}
+
+/*
+ * \brief Allocates an array of data that contains "count" objects,
+ * of "size" size.
+ *
+ * Usually, this wraps calloc().
+ *
+ * \param size size of objects to allocate.
+ * \param count amount of objects to allocate.
+ *
+ * \return A pointer to a memory buffer.
+ */
+void *
 mowgli_alloc_array(size_t size, size_t count)
 {
-	return_val_if_fail(_mowgli_allocator != NULL, NULL);
-
-	return _mowgli_allocator->allocate(size * count);
+	return mowgli_alloc_array_using_policy(_mowgli_allocator, size, count);
 }
 
 /*
@@ -79,7 +122,7 @@ mowgli_alloc_array(size_t size, size_t count)
 void *
 mowgli_alloc(size_t size)
 {
-	return mowgli_alloc_array(size, 1);
+	return mowgli_alloc_array_using_policy(_mowgli_allocator, size, 1);
 }
 
 /*
@@ -92,10 +135,12 @@ mowgli_alloc(size_t size)
 void
 mowgli_free(void *ptr)
 {
-	return_if_fail(_mowgli_allocator != NULL);
+	alloc_tag_t *tag;
+
 	return_if_fail(ptr != NULL);
 
-	_mowgli_allocator->deallocate(ptr);
+	tag = (alloc_tag_t *) (ptr - sizeof(alloc_tag_t));
+	tag->allocator->deallocate(tag);
 }
 
 /*

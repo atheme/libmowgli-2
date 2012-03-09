@@ -1,3 +1,3 @@
-SUBDIRS = echoserver formattertest helpertest libevent-bench linetest listsort patriciatest patriciatest2 randomtest timertest
+SUBDIRS = echoserver formattertest helpertest libevent-bench linetest listsort memslice-bench patriciatest patriciatest2 randomtest timertest
 
 include ../../buildsys.mk
