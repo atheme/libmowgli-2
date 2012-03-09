@@ -138,3 +138,9 @@ mowgli_memslice_init(void)
 
 	memslice = mowgli_allocation_policy_create("memslice", memslice_alloc, memslice_free);
 }
+
+mowgli_allocation_policy_t *
+mowgli_memslice_get_policy(void)
+{
+	return memslice;
+}
