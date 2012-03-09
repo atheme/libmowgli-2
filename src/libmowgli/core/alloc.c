@@ -2,7 +2,7 @@
  * libmowgli: A collection of useful routines for programming.
  * mowgli_alloc.c: Safe, portable implementations of malloc, calloc, and free.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007, 2012 William Pitcock <nenolod@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -26,6 +26,9 @@
 /*
  * bootstrapped allocators so that we can initialise without blowing up
  */
+typedef struct {
+	mowgli_allocation_policy_t *allocator;
+} alloc_tag_t;
 
 static void *
 _mowgli_bootstrap_alloc(int size)
@@ -62,9 +65,17 @@ static mowgli_allocation_policy_t *_mowgli_allocator = &_mowgli_allocator_bootst
 void *
 mowgli_alloc_array(size_t size, size_t count)
 {
+	size_t adj_size;
+	void *r;
+
 	return_val_if_fail(_mowgli_allocator != NULL, NULL);
 
-	return _mowgli_allocator->allocate(size * count);
+	adj_size = (size * count) + sizeof(alloc_tag_t);
+
+	r = _mowgli_allocator->allocate(adj_size);
+	((alloc_tag_t *)r)->allocator = _mowgli_allocator;
+
+	return r + sizeof(alloc_tag_t);
 }
 
 /*
@@ -92,10 +103,12 @@ mowgli_alloc(size_t size)
 void
 mowgli_free(void *ptr)
 {
-	return_if_fail(_mowgli_allocator != NULL);
+	alloc_tag_t *tag;
+
 	return_if_fail(ptr != NULL);
 
-	_mowgli_allocator->deallocate(ptr);
+	tag = (alloc_tag_t *) (ptr - sizeof(alloc_tag_t));
+	tag->allocator->deallocate(tag);
 }
 
 /*
