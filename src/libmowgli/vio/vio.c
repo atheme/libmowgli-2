@@ -35,6 +35,18 @@
 
 static mowgli_heap_t *vio_heap = NULL;
 
+/* Change these to suit your needs for new VIO objects */
+mowgli_vio_ops_t mowgli_vio_default_ops = {
+	.socket = mowgli_vio_default_socket,
+	.listen = mowgli_vio_default_listen,
+	.accept = mowgli_vio_default_accept,
+	.connect = mowgli_vio_default_connect,
+	.read = mowgli_vio_default_read,
+	.write = mowgli_vio_default_write,
+	.error = mowgli_vio_default_error,
+	.close = mowgli_vio_default_close,
+};
+
 mowgli_vio_t * mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
@@ -49,14 +61,7 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio->flags = 0;
 
 	/* Default ops */
-	mowgli_vio_set_op(vio, socket, mowgli_vio_default_socket);
-	mowgli_vio_set_op(vio, listen, mowgli_vio_default_listen);
-	mowgli_vio_set_op(vio, accept, mowgli_vio_default_accept);
-	mowgli_vio_set_op(vio, connect, mowgli_vio_default_connect);
-	mowgli_vio_set_op(vio, read, mowgli_vio_default_read);
-	mowgli_vio_set_op(vio, write, mowgli_vio_default_write);
-	mowgli_vio_set_op(vio, error, mowgli_vio_default_error);
-	mowgli_vio_set_op(vio, close, mowgli_vio_default_close);
+	vio->ops = mowgli_vio_default_ops;
 
 	vio->userdata = userdata;
 

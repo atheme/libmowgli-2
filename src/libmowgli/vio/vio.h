@@ -36,8 +36,11 @@ extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
 extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio);
+/* These are void ptr's so they can be null ops if SSL isn't available */
 extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
+
+extern mowgli_vio_ops_t mowgli_vio_default_ops;
 
 #define mowgli_vio_set_op(vio, operation, func) (vio)->ops.operation = func;
 
