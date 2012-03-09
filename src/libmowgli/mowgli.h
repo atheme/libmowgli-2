@@ -48,6 +48,7 @@ MOWGLI_DECLS_START
 #include "core/iterator.h"
 
 #include "core/alloc.h"
+#include "base/memslice.h"
 #include "container/list.h"
 #include "object/class.h"
 #include "object/object.h"

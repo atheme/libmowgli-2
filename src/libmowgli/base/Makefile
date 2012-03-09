@@ -17,6 +17,7 @@ INCLUDES = argstack.h		\
 	   formatter.h		\
 	   hash.h		\
 	   hook.h		\
+	   memslice.h		\
 	   random.h		\
 	   mowgli_signal.h
 

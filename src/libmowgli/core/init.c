@@ -46,6 +46,7 @@ MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 	mowgli_random_init();
 	mowgli_allocation_policy_init();
 	mowgli_allocator_init();
+	mowgli_memslice_init();
 
 	/* now that we're bootstrapped, we can use a more optimised allocator
 	   if one is available. */
