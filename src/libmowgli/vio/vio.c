@@ -120,7 +120,7 @@ int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 	
 	vio->flags |= MOWGLI_VIO_FLAGS_ISSERVER;
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLIENT;
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
