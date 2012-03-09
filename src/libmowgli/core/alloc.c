@@ -63,17 +63,17 @@ static mowgli_allocation_policy_t *_mowgli_allocator = &_mowgli_allocator_bootst
  * \return A pointer to a memory buffer.
  */
 void *
-mowgli_alloc_array(size_t size, size_t count)
+mowgli_alloc_array_using_policy(mowgli_allocation_policy_t *policy, size_t size, size_t count)
 {
 	size_t adj_size;
 	void *r;
 
-	return_val_if_fail(_mowgli_allocator != NULL, NULL);
+	return_val_if_fail(policy != NULL, NULL);
 
 	adj_size = (size * count) + sizeof(alloc_tag_t);
 
-	r = _mowgli_allocator->allocate(adj_size);
-	((alloc_tag_t *)r)->allocator = _mowgli_allocator;
+	r = policy->allocate(adj_size);
+	((alloc_tag_t *)r)->allocator = policy;
 
 	return r + sizeof(alloc_tag_t);
 }
@@ -88,9 +88,41 @@ mowgli_alloc_array(size_t size, size_t count)
  * \return A pointer to a memory buffer.
  */
 void *
+mowgli_alloc_using_policy(mowgli_allocation_policy_t *policy, size_t size)
+{
+	return mowgli_alloc_array_using_policy(policy, size, 1);
+}
+
+/*
+ * \brief Allocates an array of data that contains "count" objects,
+ * of "size" size.
+ *
+ * Usually, this wraps calloc().
+ *
+ * \param size size of objects to allocate.
+ * \param count amount of objects to allocate.
+ *
+ * \return A pointer to a memory buffer.
+ */
+void *
+mowgli_alloc_array(size_t size, size_t count)
+{
+	return mowgli_alloc_array_using_policy(_mowgli_allocator, size, count);
+}
+
+/*
+ * \brief Allocates an object of "size" size.
+ *
+ * This is the equivilant of calling mowgli_alloc_array(size, 1).
+ *
+ * \param size size of object to allocate.
+ *
+ * \return A pointer to a memory buffer.
+ */
+void *
 mowgli_alloc(size_t size)
 {
-	return mowgli_alloc_array(size, 1);
+	return mowgli_alloc_array_using_policy(_mowgli_allocator, size, 1);
 }
 
 /*

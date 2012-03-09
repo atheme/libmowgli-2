@@ -24,6 +24,9 @@
 #ifndef __MOWGLI_ALLOC_H__
 #define __MOWGLI_ALLOC_H__
 
+extern void * mowgli_alloc_array_using_policy(mowgli_allocation_policy_t *policy, size_t size, size_t count);
+extern void * mowgli_alloc_using_policy(mowgli_allocation_policy_t *policy, size_t size);
+
 extern void * mowgli_alloc_array(size_t size, size_t count);
 extern void * mowgli_alloc(size_t size);
 extern void mowgli_free(void *ptr);
