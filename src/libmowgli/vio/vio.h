@@ -27,6 +27,8 @@ extern void mowgli_vio_pollable_destroy(mowgli_vio_t *vio);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
+extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
+extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
@@ -42,6 +44,16 @@ extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type, int flags)
 {
 	return vio->ops.socket(vio, family, type, flags);
+}
+
+static inline int mowgli_vio_listen(mowgli_vio_t *vio, int backlog)
+{
+	return vio->ops.listen(vio, backlog);
+}
+
+static inline int mowgli_vio_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len)
+{
+	return vio->ops.accept(vio, newvio, addr, len);
 }
 
 static inline int mowgli_vio_connect(mowgli_vio_t *vio, const struct sockaddr *addr, socklen_t len)

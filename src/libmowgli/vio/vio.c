@@ -50,6 +50,8 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 
 	/* Default ops */
 	mowgli_vio_set_op(vio, socket, mowgli_vio_default_socket);
+	mowgli_vio_set_op(vio, listen, mowgli_vio_default_listen);
+	mowgli_vio_set_op(vio, accept, mowgli_vio_default_accept);
 	mowgli_vio_set_op(vio, connect, mowgli_vio_default_connect);
 	mowgli_vio_set_op(vio, read, mowgli_vio_default_read);
 	mowgli_vio_set_op(vio, write, mowgli_vio_default_write);
@@ -98,14 +100,61 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 		family = AF_INET6;	/* This is fine, IPv4 will still work via a 6to4 mapping */
 
 	if ((fd = socket(family, type, proto)) == -1)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
 	vio->fd = fd;
-	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
 
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+	return 0;
+}
+
+int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
+{
+	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
+
+	if (listen(vio->fd, backlog) < 0)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+	
+	vio->flags |= MOWGLI_VIO_FLAGS_ISSERVER;
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLIENT;
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+	return 0;
+}
+
+int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio, struct sockaddr *addr, socklen_t *len)
+{
+	int fd;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_ACCEPT;
+
+	if (!newvio)
+	{
+		const char errstr[] = "accept not called with valid new VIO object";
+		vio->error.type = MOWGLI_VIO_ERR_API;
+		mowgli_strlcpy(vio->error.string, errstr, sizeof(errstr));
+		return mowgli_vio_error(vio);
+	}
+
+	if ((fd = accept(vio->fd, addr, len)) < 0)
+	{
+		if (!mowgli_eventloop_ignore_errno(errno))
+		{
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	newvio->fd = fd;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
 }
 
@@ -116,9 +165,17 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, const struct sockaddr *addr, s
 	if (connect(vio->fd, addr, len) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
+		{
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
+	vio->flags |= MOWGLI_VIO_FLAGS_ISCLIENT;
+	vio->flags &= ~MOWGLI_VIO_FLAGS_ISSERVER;
 	vio->flags |= MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
 
@@ -135,7 +192,13 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	if ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
+		{
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else if (errno != 0)
+		{
+			return 0;
+		}
 
 		if (ret == 0)
 		{
@@ -150,6 +213,7 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	}
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -157,13 +221,23 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	int ret;
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
 	if ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
+	{
 		if (!mowgli_eventloop_ignore_errno(errno))
+		{
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -179,6 +253,12 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 		break;
 	case MOWGLI_VIO_ERR_OP_WRITE:
 		errtype = "Write";
+		break;
+	case MOWGLI_VIO_ERR_OP_LISTEN:
+		errtype = "Listen";
+		break;
+	case MOWGLI_VIO_ERR_OP_ACCEPT:
+		errtype = "Accept";
 		break;
 	case MOWGLI_VIO_ERR_OP_CONNECT:
 		errtype = "Connect";

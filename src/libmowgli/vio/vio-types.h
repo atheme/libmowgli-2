@@ -26,12 +26,15 @@ typedef enum {
 	MOWGLI_VIO_ERR_NONE,
 	MOWGLI_VIO_ERR_REMOTE_HANGUP,
 	MOWGLI_VIO_ERR_ERRCODE,
+	MOWGLI_VIO_ERR_API,
 	MOWGLI_VIO_ERR_CUSTOM,
 } mowgli_vio_error_type_t;
 
 typedef enum {
 	MOWGLI_VIO_ERR_OP_NONE,
 	MOWGLI_VIO_ERR_OP_SOCKET,
+	MOWGLI_VIO_ERR_OP_LISTEN,
+	MOWGLI_VIO_ERR_OP_ACCEPT,
 	MOWGLI_VIO_ERR_OP_CONNECT,
 	MOWGLI_VIO_ERR_OP_READ,
 	MOWGLI_VIO_ERR_OP_WRITE,
@@ -76,11 +79,15 @@ typedef struct _mowgli_vio_error {
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *, const struct sockaddr *, socklen_t);
+typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *, struct sockaddr *, socklen_t *);
+typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
 typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
 
 typedef struct {
 	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_connect_func_t *connect;
+	mowgli_vio_listen_func_t *listen;
+	mowgli_vio_accept_func_t *accept;
 	mowgli_vio_rw_func_t *read;
 	mowgli_vio_rw_func_t *write;
 	mowgli_vio_func_t *error;
@@ -104,5 +111,7 @@ struct _mowgli_vio {
 
 #define MOWGLI_VIO_FLAGS_ISCONNECTING		0x00001
 #define MOWGLI_VIO_FLAGS_ISCLOSED		0x00002
+#define MOWGLI_VIO_FLAGS_ISCLIENT		0x00004
+#define MOWGLI_VIO_FLAGS_ISSERVER		0x00008
 
 #endif
