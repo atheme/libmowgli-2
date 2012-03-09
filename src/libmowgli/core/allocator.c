@@ -26,7 +26,7 @@
 mowgli_allocation_policy_t *mowgli_allocator_malloc = NULL;
 
 static void *
-mowgli_allocator_func_malloc(int size)
+mowgli_allocator_func_malloc(size_t size)
 {
 	return calloc(size, 1);
 }

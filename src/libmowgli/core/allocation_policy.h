@@ -24,7 +24,7 @@
 #ifndef __MOWGLI_ALLOCATION_POLICY_H__
 #define __MOWGLI_ALLOCATION_POLICY_H__
 
-typedef void *(*mowgli_allocation_func_t)(int size);
+typedef void *(*mowgli_allocation_func_t)(size_t size);
 typedef void (*mowgli_deallocation_func_t)(void *ptr);
 
 typedef struct {

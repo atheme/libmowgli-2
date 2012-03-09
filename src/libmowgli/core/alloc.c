@@ -31,7 +31,7 @@ typedef struct {
 } alloc_tag_t;
 
 static void *
-_mowgli_bootstrap_alloc(int size)
+_mowgli_bootstrap_alloc(size_t size)
 {
 	return calloc(size, 1);
 }
