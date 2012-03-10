@@ -56,6 +56,13 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 
 	vio = mowgli_heap_alloc(vio_heap);
 
+	mowgli_vio_init(vio, userdata);
+
+	return vio;
+}
+
+void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
+{
 	vio->fd = -1;
 
 	vio->flags = 0;
@@ -64,8 +71,6 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	vio->ops = mowgli_vio_default_ops;
 
 	vio->userdata = userdata;
-
-	return vio;
 }
 
 int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)

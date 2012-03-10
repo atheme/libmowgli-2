@@ -22,6 +22,7 @@
 #include "vio/vio-types.h"
 
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
+extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
 extern int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 extern void mowgli_vio_pollable_destroy(mowgli_vio_t *vio);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
