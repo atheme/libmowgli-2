@@ -23,12 +23,13 @@
 
 /* Flags */
 #define MOWGLI_VIO_FLAGS_ISCONNECTING		0x00001
-#define MOWGLI_VIO_FLAGS_ISCLOSED		0x00002
+#define MOWGLI_VIO_FLAGS_ISSSLCONNECTING	0x00002
+#define MOWGLI_VIO_FLAGS_ISCLOSED		0x00004
 
-#define MOWGLI_VIO_FLAGS_ISCLIENT		0x00004
-#define MOWGLI_VIO_FLAGS_ISSERVER		0x00008
+#define MOWGLI_VIO_FLAGS_ISCLIENT		0x00008
+#define MOWGLI_VIO_FLAGS_ISSERVER		0x00010
 
-#define MOWGLI_VIO_FLAGS_ISONHEAP		0x00010
+#define MOWGLI_VIO_FLAGS_ISONHEAP		0x00020
 
 static inline bool mowgli_vio_hasflag(mowgli_vio_t *vio, int flag)
 {
@@ -87,7 +88,7 @@ extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
-extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr);
+extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, void *attr);
 /* These are void ptr's so they can be null ops if SSL isn't available */
 extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);

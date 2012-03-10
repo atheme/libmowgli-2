@@ -33,17 +33,19 @@
 typedef struct {
 	SSL *ssl_handle;
 	SSL_CTX *ssl_context;
-	mowgli_patricia_t *attrs;
 } mowgli_ssl_connection_t;
 
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
+static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
 static mowgli_heap_t *ssl_heap = NULL;
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr)
+static bool openssl_init = false;
+
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, void *attr)
 {
 	mowgli_ssl_connection_t *connection; 
 
@@ -51,11 +53,7 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr)
 		ssl_heap = mowgli_heap_create(sizeof(mowgli_ssl_connection_t), 64, BH_NOW);
 
 	connection = mowgli_heap_alloc(ssl_heap);
-
 	vio->privdata = connection;
-
-	/* Set default attrs */
-	connection->attrs = attr;
 
 	/* Change ops */
 	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_connect);
@@ -64,19 +62,12 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr)
 	mowgli_vio_set_op(vio, close, mowgli_vio_openssl_close);
 
 	/* SSL setup */
-	SSL_load_error_strings();
-	SSL_library_init();
-
-	/* Good default; most stuff isn't using TLSv1 or above yet (unfortunately)
-	 * The library will negotiate something better if supported.
-	 */
-	connection->ssl_context = SSL_CTX_new(SSLv3_client_method());
-	if (connection->ssl_context == NULL)
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
-
-	connection->ssl_handle = SSL_new(connection->ssl_context);
-	if (connection->ssl_handle == NULL)
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+	if (!openssl_init)
+	{
+		openssl_init = true;
+		SSL_load_error_strings();
+		SSL_library_init();
+	}
 
 	return 0;
 }
@@ -96,18 +87,31 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 {
-	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
-
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
+	mowgli_ssl_connection_t *connection = vio->privdata;
 
 	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
+		{
 			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else
+		{
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, true);
+			vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+			return 0;
+		}
 	}
 
-	SSL_load_error_strings();
-	SSL_library_init();
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+	return mowgli_vio_openssl_ssl_handshake(vio, connection);
+}
+
+static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
+{
+	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
 	/* Good default; most stuff isn't using TLSv1 or above yet (unfortunately)
 	 * The library will negotiate something better if supported.
@@ -119,19 +123,30 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 	if (connection->ssl_handle == NULL)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
-
+	
 	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
-	if (SSL_connect(connection->ssl_handle) != 1)
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
-
+	/* XXX not what we want for non-blocking sockets if they're in use! */
 	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
-	vio->privdata = connection;
+	if (SSL_connect(connection->ssl_handle) != 1)
+	{
+		unsigned long err = ERR_get_error();
 
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCONNECTING;
+		if (err != SSL_ERROR_WANT_READ && err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_CONNECT)
+		{
+			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
+		}
+		else
+		{
+			return 0;
+		}
+	}
 
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
 }
 
@@ -140,15 +155,29 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
+	/* eventloop spits us here once a connection is established */
+	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING) || mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
+	{
+		return mowgli_vio_openssl_ssl_handshake(vio, connection);
+	}
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
+ssl_read:
 	if ((ret = (int)SSL_read(connection->ssl_handle, buffer, len)) < 0)
 	{
 		unsigned long err = ERR_get_error();
 
-		/* SSL_ERROR_WANT_WRITE is not caught -- the callee may need to schedule a write */
-		if (err != SSL_ERROR_WANT_READ)
+		if (err == SSL_ERROR_WANT_WRITE)
+		{
+			/* XXX */
+			mowgli_vio_write(vio, NULL, 0);
+			goto ssl_read;
+		}
+		else if (err != SSL_ERROR_WANT_READ)
+		{
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
+		}
 
 		if (ret == 0)
 		{
@@ -160,6 +189,8 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 			return mowgli_vio_error(vio);
 		}
+
+		return 0;
 	}
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
@@ -172,15 +203,32 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
+        if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
+        {
+                return mowgli_vio_openssl_ssl_handshake(vio, connection);
+        }
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
+ssl_write:
 	if ((ret = (int)SSL_write(connection->ssl_handle, buffer, len)) == -1)
 	{
 		unsigned long err = ERR_get_error();
 
-		/* Can't write */
-		if (err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_READ)
+		if (err == SSL_ERROR_WANT_READ)
+		{
+			/* XXX */
+			mowgli_vio_read(vio, NULL, 0);
+			goto ssl_write;
+		}
+		else if (err != SSL_ERROR_WANT_WRITE)
+		{
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
@@ -196,7 +244,7 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 	SSL_free(connection->ssl_handle);
 	SSL_CTX_free(connection->ssl_context);
 
-	mowgli_free(connection);
+	mowgli_heap_free(ssl_heap, connection);
 
 	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;

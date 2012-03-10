@@ -74,19 +74,19 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 		return NULL;
 	}
 
-	/* We have to have a socket before starting the linebuf */
-	if (mowgli_vio_socket(linebuf->vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
-		return NULL;
-
-	/* Attach the linebuf */
-	mowgli_linebuf_attach_to_eventloop(client->linebuf, base_eventloop);
-
 	/* Wrap the VIO object */
 	if (use_ssl)
 	{
 		if (mowgli_vio_openssl_setssl(linebuf->vio, NULL) != 0)
 			return NULL;
 	}
+
+	/* We have to have a socket before starting the linebuf */
+	if (mowgli_vio_socket(linebuf->vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
+		return NULL;
+
+	/* Attach the linebuf */
+	mowgli_linebuf_attach_to_eventloop(linebuf, base_eventloop);
 
 	/* Do the connect */
 	linebuf->vio->addr = res->ai_addr;

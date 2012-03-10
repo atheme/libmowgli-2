@@ -100,6 +100,8 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
+	printf("API [%p] [%d]\n", vio->addr, vio->addrlen);
+
 	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
