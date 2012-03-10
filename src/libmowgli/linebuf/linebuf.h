@@ -61,6 +61,8 @@ struct _mowgli_linebuf {
 	mowgli_linebuf_buf_t readbuf;
 	mowgli_linebuf_buf_t writebuf;
 
+	mowgli_eventloop_t *eventloop;
+
 	bool return_normal_strings;
 
 	void *userdata;
