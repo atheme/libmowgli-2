@@ -136,8 +136,7 @@ static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
-	int i, num, o_errno, op = -1;
-	unsigned int old_flags;
+	int i, num, o_errno;
 
 	return_if_fail(eventloop != NULL);
 
