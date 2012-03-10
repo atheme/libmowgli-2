@@ -21,12 +21,63 @@
 
 #include "vio/vio-types.h"
 
+/* Flags */
+#define MOWGLI_VIO_FLAGS_ISCONNECTING		0x00001
+#define MOWGLI_VIO_FLAGS_ISCLOSED		0x00002
+
+#define MOWGLI_VIO_FLAGS_ISCLIENT		0x00004
+#define MOWGLI_VIO_FLAGS_ISSERVER		0x00008
+
+#define MOWGLI_VIO_FLAGS_ISONHEAP		0x00010
+
+static inline bool mowgli_vio_hasflag(mowgli_vio_t *vio, int flag)
+{
+	return vio->flags & flag ? true : false;
+}
+
+static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
+{
+	if (setting)
+		vio->flags |= flag;
+	else
+		vio->flags &= flag;
+}
+
+/* Macros */
+#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) 					\
+{										\
+	v->error.type = MOWGLI_VIO_ERR_ERRCODE; 				\
+	v->error.code = e;							\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);		\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);			\
+	mowgli_strlcpy(v->error.string, s(e), sizeof((v)->error.string));	\
+	return mowgli_vio_error((v)); 						\
+}
+
+#ifdef HAVE_OPENSSL
+
+#define MOWGLI_VIO_RETURN_SSLERR_ERRCODE(v, e)					\
+{										\
+	(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;				\
+	(v)->error.code = e;							\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);		\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);			\
+	ERR_error_string_n(e, (v)->error.string, sizeof((v)->error.string));	\
+	return mowgli_vio_error(v);						\
+}
+
+#else
+#	define MOWGLI_VIO_RETURN_SSL_ERRCODE(v, e) MOWGLI_VIO_RETURN_ERRCODE(v, strerror, e)
+#endif
+
+
+/* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
 extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
-extern int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
-extern void mowgli_vio_pollable_destroy(mowgli_vio_t *vio);
-extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
+extern void mowgli_vio_destroy(mowgli_vio_t *vio);
+extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
+extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
 extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
 extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);

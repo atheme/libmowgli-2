@@ -52,11 +52,13 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	mowgli_vio_t *vio;
 
 	if (!vio_heap)
-		vio_heap = mowgli_heap_create(sizeof(mowgli_vio_t), 16, BH_NOW);
+		vio_heap = mowgli_heap_create(sizeof(mowgli_vio_t), 64, BH_NOW);
 
 	vio = mowgli_heap_alloc(vio_heap);
 
 	mowgli_vio_init(vio, userdata);
+
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISONHEAP, true);
 
 	return vio;
 }
@@ -73,30 +75,48 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 	vio->userdata = userdata;
 }
 
-int mowgli_vio_pollable_create(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
+void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
-	return_val_if_fail(vio->fd >= 0, -1);
+	return_if_fail(vio->fd > -1);
 
 	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
-	vio->eventloop = eventloop;
+
+	/* Blergh */
+	mowgli_node_add(eventloop, mowgli_node_create(), &(vio->eventloops));
 
 	/* You're probably going to want this */
 	mowgli_pollable_set_nonblocking(vio->io, true);
-
-	return 0;
 }
 
-void mowgli_vio_pollable_destroy(mowgli_vio_t *vio)
+void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
+	mowgli_node_t *n, *tn;
+
 	return_if_fail(vio->io != NULL);
 
-	mowgli_pollable_destroy(vio->eventloop, vio->io);
+	/* Remove from eventloops list */
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, vio->eventloops.head)
+	{
+		if ((mowgli_eventloop_t *)n->data == eventloop)
+			mowgli_node_delete(n, &(vio->eventloops));
+	}
+
+	mowgli_pollable_destroy(eventloop, vio->io);
 }
 
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
-	mowgli_vio_pollable_destroy(vio);
-	mowgli_heap_free(vio_heap, vio);
+	mowgli_node_t *n, *tn;
+
+	/* Detach from each eventloop we're attached to */
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, vio->eventloops.head)
+	{
+		mowgli_pollable_destroy(n->data, vio->io);
+		mowgli_node_delete(n, &(vio->eventloops));
+	}
+
+	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISONHEAP))
+		mowgli_heap_free(vio_heap, vio);
 }
 
 int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto)
@@ -114,8 +134,8 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 
 	vio->fd = fd;
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -127,10 +147,10 @@ int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 
 	if (listen(vio->fd, backlog) < 0)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-	
-	vio->flags |= MOWGLI_VIO_FLAGS_ISSERVER;
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLIENT;
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
+
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, true);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLIENT, false);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -164,6 +184,10 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 
 	newvio->fd = fd;
 
+	/* The new VIO object is most certainly not a server */
+	mowgli_vio_setflag(newvio, MOWGLI_VIO_FLAGS_ISCLIENT, true);
+	mowgli_vio_setflag(newvio, MOWGLI_VIO_FLAGS_ISSERVER, false);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
 }
@@ -184,10 +208,10 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio)
 		}
 	}
 
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCLIENT;
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISSERVER;
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCONNECTING;
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCLOSED;
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLIENT, true);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, false);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -215,14 +239,14 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-			vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
-			vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
 
 			return mowgli_vio_error(vio);
 		}
 	}
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -246,7 +270,7 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 		}
 	}
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -292,8 +316,8 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
 	close(vio->fd);
 	return 0;
 }
