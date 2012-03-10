@@ -29,7 +29,6 @@ char buf[512];
 
 typedef struct {
 	mowgli_linebuf_t *linebuf;
-	bool connected;
 } client_t;
 
 void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata);
@@ -43,10 +42,11 @@ void write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
 client_t * create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
 {
 	client_t *client;
-	mowgli_vio_t *vio;
 	struct addrinfo hints, *res;
 	bool use_ssl = false;
 	int ret;
+
+	mowgli_linebuf_t *linebuf;
 
 	if (*port == '+')
 	{
@@ -56,8 +56,8 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 
 	client = mowgli_alloc(sizeof(client_t));
 
-	client->linebuf = mowgli_linebuf_create(eat_line, client);
-	vio = mowgli_linebuf_get_vio(client->linebuf);
+	linebuf = mowgli_linebuf_create(eat_line, client);
+	client->linebuf = linebuf;
 
 	/* Do name res */
 	memset(&hints, 0, sizeof hints);
@@ -66,16 +66,16 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 
 	if ((ret = getaddrinfo(server, port, &hints, &res)) != 0)
 	{
-		vio->error.op = MOWGLI_VIO_ERR_OP_OTHER;
-		vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
-		vio->error.code = ret;
-		mowgli_strlcpy(vio->error.string, gai_strerror(ret), sizeof(vio->error.string));
-		mowgli_vio_error(vio);
+		linebuf->vio->error.op = MOWGLI_VIO_ERR_OP_OTHER;
+		linebuf->vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
+		linebuf->vio->error.code = ret;
+		mowgli_strlcpy(linebuf->vio->error.string, gai_strerror(ret), sizeof(linebuf->vio->error.string));
+		mowgli_vio_error(linebuf->vio);
 		return NULL;
 	}
 
 	/* We have to have a socket before starting the linebuf */
-	if (mowgli_vio_socket(vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
+	if (mowgli_vio_socket(linebuf->vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
 		return NULL;
 
 	/* Attach the linebuf */
@@ -84,12 +84,14 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	/* Wrap the VIO object */
 	if (use_ssl)
 	{
-		if (mowgli_vio_openssl_setssl(vio) != 0)
+		if (mowgli_vio_openssl_setssl(linebuf->vio, NULL) != 0)
 			return NULL;
 	}
 
 	/* Do the connect */
-	if (mowgli_vio_connect(vio, res->ai_addr, res->ai_addrlen) != 0)
+	linebuf->vio->addr = res->ai_addr;
+	linebuf->vio->addrlen = res->ai_addrlen;
+	if (mowgli_vio_connect(linebuf->vio) != 0)
 		return NULL;
 
 	/* Write IRC handshake */
@@ -149,6 +151,8 @@ int main(int argc, const char *argv[])
 	port = argv[2];
 
 	client = create_client(serv, port, "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
+	if (client == NULL)
+		return EXIT_FAILURE;
 
 	mowgli_eventloop_run(base_eventloop);
 

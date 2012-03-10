@@ -87,7 +87,7 @@ extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
-extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio);
+extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr);
 /* These are void ptr's so they can be null ops if SSL isn't available */
 extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);

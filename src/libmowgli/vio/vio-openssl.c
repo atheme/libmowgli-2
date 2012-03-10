@@ -33,7 +33,7 @@
 typedef struct {
 	SSL *ssl_handle;
 	SSL_CTX *ssl_context;
-	int flags;
+	mowgli_patricia_t *attrs;
 } mowgli_ssl_connection_t;
 
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
@@ -41,10 +41,21 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
+static mowgli_heap_t *ssl_heap = NULL;
+
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_patricia_t *attr)
 {
-	mowgli_ssl_connection_t *connection = mowgli_alloc(sizeof(mowgli_ssl_connection_t));
+	mowgli_ssl_connection_t *connection; 
+
+	if (!ssl_heap)
+		ssl_heap = mowgli_heap_create(sizeof(mowgli_ssl_connection_t), 64, BH_NOW);
+
+	connection = mowgli_heap_alloc(ssl_heap);
+
 	vio->privdata = connection;
+
+	/* Set default attrs */
+	connection->attrs = attr;
 
 	/* Change ops */
 	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_connect);
@@ -52,6 +63,7 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
 	mowgli_vio_set_op(vio, write, mowgli_vio_openssl_write);
 	mowgli_vio_set_op(vio, close, mowgli_vio_openssl_close);
 
+	/* SSL setup */
 	SSL_load_error_strings();
 	SSL_library_init();
 
