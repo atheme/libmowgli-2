@@ -78,7 +78,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+			MOWGLI_VIO_RETURN_ERRCODE(newvio, strerror, errno);
 		}
 		else
 		{
@@ -99,8 +99,6 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 int mowgli_vio_default_connect(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
-
-	printf("API [%p] [%d]\n", vio->addr, vio->addrlen);
 
 	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
 	{
@@ -129,6 +127,8 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
 	if ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
@@ -152,8 +152,6 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 		}
 	}
 
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -163,6 +161,8 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
+
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
 	if ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
 	{
@@ -175,8 +175,6 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 			return 0;
 		}
 	}
-
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -222,8 +220,7 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
+	MOWGLI_VIO_SET_CLOSED(vio);
 	close(vio->fd);
 	return 0;
 }

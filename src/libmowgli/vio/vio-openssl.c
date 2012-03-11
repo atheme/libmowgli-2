@@ -105,12 +105,15 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 		}
 	}
 
+	/* Non-blocking socket, begin handshake */
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 	return mowgli_vio_openssl_ssl_handshake(vio, connection);
 }
 
 static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
 {
+	int ret;
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
 	/* Good default; most stuff isn't using TLSv1 or above yet (unfortunately)
@@ -127,23 +130,15 @@ static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connec
 	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
-	/* XXX not what we want for non-blocking sockets if they're in use! */
+	/* XXX not what we want for blocking sockets if they're in use! */
 	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
-	if (SSL_connect(connection->ssl_handle) != 1)
+	if ((ret = SSL_connect(connection->ssl_handle)) != 1)
 	{
-		unsigned long err = ERR_get_error();
-
-		if (err != SSL_ERROR_WANT_READ && err != SSL_ERROR_WANT_WRITE && err != SSL_ERROR_WANT_CONNECT)
-		{
-			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
-		}
-		else
-		{
-			return 0;
-		}
+		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, SSL_get_error(connection->ssl_handle, ret))
 	}
 
+	/* Connected */
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
@@ -155,26 +150,22 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
-	/* eventloop spits us here once a connection is established */
-	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING) || mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
+	/* Establish SSL connection */
+	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
 	{
 		return mowgli_vio_openssl_ssl_handshake(vio, connection);
 	}
 
+	/* We're connected */
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
-ssl_read:
 	if ((ret = (int)SSL_read(connection->ssl_handle, buffer, len)) < 0)
 	{
-		unsigned long err = ERR_get_error();
+		int err = SSL_get_error(connection->ssl_handle, ret);
 
-		if (err == SSL_ERROR_WANT_WRITE)
-		{
-			/* XXX */
-			mowgli_vio_write(vio, NULL, 0);
-			goto ssl_read;
-		}
-		else if (err != SSL_ERROR_WANT_READ)
+		if (err != SSL_ERROR_WANT_READ)
 		{
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 		}
@@ -184,8 +175,7 @@ ssl_read:
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-			vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
-			vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+			MOWGLI_VIO_SET_CLOSED(vio);
 
 			return mowgli_vio_error(vio);
 		}
@@ -193,7 +183,6 @@ ssl_read:
 		return 0;
 	}
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -203,25 +192,22 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	int ret;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
+	/* Establish SSL connection */
         if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
         {
                 return mowgli_vio_openssl_ssl_handshake(vio, connection);
         }
 
+	/* We're connected */
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
-ssl_write:
 	if ((ret = (int)SSL_write(connection->ssl_handle, buffer, len)) == -1)
 	{
-		unsigned long err = ERR_get_error();
+		int err = SSL_get_error(connection->ssl_handle, ret);
 
-		if (err == SSL_ERROR_WANT_READ)
-		{
-			/* XXX */
-			mowgli_vio_read(vio, NULL, 0);
-			goto ssl_write;
-		}
-		else if (err != SSL_ERROR_WANT_WRITE)
+		if (err != SSL_ERROR_WANT_WRITE)
 		{
 			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
 		}
@@ -231,7 +217,6 @@ ssl_write:
 		}
 	}
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }

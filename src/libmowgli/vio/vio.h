@@ -45,12 +45,15 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 }
 
 /* Macros */
+#define MOWGLI_VIO_SET_CLOSED(v)					\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);	\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);		\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
+
 #define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) 					\
 {										\
 	v->error.type = MOWGLI_VIO_ERR_ERRCODE; 				\
 	v->error.code = e;							\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);		\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);			\
 	mowgli_strlcpy(v->error.string, s(e), sizeof((v)->error.string));	\
 	return mowgli_vio_error((v)); 						\
 }
@@ -61,8 +64,6 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 {										\
 	(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;				\
 	(v)->error.code = e;							\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);		\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);			\
 	ERR_error_string_n(e, (v)->error.string, sizeof((v)->error.string));	\
 	return mowgli_vio_error(v);						\
 }
