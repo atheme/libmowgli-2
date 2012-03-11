@@ -100,6 +100,9 @@ typedef enum { FALSE, TRUE } mowgli_boolean_t;
 
 /* OpenSSL stuff */
 #ifdef HAVE_OPENSSL
+# if defined(__APPLE__) && defined(__GNUC__)
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+# endif
 # include <openssl/rand.h>
 # include <openssl/ssl.h>
 # include <openssl/err.h>
