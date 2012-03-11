@@ -33,10 +33,11 @@
 typedef struct {
 	SSL *ssl_handle;
 	SSL_CTX *ssl_context;
+	mowgli_vio_ssl_settings_t settings;
 } mowgli_ssl_connection_t;
 
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
-static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
+static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
@@ -45,7 +46,7 @@ static mowgli_heap_t *ssl_heap = NULL;
 
 static bool openssl_init = false;
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, void *attr)
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings)
 {
 	mowgli_ssl_connection_t *connection; 
 
@@ -54,6 +55,15 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, void *attr)
 
 	connection = mowgli_heap_alloc(ssl_heap);
 	vio->privdata = connection;
+
+	if (settings)
+		connection->settings = *settings;
+	else
+	{
+		/* Greatest compat */
+		connection->settings.ssl_version = MOWGLI_VIO_SSLFLAGS_SSLV3;
+		connection->settings.strict_checking = false;
+	}
 
 	/* Change ops */
 	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_connect);
@@ -107,19 +117,35 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 
 	/* Non-blocking socket, begin handshake */
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-	return mowgli_vio_openssl_ssl_handshake(vio, connection);
+	return mowgli_vio_openssl_client_handshake(vio, connection);
 }
 
-static int mowgli_vio_openssl_ssl_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
+static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
 {
 	int ret;
+	SSL_METHOD *method;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	/* Good default; most stuff isn't using TLSv1 or above yet (unfortunately)
-	 * The library will negotiate something better if supported.
-	 */
-	connection->ssl_context = SSL_CTX_new(SSLv3_client_method());
+	switch (connection->settings.ssl_version)
+	{
+	case MOWGLI_VIO_SSLFLAGS_SSLV2:
+		method = SSLv23_client_method();
+		break;
+	case MOWGLI_VIO_SSLFLAGS_SSLV3:
+		method = SSLv3_client_method();
+		break;
+	case MOWGLI_VIO_SSLFLAGS_TLSV10:
+	case MOWGLI_VIO_SSLFLAGS_TLSV11:
+	case MOWGLI_VIO_SSLFLAGS_TLSV12:
+		method = TLSv1_client_method();
+		break;
+	default:
+		/* Compat method */
+		method = SSLv23_client_method();
+	}
+
+	connection->ssl_context = SSL_CTX_new(method);
 	if (connection->ssl_context == NULL)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
@@ -153,7 +179,7 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	/* Establish SSL connection */
 	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
 	{
-		return mowgli_vio_openssl_ssl_handshake(vio, connection);
+		return mowgli_vio_openssl_client_handshake(vio, connection);
 	}
 
 	/* We're connected */
@@ -195,7 +221,7 @@ static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	/* Establish SSL connection */
         if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
         {
-                return mowgli_vio_openssl_ssl_handshake(vio, connection);
+                return mowgli_vio_openssl_client_handshake(vio, connection);
         }
 
 	/* We're connected */
@@ -240,7 +266,7 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 
 #else
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio)
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings)
 {
 	mowgli_log("OpenSSL requested on a VIO object, but mowgli was built without OpenSSL support...");
 	return -1;

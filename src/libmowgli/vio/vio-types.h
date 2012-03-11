@@ -86,5 +86,11 @@ struct _mowgli_vio {
 	void *privdata;
 };
 
+typedef struct _mowgli_vio_ssl_settings {
+	char cert_path[FILENAME_MAX];
+	int ssl_version;
+	bool strict_checking;
+} mowgli_vio_ssl_settings_t;
+
 #endif
 
