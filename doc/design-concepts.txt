@@ -66,3 +66,47 @@ don't crash because the object is no longer on the stack.
 [Yes, I know you can put objects in BSS by making them 'static.'  There is limited
 space for BSS on many systems, so putting 100MB worth of objects there is kind of insane
 and makes your program not look so great either.]
+
+2. Threads are evil.
+
+"The one-sentence answer is that humans are not smart enough to write threadsafe code."
+	-- Rasmus Lerdorf, inventor of PHP
+
+While PHP itself is a disaster of a programming language (for reasons I am not going to
+go into here), Rasmus Lerdorf is entirely correct in the above quote.  While Mowgli is
+itself thread-safe, we do not recommend using threads as they promote inferior design
+patterns.  There are better, safer ways to achieve concurrency using helpers and work
+queues with message-passing.
+
+Mowgli's thread library implements a subset of a thread library.  Specifically, it
+implements the fastest possible mutex implementation, and global critical sections ala
+a global lock.  It does not implement anything else other than that, except for maybe
+abstraction of TLS data in the future.  But that TLS support would just be to further
+advance Mowgli's thread safety so that it is more performant.
+
+Threads are a gigantic hack.  Depending on what you want, there is usually something
+better for any pattern which involves threads:
+
+Pattern: Threads which do work and then sleep for a long time.
+
+Answer: Use mowgli_timer_add() on an eventloop object.  This allows you to queue deferred
+work as a first-class citizen of your app's eventloop.
+
+Pattern: Multiple worker threads for I/O.
+
+Answer: Using concurrency in an I/O bound app is entirely pointless, but you can pass
+FDs to a helper using IPC.  Pass the FD and then pass instructions on what to do with it.
+
+Pattern: Work that needs to be done concurrently.
+
+Answer: Helpers with message-passing and specific regions of memory shared between
+helpers, ala mmap() or VirtualAlloc().
+
+Pattern: Work that needs to be done cooperatively.
+
+Answer: Producer-consumer models can be implemented as first-class citizens using the
+eventloop using pipes as a synchronization primitive.  Alternatively, use a coroutine
+library, such as the work-in-progress mowgli.coroutine.
+
+Pretty much anything you can do with threads, you can do better with something, *anything*
+else.
