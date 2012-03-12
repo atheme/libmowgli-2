@@ -43,6 +43,8 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 	.connect = mowgli_vio_default_connect,
 	.read = mowgli_vio_default_read,
 	.write = mowgli_vio_default_write,
+	.sendto = mowgli_vio_default_sendto,
+	.recvfrom = mowgli_vio_default_recvfrom,
 	.error = mowgli_vio_default_error,
 	.close = mowgli_vio_default_close,
 };

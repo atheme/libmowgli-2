@@ -93,6 +93,8 @@ extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
+extern int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len);
+extern int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 

@@ -156,7 +156,7 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	return ret;
 }
 
-int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	int ret;
 
@@ -173,6 +173,66 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 		else
 		{
 			return 0;
+		}
+	}
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+	return ret;
+}
+
+int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	int ret;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
+
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
+	if ((ret = (int)sendto(vio->fd, buffer, len, 0, vio->addr, vio->addrlen)) == -1)
+	{
+		if (!mowgli_eventloop_ignore_errno(errno))
+		{
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+	return ret;
+}
+
+/* XXX - overwrites vio->addr! */
+int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	int ret;
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
+
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
+	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, vio->addr, &vio->addrlen)) < 0)
+	{
+		if (!mowgli_eventloop_ignore_errno(errno))
+		{
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		}
+		else if (errno != 0)
+		{
+			return 0;
+		}
+
+		if (ret == 0)
+		{
+			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
+			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
+
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
+
+			return mowgli_vio_error(vio);
 		}
 	}
 

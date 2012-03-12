@@ -62,6 +62,8 @@ typedef struct {
 	mowgli_vio_accept_func_t *accept;
 	mowgli_vio_rw_func_t *read;
 	mowgli_vio_rw_func_t *write;
+	mowgli_vio_rw_func_t *sendto;
+	mowgli_vio_rw_func_t *recvfrom;
 	mowgli_vio_func_t *error;
 	mowgli_vio_func_t *close;
 } mowgli_vio_ops_t;
