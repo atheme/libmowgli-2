@@ -107,6 +107,7 @@ extern mowgli_vio_ops_t mowgli_vio_default_ops;
 
 #define mowgli_vio_set_op(vio, operation, func) (vio)->ops.operation = func;
 
+/* If somebody could write a macro to replace all these below functions... that'd be swell */
 static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type, int flags)
 {
 	return vio->ops.socket(vio, family, type, flags);
@@ -135,6 +136,16 @@ static inline int mowgli_vio_read(mowgli_vio_t *vio, void *buffer, size_t len)
 static inline int mowgli_vio_write(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	return vio->ops.write(vio, buffer, len);
+}
+
+static inline int mowgli_vio_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	return vio->ops.sendto(vio, buffer, len);
+}
+
+static inline int mowgli_vio_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	return vio->ops.recvfrom(vio, buffer, len);
 }
 
 static inline int mowgli_vio_error(mowgli_vio_t *vio)
