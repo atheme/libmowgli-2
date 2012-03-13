@@ -38,7 +38,7 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 
 	if (linebuf_heap == NULL)
 		linebuf_heap = mowgli_heap_create(sizeof(mowgli_linebuf_t), 16, BH_NOW);
-	
+
 	linebuf = mowgli_heap_alloc(linebuf_heap);
 
 	linebuf->delim = "\r\n"; /* Sane default */
@@ -165,6 +165,19 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	/* Anything else to write? */
 	if (buffer->buflen == 0)
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+}
+
+void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
+{
+	char *buf[linebuf->maxbuflen];
+	size_t len;
+	va_list va;
+
+	va_start(va, format);
+	len = vsnprintf(buf, linebuf->maxbuflen - 1, format, va);
+	va_end(va);
+
+	mowgli_linebuf_write(linebuf, buf, len);
 }
 
 void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
