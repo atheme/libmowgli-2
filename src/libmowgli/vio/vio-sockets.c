@@ -156,7 +156,7 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	return ret;
 }
 
-int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	int ret;
 
@@ -180,7 +180,7 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
 	return ret;
 }
 
-int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	int ret;
 
