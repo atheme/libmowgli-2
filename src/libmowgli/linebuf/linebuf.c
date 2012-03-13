@@ -169,12 +169,12 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 
 void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
 {
-	char *buf[linebuf->maxbuflen];
+	char buf[linebuf->writebuf.maxbuflen];
 	size_t len;
 	va_list va;
 
 	va_start(va, format);
-	len = vsnprintf(buf, linebuf->maxbuflen - 1, format, va);
+	len = vsnprintf(buf, linebuf->writebuf.maxbuflen - 1, format, va);
 	va_end(va);
 
 	mowgli_linebuf_write(linebuf, buf, len);
