@@ -38,6 +38,7 @@ typedef enum {
 	MOWGLI_VIO_ERR_OP_CONNECT,
 	MOWGLI_VIO_ERR_OP_READ,
 	MOWGLI_VIO_ERR_OP_WRITE,
+	MOWGLI_VIO_ERR_OP_BIND,
 	MOWGLI_VIO_ERR_OP_OTHER,
 } mowgli_vio_error_op_t;
 
@@ -48,8 +49,14 @@ typedef struct _mowgli_vio_error {
 	char string[128];
 } mowgli_vio_error_t;
 
+typedef struct _mowgli_vio_sockaddr {
+	struct sockaddr *addr;
+	socklen_t addrlen;
+} mowgli_vio_sockaddr_t;
+
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
+typedef int mowgli_vio_sr_func_t(mowgli_vio_t *, void *, size_t, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *);
 typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
@@ -62,8 +69,8 @@ typedef struct {
 	mowgli_vio_accept_func_t *accept;
 	mowgli_vio_rw_func_t *read;
 	mowgli_vio_rw_func_t *write;
-	mowgli_vio_rw_func_t *sendto;
-	mowgli_vio_rw_func_t *recvfrom;
+	mowgli_vio_sr_func_t *sendto;
+	mowgli_vio_sr_func_t *recvfrom;
 	mowgli_vio_func_t *error;
 	mowgli_vio_func_t *close;
 } mowgli_vio_ops_t;
@@ -77,8 +84,7 @@ struct _mowgli_vio {
 	/* Some jackass could attach us to multiple event loops I guess */
 	mowgli_list_t eventloops;
 
-	struct sockaddr *addr;
-	socklen_t addrlen;
+	mowgli_vio_sockaddr_t addr;
 
 	mowgli_vio_error_t error;
 

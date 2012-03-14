@@ -74,7 +74,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((fd = accept(vio->fd, newvio->addr, &(newvio->addrlen))) < 0)
+	if ((fd = accept(vio->fd, newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -100,7 +100,7 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, vio->addr, vio->addrlen) < 0)
+	if (connect(vio->fd, vio->addr.addr, vio->addr.addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -180,7 +180,7 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	return ret;
 }
 
-int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
 	int ret;
 
@@ -188,7 +188,7 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)sendto(vio->fd, buffer, len, 0, vio->addr, vio->addrlen)) == -1)
+	if ((ret = (int)sendto(vio->fd, buffer, len, 0, addr->addr, addr->addrlen)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -204,8 +204,7 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
 	return ret;
 }
 
-/* XXX - overwrites vio->addr! */
-int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
 	int ret;
 
@@ -213,7 +212,7 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, vio->addr, &vio->addrlen)) < 0)
+	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, addr->addr, &addr->addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{

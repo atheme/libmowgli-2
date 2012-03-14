@@ -121,3 +121,13 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
 		mowgli_heap_free(vio_heap, vio);
 }
 
+/* Yuck -- needs a better name */
+mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_to_mvst(mowgli_vio_t *vio, struct sockaddr *addr, socklen_t addrlen)
+{
+	mowgli_vio_sockaddr_t *newaddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
+	newaddr->addr = addr;
+	newaddr->addrlen = addrlen;
+	return newaddr;
+}
+
+

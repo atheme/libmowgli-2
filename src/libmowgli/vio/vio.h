@@ -79,7 +79,6 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 #	define MOWGLI_VIO_RETURN_SSL_ERRCODE(v, e) MOWGLI_VIO_RETURN_ERRCODE(v, strerror, e)
 #endif
 
-
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
 extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
@@ -87,14 +86,15 @@ extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
+extern mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_to_mvst(mowgli_vio_t *vio, struct sockaddr *addr, socklen_t addrlen);
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
 extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
 extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
-extern int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len);
-extern int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len);
+extern int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr);
+extern int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 
@@ -138,14 +138,14 @@ static inline int mowgli_vio_write(mowgli_vio_t *vio, void *buffer, size_t len)
 	return vio->ops.write(vio, buffer, len);
 }
 
-static inline int mowgli_vio_sendto(mowgli_vio_t *vio, void *buffer, size_t len)
+static inline int mowgli_vio_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
-	return vio->ops.sendto(vio, buffer, len);
+	return vio->ops.sendto(vio, buffer, len, addr);
 }
 
-static inline int mowgli_vio_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len)
+static inline int mowgli_vio_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
-	return vio->ops.recvfrom(vio, buffer, len);
+	return vio->ops.recvfrom(vio, buffer, len, addr);
 }
 
 static inline int mowgli_vio_error(mowgli_vio_t *vio)
