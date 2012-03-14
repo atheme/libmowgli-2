@@ -123,7 +123,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
 {
 	int ret;
-	SSL_METHOD *method;
+	const SSL_METHOD *method;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
