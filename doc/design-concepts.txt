@@ -3,43 +3,44 @@ Design concepts for Mowgli
 
 1. Object orientation
 
-First and foremost, Mowgli is a base development framework that you can build higher level
-development frameworks ontop of.  To facilitate this in a way that most people can understand,
-we use a somewhat LISP-like form of OO.
+First and foremost, Mowgli is a base development framework that you can build
+higher level development frameworks ontop of. To facilitate this in a way that
+most people can understand, we use a somewhat LISP-like form of OO.
 
 What does this mean?
 
-In LISP, it is common for objects to be made up of smaller, more primitive objects that help
-to facilitate the implementation of the object.  What this means is that, for example, we
-have mowgli_heap_t (which is a private object):
+In LISP, it is common for objects to be made up of smaller, more primitive
+objects that help to facilitate the implementation of the object. What this
+means is that, for example, we have mowgli_heap_t (which is a private object):
 
 	struct mowgli_heap_
 	{
-	        unsigned int elem_size;
-        	unsigned int mowgli_heap_elems;
-	        unsigned int free_elems;
+		unsigned int elem_size;
+		unsigned int mowgli_heap_elems;
+		unsigned int free_elems;
 
-	        unsigned int alloc_size;
+		unsigned int alloc_size;
 
-        	unsigned int flags;
+		unsigned int flags;
 
-	        mowgli_list_t blocks; /* list of non-empty blocks */
+		mowgli_list_t blocks; /* list of non-empty blocks */
 
-	        mowgli_allocation_policy_t *allocator;
-        	mowgli_boolean_t use_mmap;
+		mowgli_allocation_policy_t *allocator;
+		mowgli_boolean_t use_mmap;
 
-	        mowgli_mutex_t mutex;
+		mowgli_mutex_t mutex;
 
-        	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
+		mowgli_block_t *empty_block; /* a single entirely free block,
+		                              * or NULL */
 	};
 
-This is an object which keeps state.  It also depends on other objects, such as allocation
-policies and lists.  There is a need for a destructor, it has member objects which have
-destructors, etc.
+This is an object which keeps state. It also depends on other objects, such as
+allocation policies and lists. There is a need for a destructor, it has member
+objects which have destructors, etc.
 
-C allows you to make a pointer out of anything -- block-level variables, for example can
-be "dereferenced" using the & operator.  This means that if the heap above did not require
-initialization, you could just write something like:
+C allows you to make a pointer out of anything -- block-level variables, for
+example can be "dereferenced" using the & operator. This means that if the heap
+above did not require initialization, you could just write something like:
 
 	{
 		mowgli_heap_t heap;
@@ -49,64 +50,67 @@ initialization, you could just write something like:
 		mowgli_heap_free(&heap, ptr);
 	}
 
-However, we have a need to initialize this object, so we provide a constructor for it,
-mowgli_heap_create().  We also need to tear down the object specifically, so we provide
-mowgli_heap_destroy().
+However, we have a need to initialize this object, so we provide a constructor
+for it, mowgli_heap_create(). We also need to tear down the object
+specifically, so we provide mowgli_heap_destroy().
 
-While it is easy to provide a separate initializer function, we feel this would be a bad
-idea for objects which keep state, because odds are likely the destructor would not be
-called.  There is also a stack memory limit -- which is very small on embedded systems,
-where Mowgli is intended to be used.
+While it is easy to provide a separate initializer function, we feel this would
+be a bad idea for objects which keep state, because odds are likely the
+destructor would not be called. There is also a stack memory limit -- which is
+very small on embedded systems, where Mowgli is intended to be used.
 
-There is also the possibility that the library may depend on the reference remaining
-past the time it was used, such as an internal dependency (caching, for example).  So
-we want to enforce that a destructor is called when needed, or at least make sure we
-don't crash because the object is no longer on the stack.
+There is also the possibility that the library may depend on the reference
+remaining past the time it was used, such as an internal dependency (caching,
+for example). So we want to enforce that a destructor is called when needed, or
+at least make sure we don't crash because the object is no longer on the stack.
 
-[Yes, I know you can put objects in BSS by making them 'static.'  There is limited
-space for BSS on many systems, so putting 100MB worth of objects there is kind of insane
-and makes your program not look so great either.]
+[Yes, I know you can put objects in BSS by making them 'static.' There is
+limited space for BSS on many systems, so putting 100MB worth of objects there
+is kind of insane and makes your program not look so great either.]
 
 2. Threads are evil.
 
-"The one-sentence answer is that humans are not smart enough to write threadsafe code."
+"The one-sentence answer is that humans are not smart enough to write
+ thread-safe code."
 	-- Rasmus Lerdorf, inventor of PHP
 
-While PHP itself is a disaster of a programming language (for reasons I am not going to
-go into here), Rasmus Lerdorf is entirely correct in the above quote.  While Mowgli is
-itself thread-safe, we do not recommend using threads as they promote inferior design
-patterns.  There are better, safer ways to achieve concurrency using helpers and work
-queues with message-passing.
+While PHP itself is a disaster of a programming language (for reasons I am not
+going to go into here), Rasmus Lerdorf is entirely correct in the above quote.
+While Mowgli is itself thread-safe, we do not recommend using threads as they
+promote inferior design patterns. There are better, safer ways to achieve
+concurrency using helpers and work queues with message-passing.
 
-Mowgli's thread library implements a subset of a thread library.  Specifically, it
-implements the fastest possible mutex implementation, and global critical sections ala
-a global lock.  It does not implement anything else other than that, except for maybe
-abstraction of TLS data in the future.  But that TLS support would just be to further
-advance Mowgli's thread safety so that it is more performant.
+Mowgli's thread library implements a subset of a thread library. Specifically,
+it implements the fastest possible mutex implementation, and global critical
+sections ala a global lock. It does not implement anything else other than
+that, except for maybe abstraction of TLS data in the future. But that TLS
+support would just be to further advance Mowgli's thread-safety so that it is
+more performant.
 
-Threads are a gigantic hack.  Depending on what you want, there is usually something
-better for any pattern which involves threads:
+Threads are a gigantic hack. Depending on what you want, there is usually
+something better for any pattern which involves threads:
 
 Pattern: Threads which do work and then sleep for a long time.
 
-Answer: Use mowgli_timer_add() on an eventloop object.  This allows you to queue deferred
-work as a first-class citizen of your app's eventloop.
+Answer: Use mowgli_timer_add() on an eventloop object. This allows you to
+queue deferred work as a first-class citizen of your app's eventloop.
 
 Pattern: Multiple worker threads for I/O.
 
-Answer: Using concurrency in an I/O bound app is entirely pointless, but you can pass
-FDs to a helper using IPC.  Pass the FD and then pass instructions on what to do with it.
+Answer: Using concurrency in an I/O bound app is entirely pointless, but you
+can pass FDs to a helper using IPC. Pass the FD and then pass instructions on
+what to do with it.
 
 Pattern: Work that needs to be done concurrently.
 
-Answer: Helpers with message-passing and specific regions of memory shared between
-helpers, ala mmap() or VirtualAlloc().
+Answer: Helpers with message-passing and specific regions of memory shared
+between helpers, ala mmap() or VirtualAlloc().
 
 Pattern: Work that needs to be done cooperatively.
 
-Answer: Producer-consumer models can be implemented as first-class citizens using the
-eventloop using pipes as a synchronization primitive.  Alternatively, use a coroutine
-library, such as the work-in-progress mowgli.coroutine.
+Answer: Producer-consumer models can be implemented as first-class citizens
+using the eventloop using pipes as a synchronization primitive. Alternatively,
+use a coroutine library, such as the work-in-progress mowgli.coroutine.
 
-Pretty much anything you can do with threads, you can do better with something, *anything*
-else.
+Pretty much anything you can do with threads, you can do better with something,
+*anything* else.
