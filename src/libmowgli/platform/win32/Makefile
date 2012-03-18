@@ -1,7 +1,7 @@
 include ../../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.platform.win32.lib.a
-STATIC_LIB_NOINST = mowgli.platform.win32.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_PLATFORM_WIN32}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_PLATFORM_WIN32}
 
 SRCS = fork.c gettimeofday.c pipe.c setenv.c
 

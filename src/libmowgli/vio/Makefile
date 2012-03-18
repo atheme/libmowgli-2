@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.vio.lib.a
-STATIC_LIB_NOINST = mowgli.vio.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_VIO}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_VIO}
 
 SRCS = vio.c vio-sockets.c vio-openssl.c
 

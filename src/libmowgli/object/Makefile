@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.object.lib.a
-STATIC_LIB_NOINST = mowgli.object.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_OBJECT}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_OBJECT}
 
 SRCS = object.c		\
        class.c		\

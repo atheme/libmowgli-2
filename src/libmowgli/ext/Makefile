@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.ext.lib.a
-STATIC_LIB_NOINST = mowgli.ext.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_EXT}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_EXT}
 
 SRCS = confparse.c 			\
        error_backtrace.c		\
