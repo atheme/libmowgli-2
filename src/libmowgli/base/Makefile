@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.base.lib.a
-STATIC_LIB_NOINST = mowgli.base.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_BASE}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_BASE}
 
 SRCS = argstack.c		\
        bitvector.c 		\

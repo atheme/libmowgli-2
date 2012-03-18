@@ -620,6 +620,7 @@ OPENSSL_INCLUDES
 PKG_CONFIG
 LIBMOWGLI_STATIC_MODULES
 LIBMOWGLI_SHARED_MODULES
+LIBMOWGLI_MODULE_BUILD
 LIBMOWGLI_OS
 PTHREAD_CFLAGS
 PTHREAD_LIBS
@@ -3878,6 +3879,9 @@ fi
 LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio linebuf"
 
 
+LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"
+LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
+
 LIBMOWGLI_SHARED_MODULES=""
 # Check whether --enable-shared was given.
 if test "${enable_shared+set}" = set; then :
@@ -4007,10 +4011,11 @@ $as_echo "no" >&6; }
 
    for i in $LIBMOWGLI_MODULES
    do
+      UPPER="$(echo $i | tr '[:lower:]' '[:upper:]')"
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES $i/mowgli.$i.lib.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_SHARED_$UPPER = mowgli.$i.lib.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    done
-
-   BUILD_SHARED_MODULES="yes"
 
 fi
 
@@ -4027,10 +4032,11 @@ if test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"; then :
 
    for i in $LIBMOWGLI_MODULES
    do
+      UPPER="$(echo $i | tr '[:lower:]' '[:upper:]')"
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES $i/mowgli.$i.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_STATIC_$UPPER = mowgli.$i.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    done
-
-   BUILD_STATIC_MODULES="yes"
 
 fi
 
@@ -4047,12 +4053,16 @@ $as_echo "win32" >&6; }
    if test x"$LIBMOWGLI_SHARED_MODULES" != x""; then :
 
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_SHARED_PLATFORM_WIN32 = mowgli.platform.win32.lib.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
 
 fi
 
    if test x"$LIBMOWGLI_STATIC_MODULES" != x""; then :
 
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_STATIC_PLATFORM_WIN32 = mowgli.platform.win32.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
 
 fi
    ;;
@@ -4387,6 +4397,8 @@ fi
 
    ;;
 esac
+
+
 
 
 

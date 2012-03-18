@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.thread.lib.a
-STATIC_LIB_NOINST = mowgli.thread.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_THREAD}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_THREAD}
 
 SRCS = mutex.c			\
        null_mutexops.c		\

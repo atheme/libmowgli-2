@@ -1,7 +1,7 @@
 include ../../../extra.mk
 
-STATIC_PIC_LIB_NOINST = mowgli.container.lib.a
-STATIC_LIB_NOINST = mowgli.container.a
+STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_CONTAINER}
+STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_CONTAINER}
 
 SRCS = list.c 		\
        queue.c		\

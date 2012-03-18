@@ -33,6 +33,9 @@ AC_PATH_PROG(RANLIB, ranlib)
 LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio linebuf"
 AC_SUBST(LIBMOWGLI_MODULES)
 
+LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"
+LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
+
 LIBMOWGLI_SHARED_MODULES=""
 AC_ARG_ENABLE([shared], [AS_HELP_STRING([--disable-shared], [do not build shared library])]) 
 AS_IF([test x"$enable_shared" != x"no"], [ 
@@ -42,10 +45,11 @@ AS_IF([test x"$enable_shared" != x"no"], [
 
    for i in $LIBMOWGLI_MODULES
    do
+      UPPER="[$(echo $i | tr '[:lower:]' '[:upper:]')]"
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES $i/mowgli.$i.lib.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_SHARED_$UPPER = mowgli.$i.lib.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    done
-
-   BUILD_SHARED_MODULES="yes"
 ])
 
 LIBMOWGLI_STATIC_MODULES=""
@@ -55,10 +59,11 @@ AS_IF([test x"$enable_static" = x"yes" -o x"$enable_shared" = x"no"], [
 
    for i in $LIBMOWGLI_MODULES
    do
+      UPPER="[$(echo $i | tr '[:lower:]' '[:upper:]')]"
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES $i/mowgli.$i.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_STATIC_$UPPER = mowgli.$i.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    done
-
-   BUILD_STATIC_MODULES="yes"
 ])
 
 AC_MSG_CHECKING(OS type)
@@ -71,10 +76,14 @@ case "$target" in
 
    AS_IF([test x"$LIBMOWGLI_SHARED_MODULES" != x""], [
       LIBMOWGLI_SHARED_MODULES="$LIBMOWGLI_SHARED_MODULES platform/win32/mowgli.platform.win32.lib.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_SHARED_PLATFORM_WIN32 = mowgli.platform.win32.lib.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    ])
 
    AS_IF([test x"$LIBMOWGLI_STATIC_MODULES" != x""], [
       LIBMOWGLI_STATIC_MODULES="$LIBMOWGLI_STATIC_MODULES platform/win32/mowgli.platform.win32.a"
+      LIBMOWGLI_MODULE_BUILD="$LIBMOWGLI_MODULE_BUILD$(echo LIBMOWGLI_STATIC_PLATFORM_WIN32 = mowgli.platform.win32.a && echo x)"
+      LIBMOWGLI_MODULE_BUILD="${LIBMOWGLI_MODULE_BUILD%x}"
    ])
    ;;
 *)
@@ -88,8 +97,10 @@ case "$target" in
    ;;
 esac
 AC_SUBST([LIBMOWGLI_OS])
+AC_SUBST([LIBMOWGLI_MODULE_BUILD])
 AC_SUBST([LIBMOWGLI_SHARED_MODULES])
 AC_SUBST([LIBMOWGLI_STATIC_MODULES])
+AC_SUBST([LIBMOWGLI_MODULE_BUILD])
 
 OPENSSL="no"
 AX_CHECK_OPENSSL([
