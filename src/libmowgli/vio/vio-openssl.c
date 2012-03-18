@@ -145,7 +145,8 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 		method = SSLv23_client_method();
 	}
 
-	connection->ssl_context = SSL_CTX_new(method);
+	/* Cast is to eliminate an excessively bogus warning on old OpenSSL --Elizacat */
+	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
 	if (connection->ssl_context == NULL)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
