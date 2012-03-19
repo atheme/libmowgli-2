@@ -17,6 +17,7 @@ src/examples/timertest/timertest
 src/examples/helpertest/helpertest
 src/examples/libevent-bench/bench
 src/examples/linetest/linetest
+src/examples/memslice-bench/memslice-bench
 .deps
 *.dylib
 *.o
