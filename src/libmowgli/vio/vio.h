@@ -82,12 +82,13 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
 extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
-
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
+
 extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
-extern mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_to_mvst(mowgli_vio_t *vio, struct sockaddr *addr, socklen_t addrlen);
+
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
+extern int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
 extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
 extern int mowgli_vio_default_connect(mowgli_vio_t *vio);

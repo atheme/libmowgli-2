@@ -55,6 +55,7 @@ typedef struct _mowgli_vio_sockaddr {
 } mowgli_vio_sockaddr_t;
 
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_bind_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
 typedef int mowgli_vio_sr_func_t(mowgli_vio_t *, void *, size_t, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
@@ -64,6 +65,7 @@ typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
 
 typedef struct {
 	mowgli_vio_socket_func_t *socket;
+	mowgli_vio_bind_func_t *bind;
 	mowgli_vio_connect_func_t *connect;
 	mowgli_vio_listen_func_t *listen;
 	mowgli_vio_accept_func_t *accept;

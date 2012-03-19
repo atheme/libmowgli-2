@@ -45,6 +45,16 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 	return 0;
 }
 
+int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
+{
+	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
+
+	if (bind(vio->fd, addr->addr, addr->addrlen) != 0)
+		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+
+	return 0;
+}
+
 int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
