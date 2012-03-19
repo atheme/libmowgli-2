@@ -18,6 +18,7 @@ src/examples/helpertest/helpertest
 src/examples/libevent-bench/bench
 src/examples/linetest/linetest
 src/examples/memslice-bench/memslice-bench
+src/examples/vio-udplistener/vio-udplistener
 .deps
 *.dylib
 *.o
@@ -26,4 +27,5 @@ src/examples/memslice-bench/memslice-bench
 *.so.*
 *~
 *.core
+core
 *.swp
