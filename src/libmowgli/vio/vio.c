@@ -122,3 +122,33 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
 		mowgli_heap_free(vio_heap, vio);
 }
 
+/* Generate a mowgli_sockaddr_t struct */
+void mowgli_sockaddr_create(mowgli_vio_sockaddr_t *vsaddr, int proto, const char *addr, int port)
+{
+	struct sockaddr saddr;
+
+	if (proto == AF_INET)
+	{
+		struct sockaddr_in *addr_in = (struct sockaddr_in *)&saddr;
+
+		addr_in->sin_family = proto;
+		addr_in->sin_port = htons(port);
+		inet_pton(proto, addr, &addr_in->sin_addr);
+
+		memcpy(vsaddr->addr, &saddr, sizeof(struct sockaddr_in));
+		vsaddr->addrlen = sizeof(struct sockaddr_in);
+	}
+	else if (proto == AF_INET6)
+	{
+		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)&saddr;
+
+		addr_in6->sin6_family = proto;
+		addr_in6->sin6_port = htons(port);
+		inet_pton(proto, addr, &addr_in6->sin6_addr);
+
+		memcpy(vsaddr->addr, &saddr, sizeof(struct sockaddr_in6));
+		vsaddr->addrlen = sizeof(struct sockaddr_in6);
+	}
+	else
+		vsaddr = NULL;
+}
