@@ -87,7 +87,7 @@ extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
 
-extern void mowgli_sockaddr_create(mowgli_vio_sockaddr_t *vsaddr, int proto, const char *addr, int port);
+extern mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int port);
 
 extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto);
 extern int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);

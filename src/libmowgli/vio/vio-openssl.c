@@ -100,7 +100,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
-	if (connect(vio->fd, vio->addr.addr, vio->addr.addrlen) < 0)
+	if (connect(vio->fd, (struct sockaddr *)&vio->addr.addr, vio->addr.addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{

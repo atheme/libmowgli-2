@@ -50,7 +50,7 @@ typedef struct _mowgli_vio_error {
 } mowgli_vio_error_t;
 
 typedef struct _mowgli_vio_sockaddr {
-	struct sockaddr *addr;
+	struct sockaddr_storage addr;
 	socklen_t addrlen;
 } mowgli_vio_sockaddr_t;
 

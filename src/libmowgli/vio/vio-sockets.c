@@ -38,8 +38,11 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 
 	vio->fd = fd;
 
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
+	if (family == SOCK_STREAM)
+	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
+	}
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return 0;
@@ -49,7 +52,7 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
 
-	if (bind(vio->fd, addr->addr, addr->addrlen) != 0)
+	if (bind(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
 	return 0;
@@ -84,7 +87,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((fd = accept(vio->fd, newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((fd = accept(vio->fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -110,7 +113,7 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, vio->addr.addr, vio->addr.addrlen) < 0)
+	if (connect(vio->fd, (struct sockaddr *)&vio->addr.addr, vio->addr.addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -198,7 +201,7 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgl
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)sendto(vio->fd, buffer, len, 0, addr->addr, addr->addrlen)) == -1)
+	if ((ret = (int)sendto(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -222,7 +225,7 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, addr->addr, &addr->addrlen)) < 0)
+	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -272,6 +275,9 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 		break;
 	case MOWGLI_VIO_ERR_OP_SOCKET:
 		errtype = "Socket";
+		break;
+	case MOWGLI_VIO_ERR_OP_BIND:
+		errtype = "Bind";
 		break;
 	case MOWGLI_VIO_ERR_OP_OTHER:
 		errtype = "Application";
