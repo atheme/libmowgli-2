@@ -11,6 +11,8 @@
 #define LISTEN	"::ffff:127.0.0.1"	/* 6to4 mapping */
 #define PORT	31337
 
+#define ECHOBACK "Echo: "
+
 int main (void)
 {
 	mowgli_vio_t *vio = mowgli_vio_create(NULL);
@@ -33,6 +35,7 @@ int main (void)
 
 		printf("Recieved bytes from addr [%s]:%hu: %s", sockinfo.host, sockinfo.port, buf);
 
+		mowgli_vio_sendto(vio, ECHOBACK, sizeof(ECHOBACK), addr);
 		mowgli_vio_sendto(vio, buf, strlen(buf), addr);
 	}
 
