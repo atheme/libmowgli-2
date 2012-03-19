@@ -24,6 +24,9 @@ static mowgli_heap_t *eventloop_heap = NULL;
 
 extern mowgli_eventloop_ops_t _mowgli_null_pollops;
 
+#ifdef HAVE_PORT_CREATE
+extern mowgli_eventloop_ops_t _mowgli_ports_pollops;
+#endif
 #ifdef HAVE_DISPATCH_BLOCK
 extern mowgli_eventloop_ops_t _mowgli_qnx_pollops;
 #endif
@@ -65,6 +68,9 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 #endif
 #ifdef HAVE_DISPATCH_BLOCK
 	eventloop->eventloop_ops = &_mowgli_qnx_pollops;
+#endif
+#ifdef HAVE_PORT_CREATE
+	eventloop->eventloop_ops = &_mowgli_ports_pollops;
 #endif
 
 	if (mowgli_mutex_create(&eventloop->mutex) != 0)
