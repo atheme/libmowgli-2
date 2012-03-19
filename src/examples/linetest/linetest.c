@@ -89,8 +89,8 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	mowgli_linebuf_attach_to_eventloop(linebuf, base_eventloop);
 
 	/* Do the connect */
-	linebuf->vio->addr = res->ai_addr;
-	linebuf->vio->addrlen = res->ai_addrlen;
+	linebuf->vio->addr.addr = res->ai_addr;
+	linebuf->vio->addr.addrlen = res->ai_addrlen;
 	if (mowgli_vio_connect(linebuf->vio) != 0)
 		return NULL;
 
