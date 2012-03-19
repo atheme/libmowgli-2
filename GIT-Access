@@ -1,5 +1,5 @@
 The libmowgli GIT repository can be checked out using the following command:
-	git clone git://git.atheme.org/libmowgli.git libmowgli
+	git clone git://git.atheme.org/libmowgli-2.git libmowgli-2
 
 libmowgli's GIT repository depot can be browsed over the internet at 
 the following address:
