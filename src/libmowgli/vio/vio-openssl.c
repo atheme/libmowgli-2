@@ -40,6 +40,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
+static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
 static mowgli_heap_t *ssl_heap = NULL;
@@ -174,76 +175,79 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
-	int ret;
-	mowgli_ssl_connection_t *connection = vio->privdata;
-
-	/* Establish SSL connection */
-	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
-	{
-		return mowgli_vio_openssl_client_handshake(vio, connection);
-	}
-
-	/* We're connected */
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
-
-	if ((ret = (int)SSL_read(connection->ssl_handle, buffer, len)) < 0)
-	{
-		int err = SSL_get_error(connection->ssl_handle, ret);
-
-		if (err != SSL_ERROR_WANT_READ)
-		{
-			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
-		}
-
-		if (ret == 0)
-		{
-			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
-			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
-
-			MOWGLI_VIO_SET_CLOSED(vio);
-
-			return mowgli_vio_error(vio);
-		}
-
-		return 0;
-	}
-
-	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
-	return ret;
+	return mowgli_openssl_read_or_write(true, vio, buffer, len);
 }
 
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
 {
-	int ret;
-	mowgli_ssl_connection_t *connection = vio->privdata;
-
-	/* Establish SSL connection */
-        if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
-        {
-                return mowgli_vio_openssl_client_handshake(vio, connection);
-        }
-
-	/* We're connected */
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
+	return mowgli_openssl_read_or_write(false, vio, buffer, len);
+}
 
-	if ((ret = (int)SSL_write(connection->ssl_handle, buffer, len)) == -1)
+static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len)
+{
+	mowgli_ssl_connection_t *connection = vio->privdata;
+	int ret;
+	unsigned long err;
+
+	if(read)
+		ret = (int)SSL_read(connection->ssl_handle, buffer, len);
+	else
+		ret = (int)SSL_write(connection->ssl_handle, buffer, len);
+
+	if (ret < 0)
 	{
-		int err = SSL_get_error(connection->ssl_handle, ret);
+		switch (SSL_get_error(connection->ssl_handle, ret))
+		{
+			case SSL_ERROR_WANT_READ:
+			{
+				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+				return 0;
+			}
+			case SSL_ERROR_WANT_WRITE:
+			{
+				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+				return 0;
+			}
+			case SSL_ERROR_ZERO_RETURN:
+			{
+				return 0;
+			}
+			case SSL_ERROR_SYSCALL:
+			{
+				if((err = ERR_get_error()) == 0)
+				{
+					vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
+					mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
+	
+					mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+					mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
+	
+					return mowgli_vio_error(vio);
+				}
 
-		if (err != SSL_ERROR_WANT_WRITE)
-		{
-			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
+				break;
+			}
+			default:
+			{
+				err = ERR_get_error();
+				break;
+			}
 		}
-		else
+
+		if(err > 0)
 		{
-			return 0;
+			errno = EIO;
+			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 		}
+
+		/* idk lol */
+		return -1;
 	}
 
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
 }
@@ -258,8 +262,7 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 
 	mowgli_heap_free(ssl_heap, connection);
 
-	vio->flags &= ~MOWGLI_VIO_FLAGS_ISCONNECTING;
-	vio->flags |= MOWGLI_VIO_FLAGS_ISCLOSED;
+	MOWGLI_VIO_SET_CLOSED(vio);
 
 	close(vio->fd);
 	return 0;
