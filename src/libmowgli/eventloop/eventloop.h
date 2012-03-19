@@ -102,6 +102,8 @@ struct _mowgli_pollable {
 	void *userdata;
 
 	mowgli_node_t node;
+
+	mowgli_eventloop_t *eventloop;
 };
 
 typedef struct {
