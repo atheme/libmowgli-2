@@ -23,7 +23,7 @@ It contains:
     - mowgli_argstack: Safe serialization of valists.
     - mowgli_assert: Various assertion routines that can be used.
     - mowgli_bitvector: Bitmasks with an unlimited level of precision.
-    - mowgli_dictionary: A keyword-backed definition hashtable class.
+    - mowgli_patricia: A keyword-backed definition hashtable class.
     - mowgli_error_backtrace: Provide feedback to users on what caused the
                               error they are recieving.
     - mowgli_exception: Assertions with user feedback.
@@ -33,7 +33,6 @@ It contains:
     - mowgli_heap: An optimistic heap-based memory allocator
     - mowgli_hook: A simple hooks API you can use for your application, which
                    allows for hooks to provide both application data and user data.
-    - mowgli_ioevent: Portable I/O completion ports for many OSes.
     - mowgli_list: A high performance linked lists implementation with O(1) scalability
                    for most common operations.
     - mowgli_logger: An internal class for handling logging of exceptions.
@@ -46,7 +45,10 @@ It contains:
     - mowgli_queue: A simple class which implements double-ended queues.
     - mowgli_random: A high performance psuedo-random number generator.
     - mowgli_signal: A wrapper for sigaction(2).
-    - mowgli_spinlock: Portable spinlocks.
+    - mowgli_eventloop: A portable event loop implementation.
+    - mowgli_vio: An abstraction layer for I/O.
+    - mowgli_linebuf: A line-buffering implementation for clients.
+    - mowgli_thread: Minimal thread abstraction.
 
 More classes will be added with later releases. Please contact
 nenolod -at- atheme.org if you have suggestions on what should be 
@@ -74,3 +76,4 @@ Bug Reports
 
 Bugs can be reported on our tracker at http://jira.atheme.org against the
 libmowgli product.
+
