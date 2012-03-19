@@ -11,23 +11,6 @@
 #define LISTEN	"::ffff:127.0.0.1"	/* 6to4 mapping */
 #define PORT	31337
 
-char *get_ip_str(const struct sockaddr *addr, char *str, size_t len)
-{
-	void *ptr;
-
-	if (addr->sa_family == AF_INET)
-		ptr = &((struct sockaddr_in *)addr)->sin_addr;
-	else if (addr->sa_family == AF_INET6)
-		ptr = &((struct sockaddr_in6 *)addr)->sin6_addr;
-	else
-		return NULL;
-
-	if (inet_ntop(addr->sa_family, ptr, str, len) == NULL)
-		return NULL;
-
-	return str;
-}
-
 int main (void)
 {
 	mowgli_vio_t *vio = mowgli_vio_create(NULL);
@@ -42,13 +25,13 @@ int main (void)
 	while (true)
 	{
 		char buf[BUFSIZE] = "";
-		char host[64];
+		mowgli_vio_sockdata_t sockinfo;
 
 		mowgli_vio_recvfrom(vio, buf, sizeof(buf), addr);
 
-		get_ip_str((struct sockaddr *)&addr->addr, host, sizeof(host));
+		mowgli_vio_sockaddr_info(addr, &sockinfo);
 
-		printf("Recieved bytes from addr %s: %s", host, buf);
+		printf("Recieved bytes from addr [%s]:%hu: %s", sockinfo.host, sockinfo.port, buf);
 
 		mowgli_vio_sendto(vio, buf, strlen(buf), addr);
 	}

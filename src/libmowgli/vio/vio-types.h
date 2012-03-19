@@ -54,6 +54,11 @@ typedef struct _mowgli_vio_sockaddr {
 	socklen_t addrlen;
 } mowgli_vio_sockaddr_t;
 
+typedef struct _mowgli_vio_sockdata {
+	char host[39];	/* max length of IPv6 address */
+	uint16_t port;
+} mowgli_vio_sockdata_t;
+
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_bind_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);

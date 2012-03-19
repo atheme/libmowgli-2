@@ -163,3 +163,29 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 
 	return vsaddr;
 }
+
+int mowgli_vio_sockaddr_info(const mowgli_vio_sockaddr_t *addr, mowgli_vio_sockdata_t *data)
+{
+	const void *sockptr;
+	const struct sockaddr *saddr = (const struct sockaddr *)&addr->addr;
+
+	if (saddr->sa_family == AF_INET)
+	{
+		const struct sockaddr_in *saddr = (const struct sockaddr_in *)&addr->addr;
+		data->port = ntohs(saddr->sin_port);
+		sockptr = &saddr->sin_addr;
+	}
+	else if (saddr->sa_family == AF_INET6)
+	{
+		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *)&addr->addr;
+		data->port = ntohs(saddr->sin6_port);
+		sockptr = &saddr->sin6_addr;
+	}
+	else
+		return -1;
+
+	if (inet_ntop(saddr->sa_family, sockptr, data->host, sizeof(data->host)) == NULL)
+		return -1;
+
+	return 0;
+}
