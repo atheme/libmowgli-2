@@ -136,7 +136,7 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 		addr_in->sin_port = htons(port);
 		if (addr != NULL)
 		{
-			if (inet_pton(proto, addr, &addr_in->sin_addr) != 0)
+			if (inet_pton(proto, addr, &addr_in->sin_addr) != 1)
 				mowgli_log("Error with inet_pton!");
 		}
 
@@ -151,7 +151,7 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 		addr_in6->sin6_port = htons(port);
 		if (addr != NULL)
 		{
-			if (inet_pton(proto, addr, &addr_in6->sin6_addr) != 0)
+			if (inet_pton(proto, addr, &addr_in6->sin6_addr) != 1)
 				mowgli_log("Error with inet_pton!");
 		}
 
