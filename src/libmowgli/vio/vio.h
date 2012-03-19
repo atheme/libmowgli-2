@@ -106,57 +106,20 @@ extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 
 extern mowgli_vio_ops_t mowgli_vio_default_ops;
 
-#define mowgli_vio_set_op(vio, operation, func) (vio)->ops.operation = func;
+#define mowgli_vio_set_op(vio, op, func) vio->ops.op = func;
 
-/* If somebody could write a macro to replace all these below functions... that'd be swell */
-static inline int mowgli_vio_socket(mowgli_vio_t *vio, int family, int type, int flags)
-{
-	return vio->ops.socket(vio, family, type, flags);
-}
-
-static inline int mowgli_vio_listen(mowgli_vio_t *vio, int backlog)
-{
-	return vio->ops.listen(vio, backlog);
-}
-
-static inline int mowgli_vio_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
-{
-	return vio->ops.accept(vio, newvio);
-}
-
-static inline int mowgli_vio_connect(mowgli_vio_t *vio)
-{
-	return vio->ops.connect(vio);
-}
-
-static inline int mowgli_vio_read(mowgli_vio_t *vio, void *buffer, size_t len)
-{
-	return vio->ops.read(vio, buffer, len);
-}
-
-static inline int mowgli_vio_write(mowgli_vio_t *vio, void *buffer, size_t len)
-{
-	return vio->ops.write(vio, buffer, len);
-}
-
-static inline int mowgli_vio_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
-{
-	return vio->ops.sendto(vio, buffer, len, addr);
-}
-
-static inline int mowgli_vio_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
-{
-	return vio->ops.recvfrom(vio, buffer, len, addr);
-}
-
-static inline int mowgli_vio_error(mowgli_vio_t *vio)
-{
-	return vio->ops.error(vio);
-}
-
-static inline int mowgli_vio_close(mowgli_vio_t *vio)
-{
-	return vio->ops.close(vio);
-}
+/* A tad inelegant... */
+#define mowgli_vio_socket(vio, ...)	{vio->ops.socket(vio, __VA_ARGS__)}
+#define mowgli_vio_listen(vio, ...)	{vio->ops.listen(vio, __VA_ARGS__)}
+#define mowgli_vio_bind(vio, ...)	{vio->ops.bind(vio, __VA_ARGS__)}
+#define mowgli_vio_accept(vio, ...)	{vio->ops.accept(vio, __VA_ARGS__)}
+#define mowgli_vio_connect(vio, ...)	{vio->ops.connect(vio, __VA_ARGS__)}
+#define mowgli_vio_read(vio, ...)	{vio->ops.read(vio, __VA_ARGS__)}
+#define mowgli_vio_write(vio, ...)	{vio->ops.write(vio, __VA_ARGS__)}
+#define mowgli_vio_sendto(vio, ...)	{vio->ops.sendto(vio, __VA_ARGS__)}
+#define mowgli_vio_recvfrom(vio, ...)	{vio->ops.recvfrom(vio, __VA_ARGS__)}
+#define mowgli_vio_error(vio)		{vio->ops.error(vio)}
+#define mowgli_vio_close(vio)		{vio->ops.close(vio)}
 
 #endif
+
