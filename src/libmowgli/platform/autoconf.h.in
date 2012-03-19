@@ -1,5 +1,8 @@
 /* src/libmowgli/platform/autoconf.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the `dispatch_block' function. */
+#undef HAVE_DISPATCH_BLOCK
+
 /* Define to 1 if you have the `fcntl' function. */
 #undef HAVE_FCNTL
 

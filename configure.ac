@@ -25,7 +25,7 @@ AS_IF([test "x$GCC" = "xyes"], [
 ])
 
 AC_CHECK_HEADERS([poll.h winsock2.h linux/futex.h sys/epoll.h sys/select.h])
-AC_CHECK_FUNCS([fcntl kqueue mmap select])
+AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block])
 
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
