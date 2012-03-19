@@ -104,6 +104,8 @@ extern int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len
 extern int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
+extern int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence);
+extern int mowgli_vio_default_tell(mowgli_vio_t *vio);
 
 extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings);
 /* These are void ptr's so they can be null ops if SSL isn't available */
@@ -126,6 +128,8 @@ extern mowgli_vio_ops_t mowgli_vio_default_ops;
 #define mowgli_vio_recvfrom(vio, ...)	vio->ops.recvfrom(vio, __VA_ARGS__)
 #define mowgli_vio_error(vio)		vio->ops.error(vio);
 #define mowgli_vio_close(vio)		vio->ops.close(vio);
+#define mowgli_vio_seek(vio, ...)	vio->ops.seek(vio, __VA_ARGS__)
+#define mowgli_vio_tell(vio)		vio->ops.tell(vio)
 
 #endif
 

@@ -39,6 +39,8 @@ typedef enum {
 	MOWGLI_VIO_ERR_OP_READ,
 	MOWGLI_VIO_ERR_OP_WRITE,
 	MOWGLI_VIO_ERR_OP_BIND,
+	MOWGLI_VIO_ERR_OP_SEEK,
+	MOWGLI_VIO_ERR_OP_TELL,
 	MOWGLI_VIO_ERR_OP_OTHER,
 } mowgli_vio_error_op_t;
 
@@ -67,6 +69,7 @@ typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *);
 typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
 typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
+typedef int mowgli_vio_seek_func_t(mowgli_vio_t *, long, int);
 
 typedef struct {
 	mowgli_vio_socket_func_t *socket;
@@ -80,6 +83,8 @@ typedef struct {
 	mowgli_vio_sr_func_t *recvfrom;
 	mowgli_vio_func_t *error;
 	mowgli_vio_func_t *close;
+	mowgli_vio_seek_func_t *seek;
+	mowgli_vio_func_t *tell;
 } mowgli_vio_ops_t;
 
 struct _mowgli_vio {

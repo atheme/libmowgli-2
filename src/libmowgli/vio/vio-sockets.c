@@ -283,7 +283,7 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 		errtype = "Application";
 		break;
 	default:
-		errtype = "Generic";
+		errtype = "Generic/Unknown";
 	}
 
 	fprintf(stderr, "%s error: %s\n", errtype, vio->error.string);
@@ -302,6 +302,20 @@ int mowgli_vio_default_close(mowgli_vio_t *vio)
 	closesocket(vio->fd);
 #endif
 	return 0;
+}
+
+int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence)
+{
+	vio->error.op = MOWGLI_VIO_ERR_OP_SEEK;
+	errno = ENOSYS;
+	MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+}
+
+int mowgli_vio_default_tell(mowgli_vio_t *vio)
+{
+	vio->error.op = MOWGLI_VIO_ERR_OP_TELL;
+	errno = ENOSYS;
+	MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 }
 
 /* Generate a mowgli_sockaddr_t struct */

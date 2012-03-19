@@ -48,6 +48,8 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 	.recvfrom = mowgli_vio_default_recvfrom,
 	.error = mowgli_vio_default_error,
 	.close = mowgli_vio_default_close,
+	.seek = mowgli_vio_default_seek,
+	.tell = mowgli_vio_default_tell,
 };
 
 mowgli_vio_t * mowgli_vio_create(void *userdata)
