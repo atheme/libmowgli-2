@@ -296,7 +296,11 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
 	MOWGLI_VIO_SET_CLOSED(vio);
+#ifndef _WIN32
 	close(vio->fd);
+#else
+	closesocket(vio->fd);
+#endif
 	return 0;
 }
 
