@@ -16,10 +16,102 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_VIO_H__
-#define __MOWGLI_VIO_H__
+#ifndef __MOWGLI_VIO_VIO_H__
+#define __MOWGLI_VIO_VIO_H__
 
-#include "vio/vio-types.h"
+/* Types and structs */
+typedef struct _mowgli_vio mowgli_vio_t;
+
+typedef enum {
+	MOWGLI_VIO_ERR_NONE,
+	MOWGLI_VIO_ERR_REMOTE_HANGUP,
+	MOWGLI_VIO_ERR_ERRCODE,
+	MOWGLI_VIO_ERR_API,
+	MOWGLI_VIO_ERR_CUSTOM,
+} mowgli_vio_error_type_t;
+
+typedef enum {
+	MOWGLI_VIO_ERR_OP_NONE,
+	MOWGLI_VIO_ERR_OP_SOCKET,
+	MOWGLI_VIO_ERR_OP_LISTEN,
+	MOWGLI_VIO_ERR_OP_ACCEPT,
+	MOWGLI_VIO_ERR_OP_CONNECT,
+	MOWGLI_VIO_ERR_OP_READ,
+	MOWGLI_VIO_ERR_OP_WRITE,
+	MOWGLI_VIO_ERR_OP_BIND,
+	MOWGLI_VIO_ERR_OP_SEEK,
+	MOWGLI_VIO_ERR_OP_TELL,
+	MOWGLI_VIO_ERR_OP_OTHER,
+} mowgli_vio_error_op_t;
+
+typedef struct _mowgli_vio_error {
+	mowgli_vio_error_op_t op;
+	mowgli_vio_error_type_t type;
+	int code;
+	char string[128];
+} mowgli_vio_error_t;
+
+typedef struct _mowgli_vio_sockaddr {
+	struct sockaddr_storage addr;
+	socklen_t addrlen;
+} mowgli_vio_sockaddr_t;
+
+typedef struct _mowgli_vio_sockdata {
+	char host[39];	/* max length of IPv6 address */
+	uint16_t port;
+} mowgli_vio_sockdata_t;
+
+typedef int mowgli_vio_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_bind_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
+typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
+typedef int mowgli_vio_sr_func_t(mowgli_vio_t *, void *, size_t, mowgli_vio_sockaddr_t *);
+typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
+typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *);
+typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
+typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
+typedef int mowgli_vio_seek_func_t(mowgli_vio_t *, long, int);
+
+typedef struct {
+	mowgli_vio_socket_func_t *socket;
+	mowgli_vio_bind_func_t *bind;
+	mowgli_vio_connect_func_t *connect;
+	mowgli_vio_listen_func_t *listen;
+	mowgli_vio_accept_func_t *accept;
+	mowgli_vio_rw_func_t *read;
+	mowgli_vio_rw_func_t *write;
+	mowgli_vio_sr_func_t *sendto;
+	mowgli_vio_sr_func_t *recvfrom;
+	mowgli_vio_func_t *error;
+	mowgli_vio_func_t *close;
+	mowgli_vio_seek_func_t *seek;
+	mowgli_vio_func_t *tell;
+} mowgli_vio_ops_t;
+
+struct _mowgli_vio {
+	mowgli_vio_ops_t ops;
+
+	mowgli_eventloop_io_t *io;
+	mowgli_descriptor_t fd;
+
+	/* Some jackass could attach us to multiple event loops I guess */
+	mowgli_list_t eventloops;
+
+	mowgli_vio_sockaddr_t addr;
+
+	mowgli_vio_error_t error;
+
+	int flags;
+
+	void *userdata;
+	void *privdata;
+};
+
+typedef struct _mowgli_vio_ssl_settings {
+	char cert_path[FILENAME_MAX];
+	int ssl_version;
+	bool strict_checking;
+} mowgli_vio_ssl_settings_t;
+
 
 /* Flags */
 #define MOWGLI_VIO_FLAGS_ISCONNECTING		0x00001
@@ -41,6 +133,8 @@
 #define MOWGLI_VIO_SSLFLAGS_TLSV11		0x00008
 #define MOWGLI_VIO_SSLFLAGS_TLSV12		0x00010
 
+
+/* Flag setting/getting */
 static inline bool mowgli_vio_hasflag(mowgli_vio_t *vio, int flag)
 {
 	return vio->flags & flag ? true : false;
@@ -53,6 +147,7 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 	else
 		vio->flags &= flag;
 }
+
 
 /* Macros */
 #define MOWGLI_VIO_SET_CLOSED(v)					\
@@ -81,6 +176,7 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 #else
 #	define MOWGLI_VIO_RETURN_SSL_ERRCODE(v, e) MOWGLI_VIO_RETURN_ERRCODE(v, strerror, e)
 #endif
+
 
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
@@ -114,9 +210,10 @@ extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 
 extern mowgli_vio_ops_t mowgli_vio_default_ops;
 
+
+/* Sundry operations on vio functables */
 #define mowgli_vio_set_op(vio, op, func) vio->ops.op = func;
 
-/* A tad inelegant... */
 #define mowgli_vio_socket(vio, ...)	vio->ops.socket(vio, __VA_ARGS__)
 #define mowgli_vio_listen(vio, ...)	vio->ops.listen(vio, __VA_ARGS__)
 #define mowgli_vio_bind(vio, ...)	vio->ops.bind(vio, __VA_ARGS__)

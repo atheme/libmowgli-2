@@ -5,7 +5,7 @@ STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_VIO}
 
 SRCS = vio.c vio-sockets.c vio-openssl.c
 
-INCLUDES = vio.h vio-types.h
+INCLUDES = vio.h
 
 include ../../../buildsys.mk
 
