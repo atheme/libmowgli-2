@@ -50,7 +50,7 @@ int inet_pton(int af, const char *src, void *dst)
 	return -1;
 }
 
-const char *inet_ntop(int af, void *addr, char *host, size_t hostlen)
+const char *inet_ntop(int af, const void *addr, char *host, size_t hostlen)
 {
 	struct sockaddr_storage ss;
 	int size = sizeof(struct sockaddr_storage);
