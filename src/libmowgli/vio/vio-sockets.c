@@ -55,6 +55,9 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 	if (bind(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
 		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
 
+	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
+	vio->addr.addrlen = addr->addrlen;
+
 	return 0;
 }
 
@@ -125,6 +128,8 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 		}
 	}
 
+	/* XXX -- overwrites if we already used bind -- not terribly concerning as this is
+	 * more interesting --Elizabeth */
 	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
 	vio->addr.addrlen = addr->addrlen;
 
