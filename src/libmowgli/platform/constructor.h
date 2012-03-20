@@ -45,6 +45,13 @@
 	static void func(void) __attribute__((constructor)); \
 	static void func(void)
 
+#elif defined(__SUNPRO_C)
+
+#define MOWGLI_INITALIZER_FUNC(func) \
+	void mowgli_solaris_suncc_init(void) { func(); }
+
+#pragma init(mowgli_solaris_suncc_init)
+
 #else
 
 #error MOWGLI_INITIALIZER_FUNC not implemented for your platform :(
