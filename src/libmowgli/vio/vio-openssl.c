@@ -36,7 +36,7 @@ typedef struct {
 	mowgli_vio_ssl_settings_t settings;
 } mowgli_ssl_connection_t;
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio);
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
@@ -96,12 +96,12 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 	return connection->ssl_context;
 }
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
+static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
-	if (connect(vio->fd, (struct sockaddr *)&vio->addr.addr, vio->addr.addrlen) < 0)
+	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -115,6 +115,9 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio)
 			return 0;
 		}
 	}
+
+	memcpy(&vio->addr.addr, &addr->addr, addr->addrlen);
+	vio->addr.addrlen = addr->addrlen;
 
 	/* Non-blocking socket, begin handshake */
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);

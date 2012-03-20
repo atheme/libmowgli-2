@@ -109,11 +109,11 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	return 0;
 }
 
-int mowgli_vio_default_connect(mowgli_vio_t *vio)
+int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, (struct sockaddr *)&vio->addr.addr, vio->addr.addrlen) < 0)
+	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -124,6 +124,9 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio)
 			return 0;
 		}
 	}
+
+	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
+	vio->addr.addrlen = addr->addrlen;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLIENT, true);
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, false);

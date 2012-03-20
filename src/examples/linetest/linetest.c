@@ -44,6 +44,7 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	client_t *client;
 	struct addrinfo hints, *res;
 	bool use_ssl = false;
+	mowgli_vio_sockaddr_t addr;
 	int ret;
 
 	mowgli_linebuf_t *linebuf;
@@ -89,9 +90,9 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	mowgli_linebuf_attach_to_eventloop(linebuf, base_eventloop);
 
 	/* Do the connect */
-	memcpy(&linebuf->vio->addr.addr, res->ai_addr, res->ai_addrlen);
-	linebuf->vio->addr.addrlen = res->ai_addrlen;
-	if (mowgli_vio_connect(linebuf->vio) != 0)
+	memcpy(&addr.addr, res->ai_addr, res->ai_addrlen);
+	addr.addrlen = res->ai_addrlen;
+	if (mowgli_vio_connect(linebuf->vio, &addr) != 0)
 		return NULL;
 
 	/* Write IRC handshake */

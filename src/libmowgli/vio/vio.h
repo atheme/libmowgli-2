@@ -62,9 +62,9 @@ typedef struct _mowgli_vio_sockdata {
 } mowgli_vio_sockdata_t;
 
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
-typedef int mowgli_vio_bind_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
-typedef int mowgli_vio_rw_func_t(mowgli_vio_t *, void *, size_t);
-typedef int mowgli_vio_sr_func_t(mowgli_vio_t *, void *, size_t, mowgli_vio_sockaddr_t *);
+typedef int mowgli_vio_bind_connect_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
+typedef int mowgli_vio_read_write_func_t(mowgli_vio_t *, void *, size_t);
+typedef int mowgli_vio_sendto_recvfrom_func_t(mowgli_vio_t *, void *, size_t, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_connect_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_accept_func_t(mowgli_vio_t *, mowgli_vio_t *);
 typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
@@ -73,14 +73,14 @@ typedef int mowgli_vio_seek_func_t(mowgli_vio_t *, long, int);
 
 typedef struct {
 	mowgli_vio_socket_func_t *socket;
-	mowgli_vio_bind_func_t *bind;
-	mowgli_vio_connect_func_t *connect;
+	mowgli_vio_bind_connect_func_t *bind;
+	mowgli_vio_bind_connect_func_t *connect;
 	mowgli_vio_listen_func_t *listen;
 	mowgli_vio_accept_func_t *accept;
-	mowgli_vio_rw_func_t *read;
-	mowgli_vio_rw_func_t *write;
-	mowgli_vio_sr_func_t *sendto;
-	mowgli_vio_sr_func_t *recvfrom;
+	mowgli_vio_read_write_func_t *read;
+	mowgli_vio_read_write_func_t *write;
+	mowgli_vio_sendto_recvfrom_func_t *sendto;
+	mowgli_vio_sendto_recvfrom_func_t *recvfrom;
 	mowgli_vio_func_t *error;
 	mowgli_vio_func_t *close;
 	mowgli_vio_seek_func_t *seek;
@@ -193,7 +193,7 @@ extern int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, in
 extern int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog);
 extern int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
-extern int mowgli_vio_default_connect(mowgli_vio_t *vio);
+extern int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_write(mowgli_vio_t *vio, void *buffer, size_t len);
 extern int mowgli_vio_default_sendto(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr);
@@ -218,7 +218,7 @@ extern mowgli_vio_ops_t mowgli_vio_default_ops;
 #define mowgli_vio_listen(vio, ...)	vio->ops.listen(vio, __VA_ARGS__)
 #define mowgli_vio_bind(vio, ...)	vio->ops.bind(vio, __VA_ARGS__)
 #define mowgli_vio_accept(vio, ...)	vio->ops.accept(vio, __VA_ARGS__)
-#define mowgli_vio_connect(vio)		vio->ops.connect(vio)
+#define mowgli_vio_connect(vio, ...)	vio->ops.connect(vio, __VA_ARGS__)
 #define mowgli_vio_read(vio, ...)	vio->ops.read(vio, __VA_ARGS__)
 #define mowgli_vio_write(vio, ...)	vio->ops.write(vio, __VA_ARGS__)
 #define mowgli_vio_sendto(vio, ...)	vio->ops.sendto(vio, __VA_ARGS__)
