@@ -368,15 +368,15 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 	return vsaddr;
 }
 
-mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(const void *addr, socklen_t size)
+mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *naddr, const void *addr, socklen_t size)
 {
 	const struct sockaddr_storage *saddr = addr;
-	mowgli_vio_sockaddr_t *naddr;
 
 	return_val_if_fail(addr != NULL, NULL);
 	return_val_if_fail(saddr->ss_family != AF_INET && saddr->ss_family != AF_INET6, NULL);
 
-	naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
+	if (naddr == NULL)
+		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
 	memcpy(&naddr->addr, saddr, size);
 	naddr->addrlen = size;
 
