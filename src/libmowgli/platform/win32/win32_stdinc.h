@@ -46,6 +46,8 @@ extern int gettimeofday(struct timeval *tv, struct timezone *tz);
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int pipe(int pipefd[2]);
 extern int fork(void);
+extern int inet_pton(int af, const char *src, void *dst);
+extern const char *inet_ntop(int af, void *addr, char *host, size_t hostlen);
 
 /* MSYS autoconf is fucko. */
 #ifndef HAVE_WINSOCK2_H
