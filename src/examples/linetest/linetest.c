@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * lineserver.c: Testing of the linebuffer
+ * linetest.c: Testing of the linebuffer
  *
  * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
  * Copyright (c) 2012 Elizabeth J. Myers <elizabeth@sporksmoo.net>
