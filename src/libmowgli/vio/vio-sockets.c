@@ -327,10 +327,12 @@ int mowgli_vio_default_tell(mowgli_vio_t *vio)
 }
 
 /* Generate a mowgli_sockaddr_t struct */
-mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int port)
+mowgli_vio_sockaddr_t * mowgli_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port)
 {
 	struct sockaddr_storage saddr;
-	mowgli_vio_sockaddr_t *vsaddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
+
+	if (naddr == NULL)
+		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
 
 	if (proto == AF_INET)
 	{
@@ -344,8 +346,8 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 				mowgli_log("Error with inet_pton!");
 		}
 
-		memcpy(&vsaddr->addr, &saddr, sizeof(struct sockaddr_in));
-		vsaddr->addrlen = sizeof(struct sockaddr_in);
+		memcpy(&naddr->addr, &saddr, sizeof(struct sockaddr_in));
+		naddr->addrlen = sizeof(struct sockaddr_in);
 	}
 	else if (proto == AF_INET6)
 	{
@@ -359,13 +361,13 @@ mowgli_vio_sockaddr_t * mowgli_sockaddr_create(int proto, const char *addr, int 
 				mowgli_log("Error with inet_pton!");
 		}
 
-		memcpy(&vsaddr->addr, &saddr, sizeof(struct sockaddr_in6));
-		vsaddr->addrlen = sizeof(struct sockaddr_in6);
+		memcpy(&naddr->addr, &saddr, sizeof(struct sockaddr_in6));
+		naddr->addrlen = sizeof(struct sockaddr_in6);
 	}
 	else
-		vsaddr = NULL;
+		naddr = NULL;
 
-	return vsaddr;
+	return naddr;
 }
 
 mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *naddr, const void *addr, socklen_t size)

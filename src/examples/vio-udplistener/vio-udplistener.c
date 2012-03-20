@@ -16,12 +16,14 @@
 int main (void)
 {
 	mowgli_vio_t *vio = mowgli_vio_create(NULL);
-	mowgli_vio_sockaddr_t *addr = mowgli_sockaddr_create(PROTO, LISTEN, 31337);
+	mowgli_vio_sockaddr_t addr;
+	
+	mowgli_sockaddr_create(&addr, PROTO, LISTEN, 31337);
 
 	if (mowgli_vio_socket(vio, PROTO, SOCK_DGRAM, 0))
 		return EXIT_FAILURE;
 
-	if (mowgli_vio_bind(vio, addr))
+	if (mowgli_vio_bind(vio, &addr))
 		return EXIT_FAILURE;
 
 	while (true)
@@ -29,17 +31,15 @@ int main (void)
 		char buf[BUFSIZE] = "";
 		mowgli_vio_sockdata_t sockinfo;
 
-		mowgli_vio_recvfrom(vio, buf, sizeof(buf), addr);
+		mowgli_vio_recvfrom(vio, buf, sizeof(buf), &addr);
 
-		mowgli_vio_sockaddr_info(addr, &sockinfo);
+		mowgli_vio_sockaddr_info(&addr, &sockinfo);
 
 		printf("Recieved bytes from addr [%s]:%hu: %s", sockinfo.host, sockinfo.port, buf);
 
-		mowgli_vio_sendto(vio, ECHOBACK, sizeof(ECHOBACK), addr);
-		mowgli_vio_sendto(vio, buf, strlen(buf), addr);
+		mowgli_vio_sendto(vio, ECHOBACK, sizeof(ECHOBACK), &addr);
+		mowgli_vio_sendto(vio, buf, strlen(buf), &addr);
 	}
-
-	mowgli_free(addr);
 
 	return EXIT_SUCCESS; /* Not reached */
 }
