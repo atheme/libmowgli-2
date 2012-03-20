@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_module.c: Loadable modules for POSIX systems.
+ * loader_posix.c: Loadable modules for POSIX systems.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

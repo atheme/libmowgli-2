@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_thread.h: Cross-platform threading helper routines.
+ * thread.h: Cross-platform threading helper routines.
  *
  * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
  * Copyright (c) 2011, 2012 William Pitcock <nenolod@dereferenced.org>

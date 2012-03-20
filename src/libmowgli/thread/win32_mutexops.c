@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_thread.c: Cross-platform threading helper routines.
+ * win32_mutexops.c: Windows mutex operations
  *
  * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
  *

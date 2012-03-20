@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_thread.c: Cross-platform threading helper routines.
+ * mutex.c: Cross-platform mutexes.
  *
  * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
  *

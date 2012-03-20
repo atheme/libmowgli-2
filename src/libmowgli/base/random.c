@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_random.c: Portable mersinne-twister based psuedo-random number generator.
+ * random.c: Portable mersinne-twister based psuedo-random number generator.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Algorithm copyright (c) 1999-2007 Takuji Nishimura and Makoto Matsumoto

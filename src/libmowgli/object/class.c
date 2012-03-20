@@ -1,7 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_object_class.c: Object class and type management,
- *                        cast checking.
+ * class.c: Object class and type management, cast checking.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

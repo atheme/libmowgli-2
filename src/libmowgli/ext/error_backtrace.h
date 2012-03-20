@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_error_backtrace.h: Print errors and explain how they were reached.
+ * error_backtrace.h: Print errors and explain how they were reached.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

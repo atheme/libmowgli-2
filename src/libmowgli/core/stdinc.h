@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_stdinc.h: Pulls in the base system includes for libmowgli.
+ * stdinc.h: Pulls in the base system includes for libmowgli.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

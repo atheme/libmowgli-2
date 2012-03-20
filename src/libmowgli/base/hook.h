@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_hook.h: Hooks.
+ * hook.h: Hooks.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Copyright (c) 2007 Giacomo Lozito <james -at- develia.org>

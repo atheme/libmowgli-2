@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_module_win32.c: Loadable modules under Microsoft Windows.
+ * loader_win32.c: Loadable modules under Microsoft Windows.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

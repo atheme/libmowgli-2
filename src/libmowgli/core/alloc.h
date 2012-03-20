@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_alloc.h: Safe, portable implementations of malloc, calloc, and free.
+ * alloc.h: Safe, portable implementations of malloc, calloc, and free.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

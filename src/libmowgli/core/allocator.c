@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_allocator.h: Builtin allocation policies (mmap/malloc).
+ * allocator.h: Builtin allocation policies (mmap/malloc).
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *

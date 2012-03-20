@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_heap.h: Heap allocation.
+ * heap.h: Heap allocation.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Copyright (c) 2005-2006 Theo Julienne <terminal -at- atheme.org>

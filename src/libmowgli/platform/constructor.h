@@ -1,6 +1,6 @@
 /*
  * constructor.h
- * Code for setting up C1X initializer functions portably.
+ * Code for setting up automatic initializer functions portably.
  *
  * Copyright (c) 2012 William Pitcock <nenolod@dereferenced.org>
  *
@@ -27,7 +27,7 @@
 #ifdef _MSC_VER
 
 /*
- * C1X-style initializers are not yet officially supported in MSVC, however,
+ * Automatic constructors are not yet officially supported in MSVC, however,
  * there is a similar feature where functions in the ".CRT$XCU" section are
  * evaluated prior to DllMain(), main() and friends.
  *

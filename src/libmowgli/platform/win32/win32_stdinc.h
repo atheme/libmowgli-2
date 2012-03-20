@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * win32_support.h: Support functions and values for Win32 platform.
+ * win32_stdinc.h: Support functions and values for Win32 platform.
  *
  * Copyright (c) 2009 SystemInPlace, Inc.
  *

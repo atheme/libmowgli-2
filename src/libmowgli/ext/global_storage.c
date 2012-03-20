@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_global_storage.c: Simple key->value global storage tool.
+ * global_storage.c: Simple key->value global storage tool.
  *
  * Copyright (c) 2007, 2011 William Pitcock <nenolod@dereferenced.org>
  *

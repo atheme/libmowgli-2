@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_patricia.c: Dictionary-based information storage.
+ * patricia.c: Dictionary-based information storage.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Copyright (c) 2007-2010 Jilles Tjoelker <jilles -at- stack.nl>

@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * mowgli_thread.c: Cross-platform threading helper routines.
+ * posix_mutexops.c: POSIX Mutexes.
  *
  * Copyright (c) 2011 Wilcox Technologies, LLC <awilcox -at- wilcox-tech.com>
  *
