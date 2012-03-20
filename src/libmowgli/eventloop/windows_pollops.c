@@ -59,7 +59,10 @@ static void mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 
 	/* sanitize NT port handle values to a known-good default */
 	for (i = 0; i < priv->pfd_size; i++)
+	{
 		priv->pfd[i] = INVALID_HANDLE_VALUE;
+		priv->pollables[i] = NULL;
+	}
 
 	return;
 }
