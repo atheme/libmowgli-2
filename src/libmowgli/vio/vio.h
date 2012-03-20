@@ -218,7 +218,7 @@ extern mowgli_vio_ops_t mowgli_vio_default_ops;
 #define mowgli_vio_listen(vio, ...)	vio->ops.listen(vio, __VA_ARGS__)
 #define mowgli_vio_bind(vio, ...)	vio->ops.bind(vio, __VA_ARGS__)
 #define mowgli_vio_accept(vio, ...)	vio->ops.accept(vio, __VA_ARGS__)
-#define mowgli_vio_connect(vio, ...)	vio->ops.connect(vio, __VA_ARGS__)
+#define mowgli_vio_connect(vio)		vio->ops.connect(vio)
 #define mowgli_vio_read(vio, ...)	vio->ops.read(vio, __VA_ARGS__)
 #define mowgli_vio_write(vio, ...)	vio->ops.write(vio, __VA_ARGS__)
 #define mowgli_vio_sendto(vio, ...)	vio->ops.sendto(vio, __VA_ARGS__)
