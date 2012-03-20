@@ -65,7 +65,7 @@ static void write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io,
 	client_t *client = userdata;
 
 	if (*client->buf)
-		write(pollable->fd, client->buf, strlen(client->buf));
+		send(pollable->fd, client->buf, strlen(client->buf), 0);
 
 	memset(client->buf, '\0', sizeof(client->buf));
 
@@ -79,7 +79,7 @@ static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, 
 
 	client_t *client = userdata;
 
-	if ((ret = read(pollable->fd, client->buf, sizeof(client->buf))) <= 0)
+	if ((ret = recv(pollable->fd, client->buf, sizeof(client->buf), 0)) <= 0)
 	{
 		mowgli_free(client);
 		mowgli_pollable_destroy(eventloop, io);
