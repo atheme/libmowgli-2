@@ -64,7 +64,7 @@ const char *inet_ntop(int af, void *addr, char *host, size_t hostlen)
 		break;
 
 	case AF_INET6:
-		memcpy(&(((struct sockaddr_in *) &ss)->sin6_addr), (struct in6_addr *) addr, sizeof (struct in6_addr));
+		memcpy(&(((struct sockaddr_in6 *) &ss)->sin6_addr), (struct in6_addr *) addr, sizeof (struct in6_addr));
 		break;
 
 	default:
