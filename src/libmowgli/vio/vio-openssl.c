@@ -170,7 +170,7 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 		if (err == SSL_ERROR_WANT_READ)
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
 		else if (err == SSL_ERROR_WANT_WRITE)
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
 		else if (err == SSL_ERROR_WANT_CONNECT)
 		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
