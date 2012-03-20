@@ -36,6 +36,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <sys/types.h>
+#include <stdint.h>
 
 /* socket stuff */
 #ifndef _WIN32
