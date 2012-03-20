@@ -60,7 +60,7 @@ static void mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	priv = mowgli_alloc(sizeof(mowgli_winsock_eventloop_private_t));
 	eventloop->poller = priv;
 
-	priv->pfd_size = wsock_env.iMaxSockets + 1;
+	priv->pfd_size = wsock_env.iMaxSockets;
 	priv->pfd = mowgli_alloc(sizeof(WSAEVENT) * priv->pfd_size);
 	priv->pollables = mowgli_alloc(sizeof(mowgli_eventloop_pollable_t *) * priv->pfd_size);
 
