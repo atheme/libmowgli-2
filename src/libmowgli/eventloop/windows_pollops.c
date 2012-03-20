@@ -22,6 +22,8 @@
 
 #ifdef _WIN32
 
+#define DEFAULT_SOCKETMAX	(2048)
+
 typedef struct {
 	WSAEVENT *pfd;
 	unsigned short pfd_size;
@@ -41,6 +43,11 @@ void mowgli_winsock_bootstrap(void)
 		printf("mowgli bootstrap failure (win32): %d\n", r);
 		exit(EXIT_FAILURE);
 	}
+
+	if (!wsock_env.iMaxSockets)
+		wsock_env.iMaxSockets = DEFAULT_SOCKETMAX;
+	else
+		wsock_env.iMaxSockets -= (wsock_env.iMaxSockets % MAXIMUM_WAIT_OBJECTS);
 }
 
 static void mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
@@ -216,38 +223,44 @@ static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mo
 static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_winsock_eventloop_private_t *priv;
-	int i;
+	int i, j;
 	DWORD result;
 
 	return_if_fail(eventloop != NULL);
 
 	priv = eventloop->poller;
 
-	result = WaitForMultipleObjects(priv->pfd_size - 1, priv->pfd + 1, FALSE, delay);
-	mowgli_eventloop_synchronize(eventloop);
+	return_if_fail(priv->pfd_size % MAXIMUM_WAIT_OBJECTS == 0);
 
-	if (result == WAIT_FAILED)
+	for (i = 0; i < priv->pfd_size; i += MAXIMUM_WAIT_OBJECTS)
 	{
-		if (mowgli_eventloop_ignore_errno(WSAGetLastError()))
+		result = WaitForMultipleObjects(MAXIMUM_WAIT_OBJECTS, priv->pfd + i, FALSE, delay);
+
+		if (result == WAIT_FAILED)
+		{
+			if (mowgli_eventloop_ignore_errno(WSAGetLastError()))
+				return;
+
+			mowgli_log("mowgli_winsock_eventloop_select(): WaitForMultipleObjects failed: %d", WSAGetLastError());
 			return;
+		}
 
-		mowgli_log("mowgli_winsock_eventloop_select(): WaitForMultipleObjects failed: %d", WSAGetLastError());
-		return;
+		for (j = (result - WAIT_OBJECT_0); j < MAXIMUM_WAIT_OBJECTS; j++)
+		{
+			mowgli_eventloop_pollable_t *pollable = priv->pollables[i + j];
+			WSANETWORKEVENTS events;
+
+			WSAEnumNetworkEvents(pollable->fd, priv->pfd[pollable->slot], &events);
+
+			if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB) && pollable->read_function != NULL)
+				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+
+			if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE) && pollable->write_function != NULL)
+				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+		}
 	}
 
-	for (i = (result - WAIT_OBJECT_0); i < priv->pfd_size; i++)
-	{
-		mowgli_eventloop_pollable_t *pollable = priv->pollables[i];
-		WSANETWORKEVENTS events;
-
-		WSAEnumNetworkEvents(pollable->fd, priv->pfd[pollable->slot], &events);
-
-		if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB) && pollable->read_function != NULL)
-			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
-
-		if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE) && pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
-	}
+	mowgli_eventloop_synchronize(eventloop);
 }
 
 mowgli_eventloop_ops_t _mowgli_winsock_pollops = {
