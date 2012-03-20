@@ -114,7 +114,7 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	mowgli_node_t *n, *tn;
 	mowgli_eventloop_pollable_t *pollable;
 	mowgli_select_eventloop_private_t *priv;
-	int highest_fd = 0;
+	unsigned int highest_fd = 0;
 	fd_set rfds, wfds, efds;
 	struct timeval tv;
 
