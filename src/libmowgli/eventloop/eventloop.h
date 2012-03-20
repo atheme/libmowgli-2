@@ -94,6 +94,7 @@ struct _mowgli_pollable {
 
 	mowgli_descriptor_t fd;
 	unsigned int slot;
+	unsigned int events;
 
 	mowgli_eventloop_io_cb_t *read_function;
 	mowgli_eventloop_io_cb_t *write_function;

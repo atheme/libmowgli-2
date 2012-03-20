@@ -42,6 +42,9 @@ extern mowgli_eventloop_ops_t _mowgli_epoll_pollops;
 #ifdef HAVE_KQUEUE
 extern mowgli_eventloop_ops_t _mowgli_kqueue_pollops;
 #endif
+#ifdef _WIN32
+extern mowgli_eventloop_ops_t _mowgli_winsock_pollops;
+#endif
 
 mowgli_eventloop_t *mowgli_eventloop_create(void)
 {
@@ -71,6 +74,9 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 #endif
 #ifdef HAVE_PORT_CREATE
 	eventloop->eventloop_ops = &_mowgli_ports_pollops;
+#endif
+#ifdef _WIN32
+	eventloop->eventloop_ops = &_mowgli_winsock_pollops;
 #endif
 
 	if (mowgli_mutex_create(&eventloop->mutex) != 0)

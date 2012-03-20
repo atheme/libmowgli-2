@@ -26,14 +26,9 @@
 MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 {
 #ifdef _WIN32
-	int r;
-	WSADATA w;
+	extern void mowgli_winsock_bootstrap(void);
 
-	r = WSAStartup((short) 0x202, &w);
-	if (r != 0) {
-		printf("mowgli bootstrap failure (win32): %d\n", r);
-		exit(EXIT_FAILURE);
-	}
+	mowgli_winsock_bootstrap();
 #endif
 
 	/* initial bootstrap */
