@@ -60,11 +60,11 @@ const char *inet_ntop(int af, void *addr, char *host, size_t hostlen)
 	switch (af)
 	{
 	case AF_INET:
-		*((struct sockaddr_in *)&ss)->sin_addr = *(struct in_addr *)addr;
+		*((struct sockaddr_in *)&ss)->sin_addr = *(struct in_addr)addr;
 		break;
 
 	case AF_INET6:
-		*((struct sockaddr_in6 *)&ss)->sin6_addr = *(struct in6_addr *)addr;
+		*((struct sockaddr_in6 *)&ss)->sin6_addr = *(struct in6_addr)addr;
 		break;
 
 	default:
