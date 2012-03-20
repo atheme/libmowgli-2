@@ -158,6 +158,8 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	if (connection->ssl_handle == NULL)
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 	
+	SSL_set_connect_state(connection->ssl_handle);
+	
 	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
 		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
 
