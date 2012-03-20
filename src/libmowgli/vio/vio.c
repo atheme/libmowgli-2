@@ -82,15 +82,15 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 
 void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
-	return_if_fail(vio->fd > -1);
-
 	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
+	if (vio->io != NULL)
+	{
+		/* Blergh */
+		mowgli_node_add(eventloop, mowgli_node_create(), &(vio->eventloops));
 
-	/* Blergh */
-	mowgli_node_add(eventloop, mowgli_node_create(), &(vio->eventloops));
-
-	/* You're probably going to want this */
-	mowgli_pollable_set_nonblocking(vio->io, true);
+		/* You're probably going to want this */
+		mowgli_pollable_set_nonblocking(vio->io, true);
+	}
 }
 
 void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
