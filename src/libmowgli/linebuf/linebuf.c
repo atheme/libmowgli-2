@@ -134,6 +134,10 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 		return;
 	}
 
+	/* Do we want an SSL write? */
+	if (mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
+
 	buffer->buflen += ret;
 	mowgli_linebuf_process(linebuf);
 }
@@ -144,9 +148,8 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
 	int ret;
 
-	if (buffer->buflen == 0)
+	if (buffer->buflen == 0 && !mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
 	{
-		/* This shouldn't happen, but it might */
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 		return;
 	}

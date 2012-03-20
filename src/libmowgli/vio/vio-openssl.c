@@ -166,7 +166,20 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 
 	if ((ret = SSL_connect(connection->ssl_handle)) != 1)
 	{
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, SSL_get_error(connection->ssl_handle, ret))
+		int err = SSL_get_error(connection->ssl_handle, ret);
+		if (err == SSL_ERROR_WANT_READ)
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+		else if (err == SSL_ERROR_WANT_WRITE)
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+		else if (err == SSL_ERROR_WANT_CONNECT)
+		{
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
+			return 0;
+		}
+		else
+		{
+			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
+		}
 	}
 
 	/* Connected */
@@ -193,6 +206,9 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	int ret;
 	unsigned long err;
+
+	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
+		return mowgli_vio_openssl_client_handshake(vio, connection);
 
 	if(read)
 		ret = (int)SSL_read(connection->ssl_handle, buffer, len);
@@ -258,6 +274,8 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 {
 	mowgli_ssl_connection_t *connection = vio->privdata;
+
+	return_val_if_fail(connection->ssl_handle != NULL, -1);
 
 	SSL_shutdown(connection->ssl_handle);
 	SSL_free(connection->ssl_handle);
