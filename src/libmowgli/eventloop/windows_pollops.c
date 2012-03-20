@@ -125,7 +125,7 @@ static void mowgli_winsock_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 
 static void mowgli_winsock_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
-	mowgli_epoll_eventloop_private_t *priv;
+	mowgli_winsock_eventloop_private_t *priv;
 
 	return_if_fail(eventloop != NULL);
 	return_if_fail(pollable != NULL);
@@ -231,7 +231,7 @@ static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int d
 		if (mowgli_eventloop_ignore_errno(WSAGetLastError()))
 			return;
 
-		mowgli_log("mowgli_epoll_eventloop_select(): WaitForMultipleObjects failed: %d", WSAGetLastError());
+		mowgli_log("mowgli_winsock_eventloop_select(): WaitForMultipleObjects failed: %d", WSAGetLastError());
 		return;
 	}
 
