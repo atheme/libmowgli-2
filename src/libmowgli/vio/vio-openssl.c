@@ -207,8 +207,13 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 	int ret;
 	unsigned long err;
 
+	/* We are connected */
+	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+
 	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING))
 		return mowgli_vio_openssl_client_handshake(vio, connection);
+
+	return_val_if_fail(connection->ssl_handle != NULL, -1);
 
 	if(read)
 		ret = (int)SSL_read(connection->ssl_handle, buffer, len);
@@ -219,40 +224,31 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 	{
 		switch (SSL_get_error(connection->ssl_handle, ret))
 		{
-			case SSL_ERROR_WANT_READ:
+		case SSL_ERROR_WANT_READ:
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+			return 0;
+		case SSL_ERROR_WANT_WRITE:
+			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+			return 0;
+		case SSL_ERROR_ZERO_RETURN:
+			return 0;
+		case SSL_ERROR_SYSCALL:
+			if((err = ERR_get_error()) == 0)
 			{
-				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
-				return 0;
-			}
-			case SSL_ERROR_WANT_WRITE:
-			{
-				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
-				return 0;
-			}
-			case SSL_ERROR_ZERO_RETURN:
-			{
-				return 0;
-			}
-			case SSL_ERROR_SYSCALL:
-			{
-				if((err = ERR_get_error()) == 0)
-				{
-					vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
-					mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
-	
-					mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-					mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
-	
-					return mowgli_vio_error(vio);
-				}
+				vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
+				mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-				break;
+				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
+				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
+	
+				return mowgli_vio_error(vio);
 			}
-			default:
-			{
-				err = ERR_get_error();
-				break;
-			}
+
+			break;
+		
+		default:
+			err = ERR_get_error();
+			break;
 		}
 
 		if(err > 0)
