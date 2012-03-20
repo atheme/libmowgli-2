@@ -327,7 +327,7 @@ int mowgli_vio_default_tell(mowgli_vio_t *vio)
 }
 
 /* Generate a mowgli_sockaddr_t struct */
-mowgli_vio_sockaddr_t * mowgli_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port)
+mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port)
 {
 	struct sockaddr_storage saddr;
 
