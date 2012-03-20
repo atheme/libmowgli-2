@@ -375,7 +375,7 @@ mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *n
 	const struct sockaddr_storage *saddr = addr;
 
 	return_val_if_fail(addr != NULL, NULL);
-	return_val_if_fail(saddr->ss_family != AF_INET && saddr->ss_family != AF_INET6, NULL);
+	return_val_if_fail(saddr->ss_family == AF_INET || saddr->ss_family == AF_INET6, NULL);
 
 	if (naddr == NULL)
 		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
