@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_EXCEPTION_H__
-#define __MOWGLI_EXCEPTION_H__
+#pragma once
 
 #define mowgli_throw_exception(x) do { mowgli_log("exception %s thrown", #x); return; } while(0)
 
@@ -34,4 +33,3 @@
 		_exit(EXIT_FAILURE); \
 	} while (0)
 
-#endif

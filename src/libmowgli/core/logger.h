@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_LOGGER_H__
-#define __MOWGLI_LOGGER_H__
+#pragma once
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
@@ -42,4 +41,3 @@ extern void mowgli_log_real(const char *file, int line, const char *func, const 
 
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 
-#endif

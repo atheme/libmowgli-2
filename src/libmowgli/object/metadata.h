@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_METADATA_H__
-#define __MOWGLI_OBJECT_METADATA_H__
+#pragma once
 
 typedef struct {
 	char *name;
@@ -33,4 +32,3 @@ extern void mowgli_object_metadata_associate(mowgli_object_t *self, const char *
 extern void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key);
 extern void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key);
 
-#endif

@@ -22,8 +22,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STRING_H__
-#define __MOWGLI_STRING_H__
+#pragma once
 
 typedef struct mowgli_string_ {
 	char *str;
@@ -46,4 +45,3 @@ extern size_t mowgli_strlcat(char *dest, const char *src, size_t count);
 extern size_t mowgli_strlcpy(char *dest, const char *src, size_t count);
 extern ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...);
 
-#endif

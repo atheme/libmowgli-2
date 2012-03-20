@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_MODULE_H__
-#define __MOWGLI_MODULE_H__
+#pragma once
 
 typedef void * mowgli_module_t;
 
@@ -30,4 +29,3 @@ extern mowgli_module_t mowgli_module_open(const char *path);
 extern void * mowgli_module_symbol(mowgli_module_t module, const char *symbol);
 extern void mowgli_module_close(mowgli_module_t module);
 
-#endif

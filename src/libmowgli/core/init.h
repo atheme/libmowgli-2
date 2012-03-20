@@ -21,9 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_INIT_H__
-#define __MOWGLI_INIT_H__
+#pragma once
 
 extern void mowgli_init(void);
 
-#endif

@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_CLASS_H__
-#define __MOWGLI_OBJECT_CLASS_H__
+#pragma once
 
 typedef void (*mowgli_destructor_t)(void *);
 
@@ -57,4 +56,3 @@ do {                                                    \
   to = u.out;                                           \
 } while (0)
 
-#endif

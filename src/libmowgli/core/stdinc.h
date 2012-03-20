@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STDINC_H__
-#define __MOWGLI_STDINC_H__
+#pragma once
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -113,4 +112,3 @@ typedef enum { FALSE, TRUE } mowgli_boolean_t;
 # include <openssl/err.h>
 #endif
 
-#endif

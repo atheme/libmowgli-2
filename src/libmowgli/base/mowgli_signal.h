@@ -21,11 +21,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_SIGNAL_H__
-#define __MOWGLI_SIGNAL_H__
+#pragma once
 
 typedef void (*mowgli_signal_handler_t) (int);
 
 extern mowgli_signal_handler_t mowgli_signal_install_handler(int signum, mowgli_signal_handler_t handler);
 
-#endif

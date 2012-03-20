@@ -6,8 +6,7 @@
  *
  */
 
-#ifndef CONFPARSE_H
-#define CONFPARSE_H
+#pragma once
 
 typedef struct _mowgli_configfile mowgli_config_file_t;
 typedef struct _mowgli_configentry mowgli_config_file_entry_t;
@@ -39,7 +38,3 @@ struct _mowgli_configentry
 extern void mowgli_config_file_free(mowgli_config_file_t *cfptr);
 extern mowgli_config_file_t *mowgli_config_file_load(const char *filename);
 
-#endif
-
-/* vim:cinoptions=>s,e0,n0,f0,{0,}0,^0,=s,ps,t0,c3,+s,(2s,us,)20,*30,gs,hs ts=8 sw=8 noexpandtab
- */

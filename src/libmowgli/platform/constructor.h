@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_PLATFORM_CONSTRUCTOR_H__
-#define __MOWGLI_PLATFORM_CONSTRUCTOR_H__
+#pragma once
 
 #ifdef _MSC_VER
 
@@ -51,4 +50,3 @@
 
 #endif
 
-#endif

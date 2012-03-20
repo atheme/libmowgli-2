@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ARGSTACK_H__
-#define __MOWGLI_ARGSTACK_H__
+#pragma once
 
 typedef enum {
 	MOWGLI_ARG_NUMERIC,
@@ -54,4 +53,3 @@ extern int mowgli_argstack_pop_numeric(mowgli_argstack_t *);
 extern mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *);
 extern void *mowgli_argstack_pop_pointer(mowgli_argstack_t *);
 
-#endif

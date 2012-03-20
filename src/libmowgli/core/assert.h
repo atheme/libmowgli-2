@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ASSERT_H__
-#define __MOWGLI_ASSERT_H__
+#pragma once
 
 extern void mowgli_soft_assert_log(const char *asrt, const char *file, int line, const char *function);
 
@@ -102,4 +101,3 @@ extern void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
 
 #endif
 
-#endif

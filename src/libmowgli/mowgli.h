@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STAND_H__
-#define __MOWGLI_STAND_H__
+#pragma once
 
 #ifdef __cplusplus
 # define MOWGLI_DECLS_START extern "C" {
@@ -82,6 +81,4 @@ MOWGLI_DECLS_START
 #include "linebuf/linebuf.h"
 
 MOWGLI_DECLS_END
-
-#endif
 

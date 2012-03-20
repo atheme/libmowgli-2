@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_BITVECTOR_H__
-#define __MOWGLI_BITVECTOR_H__
+#pragma once
 
 typedef struct {
 	unsigned int bits;
@@ -38,4 +37,3 @@ extern mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mow
 extern mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 extern mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 
-#endif

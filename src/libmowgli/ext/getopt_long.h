@@ -29,8 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GETOPT_H_
-#define _GETOPT_H_
+#pragma once
 
 /*
  * Gnu like getopt_long() and BSD4.4 getsubopt()/optreset extensions
@@ -66,4 +65,3 @@ extern int optopt;
 extern int optreset;
 extern char *optarg;
 
-#endif /* !_GETOPT_H_ */

@@ -21,10 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_HASH_H__
-#define __MOWGLI_HASH_H__
+#pragma once
 
 extern int mowgli_fnv_hash_string(const char *data);
 extern int mowgli_fnv_hash(unsigned int *data);
 
-#endif

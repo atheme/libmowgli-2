@@ -21,8 +21,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_QUEUE_H__
-#define __MOWGLI_QUEUE_H__
+#pragma once
 
 typedef mowgli_iterator_t mowgli_queue_t;
 
@@ -41,4 +40,3 @@ extern void *mowgli_queue_pop_head(mowgli_queue_t **n);
 extern void *mowgli_queue_pop_tail(mowgli_queue_t **n);
 extern int mowgli_queue_length(mowgli_queue_t *head);
 
-#endif

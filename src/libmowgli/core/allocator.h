@@ -21,11 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ALLOCATOR_H__
-#define __MOWGLI_ALLOCATOR_H__
+#pragma once
 
 void mowgli_allocator_init(void);
 extern mowgli_allocation_policy_t *mowgli_allocator_malloc;
-
-#endif
 
