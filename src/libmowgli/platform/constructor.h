@@ -39,18 +39,11 @@
 	__declspec(allocate(".CRT$XCU")) void (__cdecl *func##_)(void) = func; \
 	static void __cdecl func(void)
 
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__SUNPRO_C)
 
 #define MOWGLI_INITIALIZER_FUNC(func) \
 	static void func(void) __attribute__((constructor)); \
 	static void func(void)
-
-#elif defined(__SUNPRO_C)
-
-#define MOWGLI_INITALIZER_FUNC(func) \
-	void mowgli_solaris_suncc_init(void) { func(); }
-
-#pragma init(mowgli_solaris_suncc_init)
 
 #else
 
