@@ -33,12 +33,13 @@ typedef SOCKET mowgli_descriptor_t;
 #endif
 
 typedef enum {
-	MOWGLI_EVENTLOOP_POLLABLE_TAG,
-	MOWGLI_EVENTLOOP_HELPER_TAG,
-} mowgli_eventloop_io_tag_t;
+	MOWGLI_EVENTLOOP_TYPE_POLLABLE,
+	MOWGLI_EVENTLOOP_TYPE_HELPER,
+	MOWGLI_EVENTLOOP_TYPE_ERROR = -1
+} mowgli_eventloop_io_type_t;
 
 typedef struct {
-	mowgli_eventloop_io_tag_t tag;
+	mowgli_eventloop_io_type_t type;
 } mowgli_eventloop_io_obj_t;
 
 typedef struct _mowgli_eventloop mowgli_eventloop_t;
@@ -51,7 +52,7 @@ typedef struct _mowgli_linebuf mowgli_linebuf_t;
 typedef enum {
 	MOWGLI_EVENTLOOP_IO_READ,
 	MOWGLI_EVENTLOOP_IO_WRITE,
-	MOWGLI_EVENTLOOP_IO_ERROR,
+	MOWGLI_EVENTLOOP_IO_ERROR = -1
 } mowgli_eventloop_io_dir_t;
 
 typedef void mowgli_eventloop_io_t;
@@ -62,7 +63,7 @@ static inline mowgli_eventloop_pollable_t *mowgli_eventloop_io_pollable(mowgli_e
 	mowgli_eventloop_io_obj_t *obj = io;
 
 	return_val_if_fail(io != NULL, NULL);
-	return_val_if_fail(obj->tag == MOWGLI_EVENTLOOP_POLLABLE_TAG, NULL);
+	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_POLLABLE, NULL);
 
 	return io;
 }
@@ -72,24 +73,24 @@ static inline mowgli_eventloop_helper_proc_t *mowgli_eventloop_io_helper(mowgli_
 	mowgli_eventloop_io_obj_t *obj = io;
 
 	return_val_if_fail(io != NULL, NULL);
-	return_val_if_fail(obj->tag == MOWGLI_EVENTLOOP_HELPER_TAG, NULL);
+	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_HELPER, NULL);
 
 	return io;
 }
 
-static inline mowgli_eventloop_io_tag_t mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
+static inline mowgli_eventloop_io_type_t mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
 {
 	mowgli_eventloop_io_obj_t *obj = io;
 
-	return_val_if_fail(io != NULL, MOWGLI_EVENTLOOP_IO_ERROR);
+	return_val_if_fail(io != NULL, MOWGLI_EVENTLOOP_TYPE_ERROR);
 
-	return obj->tag;
+	return obj->type;
 }
 
 typedef void mowgli_eventloop_io_cb_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 
 struct _mowgli_pollable {
-	mowgli_eventloop_io_obj_t tag;
+	mowgli_eventloop_io_obj_t type;
 
 	mowgli_descriptor_t fd;
 	unsigned int slot;
@@ -198,7 +199,7 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 typedef void mowgli_eventloop_helper_start_fn_t(mowgli_eventloop_helper_proc_t *helper, void *userdata);
 
 struct _mowgli_helper {
-	mowgli_eventloop_io_obj_t tag;
+	mowgli_eventloop_io_obj_t type;
 
 	mowgli_process_t *child;
 	mowgli_eventloop_t *eventloop;

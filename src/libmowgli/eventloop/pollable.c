@@ -34,7 +34,7 @@ mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloo
 	pollable = mowgli_heap_alloc(pollable_heap);
 
 	pollable->eventloop = eventloop;
-	pollable->tag.tag = MOWGLI_EVENTLOOP_POLLABLE_TAG;
+	pollable->type.type = MOWGLI_EVENTLOOP_TYPE_POLLABLE;
 	pollable->fd = fd;
 	pollable->userdata = userdata;
 
