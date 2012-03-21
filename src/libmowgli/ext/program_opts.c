@@ -25,25 +25,6 @@
 
 #include "ext/getopt_long.h"
 
-#ifndef __MOWGLI_PROGRAM_OPTS_H__
-#define __MOWGLI_PROGRAM_OPTS_H__
-
-typedef void (*mowgli_program_opts_consumer_t)(const char *arg, void *userdata);
-
-typedef struct {
-	const char *longopt;
-	const char smallopt;
-	bool has_param;
-	mowgli_program_opts_consumer_t consumer;
-	void *userdata;
-
-	/* optional data */
-	const char *description;
-	const char *paramname;
-} mowgli_program_opts_t;
-
-#endif
-
 void
 mowgli_program_opts_consumer_str(const char *arg, void *userdata)
 {
