@@ -18,7 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_LINEBUF_LINEBUF_H__
+#define __MOWGLI_LINEBUF_LINEBUF_H__
 
 #include "eventloop/eventloop.h"
 #include "vio/vio.h"
@@ -73,4 +74,6 @@ static inline mowgli_vio_t * mowgli_linebuf_get_vio(mowgli_linebuf_t *linebuf)
 	return_val_if_fail(linebuf != NULL, NULL);
 	return linebuf->vio;
 }
+
+#endif
 

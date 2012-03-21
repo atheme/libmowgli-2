@@ -22,7 +22,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_THREAD_H__
+#define __MOWGLI_THREAD_H__
 
 #if defined(__sun) || defined(__sco)
 # include <thread.h>
@@ -124,3 +125,4 @@ static inline void mowgli_thread_set_policy(mowgli_thread_policy_t policy)
 	mowgli_mutex_set_policy(policy);
 }
 
+#endif /* !__MOWGLI_THREAD_H__ */

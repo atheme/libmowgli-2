@@ -21,7 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_ALLOCATION_POLICY_H__
+#define __MOWGLI_ALLOCATION_POLICY_H__
 
 typedef void *(*mowgli_allocation_func_t)(size_t size);
 typedef void (*mowgli_deallocation_func_t)(void *ptr);
@@ -41,3 +42,4 @@ mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);
 void mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy);
 void mowgli_allocator_set_policy_by_name(const char *name);
 
+#endif

@@ -32,7 +32,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_PATRICIA_H__
+#define __MOWGLI_PATRICIA_H__
 
 struct mowgli_patricia_; /* defined in src/patricia.c */
 struct mowgli_patricia_elem_; /* defined in src/patricia.c */
@@ -151,3 +152,4 @@ void *mowgli_patricia_elem_get_data(mowgli_patricia_elem_t *elem);
 unsigned int mowgli_patricia_size(mowgli_patricia_t *dict);
 void mowgli_patricia_stats(mowgli_patricia_t *dict, void (*cb)(const char *line, void *privdata), void *privdata);
 
+#endif

@@ -21,7 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_ERROR_BACKTRACE_H__
+#define __MOWGLI_ERROR_BACKTRACE_H__
 
 typedef struct mowgli_error_context_ {
 	mowgli_list_t bt;
@@ -34,3 +35,4 @@ extern void mowgli_error_context_push(mowgli_error_context_t *e, const char *msg
 extern void mowgli_error_context_pop(mowgli_error_context_t *e);
 extern mowgli_error_context_t *mowgli_error_context_create(void);
 
+#endif

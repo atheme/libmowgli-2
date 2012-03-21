@@ -21,7 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_OBJECT_H__
+#define __MOWGLI_OBJECT_H__
 
 typedef struct {
 	char *name;
@@ -38,3 +39,4 @@ extern void mowgli_object_unref(void *);
 
 #define mowgli_object(x) ((mowgli_object_t *) x)
 
+#endif

@@ -18,8 +18,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_MEMSLICE_H__
+#define __MOWGLI_MEMSLICE_H__
 
 void mowgli_memslice_init(void);
 mowgli_allocation_policy_t *mowgli_memslice_get_policy(void);
 
+#endif

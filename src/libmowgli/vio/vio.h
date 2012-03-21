@@ -16,7 +16,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_VIO_VIO_H__
+#define __MOWGLI_VIO_VIO_H__
 
 /* Types and structs */
 typedef struct _mowgli_vio mowgli_vio_t;
@@ -227,4 +228,6 @@ extern mowgli_vio_ops_t mowgli_vio_default_ops;
 #define mowgli_vio_close(vio)		vio->ops.close(vio);
 #define mowgli_vio_seek(vio, ...)	vio->ops.seek(vio, __VA_ARGS__)
 #define mowgli_vio_tell(vio)		vio->ops.tell(vio)
+
+#endif
 

@@ -18,7 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_PROCESS_H__
+#define __MOWGLI_PROCESS_H__
 
 typedef void (*mowgli_process_start_fn_t)(void *data);
 
@@ -33,3 +34,4 @@ extern mowgli_process_t *mowgli_process_clone(mowgli_process_start_fn_t start_fn
 extern mowgli_process_t *mowgli_process_spawn(const char *path, char *const argv[]);
 extern void mowgli_process_kill(mowgli_process_t *process);
 
+#endif

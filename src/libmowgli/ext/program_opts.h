@@ -21,7 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_PROGRAM_OPTS_H__
+#define __MOWGLI_PROGRAM_OPTS_H__
 
 typedef void (*mowgli_program_opts_consumer_t)(const char *arg, void *userdata);
 
@@ -46,3 +47,4 @@ extern void mowgli_program_opts_consumer_bool(const char *arg, void *userdata);
 
 extern void mowgli_program_opts_parse(const mowgli_program_opts_t *opts, size_t opts_size, int *argc, char ***argv);
 
+#endif

@@ -18,7 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_INDEX_H__
+#define __MOWGLI_INDEX_H__
 
 struct mowgli_index_;
 
@@ -47,3 +48,4 @@ void mowgli_index_sort (mowgli_index_t * index, int (* compare) (const void * a,
 void mowgli_index_sort_with_data (mowgli_index_t * index, int (* compare)
  (const void * a, const void * b, void * data), void * data);
 
+#endif

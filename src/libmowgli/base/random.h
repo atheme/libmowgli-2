@@ -21,7 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_RANDOM_H__
+#define __MOWGLI_RANDOM_H__
 
 /* mowgli_random_t contains state data which is private */
 struct mowgli_random_;
@@ -41,3 +42,4 @@ extern void mowgli_random_reseed(mowgli_random_t *self, unsigned int seed);
 extern unsigned int mowgli_random_int(mowgli_random_t *self);
 extern int mowgli_random_int_ranged(mowgli_random_t *self, int begin, int end);
 
+#endif

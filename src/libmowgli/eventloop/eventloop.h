@@ -18,7 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
+#define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 
 #include "thread/thread.h"
 
@@ -251,4 +252,6 @@ extern mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *e
 extern void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
 extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function);
 extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking);
+
+#endif
 
