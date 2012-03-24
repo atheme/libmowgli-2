@@ -25,6 +25,11 @@
 
 MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 {
+	static bool initialized = 0;
+
+	if (initialized)
+		return;
+
 #ifdef _WIN32
 	extern void mowgli_winsock_bootstrap(void);
 
@@ -46,6 +51,8 @@ MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 	/* now that we're bootstrapped, we can use a more optimised allocator
 	   if one is available. */
 	mowgli_allocator_set_policy(mowgli_allocator_malloc);
+
+	initialized = true;
 }
 
 void mowgli_init(void)
