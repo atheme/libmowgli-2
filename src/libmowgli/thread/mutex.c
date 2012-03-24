@@ -43,6 +43,10 @@ void mowgli_mutex_lock_all(void)
 {
 	mowgli_node_t *iter;
 
+#if !defined(_WIN32) && defined(DEBUG)
+	mowgli_log("Locking all mutexes in PID %d", getpid());
+#endif
+
 	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
 	{
 		mowgli_mutex_t *mutex = iter->data;
@@ -54,6 +58,10 @@ void mowgli_mutex_lock_all(void)
 void mowgli_mutex_unlock_all(void)
 {
 	mowgli_node_t *iter;
+
+#if !defined(_WIN32) && defined(DEBUG)
+	mowgli_log("Unlocking all mutexes in PID %d", getpid());
+#endif
 
 	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
 	{
