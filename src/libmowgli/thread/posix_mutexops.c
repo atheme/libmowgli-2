@@ -59,7 +59,7 @@ static int mowgli_sun_mutex_destroy(mowgli_mutex_t *mutex)
 }
 
 #if defined(__sun)
-static void mowgli_sun_mutex_setup_fork_safety(void)
+static void mowgli_sun_mutex_setup_thread_safety(void)
 {
 	/* this allows us to synchronize lock states between children */
 	pthread_atfork(mowgli_mutex_lock_all, mowgli_mutex_unlock_all, mowgli_mutex_unlock_all);
