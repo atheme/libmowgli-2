@@ -78,6 +78,8 @@ MOWGLI_DECLS_START
 #include "thread/thread.h"
 #include "ext/confparse.h"
 #include "ext/program_opts.h"
+#include "concurrent/atomic.h"
+#include "concurrent/future.h"
 
 #include "linebuf/linebuf.h"
 

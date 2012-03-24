@@ -19,7 +19,9 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
    AC_MSG_ERROR([C compiler does not support C99], 1)
 ])
 
-MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers"
+AX_CHECK_ATOMIC_BUILTINS
+
+MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers"
 AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
@@ -30,7 +32,7 @@ AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create])
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
 
-LIBMOWGLI_MODULES="core base container eventloop ext module object thread vio linebuf"
+LIBMOWGLI_MODULES="core base container concurrent eventloop ext module object thread vio linebuf"
 AC_SUBST(LIBMOWGLI_MODULES)
 
 LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"
@@ -133,6 +135,7 @@ AC_OUTPUT
 cat << _EOF_
 
 Configuration:
+   Atomic builtins support: ${ATOMIC_BUILTINS}
    OpenSSL support: ${OPENSSL}
    Examples: ${EXAMPLES}
 

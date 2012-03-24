@@ -1,5 +1,14 @@
 /* src/libmowgli/platform/autoconf.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if compiler provides atomic builtins */
+#undef HAVE_ATOMIC_BUILTINS
+
+/* Define if compiler provides C11 atomic builtins */
+#undef HAVE_ATOMIC_BUILTINS_C11
+
+/* Define if compiler provides GCC atomic builtins */
+#undef HAVE_ATOMIC_BUILTINS_GCC
+
 /* Define to 1 if you have the `dispatch_block' function. */
 #undef HAVE_DISPATCH_BLOCK
 

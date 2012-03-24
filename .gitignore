@@ -19,6 +19,7 @@ src/examples/libevent-bench/bench
 src/examples/linetest/linetest
 src/examples/memslice-bench/memslice-bench
 src/examples/vio-udplistener/vio-udplistener
+src/examples/futuretest/futuretest
 .deps
 *.dylib
 *.o
