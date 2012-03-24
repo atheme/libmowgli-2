@@ -24,7 +24,6 @@
 #include "mowgli.h"
 
 static mowgli_list_t mutex_list;
-static mowgli_list_t mutex_lockall_list;
 
 #if defined(_WIN32)
 extern mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
@@ -52,31 +51,23 @@ void mowgli_mutex_lock_all(void)
 	{
 		mowgli_mutex_t *mutex = iter->data;
 
-		/* Only lock mutexes that aren't already owned by something else 
-		 * Also use mowgli_mutex_trylock to try to lock the mutex -- don't block
-		 * if something else owns it --Elizacat */
-		if (mowgli_mutex_trylock(mutex) == 0)
-			mowgli_node_add(mutex, &mutex->lockall_node, &mutex_lockall_list);
+		mowgli_mutex_lock(mutex);
 	}
 }
 
 void mowgli_mutex_unlock_all(void)
 {
-	mowgli_node_t *iter, *n_iter;
+	mowgli_node_t *iter;
 
 #if !defined(_WIN32) && defined(DEBUG)
 	mowgli_log("Unlocking all mutexes in PID %d", getpid());
 #endif
 
-	/* Only unlock the mutexes we locked --Elizacat */
-	MOWGLI_ITER_FOREACH_SAFE(iter, n_iter, mutex_lockall_list.head)
+	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
 	{
 		mowgli_mutex_t *mutex = iter->data;
 
 		mowgli_mutex_unlock(mutex);
-
-		/* Remove from list */
-		mowgli_node_delete(&mutex->lockall_node, &mutex_lockall_list);
 	}
 }
 

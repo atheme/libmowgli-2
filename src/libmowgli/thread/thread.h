@@ -54,7 +54,6 @@ typedef struct {
 
 	/* track all mutexes for fork-safety */
 	mowgli_node_t node;
-	mowgli_node_t lockall_node;
 } mowgli_mutex_t;
 
 #ifdef MOWGLI_NATIVE_MUTEX_DECL
