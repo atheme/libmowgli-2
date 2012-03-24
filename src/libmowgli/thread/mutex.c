@@ -23,14 +23,10 @@
 
 #include "mowgli.h"
 
-static mowgli_list_t mutex_list;
-
 #if defined(_WIN32)
 extern mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
 #elif defined(_sun) || defined(_sco)
 extern mowgli_mutex_ops_t _mowgli_sun_mutex_ops;
-#elif defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
-extern mowgli_mutex_ops_t _mowgli_linux_mutex_ops;
 #else
 extern mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 #endif
@@ -38,38 +34,6 @@ extern mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 extern mowgli_mutex_ops_t _mowgli_null_mutex_ops;
 
 static mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
-
-void mowgli_mutex_lock_all(void)
-{
-	mowgli_node_t *iter;
-
-#if !defined(_WIN32) && defined(DEBUG)
-	mowgli_log("Locking all mutexes in PID %d", getpid());
-#endif
-
-	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
-	{
-		mowgli_mutex_t *mutex = iter->data;
-
-		mowgli_mutex_lock(mutex);
-	}
-}
-
-void mowgli_mutex_unlock_all(void)
-{
-	mowgli_node_t *iter;
-
-#if !defined(_WIN32) && defined(DEBUG)
-	mowgli_log("Unlocking all mutexes in PID %d", getpid());
-#endif
-
-	MOWGLI_ITER_FOREACH(iter, mutex_list.head)
-	{
-		mowgli_mutex_t *mutex = iter->data;
-
-		mowgli_mutex_unlock(mutex);
-	}
-}
 
 static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 {
@@ -83,10 +47,6 @@ static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 
 #if defined(_sun) || defined(_sco)
 	return &_mowgli_sun_mutex_ops;
-#endif
-
-#if defined(HAVE_LINUX_FUTEX_H) && defined(MOWGLI_FEATURE_HAVE_ATOMIC_OPS) && defined(MOWGLI_FEATURE_WANT_EXPERIMENTAL)
-	return &_mowgli_linux_mutex_ops;
 #endif
 
 #if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
@@ -104,14 +64,7 @@ int mowgli_mutex_create(mowgli_mutex_t *mutex)
 	return_val_if_fail(mutex != NULL, -1);
 
 	if (!initialized)
-	{
-		if (mutex_ops->setup_fork_safety != NULL)
-			mutex_ops->setup_fork_safety();
-
 		initialized = true;
-	}
-
-	mowgli_node_add(mutex, &mutex->node, &mutex_list);
 
 	return mutex_ops->mutex_create(mutex);
 }
@@ -148,8 +101,6 @@ int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
 
 	return_val_if_fail(mutex != NULL, -1);
-
-	mowgli_node_delete(&mutex->node, &mutex_list);
 
 	return mutex_ops->mutex_destroy(mutex);
 }
