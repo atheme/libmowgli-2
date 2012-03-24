@@ -132,5 +132,9 @@ ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
 	len = vsnprintf(buf, sizeof buf, fmt, va);
 	va_end(va);
 
+#ifdef _WIN32
 	return send(fd, buf, len, 0);
+#else
+	return write(fd, buf, len);
+#endif
 }
