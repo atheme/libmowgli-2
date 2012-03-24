@@ -89,7 +89,7 @@ mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...)
 	vsnprintf(buf, 65535, msg, va);
 	va_end(va);
 
-	mowgli_node_add(strdup(buf), mowgli_node_create(), &e->bt);
+	mowgli_node_add(mowgli_strdup(buf), mowgli_node_create(), &e->bt);
 }
 
 void

@@ -58,7 +58,7 @@ mowgli_hook_register(const char *name)
 	return_if_fail((hook = mowgli_hook_find(name)) == NULL);
 
 	hook = mowgli_alloc(sizeof(mowgli_hook_t));
-	hook->name = strdup(name);
+	hook->name = mowgli_strdup(name);
 
 	mowgli_patricia_add(mowgli_hooks, hook->name, hook);
 }

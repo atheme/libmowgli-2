@@ -201,7 +201,7 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 	char c;
 
 	cf = mowgli_alloc(sizeof *cf);
-	cf->filename = strdup(filename);
+	cf->filename = mowgli_strdup(filename);
 	cf->curline = 1;
 	cf->mem = confdata;
 	lastcf = cf;
@@ -355,8 +355,8 @@ void mowgli_config_file_free(mowgli_config_file_t *cfptr)
 		nptr = cfptr->next;
 		if (cfptr->entries)
 			mowgli_config_file_entry_free(cfptr->entries);
-		free(cfptr->filename);
-		free(cfptr->mem);
+		mowgli_free(cfptr->filename);
+		mowgli_free(cfptr->mem);
 		mowgli_free(cfptr);
 	}
 }

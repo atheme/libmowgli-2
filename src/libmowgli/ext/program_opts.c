@@ -31,7 +31,7 @@ mowgli_program_opts_consumer_str(const char *arg, void *userdata)
 	return_if_fail(arg != NULL);
 	return_if_fail(userdata != NULL);
 
-	*(char **) userdata = strdup(arg);
+	*(char **) userdata = mowgli_strdup(arg);
 }
 
 void

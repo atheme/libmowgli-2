@@ -193,7 +193,7 @@ mowgli_patricia_t *mowgli_patricia_create_named(const char *name,
 	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
 
 	dtree->canonize_cb = canonize_cb;
-	dtree->id = strdup(name);
+	dtree->id = mowgli_strdup(name);
 
 	if (!leaf_heap)
 		leaf_heap = mowgli_heap_create(sizeof(struct patricia_leaf), 1024, BH_NOW);
@@ -598,7 +598,7 @@ struct patricia_leaf *mowgli_patricia_elem_find(mowgli_patricia_t *dict, const c
 	{
 		if (keylen >= (int) sizeof(ckey_store))
 		{
-			ckey_buf = strdup(key);
+			ckey_buf = mowgli_strdup(key);
 			dict->canonize_cb(ckey_buf);
 			ckey = ckey_buf;
 		}
@@ -624,7 +624,7 @@ struct patricia_leaf *mowgli_patricia_elem_find(mowgli_patricia_t *dict, const c
 		delem = NULL;
 
 	if (ckey_buf != NULL)
-		free(ckey_buf);
+		mowgli_free(ckey_buf);
 
 	return &delem->leaf;
 }
@@ -659,7 +659,7 @@ struct patricia_leaf *mowgli_patricia_elem_add(mowgli_patricia_t *dict, const ch
 	return_val_if_fail(data != NULL, FALSE);
 
 	keylen = strlen(key);
-	ckey = strdup(key);
+	ckey = mowgli_strdup(key);
 	if (ckey == NULL)
 	{
 		mowgli_log("major WTF: ckey is NULL, not adding node.");
@@ -684,7 +684,7 @@ struct patricia_leaf *mowgli_patricia_elem_add(mowgli_patricia_t *dict, const ch
 	if (delem != NULL && !strcmp(delem->leaf.key, ckey))
 	{
 		mowgli_log("Key is already in dict, ignoring duplicate");
-		free(ckey);
+		mowgli_free(ckey);
 		return NULL;
 	}
 

@@ -35,6 +35,8 @@ mowgli_process_cloned_execv(mowgli_process_execv_req_t *execv_req)
 
 	execv(execv_req->path, execv_req->argv);
 
+	mowgli_free(execv_req->argv);
+	mowgli_free(execv_req->path);
 	mowgli_free(execv_req);
 #else
 # warning implement me :(
@@ -88,7 +90,7 @@ mowgli_process_spawn(const char *path, char *const argv[])
 	return_val_if_fail(argv != NULL, NULL);
 
 	req = mowgli_alloc(sizeof(mowgli_process_execv_req_t));
-	req->path = strdup(path);
+	req->path = mowgli_strdup(path);
 
 	for (i = 0; argv[i] != NULL; i++)
 		;

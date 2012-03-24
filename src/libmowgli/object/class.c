@@ -47,7 +47,7 @@ void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mo
 		mowgli_throw_exception_fatal(mowgli.object_class.duplicate_object_class_exception);
 
 	/* initialize object_class::name */
-	klass->name = strdup(name);
+	klass->name = mowgli_strdup(name);
 
 	/* initialize object_class::derivitives */
 	klass->derivitives.head = NULL;

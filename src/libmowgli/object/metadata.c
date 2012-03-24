@@ -49,7 +49,7 @@ void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, vo
 	}
 
 	e = mowgli_alloc(sizeof(mowgli_object_metadata_entry_t));
-	e->name = strdup(key);
+	e->name = mowgli_strdup(key);
 	e->data = value;
 
 	mowgli_node_add(e, mowgli_node_create(), &self->metadata);

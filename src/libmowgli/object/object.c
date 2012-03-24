@@ -45,7 +45,7 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
 	return_if_fail(obj != NULL);
 
 	if (name != NULL)
-		obj->name = strdup(name);
+		obj->name = mowgli_strdup(name);
 
 	if (klass != NULL)
 		obj->klass = klass;
