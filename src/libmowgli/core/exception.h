@@ -31,7 +31,7 @@
 #define mowgli_throw_exception_fatal(x) \
 	do { \
 		mowgli_log("exception %s thrown", #x); \
-		_exit(EXIT_FAILURE); \
+		abort(); \
 	} while (0)
 
 #endif
