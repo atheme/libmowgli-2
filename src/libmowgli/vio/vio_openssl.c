@@ -39,7 +39,7 @@ typedef struct {
 static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
-static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len);
+static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len);
 static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
@@ -197,10 +197,11 @@ static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	return mowgli_openssl_read_or_write(true, vio, buffer, len);
 }
 
-static int mowgli_vio_openssl_write(mowgli_vio_t *vio, void *buffer, size_t len)
+static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
-	return mowgli_openssl_read_or_write(false, vio, buffer, len);
+	/* XXX discards const! */
+	return mowgli_openssl_read_or_write(false, vio, (void *)buffer, len);
 }
 
 static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len)
