@@ -109,8 +109,8 @@ unsigned int mowgli_random_int(mowgli_random_t *self)
 
 	/* tempering */
 	y ^= (y >> 11);
-	y ^= (y >> 7) & 0x9d2c5680U;
-	y ^= (y >> 15) & 0xefc60000U;
+	y ^= (y << 7) & 0x9d2c5680U;
+	y ^= (y << 15) & 0xefc60000U;
 	y ^= (y >> 18);
 
 	return y;
