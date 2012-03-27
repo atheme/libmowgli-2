@@ -8,21 +8,21 @@ dnl Patrick McFarland <pmcfarland@adterrasperaspera.com>
 AC_DEFUN([AX_CHECK_ATOMIC_BUILTINS],[
 AC_MSG_CHECKING([if compiler has atomic builtins])
 
-GCC_ATOMIC_BUILTINS=no
+INTEL_ATOMIC_BUILTINS=no
 C11_ATOMIC_BUILTINS=no
 
 dnl Check if compiler is a new enough GCC to avoid compile due to cross compiling
 AS_IF([test "x$GCC" = "xno"],[
   GCC_VERSION="$($CC -dumpversion)"
-	GCC_VERSION_MAJOR="$(echo $GCC_VERSION | cut -d'.' -f1)"
-  GCC_VERSION_MINOR="$(echo $GCC_VERSION | cut -d'.' -f2)"
+	GCC_VERSION_MAJOR="$(echo $INTEL_VERSION | cut -d'.' -f1)"
+  GCC_VERSION_MINOR="$(echo $INTEL_VERSION | cut -d'.' -f2)"
 
   AS_IF([test $GCC_VERSION_MAJOR > 4], [
-    AS_IF([test $GCC_VERSION_MINOR > 1], [GCC_ATOMIC_BUILTINS=yes], [GCC_ATOMIC_BUILTINS=no])
-  ], [GCC_ATOMIC_BUILTINS=no])
+    AS_IF([test $GCC_VERSION_MINOR > 1], [INTEL_ATOMIC_BUILTINS=yes], [INTEL_ATOMIC_BUILTINS=no])
+  ], [INTEL_ATOMIC_BUILTINS=no])
 ], [
 
-dnl Check if compiler supports GCC atomic builtins
+dnl Check if compiler supports Intel atomic builtins
   AC_LANG([C])
 
   AC_RUN_IFELSE([AC_LANG_SOURCE([
@@ -61,10 +61,10 @@ int main()
 
   return 0;
 }
-  ])], [GCC_ATOMIC_BUILTINS=yes], [GCC_ATOMIC_BUILTINS=no], [GCC_ATOMIC_BUILTINS=no])
+  ])], [INTEL_ATOMIC_BUILTINS=yes], [INTEL_ATOMIC_BUILTINS=no], [INTEL_ATOMIC_BUILTINS=no])
 
 dnl Check if compiler supports C11 atomic builtins
-  AS_IF([test "x$GCC_ATOMIC_BUILTINS" = "xno"], [
+  AS_IF([test "x$INTEL_ATOMIC_BUILTINS" = "xno"], [
     AC_RUN_IFELSE([AC_LANG_SOURCE([
 #include <stdatomic.h>
 int main()
@@ -87,10 +87,10 @@ int main()
 
 ATOMIC_BUILTINS="no"
 
-AS_IF([test "x$GCC_ATOMIC_BUILTINS" = "xyes"], [
+AS_IF([test "x$INTEL_ATOMIC_BUILTINS" = "xyes"], [
   AC_DEFINE(HAVE_ATOMIC_BUILTINS, 1, [Define if compiler provides atomic builtins])
-  AC_DEFINE(HAVE_ATOMIC_BUILTINS_GCC, 1, [Define if compiler provides GCC atomic builtins])
-  ATOMIC_BUILTINS="gcc"
+  AC_DEFINE(HAVE_ATOMIC_BUILTINS_INTEL, 1, [Define if compiler provides Intel atomic builtins])
+  ATOMIC_BUILTINS="Intel"
 ])
 
 AS_IF([test "x$C11_ATOMIC_BUILTINS" = "xyes"], [

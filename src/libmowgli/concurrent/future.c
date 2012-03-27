@@ -43,8 +43,8 @@ mowgli_future_t *mowgli_future_create() {
 int mowgli_future_init(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, -1);
 
-	mowgli_atomic_store(mowgli_future_state_t, future->state, MOWGLI_FUTURE_STATE_WAITING);
-	mowgli_atomic_store(void *, future->result, NULL);
+	mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_WAITING);
+	mowgli_atomic_store_pointer(&future->result, NULL);
 
 	return 0;
 }
@@ -59,23 +59,23 @@ int mowgli_future_init(mowgli_future_t *future) {
 mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result) {
 	return_val_if_fail(future != NULL, MOWGLI_FUTURE_STATE_ERROR);
 
-	void *finished = mowgli_atomic_compare_exchange(void *, future->result, NULL, result);
+	void *finished = mowgli_atomic_compare_exchange_pointer(&future->result, NULL, result);
 
 	if(finished == NULL) {
-		mowgli_future_state_t state = mowgli_atomic_compare_exchange(mowgli_future_state_t,
-				future->state, MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_FINISHED);
+		mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
+				MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_FINISHED);
 
 		if(state == MOWGLI_FUTURE_STATE_FINISHED) {
-			mowgli_atomic_store(mowgli_future_state_t, future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
+			mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
 			return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 		} else if(state == MOWGLI_FUTURE_STATE_CANCELED) {
-			mowgli_atomic_store(void *, future->result, NULL);
+			mowgli_atomic_store_pointer(&future->result, NULL);
 			return MOWGLI_FUTURE_STATE_CANCELED;
 		}
 
-		return mowgli_atomic_load(mowgli_future_state_t, future->state);
+		return mowgli_atomic_load_int(&future->state);
 	} else {
-		mowgli_atomic_store(mowgli_future_state_t, future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
+		mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
 		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 	}
 }
@@ -88,20 +88,20 @@ mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result
 mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, MOWGLI_FUTURE_STATE_ERROR);
 
-	mowgli_future_state_t state = mowgli_atomic_compare_exchange(mowgli_future_state_t,
-			future->state, MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_CANCELED);
+	mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
+			MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_CANCELED);
 
 	if(state != MOWGLI_FUTURE_STATE_WAITING)
 		return state;
 	else
-		return mowgli_atomic_load(mowgli_future_state_t, future->state);
+		return mowgli_atomic_load_int(&future->state);
 }
 
 /* Given a valid future object, return the current state */
 mowgli_future_state_t mowgli_future_state(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, MOWGLI_FUTURE_STATE_ERROR);
 
-	return mowgli_atomic_load(mowgli_future_state_t, future->state);
+	return mowgli_atomic_load_int(&future->state);
 }
 
 /* Given a valid future object, result will return the result WITHOUT
@@ -111,5 +111,5 @@ mowgli_future_state_t mowgli_future_state(mowgli_future_t *future) {
 void *mowgli_future_result(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, NULL);
 
-	return mowgli_atomic_load(void *, future->result);
+	return mowgli_atomic_load_pointer(&future->result);
 }

@@ -21,80 +21,203 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* Define MOWGLI_ATOMIC_USE_FALLBACK to force it not to use compiler
- * builtins. Use this consistently! Using it in one .c file and not
- * another will break it.
+/* This wrapper uses a lot of layers of macros to get things done. Function
+ * names can come out like mowgli_atomic_load_uchar for unsigned char, or
+ * mowgli_atomic_load_int8_t for int8_t or mowgli_atomic_load_pointer for
+ * pointers. Almost all of the C89 and C99 basic types are supported except
+ * for floating point types.
+ *
+ * Atomic operations currently wrapped are load, store, and compare_exchange.
+ *
+ * Hardware does not typically support atomic operations on larger than the
+ * native size of the hardware (ie, 4 or 8 bytes).
+ */
+
+/* Define MOWGLI_ATOMIC_DEBUG to force it not to use compiler builtins and
+ * use the mutex-based fallbacks instead. Use this consistently! Using it
+ * in one .c file and not another will break it.
  */
 
 #ifndef __MOWGLI_ATOMIC_H__
 #define __MOWGLI_ATOMIC_H__
 
-#if !defined MOWGLI_ATOMIC_USE_FALLBACK && defined HAVE_ATOMIC_BUILTINS_GCC
+#include <stddef.h>
+#include <inttypes.h>
+#include <stdbool.h>
+
+extern void mowgli_atomic_bootstrap();
+
+#if !defined MOWGLI_ATOMIC_DEBUG && defined HAVE_ATOMIC_BUILTINS_INTEL
 #define mowgli_atomic(type) volatile type
 
-#define mowgli_atomic_load(type, atomic) (type)__sync_fetch_and_add(&atomic, 0)
-#define mowgli_atomic_store(type, atomic, value) (type)__sync_lock_test_and_set(&atomic, value)
-#define mowgli_atomic_compare_exchange(type, atomic, expected, desired) (type)__sync_val_compare_and_swap(&atomic, expected, desired)
+#define mowgli_atomic_load_function(type, mangle) \
+static inline type mowgli_atomic_load_##mangle (mowgli_atomic(type) *atomic) \
+{ \
+	return (type)__sync_fetch_and_add(atomic, 0); \
+}
+
+#define mowgli_atomic_store_function(type, mangle) \
+static inline type mowgli_atomic_store_##mangle (mowgli_atomic(type) *atomic, type value) \
+{ \
+	return (type)__sync_lock_test_and_set(atomic, value); \
+}
+
+#define mowgli_atomic_compare_exchange_function(type, mangle) \
+static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) *atomic, type expected, type desired) \
+{ \
+	return (type)__sync_val_compare_and_swap(atomic, expected, desired); \
+}
 #endif
 
-#if !defined MOWGLI_ATOMIC_USE_FALLBACK && defined HAVE_ATOMIC_BUILTINS_C11
+#if !defined MOWGLI_ATOMIC_DEBUG && defined HAVE_ATOMIC_BUILTINS_C11
+#include <stdatomic.h>
+
 #define mowgli_atomic(type) _Atomic type
 
-#define mowgli_atomic_load(type, atomic) (type)atomic_load(&atomic)
-#define mowgli_atomic_store(type, atomic, value) (type)atomic_store(&atomic, value)
-#define mowgli_atomic_compare_exchange(type, atomic, expected, desired) (type)atomic_compare_exchange_strong(&atomic, expected, desired)
-#endif
+#define mowgli_atomic_load_function(type, mangle) \
+static inline type mowgli_atomic_load_##mangle (mowgli_atomic(type) *atomic) \
+{ \
+	return (type)atomic_load(atomic); \
+})
 
-#if defined MOWGLI_ATOMIC_USE_FALLBACK || !defined HAVE_ATOMIC_BUILTINS
-typedef unsigned long mowgli_atomic_value_t;
-
-typedef struct {
-	mowgli_atomic_value_t value;
-	mowgli_mutex_t mutex;
-} mowgli_atomic_t;
-
-#define mowgli_atomic(type) mowgli_atomic_t
-
-#define mowgli_atomic_load(type, atomic) (type)mowgli_atomic_load_fallback(&atomic)
-static inline mowgli_atomic_value_t mowgli_atomic_load_fallback(mowgli_atomic_t *atomic)
-{
-	mowgli_atomic_value_t value;
-
-	mowgli_mutex_lock(&atomic->mutex);
-	value = atomic->value;
-	mowgli_mutex_unlock(&atomic->mutex);
-
-	return value;
+#define mowgli_atomic_store_function(type, mangle) \
+static inline type mowgli_atomic_store_##mangle (mowgli_atomic(type) *atomic, type value) \
+{ \
+	return (type)atomic_store(atomic, value); \
 }
 
-#define mowgli_atomic_store(type, atomic, value) (type)mowgli_atomic_store_fallback(&atomic, (mowgli_atomic_value_t)value)
-static inline mowgli_atomic_value_t mowgli_atomic_store_fallback(mowgli_atomic_t *atomic, mowgli_atomic_value_t value)
-{
-	mowgli_atomic_value_t oldvalue;
-
-	mowgli_mutex_lock(&atomic->mutex);
-	oldvalue = atomic->value;
-	atomic->value = value;
-	mowgli_mutex_unlock(&atomic->mutex);
-
-	return oldvalue;
-}
-
-#define mowgli_atomic_compare_exchange(type, atomic, expected, desired) (type)mowgli_atomic_compare_exchange_fallback(&atomic, (mowgli_atomic_value_t)expected, (mowgli_atomic_value_t)desired)
-static inline mowgli_atomic_value_t mowgli_atomic_compare_exchange_fallback(mowgli_atomic_t *atomic, mowgli_atomic_value_t expected, mowgli_atomic_value_t desired)
-{
-	mowgli_atomic_value_t oldvalue;
-
-	mowgli_mutex_lock(&atomic->mutex);
-	oldvalue = atomic->value;
-
-	if(atomic->value == expected)
-		atomic->value = desired;
-	mowgli_mutex_unlock(&atomic->mutex);
-
-	return oldvalue;
+#define mowgli_atomic_compare_exchange_function(type, mangle) \
+static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) *atomic, type expected, type desired) \
+{ \
+	return (type)atomic_compare_exchange_strong(atomic, expected, desired); \
 }
 #endif
+
+#if defined MOWGLI_ATOMIC_DEBUG || !defined HAVE_ATOMIC_BUILTINS
+#define mowgli_atomic(type) volatile type
+
+extern mowgli_mutex_t mowgli_atomic_mutex[256];
+
+typedef union {
+	mowgli_atomic(void) *address;
+	struct {
+		uint8_t a;
+		uint8_t b;
+		uint8_t c;
+		uint8_t d;
+#if defined _LP64 || defined __LP64__
+		uint8_t e;
+		uint8_t f;
+		uint8_t g;
+		uint8_t h;
+#endif
+	} part;
+} mowgli_atomic_address_mangle_t;
+
+static inline mowgli_mutex_t *mowgli_atomic_mutex_lookup(mowgli_atomic(void) *address) {
+	mowgli_atomic_address_mangle_t mangle;
+
+	mangle.address = address;
+
+	uint8_t ab = mangle.part.a ^ mangle.part.b;
+	uint8_t cd = mangle.part.c ^ mangle.part.d;
+
+#if defined _LP64 || defined __LP64__
+	uint8_t ef = mangle.part.e ^ mangle.part.f;
+	uint8_t gh = mangle.part.g ^ mangle.part.h;
+#endif
+
+	uint8_t abcd = ab ^ cd;
+
+#if defined _LP64 || defined __LP64__
+	uint8_t efgh = ef ^ gh;
+
+	uint8_t abcdefgh = abcd ^ efgh;
+
+	return &mowgli_atomic_mutex[abcdefgh];
+#else
+	return &mowgli_atomic_mutex[abcd];
+#endif
+}
+
+#define mowgli_atomic_load_function(type, mangle) \
+static inline type mowgli_atomic_load_##mangle (mowgli_atomic(type) *atomic) \
+{ \
+	type result; \
+\
+	mowgli_mutex_lock(mowgli_atomic_mutex_lookup(atomic)); \
+	result = (type) *atomic; \
+	mowgli_mutex_unlock(mowgli_atomic_mutex_lookup(atomic)); \
+\
+	return result; \
+}
+
+#define mowgli_atomic_store_function(type, mangle) \
+static inline type mowgli_atomic_store_##mangle (mowgli_atomic(type) *atomic, type value) \
+{ \
+	type result; \
+\
+	mowgli_mutex_lock(mowgli_atomic_mutex_lookup(atomic)); \
+	result = (type) *atomic; \
+	*atomic = value; \
+	mowgli_mutex_unlock(mowgli_atomic_mutex_lookup(atomic)); \
+\
+	return result; \
+}
+
+#define mowgli_atomic_compare_exchange_function(type, mangle) \
+static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) *atomic, type expected, type desired) \
+{ \
+	type result; \
+\
+	mowgli_mutex_lock(mowgli_atomic_mutex_lookup(atomic)); \
+	result = (type) *atomic; \
+\
+	if(*atomic == expected) \
+		*atomic = desired; \
+\
+	mowgli_mutex_unlock(mowgli_atomic_mutex_lookup(atomic)); \
+\
+	return result; \
+}
+
+#endif
+
+#define mowgli_atomic_type(type, mangle) \
+mowgli_atomic_load_function(type, mangle) \
+mowgli_atomic_store_function(type, mangle) \
+mowgli_atomic_compare_exchange_function(type, mangle)
+
+#define mowgli_atomic_signed_type(type, mangle) \
+mowgli_atomic_type(unsigned type, u##mangle) \
+mowgli_atomic_type(signed type, mangle)
+
+#define mowgli_atomic_c99_t_type(type) \
+mowgli_atomic_type(type, type) \
+mowgli_atomic_type(u##type, u##type)
+
+#define mowgli_atomic_c99_width_type(bitwidth) \
+mowgli_atomic_c99_t_type(int##bitwidth##_t) \
+mowgli_atomic_c99_t_type(int_least##bitwidth##_t) \
+mowgli_atomic_c99_t_type(int_fast##bitwidth##_t)
+
+mowgli_atomic_signed_type(char, char)
+mowgli_atomic_signed_type(int, int)
+mowgli_atomic_signed_type(long, long)
+mowgli_atomic_signed_type(long long, longlong)
+mowgli_atomic_type(bool, bool)
+mowgli_atomic_type(void *, pointer)
+
+mowgli_atomic_type(size_t, size_t)
+mowgli_atomic_type(ptrdiff_t, ptrdiff_t)
+mowgli_atomic_type(wchar_t, wchar_t)
+
+mowgli_atomic_c99_width_type(8)
+mowgli_atomic_c99_width_type(16)
+mowgli_atomic_c99_width_type(32)
+mowgli_atomic_c99_width_type(64)
+mowgli_atomic_c99_t_type(intptr_t)
+mowgli_atomic_c99_t_type(intmax_t)
 
 #endif
 

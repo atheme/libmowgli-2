@@ -3506,25 +3506,25 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler has atomic builtins" >&5
 $as_echo_n "checking if compiler has atomic builtins... " >&6; }
 
-GCC_ATOMIC_BUILTINS=no
+INTEL_ATOMIC_BUILTINS=no
 C11_ATOMIC_BUILTINS=no
 
 if test "x$GCC" = "xno"; then :
 
   GCC_VERSION="$($CC -dumpversion)"
-	GCC_VERSION_MAJOR="$(echo $GCC_VERSION | cut -d'.' -f1)"
-  GCC_VERSION_MINOR="$(echo $GCC_VERSION | cut -d'.' -f2)"
+	GCC_VERSION_MAJOR="$(echo $INTEL_VERSION | cut -d'.' -f1)"
+  GCC_VERSION_MINOR="$(echo $INTEL_VERSION | cut -d'.' -f2)"
 
   if test $GCC_VERSION_MAJOR > 4; then :
 
     if test $GCC_VERSION_MINOR > 1; then :
-  GCC_ATOMIC_BUILTINS=yes
+  INTEL_ATOMIC_BUILTINS=yes
 else
-  GCC_ATOMIC_BUILTINS=no
+  INTEL_ATOMIC_BUILTINS=no
 fi
 
 else
-  GCC_ATOMIC_BUILTINS=no
+  INTEL_ATOMIC_BUILTINS=no
 fi
 
 else
@@ -3538,7 +3538,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
   if test "$cross_compiling" = yes; then :
-  GCC_ATOMIC_BUILTINS=no
+  INTEL_ATOMIC_BUILTINS=no
 else
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -3581,16 +3581,16 @@ int main()
 
 _ACEOF
 if ac_fn_c_try_run "$LINENO"; then :
-  GCC_ATOMIC_BUILTINS=yes
+  INTEL_ATOMIC_BUILTINS=yes
 else
-  GCC_ATOMIC_BUILTINS=no
+  INTEL_ATOMIC_BUILTINS=no
 fi
 rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
   conftest.$ac_objext conftest.beam conftest.$ac_ext
 fi
 
 
-  if test "x$GCC_ATOMIC_BUILTINS" = "xno"; then :
+  if test "x$INTEL_ATOMIC_BUILTINS" = "xno"; then :
 
     if test "$cross_compiling" = yes; then :
   C11_ATOMIC_BUILTINS=no
@@ -3631,15 +3631,15 @@ fi
 
 ATOMIC_BUILTINS="no"
 
-if test "x$GCC_ATOMIC_BUILTINS" = "xyes"; then :
+if test "x$INTEL_ATOMIC_BUILTINS" = "xyes"; then :
 
 
 $as_echo "#define HAVE_ATOMIC_BUILTINS 1" >>confdefs.h
 
 
-$as_echo "#define HAVE_ATOMIC_BUILTINS_GCC 1" >>confdefs.h
+$as_echo "#define HAVE_ATOMIC_BUILTINS_INTEL 1" >>confdefs.h
 
-  ATOMIC_BUILTINS="gcc"
+  ATOMIC_BUILTINS="Intel"
 
 fi
 
