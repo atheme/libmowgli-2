@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * init.c: Initialization of libmowgli.
+ * bootstrap.c: Initialization of libmowgli.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -21,9 +21,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_INIT_H__
-#define __MOWGLI_INIT_H__
+#ifndef __MOWGLI_BOOTSTRAP_H__
+#define __MOWGLI_BOOTSTRAP_H__
 
-extern void mowgli_init(void);
+extern void mowgli_bootstrap(void);
 
 #endif

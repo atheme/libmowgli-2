@@ -26,7 +26,7 @@
 static mowgli_heap_t *mowgli_node_heap;
 static mowgli_heap_t *mowgli_list_heap;
 
-void mowgli_node_init(void)
+void mowgli_node_bootstrap(void)
 {
         mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 1024, BH_NOW);
         mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 64, BH_NOW);

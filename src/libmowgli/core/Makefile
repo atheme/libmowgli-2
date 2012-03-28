@@ -3,7 +3,7 @@ include ../../../extra.mk
 STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_CORE}
 STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_CORE}
 
-SRCS = init.c			\
+SRCS = bootstrap.c			\
        alloc.c			\
        allocation_policy.c	\
        allocator.c		\
@@ -12,7 +12,7 @@ SRCS = init.c			\
        mowgli_string.c		\
        process.c
 
-INCLUDES = init.h		\
+INCLUDES = bootstrap.h		\
 	   alloc.h		\
 	   allocation_policy.h	\
 	   allocator.h		\

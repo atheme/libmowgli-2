@@ -132,7 +132,7 @@ memslice_free(void *ptr)
 static mowgli_allocation_policy_t *memslice = NULL;
 
 void
-mowgli_memslice_init(void)
+mowgli_memslice_bootstrap(void)
 {
 	allocator_heap = mowgli_heap_create(sizeof(slice_alloc_t), 16, BH_NOW);
 

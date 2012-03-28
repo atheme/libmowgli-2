@@ -50,7 +50,7 @@ struct mowgli_list_
 	size_t count;                    /* how many entries in the list */
 };
 
-extern void mowgli_node_init(void);
+extern void mowgli_node_bootstrap(void);
 extern mowgli_node_t *mowgli_node_create(void);
 extern void mowgli_node_free(mowgli_node_t *n);
 extern void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l);

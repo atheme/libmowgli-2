@@ -37,7 +37,7 @@ static void _hook_key_canon(char *str)
 }
 
 void
-mowgli_hook_init(void)
+mowgli_hook_bootstrap(void)
 {
 	mowgli_hooks = mowgli_patricia_create(_hook_key_canon);
 	mowgli_hook_item_heap = mowgli_heap_create(sizeof(mowgli_hook_item_t), 64, BH_NOW);

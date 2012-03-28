@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * init.c: Initialization of libmowgli.
+ * bootstrap.c: Initialization of libmowgli.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  *
@@ -23,11 +23,11 @@
 
 #include "mowgli.h"
 
-MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
+MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 {
-	static bool initialized = 0;
+	static bool bootstrapped = 0;
 
-	if (initialized)
+	if(bootstrapped)
 		return;
 
 #ifdef _WIN32
@@ -37,22 +37,22 @@ MOWGLI_INITIALIZER_FUNC(mowgli_init_real)
 #endif
 
 	/* initial bootstrap */
-	mowgli_node_init();
-	mowgli_queue_init();
-	mowgli_argstack_init();
-	mowgli_bitvector_init();
-	mowgli_global_storage_init();
-	mowgli_hook_init();
-	mowgli_random_init();
-	mowgli_allocation_policy_init();
-	mowgli_allocator_init();
-	mowgli_memslice_init();
+	mowgli_node_bootstrap();
+	mowgli_queue_bootstrap();
+	mowgli_argstack_bootstrap();
+	mowgli_bitvector_bootstrap();
+	mowgli_global_storage_bootstrap();
+	mowgli_hook_bootstrap();
+	mowgli_random_bootstrap();
+	mowgli_allocation_policy_bootstrap();
+	mowgli_allocator_bootstrap();
+	mowgli_memslice_bootstrap();
 
 	/* now that we're bootstrapped, we can use a more optimised allocator
 	   if one is available. */
 	mowgli_allocator_set_policy(mowgli_allocator_malloc);
 
-	initialized = true;
+	bootstrapped = true;
 }
 
 void mowgli_init(void)

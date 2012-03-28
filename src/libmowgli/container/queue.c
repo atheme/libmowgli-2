@@ -26,7 +26,7 @@
 static mowgli_heap_t *mowgli_queue_heap = NULL;
 
 void
-mowgli_queue_init(void)
+mowgli_queue_bootstrap(void)
 {
 	mowgli_queue_heap = mowgli_heap_create(sizeof(mowgli_queue_t), 256, BH_NOW);
 

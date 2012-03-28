@@ -52,7 +52,7 @@ static void mowgli_argstack_destroy(void *vptr)
  * Side Effects:
  *       - the mowgli_argstack_t object class is registered.
  */
-void mowgli_argstack_init(void)
+void mowgli_argstack_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_argstack_t", mowgli_argstack_destroy, FALSE);
 }

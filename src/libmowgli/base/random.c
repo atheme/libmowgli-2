@@ -42,7 +42,7 @@ struct mowgli_random_
 static mowgli_object_class_t klass;
 
 /* initialization */
-void mowgli_random_init(void)
+void mowgli_random_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_random_t", NULL, FALSE);
 }

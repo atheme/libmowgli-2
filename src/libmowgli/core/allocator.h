@@ -24,7 +24,7 @@
 #ifndef __MOWGLI_ALLOCATOR_H__
 #define __MOWGLI_ALLOCATOR_H__
 
-void mowgli_allocator_init(void);
+void mowgli_allocator_bootstrap(void);
 extern mowgli_allocation_policy_t *mowgli_allocator_malloc;
 
 #endif

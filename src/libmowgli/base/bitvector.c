@@ -39,7 +39,7 @@ static mowgli_object_class_t klass;
  * Side Effects:
  *       - the mowgli_bitvector_t object class is registered.
  */
-void mowgli_bitvector_init(void)
+void mowgli_bitvector_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_bitvector_t", mowgli_free, FALSE);
 }

@@ -34,20 +34,20 @@
  * See http://blogs.msdn.com/b/vcblog/archive/2006/10/20/crt-initialization.aspx
  * for more information.
  */
-#define MOWGLI_INITIALIZER_FUNC(func) \
+#define MOWGLI_BOOTSTRAP_FUNC(func) \
 	static void __cdecl func(void); \
 	__declspec(allocate(".CRT$XCU")) void (__cdecl *func##_)(void) = func; \
 	static void __cdecl func(void)
 
 #elif defined(__GNUC__) || defined(__SUNPRO_C)
 
-#define MOWGLI_INITIALIZER_FUNC(func) \
+#define MOWGLI_BOOTSTRAP_FUNC(func) \
 	static void func(void) __attribute__((constructor)); \
 	static void func(void)
 
 #else
 
-#error MOWGLI_INITIALIZER_FUNC not implemented for your platform :(
+#error MOWGLI_BOOTSTRAP_FUNC not implemented for your platform :(
 
 #endif
 

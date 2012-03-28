@@ -32,7 +32,7 @@ static void _storage_key_canon(char *key)
 }
 
 void
-mowgli_global_storage_init(void)
+mowgli_global_storage_bootstrap(void)
 {
 	mowgli_global_storage_dict = mowgli_patricia_create(_storage_key_canon);
 

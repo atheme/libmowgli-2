@@ -38,7 +38,7 @@ typedef struct {
     mowgli_list_t items;
 } mowgli_hook_t;
 
-extern void mowgli_hook_init(void);
+extern void mowgli_hook_bootstrap(void);
 extern void mowgli_hook_register(const char *name);
 extern int  mowgli_hook_associate(const char *name, mowgli_hook_function_t func, void * user_data);
 extern int  mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func);

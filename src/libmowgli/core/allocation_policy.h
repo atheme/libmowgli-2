@@ -33,7 +33,7 @@ typedef struct {
 	mowgli_deallocation_func_t deallocate;
 } mowgli_allocation_policy_t;
 
-void mowgli_allocation_policy_init(void);
+void mowgli_allocation_policy_bootstrap(void);
 mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name,
 	mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
 mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);

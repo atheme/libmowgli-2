@@ -32,7 +32,7 @@ static void _allocation_policy_key_canon(char *str)
 }
 
 void
-mowgli_allocation_policy_init(void)
+mowgli_allocation_policy_bootstrap(void)
 {
 	mowgli_allocation_policy_dict = mowgli_patricia_create(_allocation_policy_key_canon);
 
