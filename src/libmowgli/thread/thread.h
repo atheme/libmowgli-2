@@ -25,11 +25,11 @@
 #ifndef __MOWGLI_THREAD_H__
 #define __MOWGLI_THREAD_H__
 
-#if defined(__sun) || defined(__sco)
+#ifdef MOWGLI_OS_UNIX_TYPE
 # include <thread.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
 # define MOWGLI_NATIVE_THREAD_DECL(name)	thread_t (name)
-#elif defined(_WIN32)
+#elif defined MOWGLI_OS_WIN
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
 # define MOWGLI_NATIVE_THREAD_DECL(name) 	HANDLE (name)
 #else

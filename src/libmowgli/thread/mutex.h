@@ -24,12 +24,12 @@
 #ifndef __MOWGLI_MUTEX_H__
 #define __MOWGLI_MUTEX_H__
 
-#if defined(__sun) || defined(__sco)
+#ifdef MOWGLI_OS_UNIX_TYPE
 # include <thread.h>
 # include <synch.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
 # define MOWGLI_NATIVE_MUTEX_DECL(name) 	mutex_t (name)
-#elif defined(_WIN32)
+#elif defined MOWGLI_OS_WIN
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
 # define MOWGLI_NATIVE_MUTEX_DECL(name) 	HANDLE (name)
 #else
