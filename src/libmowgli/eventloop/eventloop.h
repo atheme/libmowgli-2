@@ -21,8 +21,6 @@
 #ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 #define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 
-#include "thread/thread.h"
-
 #ifndef _WIN32
 
 typedef int mowgli_descriptor_t;

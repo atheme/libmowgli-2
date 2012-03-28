@@ -56,7 +56,21 @@ static inline mowgli_mutex_ops_t *get_mutex_platform(void)
 	return &_mowgli_null_mutex_ops;
 }
 
-int mowgli_mutex_create(mowgli_mutex_t *mutex)
+mowgli_mutex_t *mowgli_mutex_create(void)
+{
+	mowgli_mutex_t *mutex = mowgli_alloc(sizeof(mowgli_mutex_t));
+
+	return_val_if_fail(mutex != NULL, NULL);
+
+	if(mowgli_mutex_init(mutex)) {
+		return mutex;
+	} else {
+		mowgli_free(mutex);
+		return NULL;
+	}
+}
+
+int mowgli_mutex_init(mowgli_mutex_t *mutex)
 {
 	static bool initialized = false;
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
@@ -96,13 +110,24 @@ int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 	return mutex_ops->mutex_unlock(mutex);
 }
 
-int mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+int mowgli_mutex_uninit(mowgli_mutex_t *mutex)
 {
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
 
 	return_val_if_fail(mutex != NULL, -1);
 
 	return mutex_ops->mutex_destroy(mutex);
+}
+
+mowgli_mutex_t *mowgli_mutex_destroy(mowgli_mutex_t *mutex) {
+	if(mutex != NULL)
+		return NULL;
+
+	return_val_if_fail(mowgli_mutex_uninit(mutex) != 0, NULL);
+
+	mowgli_free(mutex);
+
+	return NULL;
 }
 
 void mowgli_mutex_set_policy(mowgli_thread_policy_t policy)

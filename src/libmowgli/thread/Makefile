@@ -8,7 +8,7 @@ SRCS = mutex.c			\
        posix_mutexops.c		\
        win32_mutexops.c
 
-INCLUDES = thread.h
+INCLUDES = thread.h mutex.h
 
 include ../../../buildsys.mk
 

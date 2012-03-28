@@ -27,5 +27,5 @@ mowgli_mutex_t mowgli_atomic_mutex[256];
 
 void mowgli_atomic_bootstrap() {
 	for(int i = 0; i < 256; i++)
-		mowgli_mutex_create(&mowgli_atomic_mutex[i]);
+		mowgli_mutex_init(&mowgli_atomic_mutex[i]);
 }

@@ -50,8 +50,13 @@ MOWGLI_DECLS_START
 #include "container/list.h"
 #include "object/class.h"
 #include "object/object.h"
+
 #include "core/allocation_policy.h"
 #include "core/alloc.h"
+
+#include "thread/thread.h"
+#include "thread/mutex.h"
+
 #include "base/memslice.h"
 #include "container/patricia.h"
 #include "module/module.h"
@@ -75,7 +80,7 @@ MOWGLI_DECLS_START
 #include "core/allocator.h"
 #include "base/formatter.h"
 #include "container/index.h"
-#include "thread/thread.h"
+
 #include "ext/confparse.h"
 #include "ext/program_opts.h"
 #include "concurrent/atomic.h"

@@ -27,45 +27,14 @@
 
 #if defined(__sun) || defined(__sco)
 # include <thread.h>
-# include <synch.h>
-# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# define MOWGLI_NATIVE_MUTEX_DECL(name) 	mutex_t (name)
 # define MOWGLI_NATIVE_THREAD_DECL(name)	thread_t (name)
 #elif defined(_WIN32)
-# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# define MOWGLI_NATIVE_MUTEX_DECL(name) 	HANDLE (name)
 # define MOWGLI_NATIVE_THREAD_DECL(name) 	HANDLE (name)
 #else
 # include <pthread.h>
 #endif
-
-typedef struct {
-#ifdef MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-	MOWGLI_NATIVE_MUTEX_DECL(mutex);
-#else
-	pthread_mutex_t mutex;
-#endif
-} mowgli_mutex_t;
-
-#ifdef MOWGLI_NATIVE_MUTEX_DECL
-# undef MOWGLI_NATIVE_MUTEX_DECL
-#endif
-
-typedef struct {
-	int (*mutex_create)(mowgli_mutex_t *mutex);
-	int (*mutex_lock)(mowgli_mutex_t *mutex);
-	int (*mutex_trylock)(mowgli_mutex_t *mutex);
-	int (*mutex_unlock)(mowgli_mutex_t *mutex);
-	int (*mutex_destroy)(mowgli_mutex_t *mutex);
-} mowgli_mutex_ops_t;
-
-int mowgli_mutex_create(mowgli_mutex_t *mutex);
-int mowgli_mutex_lock(mowgli_mutex_t *mutex);
-int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
-int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
-int mowgli_mutex_destroy(mowgli_mutex_t *mutex);
 
 typedef struct {
 #ifdef MOWGLI_FEATURE_HAVE_NATIVE_THREADS
@@ -105,12 +74,5 @@ typedef enum {
 	MOWGLI_THREAD_POLICY_DISABLED,
 } mowgli_thread_policy_t;
 
-void mowgli_mutex_set_policy(mowgli_thread_policy_t policy);
+#endif
 
-/* simple dispatch function to set the ops up for the various subsystems. */
-static inline void mowgli_thread_set_policy(mowgli_thread_policy_t policy)
-{
-	mowgli_mutex_set_policy(policy);
-}
-
-#endif /* !__MOWGLI_THREAD_H__ */

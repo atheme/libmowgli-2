@@ -79,7 +79,7 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 	eventloop->eventloop_ops = &_mowgli_winsock_pollops;
 #endif
 
-	if (mowgli_mutex_create(&eventloop->mutex) != 0)
+	if (mowgli_mutex_init(&eventloop->mutex) != 0)
 	{
 		mowgli_log("couldn't create mutex for eventloop %p, aborting...", eventloop);
 		abort();
@@ -96,7 +96,7 @@ void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
 	eventloop->eventloop_ops->pollshutdown(eventloop);
 
-	mowgli_mutex_destroy(&eventloop->mutex);
+	mowgli_mutex_uninit(&eventloop->mutex);
 	mowgli_heap_free(eventloop_heap, eventloop);
 }
 

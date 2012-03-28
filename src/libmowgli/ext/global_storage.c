@@ -36,7 +36,7 @@ mowgli_global_storage_bootstrap(void)
 {
 	mowgli_global_storage_dict = mowgli_patricia_create(_storage_key_canon);
 
-	mowgli_mutex_create(&mowgli_global_storage_lock);
+	mowgli_mutex_init(&mowgli_global_storage_lock);
 }
 
 void *

@@ -204,7 +204,7 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 	bh->use_mmap = allocator != NULL ? FALSE : TRUE;
 #endif
 
-	if(mowgli_mutex_create(&bh->mutex) != 0)
+	if(mowgli_mutex_init(&bh->mutex) != 0)
 		mowgli_throw_exception_fatal("heap mutex can't be created");
 
 	if (flags & BH_NOW)
@@ -236,7 +236,7 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	if (heap->empty_block)
 		mowgli_heap_shrink(heap, heap->empty_block);
 
-	mowgli_mutex_destroy(&heap->mutex);
+	mowgli_mutex_uninit(&heap->mutex);
 
 	/* everything related to heap has gone, time for itself */
 	mowgli_free(heap);
