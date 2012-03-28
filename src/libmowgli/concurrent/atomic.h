@@ -41,10 +41,6 @@
 #ifndef __MOWGLI_ATOMIC_H__
 #define __MOWGLI_ATOMIC_H__
 
-#include <stddef.h>
-#include <inttypes.h>
-#include <stdbool.h>
-
 extern void mowgli_atomic_bootstrap();
 
 #if !defined MOWGLI_ATOMIC_DEBUG && defined HAVE_ATOMIC_BUILTINS_INTEL
@@ -105,7 +101,7 @@ typedef union {
 		uint8_t b;
 		uint8_t c;
 		uint8_t d;
-#if defined _LP64 || defined __LP64__
+#ifdef MOWGLI_CPU_BITS_64
 		uint8_t e;
 		uint8_t f;
 		uint8_t g;
@@ -122,14 +118,14 @@ static inline mowgli_mutex_t *mowgli_atomic_mutex_lookup(mowgli_atomic(void) *ad
 	uint8_t ab = mangle.part.a ^ mangle.part.b;
 	uint8_t cd = mangle.part.c ^ mangle.part.d;
 
-#if defined _LP64 || defined __LP64__
+#ifdef MOWGLI_CPU_BITS_64
 	uint8_t ef = mangle.part.e ^ mangle.part.f;
 	uint8_t gh = mangle.part.g ^ mangle.part.h;
 #endif
 
 	uint8_t abcd = ab ^ cd;
 
-#if defined _LP64 || defined __LP64__
+#ifdef MOWGLI_CPU_BITS_64
 	uint8_t efgh = ef ^ gh;
 
 	uint8_t abcdefgh = abcd ^ efgh;

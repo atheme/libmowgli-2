@@ -1,6 +1,6 @@
 SUBDIRS = win32
 
-INCLUDES = constructor.h
+INCLUDES = constructor.h machine.h
 
 include ../../../buildsys.mk
 
