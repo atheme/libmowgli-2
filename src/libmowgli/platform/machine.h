@@ -68,14 +68,16 @@
 #define MOWGLI_CPU x86_64
 #define MOWGLI_CPU_BITS_64
 #define MOWGLI_CPU_BITS 64
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
 #elif defined __i386__ || defined __i386 || defined __IA32__ || defined _M_IX86 || defined __X86__ || defined _X86__ || defined __I86__
 #define MOWGLI_CPU_X86
 #define MOWGLI_CPU x86
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
-#endif
-
-#if defined __arm__ || defined __TARGET_ARCH_ARM || defined _ARM
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
+#elif defined __arm__ || defined __TARGET_ARCH_ARM || defined _ARM
 #if defined __thumb__ || defined __TARGET_ARCH_THUMB
 #define MOWGLI_CPU_ARM_THUMB
 #endif
@@ -83,9 +85,8 @@
 #define MOWGLI_CPU arm
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
-#endif
-
-#if defined __hppa__ || defined __HPPA__ || defined __hppa
+// ARM can be either endian
+#elif defined __hppa__ || defined __HPPA__ || defined __hppa
 #if defined _PA_RISC2_0 || defined __HPPA20__ || defined __RISC2_0__
 #define MOWGLI_CPU_HPPA20
 #define MOWGLI_CPU hppa20
@@ -97,16 +98,15 @@
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
 #endif
-#endif
-
-#if defined __ia64__ || defined __IA64__ || defined _M_IA64 || defined __ia64 || defined __itanium__
+#define MOWGLI_CPU_ENDIAN_BIG
+#define MOWGLI_CPU_ENDIAN big
+#elif defined __ia64__ || defined __IA64__ || defined _M_IA64 || defined __ia64 || defined __itanium__
 #define MOWGLI_CPU_ITANIUM
 #define MOWGLI_CPU itanium
 #define MOWGLI_CPU_BITS_64
 #define MOWGLI_CPU_BITS 64
-#endif
-
-#if defined __mips__ || defined mips || defined __mips || defined __MIPS__
+// Itanium can be either endian
+#elif defined __mips__ || defined mips || defined __mips || defined __MIPS__
 #if defined __mips64 || defined __mips64__
 #define MOWGLI_CPU_MIPS64
 #define MOWGLI_CPU mips64
@@ -118,23 +118,21 @@
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
 #endif
-#endif
-
-#if defined __powerpc || defined __powerpc__ || defined __POWERPC__ || defined __ppc__ || defined _M_PPC
+// MIPS can be either endian
+#elif defined __powerpc || defined __powerpc__ || defined __POWERPC__ || defined __ppc__ || defined _M_PPC
 #if defined __ppc64__ || defined __PPC64__
 #define MOWGLI_CPU_POWERPC64
 #define MOWGLI_CPU powerpc64
 #define MOWGLI_CPU_BITS_64
 #define MOWGLI_CPU_BITS 64
 #else
-#define MOWGLI_CPU_POWERPC
 #define MOWGLI_CPU powerpc
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
 #endif
-#endif
-
-#if defined __sparc__ || defined __sparc
+#define MOWGLI_CPU_POWERPC
+// PowerPC can be either endian
+#elif defined __sparc__ || defined __sparc
 #if defined __sparcv9 || defined __sparc64 || defined __sparc64__
 #define MOWGLI_CPU_SPARC64
 #define MOWGLI_CPU sparc64
@@ -146,13 +144,15 @@
 #define MOWGLI_CPU_BITS_32
 #define MOWGLI_CPU_BITS 32
 #endif
-#endif
-
-#if defined __alpha || defined __alpha__ || defined _M_ALPHA
+#define MOWGLI_CPU_ENDIAN_BIG
+#define MOWGLI_CPU_ENDIAN big
+#elif defined __alpha || defined __alpha__ || defined _M_ALPHA
 #define MOWGLI_CPU_ALPHA
 #define MOWGLI_CPU alpha
 #define MOWGLI_CPU_BITS 64
 #define MOWGLI_CPU_BITS_64
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
 #endif
 
 #ifndef MOWGLI_CPU
@@ -177,9 +177,7 @@
 #define MOWGLI_OS_THREADS posix
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
-#endif
-
-#if defined __APPLE__
+#elif defined __APPLE__
 #define MOWGLI_OS_OSX
 #define MOWGLI_OS osx
 #define MOWGLI_OS_THREADS_POSIX
@@ -187,9 +185,12 @@
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
 #define MOWGLI_OS_BSD_TYPE
-#endif
 
-#if defined __WINDOWS__ || defined _WIN32 || defined __WIN32__ || defined __TOS_WIN__
+#ifdef MOWGLI_CPU_POWERPC
+#define MOWGLI_CPU_ENDIAN_BIG
+#define MOWGLI_CPU_ENDIAN big
+#endif
+#elif defined __WINDOWS__ || defined _WIN32 || defined __WIN32__ || defined __TOS_WIN__
 #if defined _WIN64
 #define MOWGLI_OS_WIN64
 #define MOWGLI_OS win64
@@ -208,9 +209,11 @@
 #elif defined __MINGW32__
 #define MOWGLI_OS_WIN_MINGW
 #endif
-#endif
 
-#if defined __NetBSD__ || defined __OpenBSD__ || defined __FreeBSD__ || defined __bsdi__ || defined __DragonFly__ || defined BSD || defined _SYSTYPE_BSD
+#if defined MOWGLI_CPU_POWERPC || defined MOWGLI_CPU_MIPS || defined MOWGLI_CPU_ITANIUM
+#define MOWGLI_ENDIAN_CPU_LITTLE
+#endif
+#elif defined __NetBSD__ || defined __OpenBSD__ || defined __FreeBSD__ || defined __bsdi__ || defined __DragonFly__ || defined BSD || defined _SYSTYPE_BSD
 #define MOWGLI_OS_BSD
 #define MOWGLI_OS bsd
 #define MOWGLI_OS_THREADS_POSIX
@@ -218,18 +221,14 @@
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
 #define MOWGLI_OS_BSD_TYPE
-#endif
-
-#if defined __GNU__
+#elif defined __GNU__
 #define MOWGLI_OS_HURD
 #define MOWGLI_OS hurd
 #define MOWGLI_OS_THREADS_POSIX
 #define MOWGLI_OS_THREADS posix
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
-#endif
-
-#if defined sco || defined __sco
+#elif defined sco || defined __sco
 #define MOWGLI_OS_SCO
 #define MOWGLI_OS sco
 #define MOWGLI_OS_THREADS_POSIX
@@ -237,9 +236,7 @@
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
 #define MOWGLI_OS_UNIX_TYPE
-#endif
-
-#if defined sun || defined __sun
+#elif defined sun || defined __sun
 #define MOWGLI_OS_SOLARIS
 #define MOWGLI_OS solaris
 #define MOWGLI_OS_THREADS_POSIX
@@ -247,9 +244,23 @@
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
 #define MOWGLI_OS_UNIX_TYPE
+#if defined MOWGLI_CPU_POWERPC
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
 #endif
-
-#if defined __QNX__ || defined __QNXNTO__
+#elif defined _hpux || defined hpux || defined __hpux
+#define MOWGLI_OS_HPUX
+#define MOWGLI_OS hpux
+#define MOWGLI_OS_THREADS_POSIX
+#define MOWGLI_OS_THREADS posix
+#define MOWGLI_OS_MUTEX_POSIX
+#define MOWGLI_OS_MUTEX posix
+#define MOWGLI_OS_UNIX_TYPE
+#if defined MOWGLI_CPU_ITANIUM 
+#define MOWGLI_CPU_ENDIAN_BIG
+#define MOWGLI_CPU_ENDIAN big
+#endif
+#elif defined __QNX__ || defined __QNXNTO__
 #define MOWGLI_OS_QNX
 #define MOWGLI_OS qnx
 #define MOWGLI_OS_THREADS_QNX
@@ -281,6 +292,18 @@
 #ifndef MOWGLI_OS_MUTEX
 #define MOWGLI_OS_MUTEX_NULL
 #define MOWGLI_OS_MUTEX null
+#endif
+
+#ifndef MOWGLI_CPU_ENDIAN
+#if defined __BIG_ENDIAN__ || defined __ARMEB__ || defined __THUMBEB__ || defined _MIPSEB || defined __MIPSEB || defined __MIPSEB__ || __BYTE_ORDER == __BIG_ENDIAN
+#define MOWGLI_CPU_ENDIAN_BIG
+#define MOWGLI_CPU_ENDIAN big
+#elif defined __LITTLE_ENDIAN__ || defined __ARMEL__ || defined __THUMBEL__ || defined _MIPSEL || defined __MIPSEL || defined __MIPSEL__ || __BYTE_ORDER == __LITTLE_ENDIAN
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
+#else
+#warning CPU endianness unknown, some functions of libmowgli will not work
+#endif
 #endif
 
 #endif
