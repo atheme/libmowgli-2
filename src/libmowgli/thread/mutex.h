@@ -36,17 +36,7 @@
 # include <pthread.h>
 #endif
 
-typedef struct {
-#ifdef MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-	MOWGLI_NATIVE_MUTEX_DECL(mutex);
-#else
-	pthread_mutex_t mutex;
-#endif
-} mowgli_mutex_t;
-
-#ifdef MOWGLI_NATIVE_MUTEX_DECL
-# undef MOWGLI_NATIVE_MUTEX_DECL
-#endif
+typedef struct mowgli_mutex_ mowgli_mutex_t;
 
 typedef struct {
 	int (*mutex_create)(mowgli_mutex_t *mutex);
@@ -56,13 +46,26 @@ typedef struct {
 	int (*mutex_destroy)(mowgli_mutex_t *mutex);
 } mowgli_mutex_ops_t;
 
+struct mowgli_mutex_ {
+#ifdef MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+	MOWGLI_NATIVE_MUTEX_DECL(mutex);
+#else
+	pthread_mutex_t mutex;
+#endif
+	mowgli_mutex_ops_t *ops;
+};
+
+#ifdef MOWGLI_NATIVE_MUTEX_DECL
+# undef MOWGLI_NATIVE_MUTEX_DECL
+#endif
+
 mowgli_mutex_t *mowgli_mutex_create(void);
 int mowgli_mutex_init(mowgli_mutex_t* mutex);
 int mowgli_mutex_lock(mowgli_mutex_t *mutex);
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
 int mowgli_mutex_uninit(mowgli_mutex_t *mutex);
-mowgli_mutex_t *mowgli_mutex_destroy(mowgli_mutex_t *mutex);
+void mowgli_mutex_destroy(mowgli_mutex_t *mutex);
 
 void mowgli_mutex_set_policy(mowgli_thread_policy_t policy);
 
