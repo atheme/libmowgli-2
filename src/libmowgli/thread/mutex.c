@@ -72,13 +72,9 @@ mowgli_mutex_t *mowgli_mutex_create(void)
 
 int mowgli_mutex_init(mowgli_mutex_t *mutex)
 {
-	static bool initialized = false;
 	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
 
 	return_val_if_fail(mutex != NULL, -1);
-
-	if (!initialized)
-		initialized = true;
 
 	return mutex_ops->mutex_create(mutex);
 }
