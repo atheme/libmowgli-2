@@ -135,7 +135,11 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 		return;
 	}
 
-	/* Do we want an SSL write? */
+	/* Le sigh -- stupid edge-triggered interfaces */
+	if (mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDREAD))
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
+
+	/* Do we want a write for SSL? */
 	if (mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 
