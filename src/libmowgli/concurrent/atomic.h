@@ -43,7 +43,31 @@
 
 extern void mowgli_atomic_bootstrap();
 
-#if !defined MOWGLI_ATOMIC_DEBUG && defined HAVE_ATOMIC_BUILTINS_INTEL
+#if defined MOWGLI_COMPILER_GCC_COMPAT
+#if defined MOWGLI_COMPILER_GCC
+#if __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
+#define MOWGLI_ATOMIC_GCC
+#endif
+#elif defined MOWGLI_COMPILER_CLANG
+#if __has_builtin(__sync_swap)
+#define MOWGLI_ATOMIC_GCC
+#endif
+#elif defined MOWGLI_COMPILER_ICC
+#if defined __ICC && __ICC >= 1100
+#define MOWGLI_ATOMIC_GCC
+#endif
+#endif
+#elif defined __STDC_VERSION__
+#if __STDC_VERSION__ >= 201112L && !defined __STDC_NO_ATOMICS__
+#define MOWGLI_ATOMIC_C11
+#endif
+#endif
+
+#if !defined MOWGLI_ATOMIC_GCC && !defined MOWGLI_ATOMIC_C11
+#define MOWGLI_ATOMIC_FALLBACK
+#endif
+
+#if !defined MOWGLI_ATOMIC_DEBUG && defined MOWGLI_ATOMIC_GCC
 #define mowgli_atomic(type) volatile type
 
 #define mowgli_atomic_load_function(type, mangle) \
@@ -63,18 +87,16 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 { \
 	return (type)__sync_val_compare_and_swap(atomic, expected, desired); \
 }
-#endif
-
-#if !defined MOWGLI_ATOMIC_DEBUG && defined HAVE_ATOMIC_BUILTINS_C11
+#elif !defined MOWGLI_ATOMIC_DEBUG && defined MOWGLI_ATOMIC_C11
 #include <stdatomic.h>
 
-#define mowgli_atomic(type) _Atomic type
+#define mowgli_atomic(type) _Atomic(type)
 
 #define mowgli_atomic_load_function(type, mangle) \
 static inline type mowgli_atomic_load_##mangle (mowgli_atomic(type) *atomic) \
 { \
 	return (type)atomic_load(atomic); \
-})
+}
 
 #define mowgli_atomic_store_function(type, mangle) \
 static inline type mowgli_atomic_store_##mangle (mowgli_atomic(type) *atomic, type value) \
@@ -87,9 +109,7 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 { \
 	return (type)atomic_compare_exchange_strong(atomic, expected, desired); \
 }
-#endif
-
-#if defined MOWGLI_ATOMIC_DEBUG || !defined HAVE_ATOMIC_BUILTINS
+#elif defined MOWGLI_ATOMIC_DEBUG || defined MOWGLI_ATOMIC_FALLBACK
 #define mowgli_atomic(type) volatile type
 
 extern mowgli_mutex_t mowgli_atomic_mutex[256];
