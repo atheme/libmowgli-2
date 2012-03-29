@@ -93,7 +93,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	if ((fd = accept(vio->fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-			return mowgli_vio_err_errcode(newvio, strerror, errno);
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else
 			return 0;
 	}

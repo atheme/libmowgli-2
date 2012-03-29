@@ -109,8 +109,10 @@ struct _mowgli_vio {
 
 typedef struct _mowgli_vio_ssl_settings {
 	char cert_path[FILENAME_MAX];
+	char privatekey_path[FILENAME_MAX];
 	int ssl_version;
-	bool strict_checking;
+	int (*password_func)(char *, int, int, void *);
+	int (*verify_func)(int, void *);
 } mowgli_vio_ssl_settings_t;
 
 
