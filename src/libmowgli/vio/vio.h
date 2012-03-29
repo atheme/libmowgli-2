@@ -154,7 +154,9 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 #define MOWGLI_VIO_SET_CLOSED(v)					\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCONNECTING, false);	\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);		\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);	\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDREAD, false);	\
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 
 
 /* Decls */
