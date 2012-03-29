@@ -32,7 +32,7 @@ AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create])
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
 
-LIBMOWGLI_MODULES="core base container concurrent eventloop ext module object thread vio linebuf"
+LIBMOWGLI_MODULES="core base container concurrent dns eventloop ext linebuf module object thread vio"
 AC_SUBST(LIBMOWGLI_MODULES)
 
 LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"

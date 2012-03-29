@@ -88,6 +88,7 @@ MOWGLI_DECLS_START
 #include "concurrent/future.h"
 
 #include "linebuf/linebuf.h"
+#include "dns/dns.h"
 
 MOWGLI_DECLS_END
 
