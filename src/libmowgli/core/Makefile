@@ -27,7 +27,7 @@ INCLUDES = bootstrap.h		\
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/core
+includesubdir = $(PACKAGE_NAME)/core
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

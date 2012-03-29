@@ -23,7 +23,7 @@ INCLUDES = argstack.h		\
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/base
+includesubdir = $(PACKAGE_NAME)/base
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

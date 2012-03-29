@@ -4,6 +4,6 @@ INCLUDES = constructor.h machine.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/platform
+includesubdir = $(PACKAGE_NAME)/platform
 
 include ../../../extra.mk

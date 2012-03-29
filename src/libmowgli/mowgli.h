@@ -64,7 +64,7 @@ MOWGLI_DECLS_START
 #include "container/queue.h"
 #include "base/hash.h"
 #include "core/heap.h"
-#include "core/init.h"
+#include "core/bootstrap.h"
 #include "base/bitvector.h"
 #include "base/hook.h"
 #include "base/mowgli_signal.h"

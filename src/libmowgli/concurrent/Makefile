@@ -9,7 +9,7 @@ INCLUDES := ${SRCS:.c=.h}
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/concurrent
+includesubdir = $(PACKAGE_NAME)/concurrent
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

@@ -9,7 +9,7 @@ INCLUDES = win32_stdinc.h
 
 include ../../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/platform/win32
+includesubdir = $(PACKAGE_NAME)/platform/win32
 
 CPPFLAGS += -I. -I.. -I../.. -I../../../.. -DMOWGLI_CORE
 

@@ -4867,8 +4867,6 @@ fi
 	done
 
 
-
-
 ac_config_files="$ac_config_files buildsys.mk extra.mk libmowgli-2.pc"
 
 cat >confcache <<\_ACEOF

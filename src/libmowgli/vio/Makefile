@@ -9,7 +9,7 @@ INCLUDES = vio.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/vio
+includesubdir = $(PACKAGE_NAME)/vio
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

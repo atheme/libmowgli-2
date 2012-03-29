@@ -9,7 +9,7 @@ INCLUDES = eventloop.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/eventloop
+includesubdir = $(PACKAGE_NAME)/eventloop
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

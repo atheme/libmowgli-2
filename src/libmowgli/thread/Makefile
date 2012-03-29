@@ -12,7 +12,7 @@ INCLUDES = thread.h mutex.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/thread
+includesubdir = $(PACKAGE_NAME)/thread
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

@@ -17,7 +17,7 @@ INCLUDES = confparse.h			\
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/ext
+includesubdir = $(PACKAGE_NAME)/ext
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

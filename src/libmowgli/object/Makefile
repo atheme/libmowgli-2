@@ -15,7 +15,7 @@ INCLUDES = object.h	\
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/object
+includesubdir = $(PACKAGE_NAME)/object
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

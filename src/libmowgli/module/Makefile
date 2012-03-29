@@ -9,7 +9,7 @@ INCLUDES = module.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/module
+includesubdir = $(PACKAGE_NAME)/module
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

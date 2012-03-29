@@ -9,7 +9,7 @@ INCLUDES = linebuf.h
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/linebuf
+includesubdir = $(PACKAGE_NAME)/linebuf
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 

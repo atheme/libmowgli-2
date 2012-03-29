@@ -15,7 +15,7 @@ INCLUDES = list.h	\
 
 include ../../../buildsys.mk
 
-includesubdir = $(PACKAGE)/container
+includesubdir = $(PACKAGE_NAME)/container
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
 
