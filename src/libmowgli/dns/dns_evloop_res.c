@@ -69,7 +69,13 @@ typedef struct
 } mowgli_dns_reslist_t;
 
 static void timeout_resolver(void *arg);
+
+#ifndef _WIN32
 static int parse_resvconf(mowgli_dns_t *dns);
+#else
+static void parse_windows_resolvers(mowgli_dns_t *dns)
+#endif
+
 static void add_nameserver(mowgli_dns_t *dns, const char *arg);
 static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp);
 static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
@@ -155,6 +161,8 @@ void mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
 	dns->dns_state = NULL;
 }
 
+#ifndef _WIN32
+
 /* parse_resvconf() inputs - NONE output - -1 if failure 0 if success side effects - fills in
  * state->nsaddr_list */
 static int parse_resvconf(mowgli_dns_t *dns)
@@ -167,7 +175,7 @@ static int parse_resvconf(mowgli_dns_t *dns)
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	/* XXX "/etc/resolv.conf" should be from a define in setup.h perhaps for cygwin support etc.
-	   this hardcodes it to unix for now -db */
+	 * this hardcodes it to unix for now -db */
 	if ((file = fopen("/etc/resolv.conf", "r")) == NULL)
 		return -1;
 
@@ -215,6 +223,27 @@ static int parse_resvconf(mowgli_dns_t *dns)
 	fclose(file);
 	return 0;
 }
+
+#else
+
+extern int mowgli_dns_get_windows_nameservers(char *ret_buf, size_t ret_size);
+
+static void
+parse_windows_resolvers(mowgli_dns_t *dns)
+{
+	const char *ns = mowgli_dns_get_windows_nameservers();
+	char *server;
+	char *p;
+	char *buf = mowgli_strdup(ns);
+
+	for(server = strtok_s(buf, " ", &p); server != NULL; server = strtok_s(NULL, " ", &p))
+		add_nameserver(dns, server);
+	
+	mowgli_free(buf);
+}
+
+#endif
+
 
 /* add_nameserver() input - either an IPV4 address in dotted quad or an IPV6 address in : format
  * output - NONE side effects - entry in state->nsaddr_list is filled in as needed */

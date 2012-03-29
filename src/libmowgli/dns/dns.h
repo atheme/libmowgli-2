@@ -78,8 +78,8 @@ extern void mowgli_dns_gethost_byname(mowgli_dns_t *dns, const char *name, mowgl
 extern void mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *addr, mowgli_dns_query_t *query);
 
 /* Pull in headers that depend on these types */
-#include "res.h"
-#include "reslib.h"
+#include "dns_evloop_res.h"
+#include "dns_evloop_reslib.h"
 
 #endif
 
