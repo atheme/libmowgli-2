@@ -85,42 +85,43 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
 	if (vio->io != NULL)
 	{
-		/* Blergh */
-		mowgli_node_add(eventloop, mowgli_node_create(), &(vio->eventloops));
-
+		vio->eventloop = eventloop;
 		/* You're probably going to want this */
 		mowgli_pollable_set_nonblocking(vio->io, true);
 	}
+	else
+		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", vio);
 }
 
-void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
+void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 {
-	mowgli_node_t *n, *tn;
-
 	return_if_fail(vio->io != NULL);
+	return_if_fail(vio->eventloop != NULL);
 
-	/* Remove from eventloops list */
-	MOWGLI_LIST_FOREACH_SAFE(n, tn, vio->eventloops.head)
-	{
-		if ((mowgli_eventloop_t *)n->data == eventloop)
-			mowgli_node_delete(n, &(vio->eventloops));
-	}
-
-	mowgli_pollable_destroy(eventloop, vio->io);
+	mowgli_pollable_destroy(vio->eventloop, vio->io);
 }
 
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
-	mowgli_node_t *n, *tn;
-
-	/* Detach from each eventloop we're attached to */
-	MOWGLI_LIST_FOREACH_SAFE(n, tn, vio->eventloops.head)
-	{
-		mowgli_pollable_destroy(n->data, vio->io);
-		mowgli_node_delete(n, &(vio->eventloops));
-	}
+	mowgli_vio_eventloop_detach(vio);
 
 	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISONHEAP))
 		mowgli_heap_free(vio_heap, vio);
+}
+
+int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode)
+{
+	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
+	vio->error.code = errcode;
+	mowgli_strlcpy(vio->error.string, int_to_error(errcode), sizeof(vio->error.string));
+	return mowgli_vio_error(vio);
+}
+
+int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
+{
+	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
+	vio->error.code = errcode;
+	ERR_error_string_n(errcode, vio->error.string, sizeof(vio->error.string));
+	return mowgli_vio_error(vio);
 }
 

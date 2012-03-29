@@ -104,9 +104,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *
 	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else
 		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
@@ -152,16 +150,16 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	/* Cast is to eliminate an excessively bogus warning on old OpenSSL --Elizacat */
 	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
 	if (connection->ssl_context == NULL)
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 	if (connection->ssl_handle == NULL)
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 	
 	SSL_set_connect_state(connection->ssl_handle);
 	
 	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
-		MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, ERR_get_error())
+		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
 	/* XXX not what we want for blocking sockets if they're in use! */
 	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
@@ -179,9 +177,7 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 			return 0;
 		}
 		else
-		{
-			MOWGLI_VIO_RETURN_SSLERR_ERRCODE(vio, err)
-		}
+			return mowgli_vio_err_sslerrcode(vio, err);
 	}
 
 	/* Connected */
@@ -257,7 +253,7 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 		if(err > 0)
 		{
 			errno = EIO;
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		}
 
 		/* idk lol */

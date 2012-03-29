@@ -95,8 +95,7 @@ struct _mowgli_vio {
 	mowgli_eventloop_io_t *io;
 	mowgli_descriptor_t fd;
 
-	/* Some jackass could attach us to multiple event loops I guess */
-	mowgli_list_t eventloops;
+	mowgli_eventloop_t *eventloop;
 
 	mowgli_vio_sockaddr_t addr;
 
@@ -157,28 +156,6 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);		\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
 
-#define MOWGLI_VIO_RETURN_ERRCODE(v, s, e) 					\
-{										\
-	v->error.type = MOWGLI_VIO_ERR_ERRCODE; 				\
-	v->error.code = e;							\
-	mowgli_strlcpy(v->error.string, s(e), sizeof((v)->error.string));	\
-	return mowgli_vio_error((v)); 						\
-}
-
-#ifdef HAVE_OPENSSL
-
-#define MOWGLI_VIO_RETURN_SSLERR_ERRCODE(v, e)					\
-{										\
-	(v)->error.type = MOWGLI_VIO_ERR_ERRCODE;				\
-	(v)->error.code = e;							\
-	ERR_error_string_n(e, (v)->error.string, sizeof((v)->error.string));	\
-	return mowgli_vio_error(v);						\
-}
-
-#else
-#	define MOWGLI_VIO_RETURN_SSL_ERRCODE(v, e) MOWGLI_VIO_RETURN_ERRCODE(v, strerror, e)
-#endif
-
 
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
@@ -186,7 +163,7 @@ extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
 extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
-extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
+extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio);
 
 extern mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port);
 extern mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *naddr, const void *addr, socklen_t size);
@@ -205,6 +182,9 @@ extern int mowgli_vio_default_error(mowgli_vio_t *vio);
 extern int mowgli_vio_default_close(mowgli_vio_t *vio);
 extern int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence);
 extern int mowgli_vio_default_tell(mowgli_vio_t *vio);
+
+extern int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode);
+extern int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode);
 
 extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings);
 /* These are void ptr's so they can be null ops if SSL isn't available */

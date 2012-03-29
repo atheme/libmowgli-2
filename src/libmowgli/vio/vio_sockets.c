@@ -34,7 +34,7 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 		family = AF_INET6;	/* This is fine, IPv4 will still work via a 6to4 mapping */
 
 	if ((fd = socket(family, type, proto)) == -1)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	vio->fd = fd;
 
@@ -53,7 +53,7 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
 
 	if (bind(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
 	vio->addr.addrlen = addr->addrlen;
@@ -66,7 +66,7 @@ int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 
 	if (listen(vio->fd, backlog) < 0)
-		MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, true);
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLIENT, false);
@@ -93,13 +93,9 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	if ((fd = accept(vio->fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(newvio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(newvio, strerror, errno);
 		else
-		{
 			return 0;
-		}
 	}
 
 	newvio->fd = fd;
@@ -119,13 +115,9 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else
-		{
 			return 0;
-		}
 	}
 
 	/* XXX -- overwrites if we already used bind -- not terribly concerning as this is
@@ -153,13 +145,9 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	if ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else if (errno != 0)
-		{
 			return 0;
-		}
 
 		if (ret == 0)
 		{
@@ -188,13 +176,9 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 	if ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else
-		{
 			return 0;
-		}
 	}
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
@@ -212,13 +196,9 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len,
 	if ((ret = (int)sendto(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else
-		{
 			return 0;
-		}
 	}
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
@@ -236,13 +216,9 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
-		}
+			return mowgli_vio_err_errcode(vio, strerror, errno);
 		else if (errno != 0)
-		{
 			return 0;
-		}
 
 		if (ret == 0)
 		{
@@ -316,14 +292,14 @@ int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_SEEK;
 	errno = ENOSYS;
-	MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+	return mowgli_vio_err_errcode(vio, strerror, errno);
 }
 
 int mowgli_vio_default_tell(mowgli_vio_t *vio)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_TELL;
 	errno = ENOSYS;
-	MOWGLI_VIO_RETURN_ERRCODE(vio, strerror, errno);
+	return mowgli_vio_err_errcode(vio, strerror, errno);
 }
 
 /* Generate a mowgli_sockaddr_t struct */
