@@ -40,7 +40,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len);
-static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len);
+static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const void *writebuf, size_t len);
 static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
 static mowgli_heap_t *ssl_heap = NULL;
@@ -187,20 +187,22 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	return 0;
 }
 
+#define MOWGLI_VIO_SSL_DOREAD true
+#define MOWGLI_VIO_SSL_DOWRITE false
+
 static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
-	return mowgli_openssl_read_or_write(true, vio, buffer, len);
+	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOREAD, vio, buffer, NULL, len);
 }
 
 static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
-	/* XXX discards const! */
-	return mowgli_openssl_read_or_write(false, vio, (void *)buffer, len);
+	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOWRITE, vio, NULL, buffer, len);
 }
 
-static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buffer, size_t len)
+static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const void *writebuf, size_t len)
 {
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	int ret;
@@ -215,9 +217,9 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *buff
 	return_val_if_fail(connection->ssl_handle != NULL, -1);
 
 	if(read)
-		ret = (int)SSL_read(connection->ssl_handle, buffer, len);
+		ret = (int)SSL_read(connection->ssl_handle, readbuf, len);
 	else
-		ret = (int)SSL_write(connection->ssl_handle, buffer, len);
+		ret = (int)SSL_write(connection->ssl_handle, writebuf, len);
 
 	if (ret < 0)
 	{
