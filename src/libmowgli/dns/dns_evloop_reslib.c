@@ -524,7 +524,7 @@ static int labellen(const unsigned char *lp)
  */
 static bool mowgli_dns_is_printable(int ch)
 {
-	return ch > 0x20 && ch < 0x7f;
+	return (ch > 0x20 && ch < 0x7f) ? true : false;
 }
 
 static int mowgli_dns_decode_bitstring(const char **cpp, char *dn, const char *eom)

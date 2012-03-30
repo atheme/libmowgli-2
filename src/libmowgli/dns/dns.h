@@ -36,6 +36,11 @@
 #define MOWGLI_DNS_T_SSHFP 44
 #define MOWGLI_DNS_T_NULL 10
 
+#define MOWGLI_DNS_RES_SUCCESS 0
+#define MOWGLI_DNS_RES_NXDOMAIN 1
+#define MOWGLI_DNS_RES_INVALID 2
+#define MOWGLI_DNS_RES_TIMEOUT 3
+
 typedef struct _mowgli_dns_t mowgli_dns_t;
 typedef struct _mowgli_dns_query_t mowgli_dns_query_t;
 typedef struct _mowgli_dns_reply_t mowgli_dns_reply_t;
@@ -66,7 +71,7 @@ struct _mowgli_dns_t
 struct _mowgli_dns_query_t
 {
 	void *ptr;					/* pointer used by callback to identify request */
-	void (*callback) (void *vptr, mowgli_dns_reply_t * reply);	/* callback to call */
+	void (*callback) (mowgli_dns_reply_t * reply, int result, void *vptr);	/* callback to call */
 };
 
 extern mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation);
