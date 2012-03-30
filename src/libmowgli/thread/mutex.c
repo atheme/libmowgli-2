@@ -62,9 +62,10 @@ mowgli_mutex_t *mowgli_mutex_create(void)
 
 	return_val_if_fail(mutex != NULL, NULL);
 
-	if(mowgli_mutex_init(mutex)) {
+	if (mowgli_mutex_init(mutex))
 		return mutex;
-	} else {
+	else
+	{
 		mowgli_free(mutex);
 		return NULL;
 	}
@@ -72,62 +73,51 @@ mowgli_mutex_t *mowgli_mutex_create(void)
 
 int mowgli_mutex_init(mowgli_mutex_t *mutex)
 {
-	static bool initialized = false;
-	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
-
 	return_val_if_fail(mutex != NULL, -1);
 
-	if (!initialized)
-		initialized = true;
+	mutex->ops = get_mutex_platform();
 
-	return mutex_ops->mutex_create(mutex);
+	return mutex->ops->mutex_create(mutex);
 }
 
 int mowgli_mutex_lock(mowgli_mutex_t *mutex)
 {
-	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
-
 	return_val_if_fail(mutex != NULL, -1);
+	return_val_if_fail(mutex->ops != NULL, -1);
 
-	return mutex_ops->mutex_lock(mutex);
+	return mutex->ops->mutex_lock(mutex);
 }
 
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 {
-	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
-
 	return_val_if_fail(mutex != NULL, -1);
+	return_val_if_fail(mutex->ops != NULL, -1);
 
-	return mutex_ops->mutex_trylock(mutex);
+	return mutex->ops->mutex_trylock(mutex);
 }
 
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 {
-	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
-
 	return_val_if_fail(mutex != NULL, -1);
+	return_val_if_fail(mutex->ops != NULL, -1);
 
-	return mutex_ops->mutex_unlock(mutex);
+	return mutex->ops->mutex_unlock(mutex);
 }
 
 int mowgli_mutex_uninit(mowgli_mutex_t *mutex)
 {
-	mowgli_mutex_ops_t *mutex_ops = get_mutex_platform();
-
 	return_val_if_fail(mutex != NULL, -1);
+	return_val_if_fail(mutex->ops != NULL, -1);
 
-	return mutex_ops->mutex_destroy(mutex);
+	return mutex->ops->mutex_destroy(mutex);
 }
 
-mowgli_mutex_t *mowgli_mutex_destroy(mowgli_mutex_t *mutex) {
-	if(mutex != NULL)
-		return NULL;
+void mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+{
+	return_if_fail(mutex != NULL);
 
-	return_val_if_fail(mowgli_mutex_uninit(mutex) != 0, NULL);
-
+	mowgli_mutex_uninit(mutex);
 	mowgli_free(mutex);
-
-	return NULL;
 }
 
 void mowgli_mutex_set_policy(mowgli_thread_policy_t policy)

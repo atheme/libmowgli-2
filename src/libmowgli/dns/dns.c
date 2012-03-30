@@ -22,7 +22,7 @@
 
 mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation)
 {
-	mowgli_dns_t *dns = mowgli_alloc(sizeof(mowgli_dns_ops_t));
+	mowgli_dns_t *dns = mowgli_alloc(sizeof(mowgli_dns_t));
 	mowgli_dns_ops_t *ops;
 
 	switch (implementation)
