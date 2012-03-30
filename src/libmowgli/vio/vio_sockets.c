@@ -307,9 +307,7 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 		errtype = "Generic/Unknown";
 	}
 
-	fprintf(stderr, "%s error: %s\n", errtype, vio->error.string);
-
-	mowgli_vio_close(vio);
+	mowgli_log("%s error: %s\n", errtype, vio->error.string);
 
 	return -1;
 }
