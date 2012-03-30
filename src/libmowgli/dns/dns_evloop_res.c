@@ -649,8 +649,6 @@ static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const
 
 
 	request->type = MOWGLI_DNS_T_PTR;
-	
-	mowgli_log("name: %s\n", request->queryname);
 	query_name(dns, request);
 }
 
@@ -724,20 +722,13 @@ static int check_question(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowg
 	if (header->qdcount != 1)
 		return 0;
 
-	mowgli_log("qdcount checks out...");
-
 	n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf, sizeof(hostbuf));
 
 	if (n <= 0)
 		return 0;
 
-	mowgli_log("length checks out...");
-	mowgli_log("hostbuf %s | queryname %s", hostbuf, request->queryname);
-
 	if (strcasecmp(hostbuf, request->queryname))
 		return 0;
-
-	mowgli_log("it matches what we sent");
 
 	return 1;
 }
@@ -906,31 +897,22 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	header->nscount = ntohs(header->nscount);
 	header->arcount = ntohs(header->arcount);
 
-	mowgli_log("Recieved packet!");
-
 	/* response for an id which we have already received an answer for
 	 * just ignore this response. */
 	if ((request = find_id(dns, header->id)) == 0)
 		return 1;
 
-	mowgli_log("ID found! id = %d", header->id);
-
 	/* check against possibly fake replies */
 	if (!res_ourserver(dns, &lsin.addr))
 		return 1;
 
-	mowgli_log("It's our server alright");
-
 	if (!check_question(dns, request, header, buf, buf + rc))
 		return 1;
-
-	mowgli_log("We sent it and its not timed out");
 
 	if ((header->rcode != MOWGLI_DNS_NO_ERRORS) || (header->ancount == 0))
 	{
 		if (header->rcode == MOWGLI_DNS_NXDOMAIN)
 		{
-			mowgli_log("Ack, nxdomain!");
 			(*request->query->callback) (NULL, MOWGLI_DNS_RES_NXDOMAIN, request->query->ptr);
 			rem_request(dns, request);
 		}
@@ -940,7 +922,6 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 			 * If a bad error was returned, we stop here and dont send
 			 * send any more (no retries granted).
 			 */
-			mowgli_log("Ack, no records or a bad error!");
 			(*request->query->callback) (NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 			rem_request(dns, request);
 		}
@@ -961,13 +942,10 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 				/* got a PTR response with no name, something bogus is happening
 				 * don't bother trying again, the client address doesn't resolve
 				 */
-				mowgli_log("WTF, ptr with no name?!");
 				(*request->query->callback) (reply, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 				rem_request(dns, request);
 				return 1;
 			}
-
-			mowgli_log("ptr found, searching other record...");
 
 			/* Lookup the 'authoritative' name that we were given for the
 			 * ip#. */
@@ -980,7 +958,6 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 		else
 		{
 			/* got a name and address response, client resolved */
-			mowgli_log("woop woop we resolved");
 			reply = make_dnsreply(request);
 			(*request->query->callback) (reply, MOWGLI_DNS_RES_SUCCESS, request->query->ptr);
 			mowgli_free(reply);
@@ -990,7 +967,6 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	else
 	{
 		/* couldn't decode, give up -- jilles */
-		mowgli_log("Ack, couldn't decode packet! ;_;");
 		(*request->query->callback) (NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 		rem_request(dns, request);
 	}

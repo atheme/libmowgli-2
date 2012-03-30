@@ -65,7 +65,7 @@ static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, 
 	mowgli_dns_t *dns = userdata;
 	char buf[2048];
 	char *ch;
-	size_t ret;
+	int ret;
 
 	return_if_fail(pollable->fd == STDIN_FILENO);
 
