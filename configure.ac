@@ -19,8 +19,6 @@ AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
    AC_MSG_ERROR([C compiler does not support C99], 1)
 ])
 
-AX_CHECK_ATOMIC_BUILTINS
-
 MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers"
 AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
@@ -133,7 +131,6 @@ AC_OUTPUT
 cat << _EOF_
 
 Configuration:
-   Atomic builtins support: ${ATOMIC_BUILTINS}
    OpenSSL support: ${OPENSSL}
    Examples: ${EXAMPLES}
 

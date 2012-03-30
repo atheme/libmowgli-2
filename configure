@@ -1514,48 +1514,6 @@ fi
 
 } # ac_fn_c_try_cpp
 
-# ac_fn_c_try_run LINENO
-# ----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
-# that executables *can* be run.
-ac_fn_c_try_run ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
-  { { case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_try") 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: program exited with status $ac_status" >&5
-       $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-       ac_retval=$ac_status
-fi
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_run
-
 # ac_fn_c_check_header_mongrel LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
 # Tests whether HEADER exists, giving a warning if it cannot be compiled using
@@ -1646,6 +1604,48 @@ fi
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_check_header_mongrel
+
+# ac_fn_c_try_run LINENO
+# ----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded. Assumes
+# that executables *can* be run.
+ac_fn_c_try_run ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && { ac_try='./conftest$ac_exeext'
+  { { case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_try") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: program exited with status $ac_status" >&5
+       $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+       ac_retval=$ac_status
+fi
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_run
 
 # ac_fn_c_check_header_compile LINENO HEADER VAR INCLUDES
 # -------------------------------------------------------
@@ -3501,175 +3501,13 @@ if test "x$ac_cv_prog_cc_c99" = "xno"; then :
 
 fi
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if compiler has atomic builtins" >&5
-$as_echo_n "checking if compiler has atomic builtins... " >&6; }
-
-INTEL_ATOMIC_BUILTINS=no
-C11_ATOMIC_BUILTINS=no
-
-if test "x$GCC" = "xno"; then :
-
-  GCC_VERSION="$($CC -dumpversion)"
-	GCC_VERSION_MAJOR="$(echo $INTEL_VERSION | cut -d'.' -f1)"
-  GCC_VERSION_MINOR="$(echo $INTEL_VERSION | cut -d'.' -f2)"
-
-  if test $GCC_VERSION_MAJOR > 4; then :
-
-    if test $GCC_VERSION_MINOR > 1; then :
-  INTEL_ATOMIC_BUILTINS=yes
-else
-  INTEL_ATOMIC_BUILTINS=no
-fi
-
-else
-  INTEL_ATOMIC_BUILTINS=no
-fi
-
-else
-
-
-  ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-  if test "$cross_compiling" = yes; then :
-  INTEL_ATOMIC_BUILTINS=no
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int main()
-{
-  unsigned long val = 1010, tmp, *mem = &val;
-
-  if (__sync_fetch_and_add(&val, 1010) != 1010 || val != 2020)
-    return 1;
-
-  tmp = val;
-
-  if (__sync_fetch_and_sub(mem, 1010) != tmp || val != 1010)
-    return 1;
-
-  if (__sync_sub_and_fetch(&val, 1010) != 0 || val != 0)
-    return 1;
-
-  tmp = 3030;
-
-  if (__sync_val_compare_and_swap(mem, 0, tmp) != 0 || val != tmp)
-    return 1;
-
-  if (__sync_lock_test_and_set(&val, 4040) != 3030)
-    return 1;
-
-  mem = &tmp;
-
-  if (__sync_val_compare_and_swap(&mem, &tmp, &val) != &tmp)
-    return 1;
-
-  __sync_synchronize();
-
-  if (mem != &val)
-    return 1;
-
-  return 0;
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  INTEL_ATOMIC_BUILTINS=yes
-else
-  INTEL_ATOMIC_BUILTINS=no
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-  if test "x$INTEL_ATOMIC_BUILTINS" = "xno"; then :
-
-    if test "$cross_compiling" = yes; then :
-  C11_ATOMIC_BUILTINS=no
-else
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <stdatomic.h>
-int main()
-{
-  __Atomic unsigned long val = 1010, tmp, *mem = &val;
-
-  if (atomic_fetch_add(&val, 1010) != 1010 || val != 2020)
-    return 1;
-
-  tmp = val;
-
-  if (atomic_fetch_sub(mem, 1010) != tmp || val != 1010)
-    return 1;
-
-  return 0;
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"; then :
-  C11_ATOMIC_BUILTINS=yes
-else
-  C11_ATOMIC_BUILTINS=no
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext
-fi
-
-
-fi
-
-fi
-
-ATOMIC_BUILTINS="no"
-
-if test "x$INTEL_ATOMIC_BUILTINS" = "xyes"; then :
-
-
-$as_echo "#define HAVE_ATOMIC_BUILTINS 1" >>confdefs.h
-
-
-$as_echo "#define HAVE_ATOMIC_BUILTINS_INTEL 1" >>confdefs.h
-
-  ATOMIC_BUILTINS="Intel"
-
-fi
-
-if test "x$C11_ATOMIC_BUILTINS" = "xyes"; then :
-
-
-$as_echo "#define HAVE_ATOMIC_BUILTINS 1" >>confdefs.h
-
-
-$as_echo "#define HAVE_ATOMIC_BUILTINS_C11 1" >>confdefs.h
-
-  ATOMIC_BUILTINS="C11"
-
-fi
-
-if test "x$ATOMIC_BUILTINS" != "xno"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ATOMIC_BUILTINS" >&5
-$as_echo "$ATOMIC_BUILTINS" >&6; }
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
 MORECFLAGS="-pipe -Wall -Wextra -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers"
 if test "x$GCC" = "xyes"; then :
 
    CFLAGS="$CFLAGS $MORECFLAGS"
 
 fi
+
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
@@ -6165,7 +6003,6 @@ fi
 cat << _EOF_
 
 Configuration:
-   Atomic builtins support: ${ATOMIC_BUILTINS}
    OpenSSL support: ${OPENSSL}
    Examples: ${EXAMPLES}
 
