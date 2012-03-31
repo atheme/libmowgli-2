@@ -68,7 +68,7 @@ typedef struct
 	mowgli_dns_query_t *query;			/* query callback for this request */
 } mowgli_dns_reslist_t;
 
-static void timeout_resolver(void *arg);
+static mowgli_heap_t *reslist_heap = NULL;
 
 #ifndef _WIN32
 static int parse_resvconf(mowgli_dns_t *dns);
@@ -76,6 +76,7 @@ static int parse_resvconf(mowgli_dns_t *dns);
 static void parse_windows_resolvers(mowgli_dns_t *dns)
 #endif
 
+static void timeout_resolver(void *arg);
 static void add_nameserver(mowgli_dns_t *dns, const char *arg);
 static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp);
 static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
@@ -102,12 +103,15 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 
 	if (dns->dns_state == NULL)
 		dns->dns_state = mowgli_alloc(sizeof(mowgli_dns_evloop_t));
+	
+	dns->dns_type = MOWGLI_DNS_TYPE_ASYNC;
+
+	if (!reslist_heap)
+		reslist_heap = mowgli_heap_create(sizeof(mowgli_dns_reslist_t), 512, BH_LAZY);
 
 	state = dns->dns_state;
 
 	state->rand = mowgli_random_create();
-
-	dns->dns_type = MOWGLI_DNS_TYPE_ASYNC;
 
 	state->nscount = 0;
 	parse_resvconf(dns);
@@ -446,7 +450,7 @@ static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 
 	mowgli_node_delete(&request->node, &state->request_list);
 	mowgli_free(request->name);
-	mowgli_free(request);
+	mowgli_heap_free(reslist_heap, request);
 }
 
 /* 
@@ -454,7 +458,7 @@ static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
  */
 static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t * query)
 {
-	mowgli_dns_reslist_t *request = mowgli_alloc(sizeof(mowgli_dns_reslist_t));
+	mowgli_dns_reslist_t *request = mowgli_heap_alloc(reslist_heap);
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	request->sentat = state->eventloop->currtime;
