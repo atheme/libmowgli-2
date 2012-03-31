@@ -386,9 +386,7 @@ static time_t timeout_query_list(mowgli_dns_t *dns, time_t now)
 		}
 
 		if ((next_time == 0) || timeout < next_time)
-		{
 			next_time = timeout;
-		}
 	}
 
 	return (next_time > now) ? next_time : (now + MOWGLI_DNS_AR_TTL);
@@ -400,7 +398,14 @@ static time_t timeout_query_list(mowgli_dns_t *dns, time_t now)
 static void timeout_resolver(void *arg)
 {
 	mowgli_dns_t *dns = arg;
-	timeout_query_list(dns, time(NULL));
+	mowgli_dns_evloop_t *state = dns->dns_state;
+	time_t next;
+
+	next = timeout_query_list(dns, state->eventloop->currtime);
+
+	/* Reschedule */
+	mowgli_timer_destroy(state->eventloop, state->timeout_resolver_timer);
+	mowgli_timer_add(state->eventloop, "timeout_resolver", timeout_resolver, dns, next);
 }
 
 
@@ -452,7 +457,7 @@ static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t 
 	mowgli_dns_reslist_t *request = mowgli_alloc(sizeof(mowgli_dns_reslist_t));
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
-	request->sentat = time(NULL);
+	request->sentat = state->eventloop->currtime;
 	request->retries = 3;
 	request->timeout = 4;		/* start at 4 and exponential inc. */
 	request->query = query;
