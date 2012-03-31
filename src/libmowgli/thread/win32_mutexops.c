@@ -63,7 +63,7 @@ static int mowgli_win32_mutex_destroy(mowgli_mutex_t *mutex)
 	return 0;
 }
 
-mowgli_mutex_ops_t _mowgli_win32_mutex_ops = {
+const mowgli_mutex_ops_t _mowgli_win32_mutex_ops = {
 	.mutex_create = mowgli_win32_mutex_create,
 	.mutex_lock = mowgli_win32_mutex_lock,
 	.mutex_trylock = mowgli_win32_mutex_trylock,

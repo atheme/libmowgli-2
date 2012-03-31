@@ -24,18 +24,18 @@
 #include "mowgli.h"
 
 #if defined(_WIN32)
-extern mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
+extern const mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
 #elif defined(_sun) || defined(_sco)
-extern mowgli_mutex_ops_t _mowgli_sun_mutex_ops;
+extern const mowgli_mutex_ops_t _mowgli_sun_mutex_ops;
 #else
-extern mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
+extern const mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 #endif
 
-extern mowgli_mutex_ops_t _mowgli_null_mutex_ops;
+extern const mowgli_mutex_ops_t _mowgli_null_mutex_ops;
 
-static mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
+static const mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
 
-static inline mowgli_mutex_ops_t *get_mutex_platform(void)
+static inline const mowgli_mutex_ops_t *get_mutex_platform(void)
 {
 	/* allow for threading policy to set custom mutex ops */
 	if (_mowgli_mutex_ops != NULL)

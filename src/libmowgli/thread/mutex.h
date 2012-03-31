@@ -52,7 +52,7 @@ struct mowgli_mutex_ {
 #else
 	pthread_mutex_t mutex;
 #endif
-	mowgli_mutex_ops_t *ops;
+	const mowgli_mutex_ops_t *ops;
 };
 
 #ifdef MOWGLI_NATIVE_MUTEX_DECL

@@ -58,7 +58,7 @@ static int mowgli_sun_mutex_destroy(mowgli_mutex_t *mutex)
 	return mutex_destroy(&mutex->mutex);
 }
 
-mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
+const mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
 	.mutex_create = mowgli_sun_mutex_create,
 	.mutex_lock = mowgli_sun_mutex_lock,
 	.mutex_trylock = mowgli_sun_mutex_trylock,
@@ -102,7 +102,7 @@ static int mowgli_posix_mutex_destroy(mowgli_mutex_t *mutex)
 	return pthread_mutex_destroy(&mutex->mutex);
 }
 
-mowgli_mutex_ops_t _mowgli_posix_mutex_ops = {
+const mowgli_mutex_ops_t _mowgli_posix_mutex_ops = {
 	.mutex_create = mowgli_posix_mutex_create,
 	.mutex_lock = mowgli_posix_mutex_lock,
 	.mutex_trylock = mowgli_posix_mutex_trylock,
