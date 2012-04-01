@@ -23,7 +23,7 @@
 mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation)
 {
 	mowgli_dns_t *dns = mowgli_alloc(sizeof(mowgli_dns_t));
-	mowgli_dns_ops_t *ops;
+	const mowgli_dns_ops_t *ops;
 
 	switch (implementation)
 	{
@@ -35,9 +35,7 @@ mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementati
 		break;
 	}
 
-	dns->dns_ops = ops;
-
-	if (mowgli_dns_init(dns, eventloop) != 0)
+	if (mowgli_dns_init(dns, eventloop, ops) != 0)
 	{
 		mowgli_free(dns);
 		return NULL;
@@ -46,10 +44,11 @@ mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementati
 	return dns;
 }
 
-int mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
+int mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop, const mowgli_dns_ops_t *ops)
 {
 	return_val_if_fail(dns != NULL, -1);
-	return_val_if_fail(dns->dns_ops != NULL, -1);
+
+	dns->dns_ops = ops;
 
 	return dns->dns_ops->mowgli_dns_init_func_t(dns, eventloop);
 }

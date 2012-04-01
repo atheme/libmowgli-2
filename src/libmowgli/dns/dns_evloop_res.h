@@ -11,9 +11,6 @@
 /* Maximum number of nameservers we track */
 #define MOWGLI_DNS_MAXNS 10
 
-/* Longest hostname we're willing to work with */
-#define MOWGLI_DNS_RES_HOSTLEN 512
-
 typedef struct
 {
 	mowgli_vio_sockaddr_t nsaddr_list[MOWGLI_DNS_MAXNS];
@@ -42,6 +39,6 @@ extern void mowgli_dns_evloop_gethost_byname(mowgli_dns_t *dns, const char *, mo
 extern void mowgli_dns_evloop_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *, mowgli_dns_query_t *);
 extern void mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *, size_t);
 
-extern mowgli_dns_ops_t mowgli_dns_evloop_resolver;
+extern const mowgli_dns_ops_t mowgli_dns_evloop_resolver;
 
 #endif

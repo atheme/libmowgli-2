@@ -1002,7 +1002,7 @@ static void res_readreply(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *
 }
 
 /* DNS ops for this resolver */
-mowgli_dns_ops_t mowgli_dns_evloop_resolver = {
+const mowgli_dns_ops_t mowgli_dns_evloop_resolver = {
 	.mowgli_dns_init_func_t = mowgli_dns_evloop_init,
 	.mowgli_dns_fini_func_t = mowgli_dns_evloop_destroy,
 	.mowgli_dns_restart_func_t = mowgli_dns_evloop_restart,
