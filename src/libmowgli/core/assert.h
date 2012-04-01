@@ -54,15 +54,6 @@ extern void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
 		return (y);							        \
 	}
 
-/*
- * Same as soft_assert, but returns NULL if the value is NULL.
- */
-#define return_if_null(x)							        \
-	if (x == NULL) { 							        \
-                mowgli_soft_assert_log(#x, __FILE__, __LINE__, __PRETTY_FUNCTION__);    \
-		return (NULL);							        \
-	}
-
 #else
 
 /*
