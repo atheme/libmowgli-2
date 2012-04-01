@@ -27,7 +27,10 @@
  * http://sourceforge.net/apps/mediawiki/predef/
  *
  * Please note: Just because a compiler, CPU, or OS is listed in this file,
- * that doesn't mean that it is supported by Mowgli.
+ * that doesn't mean that it is supported by libmowgli. libmowgli requires
+ * a 32-bit or higher CPU and an OS that supports a supported mutex and
+ * thread scheme (if you intend on having functional multithreaded
+ * operation).
  */
 
 #ifndef __MOWGLI_MACHINE_H__
@@ -149,10 +152,23 @@
 #elif defined __alpha || defined __alpha__ || defined _M_ALPHA
 #define MOWGLI_CPU_ALPHA
 #define MOWGLI_CPU alpha
-#define MOWGLI_CPU_BITS 64
 #define MOWGLI_CPU_BITS_64
+#define MOWGLI_CPU_BITS 64
 #define MOWGLI_CPU_ENDIAN_LITTLE
 #define MOWGLI_CPU_ENDIAN little
+#elif defined __avr32__ || defined __AVR32__
+#define MOWGLI_CPU_AVR32
+#define MOWGLI_CPU avr
+#define MOWGLI_CPU_BITS_32
+#define MOWGLI_CPU_BITS 32
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
+#elif defined __sh__ || defined __SH__
+#define MOWGLI_CPU_SuperH
+#define MOWGLI_CPU superh
+#define MOWGLI_CPU_BITS_32
+#define MOWGLI_CPU_BITS 32
+// SyoerH can be either endian
 #endif
 
 #ifndef MOWGLI_CPU
@@ -267,6 +283,15 @@
 #define MOWGLI_OS_THREADS qnx
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
+#elif defined __vms || defined || __VMS
+#define MOWGLI_OS_THREADS_POSIX
+#define MOWGLI_OS_THREADS posix
+#define MOWGLI_OS_MUTEX_POSIX
+#define MOWGLI_OS_MUTEX posix
+#if defined MOWGLI_CPU_ITANIUM
+#define MOWGLI_CPU_ENDIAN_LITTLE
+#define MOWGLI_CPU_ENDIAN little
+#endif
 #endif
 
 #ifndef MOWGLI_OS
