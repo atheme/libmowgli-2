@@ -24,7 +24,7 @@ AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
 
-AC_CHECK_HEADERS([poll.h winsock2.h linux/futex.h sys/epoll.h sys/select.h])
+AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h])
 AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create])
 
 AC_PATH_PROG(AR, ar)
