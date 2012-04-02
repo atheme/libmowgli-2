@@ -283,7 +283,7 @@
 #define MOWGLI_OS_THREADS qnx
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
-#elif defined __vms || defined || __VMS
+#elif defined __vms || defined __VMS
 #define MOWGLI_OS_THREADS_POSIX
 #define MOWGLI_OS_THREADS posix
 #define MOWGLI_OS_MUTEX_POSIX
