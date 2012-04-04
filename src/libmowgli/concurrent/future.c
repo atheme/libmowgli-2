@@ -83,16 +83,14 @@ mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result
 			}
 	} else if(oldstate == MOWGLI_FUTURE_STATE_CANCELED) {
 		return MOWGLI_FUTURE_STATE_CANCELED;
-	} else if(oldstate == MOWGLI_FUTURE_STATE_FINISHED || oldstate == MOWGLI_FUTURE_STATE_RUNNING) {
-		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 	} else {
-		return oldstate;
+		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 	}
 }
 
 /* Given a valid future object, cancel will either return CANCELED and it was
  * successfully canceled before it could finish, FINISHED if it already
- * finished (and you now must clean up the result), or ERROR or
+ * finished (and you now must clean up the result from the future), or
  * CONSISTENCY_FAILURE if something went wrong before you tried to cancel.
  */
 mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
@@ -103,7 +101,7 @@ mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
 
 	if(state == MOWGLI_FUTURE_STATE_WAITING || state == MOWGLI_FUTURE_STATE_CANCELED)
 		return MOWGLI_FUTURE_STATE_CANCELED;
-	else if(state == MOWGLI_FUTURE_STATE_FINISHED)
+	else if(state == MOWGLI_FUTURE_STATE_FINISHED || state == MOWGLI_FUTURE_STATE_RUNNING)
 		return MOWGLI_FUTURE_STATE_FINISHED;
 	else
 		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
