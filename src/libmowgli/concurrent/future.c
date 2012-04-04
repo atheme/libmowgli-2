@@ -64,24 +64,29 @@ int mowgli_future_init(mowgli_future_t *future) {
 mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result) {
 	return_val_if_fail(future != NULL, MOWGLI_FUTURE_STATE_ERROR);
 
-	void *finished = mowgli_atomic_compare_exchange_pointer(&future->result, NULL, result);
+	mowgli_future_state_t oldstate = mowgli_atomic_compare_exchange_int(&future->state,
+			MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_RUNNING);
 
-	if(finished == NULL) {
-		mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
-				MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_FINISHED);
+	if(oldstate == MOWGLI_FUTURE_STATE_WAITING) {
+			void *oldresult = mowgli_atomic_compare_exchange_pointer(&future->result, NULL, result);
 
-		if(state == MOWGLI_FUTURE_STATE_FINISHED) {
-			mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
-			return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
-		} else if(state == MOWGLI_FUTURE_STATE_CANCELED) {
-			mowgli_atomic_store_pointer(&future->result, NULL);
-			return MOWGLI_FUTURE_STATE_CANCELED;
-		}
+			if(oldresult == NULL) {
+				oldstate = mowgli_atomic_compare_exchange_int(&future->state, MOWGLI_FUTURE_STATE_RUNNING,
+						MOWGLI_FUTURE_STATE_FINISHED);
 
-		return mowgli_atomic_load_int(&future->state);
-	} else {
-		mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
+				if(oldstate == MOWGLI_FUTURE_STATE_RUNNING)
+					return MOWGLI_FUTURE_STATE_FINISHED;
+				else
+					return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+			}
+			else
+				return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+	} else if(oldstate == MOWGLI_FUTURE_STATE_CANCELED) {
+		return MOWGLI_FUTURE_STATE_CANCELED;
+	} else if(oldstate == MOWGLI_FUTURE_STATE_FINISHED || oldstate == MOWGLI_FUTURE_STATE_RUNNING) {
 		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+	} else {
+		return oldstate;
 	}
 }
 
