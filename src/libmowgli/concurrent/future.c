@@ -101,10 +101,12 @@ mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
 	mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
 			MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_CANCELED);
 
-	if(state != MOWGLI_FUTURE_STATE_WAITING)
-		return state;
+	if(state == MOWGLI_FUTURE_STATE_WAITING || state == MOWGLI_FUTURE_STATE_CANCELED)
+		return MOWGLI_FUTURE_STATE_CANCELED;
+	else if(state == MOWGLI_FUTURE_STATE_FINISHED)
+		return MOWGLI_FUTURE_STATE_FINISHED;
 	else
-		return mowgli_atomic_load_int(&future->state);
+		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 }
 
 /* Given a valid future object, return the current state */
@@ -116,7 +118,7 @@ mowgli_future_state_t mowgli_future_state(mowgli_future_t *future) {
 
 /* Given a valid future object, result will return the result WITHOUT
  * checking the state. If this future has a state of CONSISTENCY_FAILURE,
- * ERRORED, CANCELED, or WAITING, it will still return the result.
+ * ERRORED, CANCELED, WAITING, or RUNNING it will still return the result.
  */
 void *mowgli_future_result(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, NULL);
