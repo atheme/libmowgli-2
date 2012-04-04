@@ -29,6 +29,11 @@
 
 #include "mowgli.h"
 
+typedef struct _mowgli_future {
+	mowgli_atomic(mowgli_future_state_t) state;
+	mowgli_atomic(void *) result;
+} mowgli_future_t;
+
 mowgli_future_t *mowgli_future_create() {
 	mowgli_future_t *future = mowgli_alloc(sizeof(mowgli_future_t));
 
