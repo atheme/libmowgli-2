@@ -78,9 +78,9 @@ mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result
 					return MOWGLI_FUTURE_STATE_FINISHED;
 				else
 					return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
-			}
-			else
+			} else {
 				return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+			}
 	} else if(oldstate == MOWGLI_FUTURE_STATE_CANCELED) {
 		return MOWGLI_FUTURE_STATE_CANCELED;
 	} else if(oldstate == MOWGLI_FUTURE_STATE_FINISHED || oldstate == MOWGLI_FUTURE_STATE_RUNNING) {
