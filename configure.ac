@@ -24,8 +24,21 @@ AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
 
-AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h])
-AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create])
+AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h sys/pstat.h])
+AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create setproctitle pstat])
+
+AC_CACHE_CHECK([for PS_STRINGS], [pgac_cv_var_PS_STRINGS],
+[AC_TRY_LINK(
+[#include <machine/vmparam.h>
+#include <sys/exec.h>
+],
+[PS_STRINGS->ps_nargvstr = 1;
+PS_STRINGS->ps_argvstr = "foo";],
+[pgac_cv_var_PS_STRINGS=yes],
+[pgac_cv_var_PS_STRINGS=no])])
+if test "$pgac_cv_var_PS_STRINGS" = yes ; then
+  AC_DEFINE([HAVE_PS_STRINGS], [], [Define to 1 if the PS_STRINGS struct exists on your platform (likely no).])
+fi
 
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)

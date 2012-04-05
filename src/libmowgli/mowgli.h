@@ -70,6 +70,7 @@ MOWGLI_DECLS_START
 #include "base/bitvector.h"
 #include "base/hook.h"
 #include "base/mowgli_signal.h"
+#include "ext/proctitle.h"
 #include "ext/error_backtrace.h"
 #include "base/random.h"
 #include "base/argstack.h"
