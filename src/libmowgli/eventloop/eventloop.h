@@ -203,11 +203,8 @@ struct _mowgli_helper {
 	mowgli_process_t *child;
 	mowgli_eventloop_t *eventloop;
 
-	mowgli_descriptor_t in_fd;
-	mowgli_descriptor_t out_fd;
-
-	mowgli_eventloop_pollable_t *in_pfd;
-	mowgli_eventloop_pollable_t *out_pfd;
+	mowgli_descriptor_t fd;
+	mowgli_eventloop_pollable_t *pfd;
 
 	mowgli_eventloop_io_cb_t *read_function;
 
