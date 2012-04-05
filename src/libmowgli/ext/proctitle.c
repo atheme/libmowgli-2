@@ -31,8 +31,6 @@
 #endif
 
 extern char **environ;
-bool		mowgli_proctitle_update = true;
-
 
 /*
  * Alternative ways of updating ps display:
@@ -88,20 +86,17 @@ bool		mowgli_proctitle_update = true;
 #define PS_BUFFER_SIZE 256
 static char ps_buffer[PS_BUFFER_SIZE];
 static const size_t ps_buffer_size = PS_BUFFER_SIZE;
-#else							/* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
+#else					/* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 static char *ps_buffer;			/* will point to argv area */
 static size_t ps_buffer_size;	/* space determined at run time */
-static size_t last_status_len;	/* use to minimize length of clobber */
 #endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
+static size_t ps_buffer_fixed_size;
 static size_t ps_buffer_cur_len;	/* nominal strlen(ps_buffer) */
 
-static size_t ps_buffer_fixed_size;		/* size of the constant prefix */
-
 /* save the original argv[] location here */
-static int	save_argc;
+static int save_argc;
 static char **save_argv;
-
 
 /*
  * Call this early in startup to save the original argc/argv values.
@@ -109,12 +104,12 @@ static char **save_argv;
  * from being clobbered by subsequent ps_display actions.
  *
  * (The original argv[] will not be overwritten by this routine, but may be
- * overwritten during mowgli_proctitle_init.	Also, the physical location of the
+ * overwritten during mowgli_proctitle_set. Also, the physical location of the
  * environment strings may be moved, so this should be called before any code
  * that might try to hang onto a getenv() result.)
  */
-char	  **
-mowgli_proctitle_copy_args(int argc, char **argv)
+char **
+mowgli_proctitle_init(int argc, char **argv)
 {
 	save_argc = argc;
 	save_argv = argv;
@@ -126,9 +121,9 @@ mowgli_proctitle_copy_args(int argc, char **argv)
 	 * Also move the environment to make additional room.
 	 */
 	{
-		char	   *end_of_area = NULL;
-		char	  **new_environ;
-		int			i;
+		char *end_of_area = NULL;
+		char **new_environ;
+		int i;
 
 		/*
 		 * check for contiguous argv strings
@@ -156,12 +151,12 @@ mowgli_proctitle_copy_args(int argc, char **argv)
 		}
 
 		ps_buffer = argv[0];
-		last_status_len = ps_buffer_size = end_of_area - argv[0];
+		ps_buffer_size = end_of_area - argv[0];
 
 		/*
 		 * move the environment out of the way
 		 */
-		new_environ = (char **) mowgli_alloc((i + 1) * sizeof(char *));
+		new_environ = (char **) malloc((i + 1) * sizeof(char *));
 		for (i = 0; environ[i] != NULL; i++)
 			new_environ[i] = mowgli_strdup(environ[i]);
 		new_environ[i] = NULL;
@@ -182,10 +177,10 @@ mowgli_proctitle_copy_args(int argc, char **argv)
 	 * platforms have other dependencies on argv[].
 	 */
 	{
-		char	  **new_argv;
-		int			i;
+		char **new_argv;
+		int i;
 
-		new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
+		new_argv = (char **) malloc((argc + 1) * sizeof(char *));
 		for (i = 0; i < argc; i++)
 			new_argv[i] = mowgli_strdup(argv[i]);
 		new_argv[argc] = NULL;
@@ -205,78 +200,34 @@ mowgli_proctitle_copy_args(int argc, char **argv)
 	return argv;
 }
 
-/*
- * Call this once during subprocess startup to set the identification
- * values.
- *
- * At this point, the original argv[] array may be overwritten.
- */
 void
-mowgli_proctitle_init(const char *fmt, ...)
+mowgli_proctitle_set(const char *fmt, ...)
 {
+#ifndef MOWGLI_SETPROC_USE_NONE
 	va_list va;
 
-#ifndef MOWGLI_SETPROC_USE_NONE
-	/* no ps display if you didn't call mowgli_proctitle_copy_args() */
 	if (!save_argv)
 		return;
 
-#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
-	/* If ps_buffer is a pointer, it might still be null */
-	if (!ps_buffer)
-		return;
-#endif
-
 	va_start(va, fmt);
-	vsnprintf(ps_buffer, sizeof(ps_buffer), fmt, va);
+	vsnprintf(ps_buffer, ps_buffer_size, fmt, va);
 	va_end(va);
 
-	/*
-	 * Overwrite argv[] to point at appropriate space, if needed
-	 */
+	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
 
 #ifdef MOWGLI_SETPROC_USE_CHANGE_ARGV
 	save_argv[0] = ps_buffer;
 	save_argv[1] = NULL;
-#endif   /* MOWGLI_SETPROC_USE_CHANGE_ARGV */
-
-#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
-	/* make extra argv slots point at end_of_area (a NUL) */
-	for (int i = 1; i < save_argc; i++)
-		save_argv[i] = ps_buffer + ps_buffer_size;
-#endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
-
-
-	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
-
-	mowgli_proctitle_set(ps_buffer, true);
-#endif   /* not MOWGLI_SETPROC_USE_NONE */
-}
-
-/*
- * Call this to update the ps status display to a fixed prefix plus an
- * indication of what you're currently doing passed in the argument.
- */
-void
-mowgli_proctitle_set(const char *activity, bool force)
-{
-#ifndef MOWGLI_SETPROC_USE_NONE
-	/* mowgli_proctitle_update=off disables updates, unless force = true */
-	if (!force && !mowgli_proctitle_update)
-		return;
-
-#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
-	/* If ps_buffer is a pointer, it might still be null */
-	if (!ps_buffer)
-		return;
 #endif
 
-	/* Update ps_buffer to contain both fixed part and activity */
-	mowgli_strlcpy(ps_buffer + ps_buffer_fixed_size, activity,
-			ps_buffer_size - ps_buffer_fixed_size);
-	ps_buffer_cur_len = strlen(ps_buffer);
+#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
+	for (int i = 1; i < save_argc; i++)
+		save_argv[i] = ps_buffer + ps_buffer_size;
 
-	/* Transmit new setting to kernel, if necessary */
+	/* Pad unused bytes */
+	printf("%d %d\n", ps_buffer_size, ps_buffer_cur_len);
+	memset(ps_buffer + ps_buffer_cur_len, PS_PADDING, ps_buffer_size - ps_buffer_cur_len + 1);
+#endif
 
 #ifdef MOWGLI_SETPROC_USE_SETPROCTITLE
 	setproctitle("%s", ps_buffer);
@@ -296,14 +247,6 @@ mowgli_proctitle_set(const char *activity, bool force)
 	PS_STRINGS->ps_argvstr = ps_buffer;
 #endif   /* MOWGLI_SETPROC_USE_PS_STRINGS */
 
-#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
-	/* pad unused memory; need only clobber remainder of old status string */
-	if (last_status_len > ps_buffer_cur_len)
-		memset(ps_buffer + ps_buffer_cur_len, PS_PADDING,
-			   last_status_len - ps_buffer_cur_len);
-	last_status_len = ps_buffer_cur_len;
-#endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
-
 #ifdef MOWGLI_SETPROC_USE_WIN32
 	{
 		/*
@@ -312,7 +255,7 @@ mowgli_proctitle_set(const char *activity, bool force)
 		 * named object that can be viewed with for example Process Explorer.
 		 */
 		static HANDLE ident_handle = INVALID_HANDLE_VALUE;
-		char		name[PS_BUFFER_SIZE + 32];
+		char name[PS_BUFFER_SIZE + 32];
 
 		if (ident_handle != INVALID_HANDLE_VALUE)
 			CloseHandle(ident_handle);

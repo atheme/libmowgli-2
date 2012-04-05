@@ -14,11 +14,9 @@
 
 extern bool mowgli_proctitle_update;
 
-extern char **mowgli_proctitle_copy_args(int argc, char **argv);
+extern char **mowgli_proctitle_init(int argc, char **argv);
 
-extern void mowgli_proctitle_init(const char *fmt, ...);
-
-extern void mowgli_proctitle_set(const char *activity, bool force);
+extern void mowgli_proctitle_set(const char *fmt, ...);
 
 extern const char *mowgli_proctitle_get(int *displen);
 
