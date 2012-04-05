@@ -26,16 +26,14 @@
 
 typedef enum {
 	MOWGLI_FUTURE_STATE_WAITING,
+	MOWGLI_FUTURE_STATE_RUNNING,
 	MOWGLI_FUTURE_STATE_FINISHED,
 	MOWGLI_FUTURE_STATE_CANCELED,
 	MOWGLI_FUTURE_STATE_ERROR = -1,
 	MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE = -2
 } mowgli_future_state_t;
 
-typedef struct {
-	mowgli_atomic(mowgli_future_state_t) state;
-	mowgli_atomic(void *) result;
-} mowgli_future_t;
+typedef struct _mowgli_future mowgli_future_t;
 
 extern mowgli_future_t *mowgli_future_create();
 extern mowgli_future_t *mowgli_future_destroy(mowgli_future_t *future);

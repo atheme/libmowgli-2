@@ -29,6 +29,11 @@
 
 #include "mowgli.h"
 
+typedef struct _mowgli_future {
+	mowgli_atomic(mowgli_future_state_t) state;
+	mowgli_atomic(void *) result;
+} mowgli_future_t;
+
 mowgli_future_t *mowgli_future_create() {
 	mowgli_future_t *future = mowgli_alloc(sizeof(mowgli_future_t));
 
@@ -59,30 +64,33 @@ int mowgli_future_init(mowgli_future_t *future) {
 mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result) {
 	return_val_if_fail(future != NULL, MOWGLI_FUTURE_STATE_ERROR);
 
-	void *finished = mowgli_atomic_compare_exchange_pointer(&future->result, NULL, result);
+	mowgli_future_state_t oldstate = mowgli_atomic_compare_exchange_int(&future->state,
+			MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_RUNNING);
 
-	if(finished == NULL) {
-		mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
-				MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_FINISHED);
+	if(oldstate == MOWGLI_FUTURE_STATE_WAITING) {
+			void *oldresult = mowgli_atomic_compare_exchange_pointer(&future->result, NULL, result);
 
-		if(state == MOWGLI_FUTURE_STATE_FINISHED) {
-			mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
-			return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
-		} else if(state == MOWGLI_FUTURE_STATE_CANCELED) {
-			mowgli_atomic_store_pointer(&future->result, NULL);
-			return MOWGLI_FUTURE_STATE_CANCELED;
-		}
+			if(oldresult == NULL) {
+				oldstate = mowgli_atomic_compare_exchange_int(&future->state, MOWGLI_FUTURE_STATE_RUNNING,
+						MOWGLI_FUTURE_STATE_FINISHED);
 
-		return mowgli_atomic_load_int(&future->state);
+				if(oldstate == MOWGLI_FUTURE_STATE_RUNNING)
+					return MOWGLI_FUTURE_STATE_FINISHED;
+				else
+					return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+			} else {
+				return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
+			}
+	} else if(oldstate == MOWGLI_FUTURE_STATE_CANCELED) {
+		return MOWGLI_FUTURE_STATE_CANCELED;
 	} else {
-		mowgli_atomic_store_int(&future->state, MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE);
 		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 	}
 }
 
 /* Given a valid future object, cancel will either return CANCELED and it was
  * successfully canceled before it could finish, FINISHED if it already
- * finished (and you now must clean up the result), or ERROR or
+ * finished (and you now must clean up the result from the future), or
  * CONSISTENCY_FAILURE if something went wrong before you tried to cancel.
  */
 mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
@@ -91,10 +99,12 @@ mowgli_future_state_t mowgli_future_cancel(mowgli_future_t *future) {
 	mowgli_future_state_t state = mowgli_atomic_compare_exchange_int(&future->state,
 			MOWGLI_FUTURE_STATE_WAITING, MOWGLI_FUTURE_STATE_CANCELED);
 
-	if(state != MOWGLI_FUTURE_STATE_WAITING)
-		return state;
+	if(state == MOWGLI_FUTURE_STATE_WAITING || state == MOWGLI_FUTURE_STATE_CANCELED)
+		return MOWGLI_FUTURE_STATE_CANCELED;
+	else if(state == MOWGLI_FUTURE_STATE_FINISHED || state == MOWGLI_FUTURE_STATE_RUNNING)
+		return MOWGLI_FUTURE_STATE_FINISHED;
 	else
-		return mowgli_atomic_load_int(&future->state);
+		return MOWGLI_FUTURE_STATE_CONSISTENCY_FAILURE;
 }
 
 /* Given a valid future object, return the current state */
@@ -106,7 +116,7 @@ mowgli_future_state_t mowgli_future_state(mowgli_future_t *future) {
 
 /* Given a valid future object, result will return the result WITHOUT
  * checking the state. If this future has a state of CONSISTENCY_FAILURE,
- * ERRORED, CANCELED, or WAITING, it will still return the result.
+ * ERRORED, CANCELED, WAITING, or RUNNING it will still return the result.
  */
 void *mowgli_future_result(mowgli_future_t *future) {
 	return_val_if_fail(future != NULL, NULL);
