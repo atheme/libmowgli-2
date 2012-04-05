@@ -212,7 +212,7 @@ mowgli_proctitle_copy_args(int argc, char **argv)
  * At this point, the original argv[] array may be overwritten.
  */
 void
-mowgli_proctitle_init(const char *initial_str, const char *fmt, ...)
+mowgli_proctitle_init(const char *fmt, ...)
 {
 	va_list va;
 
@@ -249,7 +249,7 @@ mowgli_proctitle_init(const char *initial_str, const char *fmt, ...)
 
 	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
 
-	mowgli_proctitle_set(initial_str, true);
+	mowgli_proctitle_set(ps_buffer, true);
 #endif   /* not MOWGLI_SETPROC_USE_NONE */
 }
 
