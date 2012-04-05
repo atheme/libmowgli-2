@@ -23,7 +23,7 @@
 typedef struct {
 	mowgli_eventloop_helper_start_fn_t *start_fn;
 	void *userdata;
-	mowgli_descriptor_t in_fd, out_fd;
+	mowgli_descriptor_t fd;
 } mowgli_helper_create_req_t;
 
 static void
@@ -39,8 +39,7 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
-	helper->in_fd = req->in_fd;
-	helper->out_fd = req->out_fd;
+	helper->fd = req->fd;
 
 #ifndef _WIN32
 	for (i = 0; i < 1024; i++)
@@ -62,12 +61,10 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 #endif
 
 	helper->eventloop = mowgli_eventloop_create();
-	helper->in_pfd = mowgli_pollable_create(helper->eventloop, helper->in_fd, helper);
-	helper->out_pfd = mowgli_pollable_create(helper->eventloop, helper->out_fd, helper);
+	helper->pfd = mowgli_pollable_create(helper->eventloop, helper->fd, helper);
 	helper->userdata = req->userdata;
 
-	mowgli_pollable_set_nonblocking(helper->in_pfd, true);
-	mowgli_pollable_set_nonblocking(helper->out_pfd, true);
+	mowgli_pollable_set_nonblocking(helper->pfd, true);
 
 	req->start_fn(helper, helper->userdata);
 }
@@ -77,7 +74,7 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 {
 	mowgli_eventloop_helper_proc_t *helper;
 	mowgli_helper_create_req_t child;
-	int in_fd[2], out_fd[2];
+	int io_fd[2];
 
 	return_val_if_fail(eventloop != NULL, NULL);
 	return_val_if_fail(start_fn != NULL, NULL);
@@ -89,40 +86,31 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
 
-	pipe(in_fd);
-	pipe(out_fd);
+	socketpair(AF_UNIX, SOCK_STREAM, 0, io_fd);
 
 	/* set up helper/child fd mapping */
-	helper->in_fd = out_fd[0];
-	helper->out_fd = in_fd[1];
-	child.in_fd = in_fd[0];
-	child.out_fd = out_fd[1];
+	helper->fd = io_fd[0];
+	child.fd = io_fd[1];
 
 	/* make pollables and make them non-blocking */
-	helper->in_pfd = mowgli_pollable_create(eventloop, helper->in_fd, helper);
-	helper->out_pfd = mowgli_pollable_create(eventloop, helper->out_fd, helper);
-	mowgli_pollable_set_nonblocking(helper->in_pfd, true);
-	mowgli_pollable_set_nonblocking(helper->out_pfd, true);
+	helper->pfd = mowgli_pollable_create(eventloop, helper->in_fd, helper);
+	mowgli_pollable_set_nonblocking(helper->pfd, true);
 
 	/* spawn helper process using mowgli_process_clone() */
 	helper->child = mowgli_process_clone((mowgli_process_start_fn_t) mowgli_helper_trampoline, &child);
 
 	if (helper->child == NULL)
 	{
-		mowgli_pollable_destroy(eventloop, helper->in_pfd);
-		mowgli_pollable_destroy(eventloop, helper->out_pfd);
+		mowgli_pollable_destroy(eventloop, helper->pfd);
 
-		close(in_fd[0]);
-		close(in_fd[1]);
-		close(out_fd[0]);
-		close(out_fd[1]);
+		close(io_fd[0]);
+		close(io_fd[1]);
 
 		mowgli_free(helper);
 		return NULL;
 	}
 
-	close(child.in_fd);
-	close(child.out_fd);
+	close(child.fd);
 
 	return helper;
 }
@@ -131,7 +119,7 @@ mowgli_eventloop_helper_proc_t *
 mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const argv[])
 {
 	mowgli_eventloop_helper_proc_t *helper;
-	int in_fd[2], out_fd[2];
+	int io_fd[2];
 	char buf[64];
 
 	return_val_if_fail(eventloop != NULL, NULL);
@@ -141,47 +129,36 @@ mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
 
-	pipe(in_fd);
-	pipe(out_fd);
+	socketpair(AF_UNIX, SOCK_STREAM, 0, io_fd);
 
 	/* set up helper/child fd mapping */
-	helper->in_fd = out_fd[0];
-	helper->out_fd = in_fd[1];
+	helper->fd = io_fd[0];
+	child.fd = io_fd[1];
 
 	/* make pollables and make them non-blocking */
-	helper->in_pfd = mowgli_pollable_create(eventloop, helper->in_fd, helper);
-	helper->out_pfd = mowgli_pollable_create(eventloop, helper->out_fd, helper);
-	mowgli_pollable_set_nonblocking(helper->in_pfd, true);
-	mowgli_pollable_set_nonblocking(helper->out_pfd, true);
+	helper->pfd = mowgli_pollable_create(eventloop, helper->fd, helper);
 
-	snprintf(buf, sizeof buf, "%d", out_fd[1]);
-	setenv("IN_FD", buf, 1);
-
-	snprintf(buf, sizeof buf, "%d", in_fd[0]);
-	setenv("OUT_FD", buf, 1);
+	snprintf(buf, sizeof buf, "%d", child.fd);
+	setenv("IO_FD", buf, 1);
 
 	/* Spawn helper process using mowgli_process_spawn(), helper will get
-	 * IN_FD/OUT_FD mapping from getenv().  Ugly hack, but it works...
+	 * IO_FD mapping from getenv().  Ugly hack, but it works...
 	 *     --nenolod
 	 */
 	helper->child = mowgli_process_spawn(path, argv);
 
 	if (helper->child == NULL)
 	{
-		mowgli_pollable_destroy(eventloop, helper->in_pfd);
-		mowgli_pollable_destroy(eventloop, helper->out_pfd);
+		mowgli_pollable_destroy(eventloop, helper->pfd);
 
-		close(in_fd[0]);
-		close(in_fd[1]);
-		close(out_fd[0]);
-		close(out_fd[1]);
+		close(io_fd[0]);
+		close(io_fd[1]);
 
 		mowgli_free(helper);
 		return NULL;
 	}
 
-	close(in_fd[1]);
-	close(out_fd[0]);
+	close(child.fd);
 
 	return helper;
 }
@@ -191,31 +168,24 @@ mowgli_eventloop_helper_proc_t *
 mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_eventloop_helper_proc_t *helper;
-	const char *env_in_fd, *env_out_fd;
+	const char *env_io_fd;
 
-	env_in_fd = getenv("IN_FD");
-	env_out_fd = getenv("OUT_FD");
+	env_io_fd = getenv("IO_FD");
 
 	/* this shouldn't be a hard-fail because some idiot may run the helper from
 	 * the cmdline.  allow the helper to error out gracefully if not spawned as
 	 * a helper.
 	 */
-	if (env_in_fd == NULL)
-		return NULL;
-
-	if (env_out_fd == NULL)
+	if (env_io_fd == NULL)
 		return NULL;
 
 	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
-	helper->in_fd = atoi(env_in_fd);
-	helper->out_fd = atoi(env_out_fd);
-	helper->in_pfd = mowgli_pollable_create(helper->eventloop, helper->in_fd, helper);
-	helper->out_pfd = mowgli_pollable_create(helper->eventloop, helper->out_fd, helper);
+	helper->fd = atoi(env_io_fd);
+	helper->pfd = mowgli_pollable_create(helper->eventloop, helper->in_fd, helper);
 
-	mowgli_pollable_set_nonblocking(helper->in_pfd, true);
-	mowgli_pollable_set_nonblocking(helper->out_pfd, true);
+	mowgli_pollable_set_nonblocking(helper->pfd, true);
 
 	return helper;
 }
@@ -241,10 +211,10 @@ mowgli_helper_set_read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper
 	return_if_fail(helper != NULL);
 
 	if (read_fn == NULL)
-		mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_IO_READ, NULL);
+		mowgli_pollable_setselect(eventloop, helper->pfd, MOWGLI_EVENTLOOP_IO_READ, NULL);
 
 	helper->read_function = read_fn;
-	mowgli_pollable_setselect(eventloop, helper->in_pfd, MOWGLI_EVENTLOOP_IO_READ, mowgli_helper_io_trampoline);
+	mowgli_pollable_setselect(eventloop, helper->pfd, MOWGLI_EVENTLOOP_IO_READ, mowgli_helper_io_trampoline);
 }
 
 void
@@ -254,10 +224,8 @@ mowgli_helper_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_pro
 	return_if_fail(helper != NULL);
 
 	mowgli_process_kill(helper->child);
-	mowgli_pollable_destroy(eventloop, helper->in_pfd);
-	mowgli_pollable_destroy(eventloop, helper->out_pfd);
-	close(helper->in_fd);
-	close(helper->out_fd);
+	mowgli_pollable_destroy(eventloop, helper->pfd);
+	close(helper->fd);
 
 	mowgli_free(helper);
 }
