@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 		printf("error: abandon all hope\n");
 
 	printf("get state manually of waiting future: ");
-  if(mowgli_future_state(future) == MOWGLI_FUTURE_STATE_WAITING)
+	if(mowgli_future_state(future) == MOWGLI_FUTURE_STATE_WAITING)
 		printf("correctly waiting\n");
 	else
 		printf("error: %i\n", mowgli_future_state(future));
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
 		printf("error: %s\n", (char *)mowgli_future_result(future));
 
 	printf("get state of finished future: ");
-  if(mowgli_future_state(future) == MOWGLI_FUTURE_STATE_FINISHED)
+	if(mowgli_future_state(future) == MOWGLI_FUTURE_STATE_FINISHED)
 		printf("correctly finished\n");
 	else
 		printf("error: %i\n", mowgli_future_state(future));
