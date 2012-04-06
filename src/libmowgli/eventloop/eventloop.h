@@ -212,7 +212,7 @@ struct _mowgli_helper {
 };
 
 /* helper.c */
-extern mowgli_eventloop_helper_proc_t *mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_start_fn_t *start_fn, void *userdata);
+extern mowgli_eventloop_helper_proc_t *mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_start_fn_t *start_fn, const char *helpername, void *userdata);
 
 /* creation of helpers inside other executable images */
 extern mowgli_eventloop_helper_proc_t *mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const argv[]);

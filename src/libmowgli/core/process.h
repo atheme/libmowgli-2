@@ -30,7 +30,7 @@ typedef struct {
 	void *userdata;
 } mowgli_process_t;
 
-extern mowgli_process_t *mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata);
+extern mowgli_process_t *mowgli_process_clone(mowgli_process_start_fn_t start_fn, const char *proctitle, void *userdata);
 extern mowgli_process_t *mowgli_process_spawn(const char *path, char *const argv[]);
 extern void mowgli_process_kill(mowgli_process_t *process);
 

@@ -33,6 +33,8 @@ mowgli_process_cloned_execv(mowgli_process_execv_req_t *execv_req)
 	return_if_fail(execv_req->path != NULL);
 	return_if_fail(execv_req->argv != NULL);
 
+	/* Do best to set proctitle if below hack don't work */
+	mowgli_proctitle_set("%s", execv_req->argv[0]);
 	execv(execv_req->path, execv_req->argv);
 
 	mowgli_free(execv_req->argv);
@@ -44,7 +46,7 @@ mowgli_process_cloned_execv(mowgli_process_execv_req_t *execv_req)
 }
 
 mowgli_process_t *
-mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
+mowgli_process_clone(mowgli_process_start_fn_t start_fn, const char *procname, void *userdata)
 {
 #ifndef _WIN32
 	mowgli_process_t *out;
@@ -61,6 +63,8 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, void *userdata)
 		break;
 
 	case 0:
+		/* Do our best to set this... */
+		mowgli_proctitle_set("%s", procname);
 		start_fn(out->userdata);
 		_exit(255);
 
@@ -100,7 +104,7 @@ mowgli_process_spawn(const char *path, char *const argv[])
 	for (i = 0; argv[i] != NULL; i++)
 		req->argv[i] = argv[i];
 
-	return mowgli_process_clone((mowgli_process_start_fn_t) mowgli_process_cloned_execv, req);
+	return mowgli_process_clone((mowgli_process_start_fn_t) mowgli_process_cloned_execv, req->argv[0], req);
 }
 
 void

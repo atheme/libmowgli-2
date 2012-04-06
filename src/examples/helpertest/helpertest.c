@@ -65,7 +65,7 @@ void helper_spawn(mowgli_eventloop_t *eventloop)
 	if (helper_count >= 100)
 		return;
 
-	helper = mowgli_helper_create(eventloop, helper_start, NULL);
+	helper = mowgli_helper_create(eventloop, helper_start, "Spawned helper", NULL);
 	mowgli_helper_set_read_cb(eventloop, helper, helper_read);
 
 	helper_count++;
@@ -95,6 +95,9 @@ void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgl
 int main(int argc, char *argv[])
 {
 	mowgli_eventloop_t *base_eventloop;
+
+	/* Bleh this is needed to ensure some systems can set the process title */
+	argv = mowgli_proctitle_init(argc, argv);
 
 	base_eventloop = mowgli_eventloop_create();
 
