@@ -24,7 +24,7 @@ AS_IF([test "x$GCC" = "xyes"], [
    CFLAGS="$CFLAGS $MORECFLAGS"
 ])
 
-AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h sys/pstat.h])
+AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h sys/pstat.h sys/prctl.h])
 AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create setproctitle pstat])
 
 AC_CACHE_CHECK([for PS_STRINGS], [pgac_cv_var_PS_STRINGS],

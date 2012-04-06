@@ -1,6 +1,9 @@
 /* 
  * Code has been calqued from PostgreSQL 9.1 by Elizabeth J. Myers.
- * Below is their copyright header
+ * Below is their copyright header.
+ *
+ * Do note I've made extensive changes to this code, including adding
+ * Linux (and Irix?) prctl support.
  */
 
 /*--------------------------------------------------------------------
@@ -29,6 +32,9 @@
 #if defined(__darwin__)
 #include <crt_externs.h>
 #endif
+#ifdef HAVE_SYS_PRCTL_H
+#include <sys/prctl.h>
+#endif
 
 extern char **environ;
 
@@ -44,12 +50,15 @@ extern char **environ;
  * MOWGLI_SETPROC_USE_PS_STRINGS
  *	   assign PS_STRINGS->ps_argvstr = "string"
  *	   (some BSD systems)
+ * MOWGLI_SETPROC_USE_PRCTL
+ *	   use prctl(PR_SET_NAME, ...)
+ *	   (Newer Linux and possibly Irix? -- Note some utilities don't use this name)
  * MOWGLI_SETPROC_USE_CHANGE_ARGV
  *	   assign argv[0] = "string"
  *	   (some other BSD systems)
  * MOWGLI_SETPROC_USE_CLOBBER_ARGV
  *	   write over the argv and environment area
- *	   (Linux and most SysV-like systems)
+ *	   (Old Linux and most SysV-like systems)
  * MOWGLI_SETPROC_USE_WIN32
  *	   push the string out as the name of a Windows event
  * MOWGLI_SETPROC_USE_NONE
@@ -58,6 +67,8 @@ extern char **environ;
  */
 #if defined(HAVE_SETPROCTITLE)
 #define MOWGLI_SETPROC_USE_SETPROCTITLE
+#elif defined(PR_SET_NAME) && defined(HAVE_SYS_PRCTL_H)
+#define MOWGLI_SETPROC_USE_PRCTL
 #elif defined(HAVE_PSTAT) && defined(PSTAT_SETCMD)
 #define MOWGLI_SETPROC_USE_PSTAT
 #elif defined(HAVE_PS_STRINGS)
@@ -206,8 +217,10 @@ mowgli_proctitle_set(const char *fmt, ...)
 #ifndef MOWGLI_SETPROC_USE_NONE
 	va_list va;
 
+#if defined(MOWGLI_SETPROC_USE_CHANGE_ARGV) || defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
 	if (!save_argv)
 		return;
+#endif
 
 	va_start(va, fmt);
 	vsnprintf(ps_buffer, ps_buffer_size, fmt, va);
@@ -233,13 +246,19 @@ mowgli_proctitle_set(const char *fmt, ...)
 	setproctitle("%s", ps_buffer);
 #endif
 
-#ifdef MOWGLI_SETPROC_USE_PSTAT
-	{
-		union pstun pst;
+#ifdef MOWGLI_SETPROC_USE_PRCTL
+	/* Limit us to 16 chars to be safe */
+	char procbuf[17];
+	mowgli_strlcpy(procbuf, ps_buffer, sizeof(procbuf));
+	prctl(PR_SET_NAME, procbuf, 0, 0, 0);
+	printf("%s\n", procbuf);
+#endif
 
-		pst.pst_command = ps_buffer;
-		pstat(PSTAT_SETCMD, pst, ps_buffer_cur_len, 0, 0);
-	}
+#ifdef MOWGLI_SETPROC_USE_PSTAT
+	union pstun pst;
+
+	pst.pst_command = ps_buffer;
+	pstat(PSTAT_SETCMD, pst, ps_buffer_cur_len, 0, 0);
 #endif   /* MOWGLI_SETPROC_USE_PSTAT */
 
 #ifdef MOWGLI_SETPROC_USE_PS_STRINGS
@@ -248,22 +267,21 @@ mowgli_proctitle_set(const char *fmt, ...)
 #endif   /* MOWGLI_SETPROC_USE_PS_STRINGS */
 
 #ifdef MOWGLI_SETPROC_USE_WIN32
-	{
-		/*
-		 * Win32 does not support showing any changed arguments. To make it at
-		 * all possible to track which backend is doing what, we create a
-		 * named object that can be viewed with for example Process Explorer.
-		 */
-		static HANDLE ident_handle = INVALID_HANDLE_VALUE;
-		char name[PS_BUFFER_SIZE + 32];
+	/*
+	 * Win32 does not support showing any changed arguments. To make it at
+	 * all possible to track which backend is doing what, we create a
+	 * named object that can be viewed with for example Process Explorer.
+	 */
+	static HANDLE ident_handle = INVALID_HANDLE_VALUE;
+	char name[PS_BUFFER_SIZE + 32];
 
-		if (ident_handle != INVALID_HANDLE_VALUE)
-			CloseHandle(ident_handle);
+	if (ident_handle != INVALID_HANDLE_VALUE)
+		CloseHandle(ident_handle);
 
-		sprintf(name, "mowgli_ident(%d): %s", MyProcPid, ps_buffer);
+	sprintf(name, "mowgli_ident(%d): %s", MyProcPid, ps_buffer);
 
-		ident_handle = CreateEvent(NULL, TRUE, FALSE, name);
-	}
+	ident_handle = CreateEvent(NULL, TRUE, FALSE, name);
+
 #endif   /* MOWGLI_SETPROC_USE_WIN32 */
 #endif   /* not MOWGLI_SETPROC_USE_NONE */
 }
