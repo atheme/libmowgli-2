@@ -70,7 +70,7 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 }
 
 mowgli_eventloop_helper_proc_t *
-mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_start_fn_t *start_fn, void *userdata)
+mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_start_fn_t *start_fn, const char *helpername, void *userdata)
 {
 	mowgli_eventloop_helper_proc_t *helper;
 	mowgli_helper_create_req_t child;
@@ -97,7 +97,7 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	mowgli_pollable_set_nonblocking(helper->pfd, true);
 
 	/* spawn helper process using mowgli_process_clone() */
-	helper->child = mowgli_process_clone((mowgli_process_start_fn_t) mowgli_helper_trampoline, &child);
+	helper->child = mowgli_process_clone((mowgli_process_start_fn_t) mowgli_helper_trampoline, helpername, &child);
 
 	if (helper->child == NULL)
 	{

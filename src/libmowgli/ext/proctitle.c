@@ -131,48 +131,47 @@ mowgli_proctitle_init(int argc, char **argv)
 	 * If we're going to overwrite the argv area, count the available space.
 	 * Also move the environment to make additional room.
 	 */
+	char *end_of_area = NULL;
+	char **new_environ;
+	int i;
+
+	/*
+	 * check for contiguous argv strings
+	 */
+	for (i = 0; i < argc; i++)
 	{
-		char *end_of_area = NULL;
-		char **new_environ;
-		int i;
-
-		/*
-		 * check for contiguous argv strings
-		 */
-		for (i = 0; i < argc; i++)
-		{
-			if (i == 0 || end_of_area + 1 == argv[i])
-				end_of_area = argv[i] + strlen(argv[i]);
-		}
-
-		if (end_of_area == NULL)	/* probably can't happen? */
-		{
-			ps_buffer = NULL;
-			ps_buffer_size = 0;
-			return argv;
-		}
-
-		/*
-		 * check for contiguous environ strings following argv
-		 */
-		for (i = 0; environ[i] != NULL; i++)
-		{
-			if (end_of_area + 1 == environ[i])
-				end_of_area = environ[i] + strlen(environ[i]);
-		}
-
-		ps_buffer = argv[0];
-		ps_buffer_size = end_of_area - argv[0];
-
-		/*
-		 * move the environment out of the way
-		 */
-		new_environ = (char **) malloc((i + 1) * sizeof(char *));
-		for (i = 0; environ[i] != NULL; i++)
-			new_environ[i] = mowgli_strdup(environ[i]);
-		new_environ[i] = NULL;
-		environ = new_environ;
+		if (i == 0 || end_of_area + 1 == argv[i])
+			end_of_area = argv[i] + strlen(argv[i]);
 	}
+
+	if (end_of_area == NULL)	/* probably can't happen? */
+	{
+		ps_buffer = NULL;
+		ps_buffer_size = 0;
+		return argv;
+	}
+
+	/*
+	 * check for contiguous environ strings following argv
+	 */
+	for (i = 0; environ[i] != NULL; i++)
+	{
+		if (end_of_area + 1 == environ[i])
+			end_of_area = environ[i] + strlen(environ[i]);
+	}
+
+	ps_buffer = argv[0];
+	ps_buffer_size = end_of_area - argv[0];
+
+	/*
+	 * move the environment out of the way
+	 */
+	new_environ = (char **) malloc((i + 1) * sizeof(char *));
+	for (i = 0; environ[i] != NULL; i++)
+		new_environ[i] = mowgli_strdup(environ[i]);
+	new_environ[i] = NULL;
+	environ = new_environ;
+
 #endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
 #if defined(MOWGLI_SETPROC_USE_CHANGE_ARGV) || defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
@@ -187,25 +186,25 @@ mowgli_proctitle_init(int argc, char **argv)
 	 * argument string if the argv storage has been clobbered meanwhile. Other
 	 * platforms have other dependencies on argv[].
 	 */
-	{
-		char **new_argv;
-		int i;
 
-		new_argv = (char **) malloc((argc + 1) * sizeof(char *));
-		for (i = 0; i < argc; i++)
-			new_argv[i] = mowgli_strdup(argv[i]);
-		new_argv[argc] = NULL;
+	char **new_argv;
+	int i;
+
+	new_argv = (char **) malloc((argc + 1) * sizeof(char *));
+	for (i = 0; i < argc; i++)
+		new_argv[i] = mowgli_strdup(argv[i]);
+	new_argv[argc] = NULL;
 
 #if defined(__darwin__)
-		/*
-		 * Darwin (and perhaps other NeXT-derived platforms?) has a static
-		 * copy of the argv pointer, which we may fix like so:
-		 */
-		*_NSGetArgv() = new_argv;
+	/*
+	 * Darwin (and perhaps other NeXT-derived platforms?) has a static
+	 * copy of the argv pointer, which we may fix like so:
+	 */
+	*_NSGetArgv() = new_argv;
 #endif
 
-		argv = new_argv;
-	}
+	argv = new_argv;
+
 #endif   /* MOWGLI_SETPROC_USE_CHANGE_ARGV or MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
 	return argv;
@@ -225,6 +224,8 @@ mowgli_proctitle_set(const char *fmt, ...)
 	va_start(va, fmt);
 	vsnprintf(ps_buffer, ps_buffer_size, fmt, va);
 	va_end(va);
+
+	return_if_fail(*ps_buffer == NULL);
 
 	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
 
@@ -248,7 +249,7 @@ mowgli_proctitle_set(const char *fmt, ...)
 
 #ifdef MOWGLI_SETPROC_USE_PRCTL
 	/* Limit us to 16 chars to be safe */
-	char procbuf[17];
+	char procbuf[16];
 	mowgli_strlcpy(procbuf, ps_buffer, sizeof(procbuf));
 	prctl(PR_SET_NAME, procbuf, 0, 0, 0);
 	printf("%s\n", procbuf);
