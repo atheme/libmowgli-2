@@ -225,7 +225,7 @@ mowgli_proctitle_set(const char *fmt, ...)
 	vsnprintf(ps_buffer, ps_buffer_size, fmt, va);
 	va_end(va);
 
-	return_if_fail(*ps_buffer == NULL);
+	return_if_fail(*ps_buffer == '\0');
 
 	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
 
