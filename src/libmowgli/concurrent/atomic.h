@@ -27,7 +27,8 @@
  * pointers. Almost all of the C89 and C99 basic types are supported except
  * for floating point types.
  *
- * Atomic operations currently wrapped are load, store, and compare_exchange.
+ * Atomic operations currently wrapped are load, store, compare_exchange,
+ * and (full barrier) synchronize.
  *
  * Hardware does not typically support atomic operations on larger than the
  * native size of the hardware (ie, 4 or 8 bytes).
@@ -87,6 +88,11 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 { \
 	return (type)__sync_val_compare_and_swap(atomic, expected, desired); \
 }
+
+static inline void mowgli_atomic_synchronize() {
+	__sync_synchronize();
+}
+
 #elif !defined MOWGLI_ATOMIC_DEBUG && defined MOWGLI_ATOMIC_C11
 #include <stdatomic.h>
 
@@ -109,6 +115,11 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 { \
 	return (type)atomic_compare_exchange_strong(atomic, expected, desired); \
 }
+
+static inline void mowgli_atomic_synchronize() {
+	atomic_thread_fence(memory_order_seq_cst);
+}
+
 #elif defined MOWGLI_ATOMIC_DEBUG || defined MOWGLI_ATOMIC_FALLBACK
 #define mowgli_atomic(type) volatile type
 
@@ -197,6 +208,8 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 	return result; \
 }
 
+static inline void mowgli_atomic_synchronize() { }
+
 #endif
 
 #define mowgli_atomic_type(type, mangle) \
@@ -234,6 +247,14 @@ mowgli_atomic_c99_width_type(32)
 mowgli_atomic_c99_width_type(64)
 mowgli_atomic_c99_t_type(intptr_t)
 mowgli_atomic_c99_t_type(intmax_t)
+
+#undef mowgli_atomic_load_function
+#undef mowgli_atomic_store_function
+#undef mowgli_atomic_compare_exchange_function
+#undef mowgli_atomic_type
+#undef mowgli_atomic_signed_type
+#undef mowgli_atomic_c99_t_type
+#undef mowgli_atomic_c99_width_type
 
 #endif
 
