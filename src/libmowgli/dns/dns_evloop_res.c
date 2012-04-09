@@ -73,7 +73,7 @@ static mowgli_heap_t *reslist_heap = NULL;
 #ifndef _WIN32
 static int parse_resvconf(mowgli_dns_t *dns);
 #else
-static void parse_windows_resolvers(mowgli_dns_t *dns)
+static void parse_windows_resolvers(mowgli_dns_t *dns);
 #endif
 
 static void timeout_resolver(void *arg);
@@ -238,15 +238,13 @@ extern int mowgli_dns_get_windows_nameservers(char *ret_buf, size_t ret_size);
 static void
 parse_windows_resolvers(mowgli_dns_t *dns)
 {
-	const char *ns = mowgli_dns_get_windows_nameservers();
+	char ns_buf[4096];
+	int count = mowgli_dns_get_windows_nameservers(ns_buf, sizeof ns_buf);
 	char *server;
 	char *p;
-	char *buf = mowgli_strdup(ns);
 
-	for(server = strtok_s(buf, " ", &p); server != NULL; server = strtok_s(NULL, " ", &p))
+	for(server = strtok_s(ns_buf, ",", &p); server != NULL; server = strtok_s(NULL, ",", &p))
 		add_nameserver(dns, server);
-
-	mowgli_free(buf);
 }
 
 #endif
