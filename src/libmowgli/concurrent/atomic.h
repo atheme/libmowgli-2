@@ -235,18 +235,7 @@ mowgli_atomic_signed_type(int, int)
 mowgli_atomic_signed_type(long, long)
 mowgli_atomic_signed_type(long long, longlong)
 mowgli_atomic_type(bool, bool)
-
-/* GCC issues a bogus __attribute__(noreturn) warning here... */
-#ifdef MOWGLI_COMPILER_GCC
-# pragma GCC diagnostic push
-# pragma GCC diagnostic ignored "-Wcast-qual"
-#endif
-
-mowgli_atomic_type(void *, pointer)
-
-#ifdef MOWGLI_COMPILER_GCC
-# pragma GCC diagnostic pop
-#endif
+mowgli_atomic_type(uintptr_t, pointer)
 
 mowgli_atomic_type(size_t, size_t)
 mowgli_atomic_type(ptrdiff_t, ptrdiff_t)
