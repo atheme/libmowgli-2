@@ -184,7 +184,7 @@ mowgli_program_opts_parse(const mowgli_program_opts_t *opts, size_t opts_size, i
 			break;
 		}
 
-		mowgli_program_opts_dispatch(opt, optarg);
+		mowgli_program_opts_dispatch(opt, mowgli_optarg);
 	}
 
 	mowgli_free(g_opts);

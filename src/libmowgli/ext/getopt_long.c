@@ -33,17 +33,17 @@
 
 #include "getopt_long.h"
 
-int	opterr = 1;		/* if error message should be printed */
-int	optind = 1;		/* index into parent argv vector */
-int	optopt = '?';		/* character checked for validity */
-int	optreset;		/* reset getopt */
-char    *optarg;		/* argument associated with option */
+int	mowgli_opterr = 1;		/* if error message should be printed */
+int	mowgli_optind = 1;		/* index into parent argv vector */
+int	mowgli_optopt = '?';		/* character checked for validity */
+int	mowgli_optreset;		/* reset getopt */
+char    *mowgli_optarg;			/* argument associated with option */
 
 /* XXX: suppress const warnings */
 #define __UNCONST(a) ((void *)(unsigned long)(const void *)(a))
 
 #define IGNORE_FIRST	(*options == '-' || *options == '+')
-#define PRINT_ERROR	((opterr) && ((*options != ':') \
+#define PRINT_ERROR	((mowgli_opterr) && ((*options != ':') \
 				      || (IGNORE_FIRST && options[1] != ':')))
 #define IS_POSIXLY_CORRECT (getenv("POSIXLY_CORRECT") != NULL)
 #define PERMUTE         (!IS_POSIXLY_CORRECT && !IGNORE_FIRST)
@@ -73,7 +73,7 @@ static void permute_args(int, int, int, char **);
 
 static const char *place = EMSG; /* option letter processing */
 
-/* XXX: set optreset to 1 rather than these two */
+/* XXX: set mowgli_optreset to 1 rather than these two */
 static int nonopt_start = -1; /* first non option argument (for permute) */
 static int nonopt_end = -1;   /* first option after non options (for permute) */
 
@@ -154,40 +154,40 @@ getopt_internal(int nargc, char **nargv, const char *options)
 	return_val_if_fail(nargv != NULL, -1);
 	return_val_if_fail(options != NULL, -1);
 
-	optarg = NULL;
+	mowgli_optarg = NULL;
 
 	/*
 	 * XXX Some programs (like rsyncd) expect to be able to
-	 * XXX re-initialize optind to 0 and have getopt_long(3)
+	 * XXX re-initialize mowgli_optind to 0 and have getopt_long(3)
 	 * XXX properly function again.  Work around this braindamage.
 	 */
-	if (optind == 0)
-		optind = 1;
+	if (mowgli_optind == 0)
+		mowgli_optind = 1;
 
-	if (optreset)
+	if (mowgli_optreset)
 		nonopt_start = nonopt_end = -1;
 start:
-	if (optreset || !*place) {		/* update scanning pointer */
-		optreset = 0;
-		if (optind >= nargc) {          /* end of argument vector */
+	if (mowgli_optreset || !*place) {		/* update scanning pointer */
+		mowgli_optreset = 0;
+		if (mowgli_optind >= nargc) {          /* end of argument vector */
 			place = EMSG;
 			if (nonopt_end != -1) {
 				/* do permutation, if we have to */
 				permute_args(nonopt_start, nonopt_end,
-				    optind, nargv);
-				optind -= nonopt_end - nonopt_start;
+				    mowgli_optind, nargv);
+				mowgli_optind -= nonopt_end - nonopt_start;
 			}
 			else if (nonopt_start != -1) {
 				/*
-				 * If we skipped non-options, set optind
+				 * If we skipped non-options, set mowgli_optind
 				 * to the first of them.
 				 */
-				optind = nonopt_start;
+				mowgli_optind = nonopt_start;
 			}
 			nonopt_start = nonopt_end = -1;
 			return -1;
 		}
-		if ((*(place = nargv[optind]) != '-')
+		if ((*(place = nargv[mowgli_optind]) != '-')
 		    || (place[1] == '\0')) {    /* found non-option */
 			place = EMSG;
 			if (IN_ORDER) {
@@ -195,7 +195,7 @@ start:
 				 * GNU extension: 
 				 * return non-option as argument to option 1
 				 */
-				optarg = nargv[optind++];
+				mowgli_optarg = nargv[mowgli_optind++];
 				return INORDER;
 			}
 			if (!PERMUTE) {
@@ -207,20 +207,20 @@ start:
 			}
 			/* do permutation */
 			if (nonopt_start == -1)
-				nonopt_start = optind;
+				nonopt_start = mowgli_optind;
 			else if (nonopt_end != -1) {
 				permute_args(nonopt_start, nonopt_end,
-				    optind, nargv);
-				nonopt_start = optind -
+				    mowgli_optind, nargv);
+				nonopt_start = mowgli_optind -
 				    (nonopt_end - nonopt_start);
 				nonopt_end = -1;
 			}
-			optind++;
+			mowgli_optind++;
 			/* process next argument */
 			goto start;
 		}
 		if (nonopt_start != -1 && nonopt_end == -1)
-			nonopt_end = optind;
+			nonopt_end = mowgli_optind;
 		if (place[1] && *++place == '-') {	/* found "--" */
 			place++;
 			return -2;
@@ -230,10 +230,10 @@ start:
 	    (oli = strchr(options + (IGNORE_FIRST ? 1 : 0), optchar)) == NULL) {
 		/* option letter unknown or ':' */
 		if (!*place)
-			++optind;
+			++mowgli_optind;
 		if (PRINT_ERROR)
 			warnx(illoptchar, optchar);
-		optopt = optchar;
+		mowgli_optopt = optchar;
 		return BADCH;
 	}
 	if (optchar == 'W' && oli[1] == ';') {		/* -W long-option */
@@ -241,14 +241,14 @@ start:
 		if (*place) 
 			return -2;
 
-		if (++optind >= nargc) {	/* no arg */
+		if (++mowgli_optind >= nargc) {	/* no arg */
 			place = EMSG;
 			if (PRINT_ERROR)
 				warnx(recargchar, optchar);
-			optopt = optchar;
+			mowgli_optopt = optchar;
 			return BADARG;
 		} else				/* white space */
-			place = nargv[optind];
+			place = nargv[mowgli_optind];
 		/*
 		 * Handle -W arg the same as --arg (which causes getopt to
 		 * stop parsing).
@@ -257,24 +257,24 @@ start:
 	}
 	if (*++oli != ':') {			/* doesn't take argument */
 		if (!*place)
-			++optind;
+			++mowgli_optind;
 	} else {				/* takes (optional) argument */
-		optarg = NULL;
+		mowgli_optarg = NULL;
 		if (*place)			/* no white space */
-			optarg = __UNCONST(place);
+			mowgli_optarg = __UNCONST(place);
 		/* XXX: disable test for :: if PC? (GNU doesn't) */
 		else if (oli[1] != ':') {	/* arg not optional */
-			if (++optind >= nargc) {	/* no arg */
+			if (++mowgli_optind >= nargc) {	/* no arg */
 				place = EMSG;
 				if (PRINT_ERROR)
 					warnx(recargchar, optchar);
-				optopt = optchar;
+				mowgli_optopt = optchar;
 				return BADARG;
 			} else
-				optarg = nargv[optind];
+				mowgli_optarg = nargv[mowgli_optind];
 		}
 		place = EMSG;
-		++optind;
+		++mowgli_optind;
 	}
 	/* dump back option letter */
 	return optchar;
@@ -299,15 +299,15 @@ mowgli_getopt(nargc, nargv, options)
 
 	retval = getopt_internal(nargc, __UNCONST(nargv), options);
 	if (retval == -2) {
-		++optind;
+		++mowgli_optind;
 		/*
 		 * We found an option (--), so if we skipped non-options,
 		 * we have to permute.
 		 */
 		if (nonopt_end != -1) {
-			permute_args(nonopt_start, nonopt_end, optind,
+			permute_args(nonopt_start, nonopt_end, mowgli_optind,
 				       __UNCONST(nargv));
-			optind -= nonopt_end - nonopt_start;
+			mowgli_optind -= nonopt_end - nonopt_start;
 		}
 		nonopt_start = nonopt_end = -1;
 		retval = -1;
@@ -345,7 +345,7 @@ mowgli_getopt_long(int nargc, char * const *nargv, const char *options,
 		match = -1;
 		ambiguous = 0;
 
-		optind++;
+		mowgli_optind++;
 		place = EMSG;
 
 		if (*current_argv == '\0') {		/* found "--" */
@@ -355,8 +355,8 @@ mowgli_getopt_long(int nargc, char * const *nargv, const char *options,
 			 */
 			if (nonopt_end != -1) {
 				permute_args(nonopt_start, nonopt_end,
-				    optind, __UNCONST(nargv));
-				optind -= nonopt_end - nonopt_start;
+				    mowgli_optind, __UNCONST(nargv));
+				mowgli_optind -= nonopt_end - nonopt_start;
 			}
 			nonopt_start = nonopt_end = -1;
 			return -1;
@@ -391,7 +391,7 @@ mowgli_getopt_long(int nargc, char * const *nargv, const char *options,
 			if (PRINT_ERROR)
 				warnx(ambig, (int)current_argv_len,
 				     current_argv);
-			optopt = 0;
+			mowgli_optopt = 0;
 			return BADCH;
 		}
 		if (match != -1) {			/* option found */
@@ -401,30 +401,30 @@ mowgli_getopt_long(int nargc, char * const *nargv, const char *options,
 					warnx(noarg, (int)current_argv_len,
 					     current_argv);
 				/*
-				 * XXX: GNU sets optopt to val regardless of
+				 * XXX: GNU sets mowgli_optopt to val regardless of
 				 * flag
 				 */
 				if (long_options[match].flag == NULL)
-					optopt = long_options[match].val;
+					mowgli_optopt = long_options[match].val;
 				else
-					optopt = 0;
+					mowgli_optopt = 0;
 				return BADARG;
 			}
 			if (long_options[match].has_arg == required_argument ||
 			    long_options[match].has_arg == optional_argument) {
 				if (has_equal)
-					optarg = has_equal;
+					mowgli_optarg = has_equal;
 				else if (long_options[match].has_arg ==
 				    required_argument) {
 					/*
 					 * optional argument doesn't use
 					 * next nargv
 					 */
-					optarg = nargv[optind++];
+					mowgli_optarg = nargv[mowgli_optind++];
 				}
 			}
 			if ((long_options[match].has_arg == required_argument)
-			    && (optarg == NULL)) {
+			    && (mowgli_optarg == NULL)) {
 				/*
 				 * Missing argument; leading ':'
 				 * indicates no error should be generated
@@ -432,20 +432,20 @@ mowgli_getopt_long(int nargc, char * const *nargv, const char *options,
 				if (PRINT_ERROR)
 					warnx(recargstring, current_argv);
 				/*
-				 * XXX: GNU sets optopt to val regardless
+				 * XXX: GNU sets mowgli_optopt to val regardless
 				 * of flag
 				 */
 				if (long_options[match].flag == NULL)
-					optopt = long_options[match].val;
+					mowgli_optopt = long_options[match].val;
 				else
-					optopt = 0;
-				--optind;
+					mowgli_optopt = 0;
+				--mowgli_optind;
 				return BADARG;
 			}
 		} else {			/* unknown option */
 			if (PRINT_ERROR)
 				warnx(illoptstring, current_argv);
-			optopt = 0;
+			mowgli_optopt = 0;
 			return BADCH;
 		}
 		if (long_options[match].flag) {

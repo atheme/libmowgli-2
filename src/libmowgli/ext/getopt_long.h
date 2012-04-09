@@ -60,10 +60,10 @@ extern int mowgli_getopt(int nargc, char * const *nargv, const char *options);
 extern int mowgli_getopt_long(int, char * const *, const char *,
     const mowgli_getopt_option_t *, int *);
 
-extern int opterr;
-extern int optind;
-extern int optopt;
-extern int optreset;
-extern char *optarg;
+extern int mowgli_opterr;
+extern int mowgli_optind;
+extern int mowgli_optopt;
+extern int mowgli_optreset;
+extern char *mowgli_optarg;
 
 #endif /* !_GETOPT_H_ */
