@@ -63,16 +63,28 @@ int mowgli_index_count (mowgli_index_t * index)
 
 void mowgli_index_allocate (mowgli_index_t * index, int size)
 {
+    size_t oldsize;
+    void *new_ptr;
+
     if (size <= index->size)
         return;
 
     if (! index->size)
         index->size = 64;
 
+    oldsize = index->size;
     while (size > index->size)
         index->size <<= 1;
 
-    index->data = realloc (index->data, sizeof (void *) * index->size);
+    new_ptr = mowgli_alloc_array(sizeof (void *), index->size);
+
+    if (index->data != NULL)
+    {
+        memcpy(new_ptr, index->data, oldsize);
+        mowgli_free(index->data);
+    }
+
+    index->data = new_ptr;
 }
 
 void mowgli_index_set (mowgli_index_t * index, int at, void * value)
