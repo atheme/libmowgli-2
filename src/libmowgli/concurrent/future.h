@@ -35,7 +35,7 @@ typedef enum {
 
 typedef struct _mowgli_future mowgli_future_t;
 
-extern mowgli_future_t *mowgli_future_create();
+extern mowgli_future_t *mowgli_future_create(void);
 extern mowgli_future_t *mowgli_future_destroy(mowgli_future_t *future);
 extern int mowgli_future_init(mowgli_future_t *future);
 extern mowgli_future_state_t mowgli_future_finish(mowgli_future_t *future, void *result);
