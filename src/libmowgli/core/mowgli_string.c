@@ -59,11 +59,17 @@ void mowgli_string_append(mowgli_string_t *self, const char *src, size_t n)
 {
 	if (self->size - self->pos <= n)
 	{
-		char *new;
+		char *new_ptr;
+		size_t oldsize;
 
+		oldsize = self->size;
 		self->size = MAX(self->size * 2, self->pos + n + 8);
-		new = realloc(self->str, self->size);
-		self->str = new;
+
+		new_ptr = mowgli_alloc(self->size);
+		mowgli_strlcpy(new_ptr, self->str, self->size);
+
+		mowgli_free(self->str);
+		self->str = new_ptr;
 	}
 
 	memcpy(self->str + self->pos, src, n);
@@ -75,11 +81,17 @@ void mowgli_string_append_char(mowgli_string_t *self, const char c)
 {
 	if (self->size - self->pos <= 1)
 	{
-		char *new;
+		char *new_ptr;
+		size_t oldsize;
 
-		self->size = MAX(self->size * 2, self->pos + 9);
-		new = realloc(self->str, self->size);
-		self->str = new;
+		oldsize = self->size;
+		self->size = MAX(self->size * 2, self->pos + n + 8);
+
+		new_ptr = mowgli_alloc(self->size);
+		mowgli_strlcpy(new_ptr, self->str, self->size);
+
+		mowgli_free(self->str);
+		self->str = new_ptr;
 	}
 
 	self->str[self->pos++] = c;
