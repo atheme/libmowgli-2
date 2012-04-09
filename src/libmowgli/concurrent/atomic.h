@@ -42,7 +42,7 @@
 #ifndef __MOWGLI_ATOMIC_H__
 #define __MOWGLI_ATOMIC_H__
 
-extern void mowgli_atomic_bootstrap();
+extern void mowgli_atomic_bootstrap(void);
 
 #if defined MOWGLI_COMPILER_GCC_COMPAT
 #if defined MOWGLI_COMPILER_GCC
@@ -89,7 +89,7 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 	return (type)__sync_val_compare_and_swap(atomic, expected, desired); \
 }
 
-static inline void mowgli_atomic_synchronize() {
+static inline void mowgli_atomic_synchronize(void) {
 	__sync_synchronize();
 }
 
@@ -116,7 +116,7 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 	return (type)atomic_compare_exchange_strong(atomic, expected, desired); \
 }
 
-static inline void mowgli_atomic_synchronize() {
+static inline void mowgli_atomic_synchronize(void) {
 	atomic_thread_fence(memory_order_seq_cst);
 }
 
@@ -208,7 +208,7 @@ static inline type mowgli_atomic_compare_exchange_##mangle (mowgli_atomic(type) 
 	return result; \
 }
 
-static inline void mowgli_atomic_synchronize() { }
+static inline void mowgli_atomic_synchronize(void) { }
 
 #endif
 
