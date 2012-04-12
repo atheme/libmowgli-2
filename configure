@@ -3911,7 +3911,7 @@ fi
 
 
 
-LIBMOWGLI_MODULES="core base container concurrent coroutine dns eventloop ext linebuf module object thread vio"
+LIBMOWGLI_MODULES="core base container concurrent dns eventloop ext linebuf module object thread vio"
 
 
 LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"
