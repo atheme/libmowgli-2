@@ -55,8 +55,6 @@ MOWGLI_DECLS_START
 #include "core/allocation_policy.h"
 #include "core/alloc.h"
 
-#include "coroutine/coroutine.h"
-
 #include "thread/thread.h"
 #include "thread/mutex.h"
 
