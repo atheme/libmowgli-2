@@ -225,6 +225,7 @@ extern void mowgli_helper_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloo
 
 /* null_pollops.c */
 extern void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop);
+extern void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout);
 extern void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 
 /* eventloop.c */
@@ -232,6 +233,7 @@ extern mowgli_eventloop_t *mowgli_eventloop_create(void);
 extern void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop);
 extern void mowgli_eventloop_run(mowgli_eventloop_t *eventloop);
 extern void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout);
 extern void mowgli_eventloop_break(mowgli_eventloop_t *eventloop);
 extern void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop);
 

@@ -125,6 +125,17 @@ void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
+void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
+{
+	return_if_fail(eventloop != NULL);
+
+	mowgli_mutex_lock(&eventloop->mutex);
+
+	eventloop->eventloop_ops->timeout_once(eventloop, timeout);
+
+	mowgli_mutex_unlock(&eventloop->mutex);
+}
+
 void mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
