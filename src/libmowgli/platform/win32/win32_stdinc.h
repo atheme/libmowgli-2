@@ -44,7 +44,8 @@ struct timezone {
 
 extern int gettimeofday(struct timeval *tv, struct timezone *tz);
 extern int setenv(const char *name, const char *value, int overwrite);
-extern int pipe(int pipefd[2]);
+extern int pipe(mowgli_descriptor_t pipefd[2]);
+extern int socketpair(int domain, int type, int protocol, mowgli_descriptor_t pipefd[2]);
 extern int fork(void);
 extern int inet_pton(int af, const char *src, void *dst);
 extern const char *inet_ntop(int af, const void *addr, char *host, size_t hostlen);

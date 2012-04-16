@@ -3,7 +3,7 @@ include ../../../../extra.mk
 STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_PLATFORM_WIN32}
 STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_PLATFORM_WIN32}
 
-SRCS = fork.c gettimeofday.c inet.c pipe.c setenv.c
+SRCS = fork.c gettimeofday.c inet.c pipe.c socketpair.c setenv.c
 
 INCLUDES = win32_stdinc.h
 
