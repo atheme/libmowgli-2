@@ -279,10 +279,9 @@ mowgli_proctitle_set(const char *fmt, ...)
 	if (ident_handle != INVALID_HANDLE_VALUE)
 		CloseHandle(ident_handle);
 
-	sprintf(name, "mowgli_ident(%d): %s", MyProcPid, ps_buffer);
+	sprintf(name, "mowgli_ident(%d): %s", getpid(), ps_buffer);
 
 	ident_handle = CreateEvent(NULL, TRUE, FALSE, name);
-
 #endif   /* MOWGLI_SETPROC_USE_WIN32 */
 #endif   /* not MOWGLI_SETPROC_USE_NONE */
 }
