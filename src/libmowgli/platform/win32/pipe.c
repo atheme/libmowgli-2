@@ -24,7 +24,7 @@
 #include "mowgli.h"
 
 #ifdef _WIN32
-int pipe(mowgli_descriptor_t pipefd[2])
+int pipe(int pipefd[2])
 {
 	return socketpair(AF_INET, SOCK_STREAM, 0, pipefd);
 }

@@ -46,7 +46,7 @@
  *   sockets must be closed with closesocket() regardless.
  */
 
-int socketpair(int domain, int type, int protocol, mowgli_descriptor_t socks[2])
+int socketpair(int domain, int type, int protocol, int socks[2])
 {
     union {
        struct sockaddr_in inaddr;
