@@ -117,6 +117,8 @@ int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int er
 	return mowgli_vio_error(vio);
 }
 
+#ifdef HAVE_OPENSSL
+
 int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
 {
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
@@ -125,3 +127,14 @@ int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
 	return mowgli_vio_error(vio);
 }
 
+#else
+
+int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
+{
+	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
+	vio->error.code = errcode;
+	mowgli_strlcpy(vio->error.string, "Unknown SSL error", sizeof(vio->error.string));
+	return mowgli_vio_error(vio);
+}
+
+#endif
