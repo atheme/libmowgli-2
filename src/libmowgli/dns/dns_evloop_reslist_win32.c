@@ -78,15 +78,15 @@ mowgli_dns_get_windows_nameservers(char *ret_buf, size_t ret_size)
 #endif
 	}
 
+	mowgli_free(fixedinfo);
+
 quit:
 	if(handle)
 		FreeLibrary(handle);
 
-	mowgli_free(fixedinfo);
-
 	if(left <= ip_size)
 		mowgli_log("Too many nameservers. Truncating to %d addressess", count);
-	
+
 	if(ret > ret_buf)
 		ret[-1] = '\0';
 

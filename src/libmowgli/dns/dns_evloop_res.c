@@ -114,7 +114,13 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 	state->rand = mowgli_random_create();
 
 	state->nscount = 0;
+
+#ifndef _WIN32
 	parse_resvconf(dns);
+#else
+	parse_windows_resolvers(dns);
+#endif
+
 	if (state->nscount == 0)
 	{
 		mowgli_log("couldn't get resolv.conf entries, falling back to localhost resolver");
@@ -239,11 +245,11 @@ static void
 parse_windows_resolvers(mowgli_dns_t *dns)
 {
 	char ns_buf[4096];
-	int count = mowgli_dns_get_windows_nameservers(ns_buf, sizeof ns_buf);
 	char *server;
-	char *p;
 
-	for(server = strtok_s(ns_buf, ",", &p); server != NULL; server = strtok_s(NULL, ",", &p))
+	mowgli_dns_get_windows_nameservers(ns_buf, sizeof ns_buf);
+
+	for(server = strtok(ns_buf, ","); server != NULL; server = strtok(NULL, ","))
 		add_nameserver(dns, server);
 }
 
