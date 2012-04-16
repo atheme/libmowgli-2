@@ -84,13 +84,13 @@ int socketpair(int domain, int type, int protocol, int socks[2])
             break;
 
         socks[0] = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, flags);
-        if (socks[0] == INVALID_SOCKET)
+        if (socks[0] == (int) INVALID_SOCKET)
             break;
         if (connect(socks[0], &a.addr, sizeof(a.inaddr)) == SOCKET_ERROR)
             break;
 
         socks[1] = accept(listener, NULL, NULL);
-        if (socks[1] == INVALID_SOCKET)
+        if (socks[1] == (int) INVALID_SOCKET)
             break;
 
         closesocket(listener);
