@@ -217,6 +217,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 }
 
 mowgli_eventloop_ops_t _mowgli_poll_pollops = {
+	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_poll_eventloop_pollsetup,
 	.pollshutdown = mowgli_poll_eventloop_pollshutdown,

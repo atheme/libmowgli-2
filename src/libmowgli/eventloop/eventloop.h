@@ -107,6 +107,7 @@ struct _mowgli_pollable {
 };
 
 typedef struct {
+	void (*timeout_once)(mowgli_eventloop_t *eventloop, int timeout);
 	void (*run_once)(mowgli_eventloop_t *eventloop);
 	void (*pollsetup)(mowgli_eventloop_t *eventloop);
 	void (*pollshutdown)(mowgli_eventloop_t *eventloop);

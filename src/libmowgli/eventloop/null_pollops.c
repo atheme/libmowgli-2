@@ -20,7 +20,7 @@
 
 #include "mowgli.h"
 
-void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
+void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 {
 	time_t delay, currtime;
 	int t;
@@ -42,16 +42,27 @@ void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 		delay = mowgli_eventloop_next_timer(eventloop);
 	}
 
-	if (delay <= currtime)
-		t = -1;
+	if (timeout)
+		t = timeout;
 	else
-		t = (delay - currtime) * 1000;
+	{
+		if (delay <= currtime)
+			t = -1;
+		else
+			t = (delay - currtime) * 1000;
+	}
 
 #ifdef DEBUG
 	mowgli_log("delay: %ld, currtime: %ld, select period: %d", delay, currtime, t);
 #endif
 
 	eventloop->eventloop_ops->select(eventloop, t);
+
+}
+
+void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
+{
+	eventloop->eventloop_ops->timeout_once(eventloop, 0);
 }
 
 void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
@@ -103,6 +114,7 @@ static void mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop, int time
 }
 
 mowgli_eventloop_ops_t _mowgli_null_pollops = {
+	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_null_eventloop_pollsetup,
 	.pollshutdown = mowgli_null_eventloop_pollshutdown,

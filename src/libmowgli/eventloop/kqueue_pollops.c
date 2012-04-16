@@ -177,6 +177,7 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 }
 
 mowgli_eventloop_ops_t _mowgli_kqueue_pollops = {
+	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_kqueue_eventloop_pollsetup,
 	.pollshutdown = mowgli_kqueue_eventloop_pollshutdown,

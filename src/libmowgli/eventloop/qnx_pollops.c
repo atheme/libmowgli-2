@@ -188,6 +188,7 @@ static void mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay
 }
 
 mowgli_eventloop_ops_t _mowgli_qnx_pollops = {
+	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_qnx_eventloop_pollsetup,
 	.pollshutdown = mowgli_qnx_eventloop_pollshutdown,

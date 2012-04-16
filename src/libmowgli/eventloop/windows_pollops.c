@@ -264,6 +264,7 @@ static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int d
 }
 
 mowgli_eventloop_ops_t _mowgli_winsock_pollops = {
+	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_winsock_eventloop_pollsetup,
 	.pollshutdown = mowgli_winsock_eventloop_pollshutdown,
