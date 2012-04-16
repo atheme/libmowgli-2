@@ -85,8 +85,6 @@ MOWGLI_DECLS_START
 
 #include "ext/confparse.h"
 #include "ext/program_opts.h"
-#include "concurrent/atomic.h"
-#include "concurrent/future.h"
 
 #include "linebuf/linebuf.h"
 #include "dns/dns.h"
