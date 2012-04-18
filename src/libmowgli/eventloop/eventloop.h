@@ -129,6 +129,8 @@ struct _mowgli_eventloop {
 	void *poller;
 
 	bool death_requested;
+
+	void *data;
 };
 
 typedef void mowgli_event_dispatch_func_t(void *userdata);
@@ -236,6 +238,8 @@ extern void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop);
 extern void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout);
 extern void mowgli_eventloop_break(mowgli_eventloop_t *eventloop);
 extern void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop);
+extern void mowgli_eventloop_set_data(mowgli_eventloop_t *eventloop, void *data);
+extern void *mowgli_eventloop_get_data(mowgli_eventloop_t *eventloop);
 
 /* timer.c */
 extern mowgli_eventloop_timer_t *mowgli_timer_add(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when);

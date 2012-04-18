@@ -150,3 +150,18 @@ void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop)
 
 	eventloop->eventloop_ops = &_mowgli_null_pollops;
 }
+
+/* userdata setting/getting functions (for bindings) */
+void *mowgli_eventloop_get_data(mowgli_eventloop_t *eventloop)
+{
+	return_val_if_fail(eventloop != NULL, NULL);
+
+	return eventloop->data;
+}
+
+void mowgli_eventloop_set_data(mowgli_eventloop_t *eventloop, void *data)
+{
+	return_if_fail(eventloop != NULL);
+
+	eventloop->data = data;
+}
