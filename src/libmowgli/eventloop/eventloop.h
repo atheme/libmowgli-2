@@ -59,27 +59,27 @@ typedef void mowgli_eventloop_io_t;
 /* checked casts */
 static inline mowgli_eventloop_pollable_t *mowgli_eventloop_io_pollable(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_POLLABLE, NULL);
 
-	return io;
+	return (mowgli_eventloop_pollable_t *) io;
 }
 
 static inline mowgli_eventloop_helper_proc_t *mowgli_eventloop_io_helper(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_HELPER, NULL);
 
-	return io;
+	return (mowgli_eventloop_helper_proc_t *) io;
 }
 
 static inline mowgli_eventloop_io_type_t mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, MOWGLI_EVENTLOOP_TYPE_ERROR);
 
