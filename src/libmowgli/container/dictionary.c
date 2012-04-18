@@ -237,7 +237,7 @@ void
 mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
 {
 	mowgli_dictionary_elem_t n, *tn, *left, *right, *node;
-	int ret;
+	ptrdiff_t ret;
 
 	return_if_fail(dict != NULL);
 
