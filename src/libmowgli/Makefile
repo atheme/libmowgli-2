@@ -15,5 +15,7 @@ OBJS_EXTRA = ${LIBMOWGLI_STATIC_MODULES}
 
 include ../../buildsys.mk
 
+$(SHARED_LIB): subdirs
+
 LIBS += ${PTHREAD_LIBS}
 CPPFLAGS += -I. -I../.. -DMOWGLI_CORE
