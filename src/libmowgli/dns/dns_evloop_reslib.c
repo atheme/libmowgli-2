@@ -1059,7 +1059,7 @@ static int mowgli_dns_mklower(int ch)
  * Returns the size of the result or -1.
  */
 int mowgli_dns_res_mkquery(const char *dname,	/* domain name */
-					int class, int type,	/* class and type of query */
+					int query_class, int type,	/* class and type of query */
 					unsigned char *buf,	/* buffer to put query */
 					int buflen)	/* size of buffer */
 {
@@ -1095,7 +1095,7 @@ int mowgli_dns_res_mkquery(const char *dname,	/* domain name */
 	cp += n;
 	buflen -= n;
 	MOWGLI_DNS_NS_PUT16(type, cp);
-	MOWGLI_DNS_NS_PUT16(class, cp);
+	MOWGLI_DNS_NS_PUT16(query_class, cp);
 	hp->qdcount = htons(1);
 
 	return cp - buf;
