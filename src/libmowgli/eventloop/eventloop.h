@@ -118,7 +118,7 @@ typedef struct {
 
 struct _mowgli_eventloop {
 	time_t currtime;
-	time_t time_min;
+	time_t deadline;
 
 	const char *last_ran;
 

@@ -43,13 +43,13 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if (eventloop->time_min <= mowgli_eventloop_get_time(eventloop) || timer->when <= eventloop->time_min)
-		eventloop->time_min = timer->when;
+	if (eventloop->deadline <= mowgli_eventloop_get_time(eventloop) || timer->when <= eventloop->deadline)
+		eventloop->deadline = timer->when;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
 
 #ifdef DEBUG
-	mowgli_log("[timer(%p) add when:%d active:%d] [eventloop time_min:%d]", timer, timer->when, timer->active, eventloop->time_min);
+	mowgli_log("[timer(%p) add when:%d active:%d] [eventloop deadline:%d]", timer, timer->when, timer->active, eventloop->deadline);
 #endif
 
 	return timer;
@@ -101,7 +101,7 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 			timer->func(timer->arg);
 
 			/* invalidate eventloop sleep-until time */
-			eventloop->time_min = -1;
+			eventloop->deadline = -1;
 
 			/* event is scheduled more than once */
 			if (timer->frequency)
@@ -124,26 +124,26 @@ time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 
 	return_val_if_fail(eventloop != NULL, 0);
 
-	if (eventloop->time_min == -1)
+	if (eventloop->deadline == -1)
 	{
 		MOWGLI_ITER_FOREACH(n, eventloop->timer_list.head)
 		{
 			mowgli_eventloop_timer_t *timer = n->data;
 
-			if (timer->active && (timer->when < eventloop->time_min || eventloop->time_min == -1))
-				eventloop->time_min = timer->when;
+			if (timer->active && (timer->when < eventloop->deadline || eventloop->deadline == -1))
+				eventloop->deadline = timer->when;
 
 #ifdef DEBUG
-			mowgli_log("timer %p active:%d when:%ld time_min:%ld", timer, timer->active, timer->when, eventloop->time_min);
+			mowgli_log("timer %p active:%d when:%ld deadline:%ld", timer, timer->active, timer->when, eventloop->deadline);
 #endif
 		}
 	}
 
 #ifdef DEBUG
-	mowgli_log("eventloop time_min:%ld", eventloop->time_min);
+	mowgli_log("eventloop deadline:%ld", eventloop->deadline);
 #endif
 
-	return eventloop->time_min;
+	return eventloop->deadline;
 }
 
 /* finds an event in the table */
