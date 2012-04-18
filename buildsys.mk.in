@@ -21,6 +21,7 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
+V=1
 PACKAGE_NAME = @PACKAGE_NAME@
 PACKAGE_VERSION = @PACKAGE_VERSION@
 AS = @AS@
@@ -142,15 +143,36 @@ depend: pre-depend ${SRCS}
 		fi; \
 	fi
 
-.c.c.dep .cc.cc.dep .cxx.cxx.dep .m.m.dep .mm.mm.dep .S.S.dep:
-	${CPP} ${CPPFLAGS} -M $< | \
+.c.c.dep:
+	${CPP} ${CPPFLAGS} ${CFLAGS} -M $< | \
+	sed 's/^\([^\.]*\)\.o:/\1.o \1.lib.o \1.plugin.o:/' >$@ || \
+	{ rm -f $@; false; }
+
+.cc.cc.dep .cxx.cxx.dep:
+	${CPP} ${CPPFLAGS} ${CXXFLAGS} -M $< | \
+	sed 's/^\([^\.]*\)\.o:/\1.o \1.lib.o \1.plugin.o:/' >$@ || \
+	{ rm -f $@; false; }
+
+.m.m.dep:
+	${CPP} ${CPPFLAGS} ${OBJCFLAGS} -M $< | \
+	sed 's/^\([^\.]*\)\.o:/\1.o \1.lib.o \1.plugin.o:/' >$@ || \
+	{ rm -f $@; false; }
+
+.mm.mm.dep:
+	${CPP} ${CPPFLAGS} ${OBJCPPFLAGS} -M $< | \
+	sed 's/^\([^\.]*\)\.o:/\1.o \1.lib.o \1.plugin.o:/' >$@ || \
+	{ rm -f $@; false; }
+
+.S.S.dep:
+	${CPP} ${CPPFLAGS} ${ASFLAGS} -M $< | \
 	sed 's/^\([^\.]*\)\.o:/\1.o \1.lib.o \1.plugin.o:/' >$@ || \
 	{ rm -f $@; false; }
 
 pre-depend:
 
 ${PROG} ${PROG_NOINST}: ${EXT_DEPS} ${OBJS} ${OBJS_EXTRA}
-	${LINK_STATUS}
+	LDOBJS="${OBJS} ${OBJS_EXTRA}"; \
+	${LINK_STATUS}; \
 	if ${LD} -o $@ ${OBJS} ${OBJS_EXTRA} ${LDFLAGS} ${LIBS}; then \
 		${LINK_OK}; \
 	else \
@@ -174,6 +196,7 @@ ${JARFILE}: ${EXT_DEPS} ${JAR_MANIFEST} ${OBJS} ${OBJS_EXTRA}
 	fi
 
 ${SHARED_LIB} ${SHARED_LIB_NOINST}: ${EXT_DEPS} ${LIB_OBJS} ${LIB_OBJS_EXTRA}
+	LDOBJS="${LIB_OBJS} ${LIB_OBJS_EXTRA}"; \
 	${LINK_STATUS}; \
 	objs=""; \
 	ars=""; \
@@ -209,7 +232,8 @@ ${SHARED_LIB} ${SHARED_LIB_NOINST}: ${EXT_DEPS} ${LIB_OBJS} ${LIB_OBJS_EXTRA}
 	done
 
 ${PLUGIN} ${PLUGIN_NOINST}: ${EXT_DEPS} ${PLUGIN_OBJS}
-	${LINK_STATUS}
+	LDOBJS="${PLUGIN_OBJS}"; \
+	${LINK_STATUS}; \
 	objs=""; \
 	ars=""; \
 	for i in ${PLUGIN_OBJS}; do \
@@ -244,8 +268,9 @@ ${PLUGIN} ${PLUGIN_NOINST}: ${EXT_DEPS} ${PLUGIN_OBJS}
 	done
 
 ${STATIC_LIB} ${STATIC_LIB_NOINST}: ${EXT_DEPS} ${OBJS} ${OBJS_EXTRA}
-	${LINK_STATUS}
-	rm -f $@
+	LDOBJS="${OBJS} ${OBJS_EXTRA}"; \
+	${LINK_STATUS}; \
+	rm -f $@; \
 	objs=""; \
 	ars=""; \
 	for i in ${OBJS} ${OBJS_EXTRA}; do \
@@ -281,7 +306,8 @@ ${STATIC_LIB} ${STATIC_LIB_NOINST}: ${EXT_DEPS} ${OBJS} ${OBJS_EXTRA}
 	done
 
 ${STATIC_PIC_LIB} ${STATIC_PIC_LIB_NOINST}: ${EXT_DEPS} ${LIB_OBJS} ${LIB_OBJS_EXTRA}
-	${LINK_STATUS}
+	LDOBJS="${LIB_OBJS} ${LIB_OBJS_EXTRA}"; \
+	${LINK_STATUS}; \
 	rm -f $@
 	objs=""; \
 	ars=""; \
@@ -320,59 +346,72 @@ ${STATIC_PIC_LIB} ${STATIC_PIC_LIB_NOINST}: ${EXT_DEPS} ${LIB_OBJS} ${LIB_OBJS_E
 locales: ${MO_FILES}
 
 .c.o:
-	${COMPILE_STATUS}
-	if ${CC} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${CFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .c.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${CC} ${LIB_CFLAGS} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .c.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${CC} ${PLUGIN_CFLAGS} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${CFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
 	fi
 
 .cc.o .cxx.o:
-	${COMPILE_STATUS}
-	if ${CXX} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CXX}"; \
+	COMPILER_FLAGS="${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .cc.lib.o .cxx.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${CXX} ${LIB_CFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CXX}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .cc.plugin.o .cxx.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${CXX} ${PLUGIN_CFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${CXX}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
 	fi
 
 .d.o:
-	${COMPILE_STATUS}
-	if test x"$(basename ${DC})" = x"dmd"; then \
-		if ${DC} ${DFLAGS} -c -of$@ $<; then \
+	COMPILER="${DC}"; \
+	${COMPILE_STATUS}; \
+	if test x"$(basename ${COMPILER})" = x"dmd"; then \
+		if $${COMPILER} ${DFLAGS} -c -of$@ $<; then \
 			${COMPILE_OK}; \
 		else \
 			${COMPILE_FAILED}; \
 		fi \
 	else \
-		if ${DC} ${DFLAGS} -c -o $@ $<; then \
+		if $${COMPILER} ${DFLAGS} -c -o $@ $<; then \
 			${COMPILE_OK}; \
 		else \
 			${COMPILE_FAILED}; \
@@ -380,128 +419,162 @@ locales: ${MO_FILES}
 	fi
 
 .erl.beam:
-	${COMPILE_STATUS}
-	if ${ERLC} ${ERLCFLAGS} -o $@ $<; then \
+	COMPILER="${ERLC}"; \
+	COMPILER_FLAGS="${ERLCFLAGS} -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 
 .java.class:
-	${COMPILE_STATUS}
-	if ${JAVAC} ${JAVACFLAGS} $<; then \
+	COMPILER="${JAVAC}"; \
+	COMPILER_FLAGS="${JAVACFLAGS} $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS} $<; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 
 .m.o:
-	${COMPILE_STATUS}
-	if ${OBJC} ${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJC}"; \
+	COMPILER_FLAGS="${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .m.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${OBJC} ${LIB_CFLAGS} ${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJC}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .m.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${OBJC} ${PLUGIN_CFLAGS} ${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJC}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${OBJCFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
 	fi
 
 .mm.o:
-	${COMPILE_STATUS}
-	if ${OBJCXX} ${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJCXX}"; \
+	COMPILER_FLAGS="${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .mm.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${OBJCXX} ${LIB_CFLAGS} ${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJCXX}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .mm.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${OBJCXX} ${PLUGIN_CFLAGS} ${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${OBJCXX}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${OBJCXXFLAGS} ${OBJCFLAGS} ${CXXFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
 	fi
 
 .po.mo:
-	${COMPILE_STATUS}
-	if ${MSGFMT} -c -o $@ $<; then \
-		${COMPILE_OK}; \
+	COMPILER="${MSGFMT}"; \
+	COMPILER_FLAGS="-c -o $@ $<"; \
+	${COMPILE_RESOURCE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
+		${COMPILE_RESOURCE_OK}; \
 	else \
-		${COMPILE_FAILED}; \
+		${COMPILE_RESOURCE_FAILED}; \
 	fi
 
 .py.pyc:
-	${COMPILE_STATUS}
-	if ${PYTHON} ${PYTHON_FLAGS} -c "import py_compile; py_compile.compile('$<')"; then \
-		${COMPILE_OK}; \
+	COMPILER="${PYTHON}"; \
+	COMPILER_FLAGS="${PYTHON_FLAGS}"; \
+	${COMPILE_RESOURCE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS} -c "import py_compile; py_compile.compile('$<')"; then \
+		${COMPILE_RESOURCE_OK}; \
 	else \
-		${COMPILE_FAILED}; \
+		${COMPILE_RESOURCE_FAILED}; \
 	fi
 
 .rc.o .rc.lib.o .rc.plugin.o:
-	${COMPILE_STATUS}
-	if ${WINDRES} ${CPPFLAGS} -J rc -O coff -o $@ $<; then \
-		${COMPILE_OK}; \
+	COMPILER="${WINDRES}"; \
+	COMPILER_FLAGS="${CPPFLAGS} -J rc -O coff -o $@ $<"; \
+	${COMPILE_RESOURCE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
+		${COMPILE_RESOURCE_OK}; \
 	else \
-		${COMPILE_FAILED}; \
+		${COMPILE_RESOURCE_FAILED}; \
 	fi
 
 .S.o:
-	${COMPILE_STATUS}
-	if ${AS} ${ASFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${AS}"; \
+	COMPILER_FLAGS="${ASFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .S.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${AS} ${LIB_CFLAGS} ${ASFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${AS}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${ASFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .S.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${AS} ${PLUGIN_CFLAGS} ${ASFLAGS} ${CPPFLAGS} -c -o $@ $<; then \
+	COMPILER="${AS}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${ASFLAGS} ${CPPFLAGS} -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
 	fi
 
 .xpm.o:
-	${COMPILE_STATUS}
-	if ${CC} ${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<"; \
+	${COMPILE_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_OK}; \
 	else \
 		${COMPILE_FAILED}; \
 	fi
 .xpm.lib.o:
-	${COMPILE_LIB_STATUS}
-	if ${CC} ${LIB_CFLAGS} ${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${LIB_CFLAGS} ${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<"; \
+	${COMPILE_LIB_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_LIB_OK}; \
 	else \
 		${COMPILE_LIB_FAILED}; \
 	fi
 .xpm.plugin.o:
-	${COMPILE_PLUGIN_STATUS}
-	if ${CC} ${PLUGIN_CFLAGS} ${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<; then \
+	COMPILER="${CC}"; \
+	COMPILER_FLAGS="${PLUGIN_CFLAGS} ${CFLAGS} ${CPPFLAGS} -x c -c -o $@ $<"; \
+	${COMPILE_PLUGIN_STATUS}; \
+	if $${COMPILER} $${COMPILER_FLAGS}; then \
 		${COMPILE_PLUGIN_OK}; \
 	else \
 		${COMPILE_PLUGIN_FAILED}; \
@@ -715,6 +788,8 @@ distclean: clean
 		fi \
 	done
 
+ifndef V
+
 DIR_ENTER = printf "@TERM_EL@@TERM_SETAF6@Entering directory @TERM_BOLD@$$i@TERM_SGR0@@TERM_SETAF6@.@TERM_SGR0@\n"; cd $$i || exit $$?
 DIR_LEAVE = printf "@TERM_EL@@TERM_SETAF6@Leaving directory @TERM_BOLD@$$i@TERM_SGR0@@TERM_SETAF6@.@TERM_SGR0@\n"; cd .. || exit $$?
 DEPEND_STATUS = printf "@TERM_EL@@TERM_SETAF3@Generating dependencies...@TERM_SGR0@\r"
@@ -729,6 +804,9 @@ COMPILE_LIB_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to compile @T
 COMPILE_PLUGIN_STATUS = printf "@TERM_EL@@TERM_SETAF3@Compiling @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF3@ (plugin)...@TERM_SGR0@\r"
 COMPILE_PLUGIN_OK = printf "@TERM_EL@@TERM_SETAF2@Successfully compiled @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF2@ (plugin).@TERM_SGR0@\n"
 COMPILE_PLUGIN_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to compile @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF1@ (plugin)!@TERM_SGR0@\n"; exit $$err
+COMPILE_RESOURCE_STATUS = printf "@TERM_EL@@TERM_SETAF3@Compiling @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF3@ (resource)...@TERM_SGR0@\r"
+COMPILE_RESOURCE_OK = printf "@TERM_EL@@TERM_SETAF2@Successfully compiled @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF2@ (resource).@TERM_SGR0@\n"
+COMPILE_RESOURCE_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to compile @TERM_BOLD@$<@TERM_SGR0@@TERM_SETAF1@ (resource)!@TERM_SGR0@\n"; exit $$err
 LINK_STATUS = printf "@TERM_EL@@TERM_SETAF3@Linking @TERM_BOLD@$@@TERM_SGR0@@TERM_SETAF3@...@TERM_SGR0@\r"
 LINK_OK = printf "@TERM_EL@@TERM_SETAF2@Successfully linked @TERM_BOLD@$@@TERM_SGR0@@TERM_SETAF2@.@TERM_SGR0@\n"
 LINK_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to link @TERM_BOLD@$@@TERM_SGR0@@TERM_SETAF1@!@TERM_SGR0@\n"; exit $$err
@@ -737,5 +815,35 @@ INSTALL_OK = printf "@TERM_EL@@TERM_SETAF2@Successfully installed @TERM_BOLD@$$i
 INSTALL_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to install @TERM_BOLD@$$i@TERM_SGR0@@TERM_SETAF1@!@TERM_SGR0@\n"; exit $$err
 DELETE_OK = printf "@TERM_EL@@TERM_SETAF4@Deleted @TERM_BOLD@$$i@TERM_SGR0@@TERM_SETAF4@.@TERM_SGR0@\n"
 DELETE_FAILED = err=$$?; printf "@TERM_EL@@TERM_SETAF1@Failed to delete @TERM_BOLD@$$i@TERM_SGR0@@TERM_SETAF1@!@TERM_SGR0@\n"; exit $$err
+
+else
+
+DIR_ENTER = cd $$i || exit $$?
+DIR_LEAVE = cd .. || exit $$?
+DEPEND_STATUS = true
+DEPEND_OK = true
+DEPEND_FAILED = exit $$?
+COMPILE_STATUS = printf "CompileExe: $$COMPILER $${COMPILER_FLAGS}\n"
+COMPILE_OK = true
+COMPILE_FAILED = exit $$?
+COMPILE_LIB_STATUS = printf "CompileLib: $$COMPILER $${COMPILER_FLAGS}\n"
+COMPILE_LIB_OK = true
+COMPILE_LIB_FAILED = exit $$?
+COMPILE_PLUGIN_STATUS = printf "CompilePlugin: $$COMPILER $${COMPILER_FLAGS}\n"
+COMPILE_PLUGIN_OK = true
+COMPILE_PLUGIN_FAILED = exit $$?
+COMPILE_RESOURCE_STATUS = printf "CompileResource: $$COMPILER $${COMPILER_FLAGS}\n"
+COMPILE_RESOURCE_OK = true
+COMPILE_RESOURCE_FAILED = exit $$?
+LINK_STATUS = printf "Link: ${LD} $@ $$LDOBJS ${LDFLAGS} ${LIBS}\n"
+LINK_OK = true
+LINK_FAILED = exit $$?
+INSTALL_STATUS = printf "Install: $$i\n"
+INSTALL_OK = true
+INSTALL_FAILED = exit $$?
+DELETE_OK = printf "Delete: $$i\n"
+DELETE_FAILED = exit $$?
+
+endif
 
 include .deps
