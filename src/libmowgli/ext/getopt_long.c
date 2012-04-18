@@ -36,8 +36,8 @@
 int	mowgli_opterr = 1;		/* if error message should be printed */
 int	mowgli_optind = 1;		/* index into parent argv vector */
 int	mowgli_optopt = '?';		/* character checked for validity */
-int	mowgli_optreset;		/* reset getopt */
-char    *mowgli_optarg;			/* argument associated with option */
+int	mowgli_optreset = 0;		/* reset getopt */
+char    *mowgli_optarg = NULL;		/* argument associated with option */
 
 /* XXX: suppress const warnings */
 #define __UNCONST(a) ((void *)(unsigned long)(const void *)(a))
