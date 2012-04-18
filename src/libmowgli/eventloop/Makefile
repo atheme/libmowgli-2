@@ -12,4 +12,3 @@ include ../../../buildsys.mk
 includesubdir = $(PACKAGE_NAME)/eventloop
 
 CPPFLAGS += -I. -I.. -I../../.. -DMOWGLI_CORE
-

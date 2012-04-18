@@ -43,7 +43,7 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if (eventloop->time_min < mowgli_eventloop_get_time(eventloop) || timer->when < eventloop->time_min)
+	if (eventloop->time_min <= mowgli_eventloop_get_time(eventloop) || timer->when <= eventloop->time_min)
 		eventloop->time_min = timer->when;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
