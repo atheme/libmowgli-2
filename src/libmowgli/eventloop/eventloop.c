@@ -131,7 +131,10 @@ void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 
 	mowgli_mutex_lock(&eventloop->mutex);
 
-	eventloop->eventloop_ops->timeout_once(eventloop, timeout);
+	if (timeout >= 0)
+		eventloop->eventloop_ops->timeout_once(eventloop, timeout);
+	else
+		eventloop->eventloop_ops->run_once(eventloop);
 
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
