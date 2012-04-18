@@ -143,7 +143,7 @@ mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
 
 /*
  * mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict,
- *     const char *key)
+ *     const void *key)
  *
  * Gets a linear index number for key.
  *
@@ -158,7 +158,7 @@ mowgli_dictionary_get_comparator_func(mowgli_dictionary_t *dict)
  *     - rebuilds the linear index if the tree is marked as dirty.
  */
 int
-mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key)
+mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const void *key)
 {
 	mowgli_dictionary_elem_t *elem;
 
@@ -186,7 +186,7 @@ mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key)
 }
 
 /*
- * mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
+ * mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
  *
  * Retunes the tree, self-optimizing for the element which belongs to key.
  *
@@ -234,7 +234,7 @@ mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key)
  *     - a new root node is nominated.
  */
 void
-mowgli_dictionary_retune(mowgli_dictionary_t *dict, const char *key)
+mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
 {
 	mowgli_dictionary_elem_t n, *tn, *left, *right, *node;
 	ptrdiff_t ret;
@@ -688,7 +688,7 @@ void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
 }
 
 /*
- * mowgli_dictionary_find(mowgli_dictionary_t *dtree, const char *key)
+ * mowgli_dictionary_find(mowgli_dictionary_t *dtree, const void *key)
  *
  * Looks up a DTree node by name.
  *
@@ -703,7 +703,7 @@ void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - none
  */
-mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, const char *key)
+mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, const void *key)
 {
 	return_val_if_fail(dict != NULL, NULL);
 	return_val_if_fail(key != NULL, NULL);
@@ -718,7 +718,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, cons
 }
 
 /*
- * mowgli_dictionary_add(mowgli_dictionary_t *dtree, const char *key, void *data)
+ * mowgli_dictionary_add(mowgli_dictionary_t *dtree, const void *key, void *data)
  *
  * Creates a new DTree node and binds data to it.
  *
@@ -734,7 +734,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, cons
  * Side Effects:
  *     - data is inserted into the DTree.
  */
-mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const char *key, void *data)
+mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const void *key, void *data)
 {
 	mowgli_dictionary_elem_t *delem;
 
@@ -760,7 +760,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 }
 
 /*
- * mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
+ * mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
  *
  * Deletes data from a dictionary tree.
  *
@@ -778,7 +778,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
  * Notes:
  *     - the returned data needs to be mowgli_freed/released manually!
  */
-void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
+void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
 {
 	mowgli_dictionary_elem_t *delem = mowgli_dictionary_find(dtree, key);
 	void *data;
@@ -796,7 +796,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
 }
 
 /*
- * mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const char *key)
+ * mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key)
  *
  * Retrieves data from a dictionary.
  *
@@ -811,7 +811,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key)
  * Side Effects:
  *     - none
  */
-void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const char *key)
+void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key)
 {
 	mowgli_dictionary_elem_t *delem = mowgli_dictionary_find(dtree, key);
 

@@ -88,7 +88,7 @@ extern mowgli_dictionary_comparator_func_t mowgli_dictionary_get_comparator_func
  * mowgli_dictionary_get_linear_index() returns the linear index of an object in the
  * DTree structure.
  */
-extern int mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const char *key);
+extern int mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const void *key);
 
 /*
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls
@@ -144,22 +144,22 @@ extern void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
 /*
  * mowgli_dictionary_add() adds a key->value entry to the dictionary tree.
  */
-extern mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, const char *key, void *data);
+extern mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, const void *key, void *data);
 
 /*
  * mowgli_dictionary_find() returns a mowgli_dictionary_elem_t container from a dtree for key 'key'.
  */
-extern mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dtree, const char *key);
+extern mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dtree, const void *key);
 
 /*
  * mowgli_dictionary_find() returns data from a dtree for key 'key'.
  */
-extern void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const char *key);
+extern void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key);
 
 /*
  * mowgli_dictionary_delete() deletes a key->value entry from the dictionary tree.
  */
-extern void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const char *key);
+extern void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key);
 
 void mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, void *privdata), void *privdata);
 
