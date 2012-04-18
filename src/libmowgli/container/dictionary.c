@@ -32,7 +32,7 @@ struct mowgli_dictionary_
 	mowgli_dictionary_elem_t *root, *head, *tail;
 	unsigned int count;
 	char *id;
-	mowgli_boolean_t dirty;
+	bool dirty;
 };
 
 /*
@@ -179,7 +179,7 @@ mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const void *key)
 		for (delem = dict->head, i = 0; delem != NULL; delem = delem->next, i++)
 			delem->position = i;
 
-		dict->dirty = FALSE;
+		dict->dirty = false;
 	}
 
 	return elem->position;
@@ -339,7 +339,7 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict,
 	return_if_fail(dict != NULL);
 	return_if_fail(delem != NULL);
 
-	dict->dirty = TRUE;
+	dict->dirty = true;
 
 	dict->count++;
 
@@ -417,7 +417,7 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 {
 	mowgli_dictionary_elem_t *delem, *nextnode, *parentofnext;
 
-	dict->dirty = TRUE;
+	dict->dirty = true;
 
 	delem = dict->root;
 	if (delem == NULL)
@@ -502,7 +502,6 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
 		if (destroy_cb != NULL)
 			(*destroy_cb)(n, privdata);
 
-		mowgli_free(n->key);
 		mowgli_heap_free(elem_heap, n);
 	}
 
@@ -744,7 +743,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 	return_val_if_fail(mowgli_dictionary_find(dict, key) == NULL, NULL);
 
 	delem = mowgli_heap_alloc(elem_heap);
-	delem->key = strdup(key);
+	delem->key = key;
 	delem->data = data;
 
 	if (delem->key == NULL)
@@ -788,7 +787,6 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
 
 	data = delem->data;
 
-	mowgli_free(delem->key);
 	mowgli_dictionary_unlink_root(dtree);
 	mowgli_heap_free(elem_heap, delem);	
 
