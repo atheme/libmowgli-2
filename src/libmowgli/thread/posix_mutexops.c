@@ -26,47 +26,6 @@
 #ifndef _WIN32
 
 /*************
- * This implements native Sun/UnixWare threads.  Some other SVR4-based
- * environments attempted to make work-alikes, but those aren't guaranteed
- * to be supported.  This should work on SunOS 5.2 and UnixWare 7, and
- * anything later.
- *************/
-#if defined(__sun) || defined(__sco)
-
-static int mowgli_sun_mutex_create(mowgli_mutex_t *mutex)
-{
-	return mutex_init(&mutex->mutex, USYNC_THREAD, NULL);
-}
-
-static int mowgli_sun_mutex_lock(mowgli_mutex_t *mutex)
-{
-	return mutex_lock(&mutex->mutex);
-}
-
-static int mowgli_sun_mutex_trylock(mowgli_mutex_t *mutex)
-{
-	return mutex_trylock(&mutex->mutex);
-}
-
-static int mowgli_sun_mutex_unlock(mowgli_mutex_t *mutex)
-{
-	return mutex_unlock(&mutex->mutex);
-}
-
-static int mowgli_sun_mutex_destroy(mowgli_mutex_t *mutex)
-{
-	return mutex_destroy(&mutex->mutex);
-}
-
-const mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
-	.mutex_create = mowgli_sun_mutex_create,
-	.mutex_lock = mowgli_sun_mutex_lock,
-	.mutex_trylock = mowgli_sun_mutex_trylock,
-	.mutex_unlock = mowgli_sun_mutex_unlock,
-	.mutex_destroy = mowgli_sun_mutex_destroy,
-};
-
-/*************
  * This "default" implementation uses pthreads.  Care has been taken to
  * ensure it runs on POSIX 1003.4a (draft 4, aka DECthreads, aka what OSF/1,
  * Tru64, Ultrix, CMU Mach, and HP-UX use) as well as POSIX 1003.1c-1995.
@@ -75,7 +34,7 @@ const mowgli_mutex_ops_t _mowgli_sun_mutex_ops = {
  * it should be relatively easy to maintian d4 compatibility without
  * sacrificing any functionality.
  *************/
-#elif !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
+#if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
 
 static int mowgli_posix_mutex_create(mowgli_mutex_t *mutex)
 {

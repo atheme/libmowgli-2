@@ -25,8 +25,6 @@
 
 #if defined(_WIN32)
 extern const mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
-#elif defined(_sun) || defined(_sco)
-extern const mowgli_mutex_ops_t _mowgli_sun_mutex_ops;
 #else
 extern const mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
 #endif
@@ -43,10 +41,6 @@ static inline const mowgli_mutex_ops_t *get_mutex_platform(void)
 
 #if defined(_WIN32)
 	return &_mowgli_win32_mutex_ops;
-#endif
-
-#if defined(_sun) || defined(_sco)
-	return &_mowgli_sun_mutex_ops;
 #endif
 
 #if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
