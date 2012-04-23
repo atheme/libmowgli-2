@@ -232,12 +232,12 @@ extern int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffe
 extern int mowgli_vio_openssl_default_close(mowgli_vio_t *vio);
 #else
 #define NOSSLSUPPORT { mowgli_log("Attempting to use default OpenSSL op with no SSL support; this will not work!"); return -255; }
-static int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr) NOSSLSUPPORT
-static int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog) NOSSLSUPPORT
-static int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio) NOSSLSUPPORT
-static int mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len) NOSSLSUPPORT
-static int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len) NOSSLSUPPORT
-static int mowgli_vio_openssl_default_close(mowgli_vio_t *vio) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len) NOSSLSUPPORT
+static inline int mowgli_vio_openssl_default_close(mowgli_vio_t *vio) NOSSLSUPPORT
 #endif
 
 extern mowgli_vio_ops_t mowgli_vio_default_ops;
