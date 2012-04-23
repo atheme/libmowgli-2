@@ -31,6 +31,11 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf);
 
 static int mowgli_linebuf_error(mowgli_vio_t *vio);
 
+static mowgli_vio_evops_t linebuf_evops = {
+	.read_cb = mowgli_linebuf_read_data,
+	.write_cb = mowgli_linebuf_write_data
+};
+
 mowgli_linebuf_t *
 mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 {
@@ -68,7 +73,7 @@ void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventl
 	return_if_fail(linebuf->vio != NULL);
 	return_if_fail((linebuf->vio->flags & MOWGLI_VIO_FLAGS_ISCLOSED) == 0);
 
-	mowgli_vio_eventloop_attach(linebuf->vio, eventloop);
+	mowgli_vio_eventloop_attach(linebuf->vio, eventloop, &linebuf_evops);
 	mowgli_pollable_setselect(eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 	mowgli_pollable_setselect(eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 

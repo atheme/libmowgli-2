@@ -141,7 +141,7 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 		}
 
 		state->eventloop = eventloop;
-		mowgli_vio_eventloop_attach(state->vio, state->eventloop);
+		mowgli_vio_eventloop_attach(state->vio, state->eventloop, NULL);
 		mowgli_pollable_setselect(state->eventloop, state->vio->io, MOWGLI_EVENTLOOP_IO_READ, res_readreply);
 		state->timeout_resolver_timer = mowgli_timer_add(state->eventloop, "timeout_resolver", timeout_resolver, dns, 1);
 	}
