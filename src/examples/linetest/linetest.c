@@ -78,7 +78,7 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	/* Wrap the VIO object */
 	if (use_ssl)
 	{
-		if (mowgli_vio_openssl_setssl(linebuf->vio, NULL) != 0)
+		if (mowgli_vio_openssl_setssl(linebuf->vio, NULL, NULL) != 0)
 			return NULL;
 	}
 
