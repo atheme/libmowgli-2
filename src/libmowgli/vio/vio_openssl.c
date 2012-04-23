@@ -36,14 +36,8 @@ typedef struct {
 	mowgli_vio_ssl_settings_t settings;
 } mowgli_ssl_connection_t;
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
-static int mowgli_vio_openssl_listen(mowgli_vio_t *vio, int backlog);
-static int mowgli_vio_openssl_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection);
-static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len);
-static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len);
 static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const void *writebuf, size_t len);
-static int mowgli_vio_openssl_close(mowgli_vio_t *vio);
 
 static mowgli_heap_t *ssl_heap = NULL;
 
@@ -66,12 +60,12 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 		connection->settings.ssl_version = MOWGLI_VIO_SSLFLAGS_SSLV3;
 
 	/* Change ops */
-	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_connect);
-	mowgli_vio_set_op(vio, read, mowgli_vio_openssl_read);
-	mowgli_vio_set_op(vio, write, mowgli_vio_openssl_write);
-	mowgli_vio_set_op(vio, close, mowgli_vio_openssl_close);
-	mowgli_vio_set_op(vio, accept, mowgli_vio_openssl_accept);
-	mowgli_vio_set_op(vio, listen, mowgli_vio_openssl_listen);
+	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_default_connect);
+	mowgli_vio_set_op(vio, read, mowgli_vio_openssl_default_read);
+	mowgli_vio_set_op(vio, write, mowgli_vio_openssl_default_write);
+	mowgli_vio_set_op(vio, close, mowgli_vio_openssl_default_close);
+	mowgli_vio_set_op(vio, accept, mowgli_vio_openssl_default_accept);
+	mowgli_vio_set_op(vio, listen, mowgli_vio_openssl_default_listen);
 
 	/* SSL setup */
 	if (!openssl_init)
@@ -99,7 +93,7 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 	return connection->ssl_context;
 }
 
-static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
+int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 	mowgli_ssl_connection_t *connection = vio->privdata;
@@ -128,7 +122,7 @@ static int mowgli_vio_openssl_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *
 	return mowgli_vio_openssl_client_handshake(vio, connection);
 }
 
-static int mowgli_vio_openssl_listen(mowgli_vio_t *vio, int backlog)
+int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 	mowgli_ssl_connection_t *connection = vio->privdata;
@@ -187,7 +181,7 @@ static int mowgli_vio_openssl_listen(mowgli_vio_t *vio, int backlog)
 	return 0;
 }
 
-static int mowgli_vio_openssl_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
+int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
 	int fd;
 	int ret;
@@ -327,13 +321,13 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 #define MOWGLI_VIO_SSL_DOREAD true
 #define MOWGLI_VIO_SSL_DOWRITE false
 
-static int mowgli_vio_openssl_read(mowgli_vio_t *vio, void *buffer, size_t len)
+int mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOREAD, vio, buffer, NULL, len);
 }
 
-static int mowgli_vio_openssl_write(mowgli_vio_t *vio, const void *buffer, size_t len)
+int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOWRITE, vio, NULL, buffer, len);
@@ -405,7 +399,7 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 	return ret;
 }
 
-static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
+int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 {
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
@@ -419,6 +413,7 @@ static int mowgli_vio_openssl_close(mowgli_vio_t *vio)
 
 	MOWGLI_VIO_SET_CLOSED(vio);
 
+	/* FIXME - doesn't verify a proper SSL shutdown! */
 	close(vio->fd);
 	return 0;
 }
