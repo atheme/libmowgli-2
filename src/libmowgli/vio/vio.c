@@ -82,23 +82,36 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 
 void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
 {
-	vio->io = mowgli_pollable_create(eventloop, vio->fd, vio->userdata);
-	if (vio->io != NULL)
+	const int fd = vio->fd;
+	
+	return_if_fail(vio);
+	return_if_fail(vio->eventloop);
+
+	if ((vio->io = mowgli_pollable_create(eventloop, fd, vio->userdata)) != NULL)
 	{
 		vio->eventloop = eventloop;
 		/* You're probably going to want this */
 		mowgli_pollable_set_nonblocking(vio->io, true);
 	}
 	else
+	{
 		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", vio);
+		vio->fd = fd; /* May have been clobbered */
+	}
 }
 
 void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 {
+	const int fd = mowgli_vio_getfd(vio);
+
+	return_if_fail(vio != NULL);
 	return_if_fail(vio->io != NULL);
 	return_if_fail(vio->eventloop != NULL);
 
 	mowgli_pollable_destroy(vio->eventloop, vio->io);
+
+	vio->eventloop = NULL;
+	vio->fd = fd;
 }
 
 void mowgli_vio_destroy(mowgli_vio_t *vio)

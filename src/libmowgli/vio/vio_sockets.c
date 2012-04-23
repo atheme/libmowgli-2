@@ -50,9 +50,11 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 
 int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
+	const int fd = mowgli_vio_getfd(vio);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
 
-	if (bind(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
+	if (bind(fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
 		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
@@ -63,9 +65,11 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 
 int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 {
+	const int fd = mowgli_vio_getfd(vio);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 
-	if (listen(vio->fd, backlog) < 0)
+	if (listen(fd, backlog) < 0)
 		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, true);
@@ -78,7 +82,8 @@ int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 
 int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
-	int fd;
+	const int fd = mowgli_vio_getfd(vio);
+	int afd;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_ACCEPT;
 
@@ -90,7 +95,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((fd = accept(vio->fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((afd = accept(fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -98,7 +103,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 			return 0;
 	}
 
-	newvio->fd = fd;
+	newvio->fd = afd;
 
 	/* The new VIO object is most certainly not a server */
 	mowgli_vio_setflag(newvio, MOWGLI_VIO_FLAGS_ISCLIENT, true);
@@ -110,9 +115,11 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 
 int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
+	const int fd = mowgli_vio_getfd(vio);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
+	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -136,13 +143,14 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 
 int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recv(vio->fd, buffer, len, 0)) < 0)
+	if ((ret = (int)recv(fd, buffer, len, 0)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -176,13 +184,14 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)send(vio->fd, buffer, len, 0)) == -1)
+	if ((ret = (int)send(fd, buffer, len, 0)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -206,13 +215,14 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 
 int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)sendto(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
+	if ((ret = (int)sendto(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -235,13 +245,14 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len,
 
 int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_vio_sockaddr_t *addr)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recvfrom(vio->fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
+	if ((ret = (int)recvfrom(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -314,11 +325,13 @@ int mowgli_vio_default_error(mowgli_vio_t *vio)
 
 int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
+	const int fd = mowgli_vio_getfd(vio);
+
 	MOWGLI_VIO_SET_CLOSED(vio);
 #ifndef _WIN32
-	close(vio->fd);
+	close(fd);
 #else
-	closesocket(vio->fd);
+	closesocket(fd);
 #endif
 	return 0;
 }

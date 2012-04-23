@@ -95,10 +95,12 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 
 int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
-	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
+	const int fd = mowgli_vio_getfd(vio);
 	mowgli_ssl_connection_t *connection = vio->privdata;
+	
+	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(vio->fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
+	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -124,9 +126,11 @@ int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t 
 
 int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 {
-	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	const SSL_METHOD *method;
+	const int fd = mowgli_vio_getfd(vio);
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 
 	switch (connection->settings.ssl_version)
 	{
@@ -169,10 +173,10 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 	if (SSL_CTX_use_PrivateKey_file(connection->ssl_context, connection->settings.privatekey_path, SSL_FILETYPE_PEM) != 1)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
-	if (listen(vio->fd, backlog) != 0)
+	if (listen(fd, backlog) != 0)
 		return mowgli_vio_err_errcode(vio, strerror, errno);
 
-	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
+	if (!SSL_set_fd(connection->ssl_handle, fd))
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSERVER, true);
@@ -183,7 +187,8 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 
 int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
-	int fd;
+	const int fd = mowgli_vio_getfd(vio);
+	int afd;
 	int ret;
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	mowgli_ssl_connection_t *newconnection;
@@ -198,7 +203,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((fd = accept(vio->fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((afd = accept(fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -206,14 +211,14 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 			return 0;
 	}
 
-	newvio->fd = fd;
+	newvio->fd = afd;
 
 	mowgli_vio_openssl_setssl(newvio, &connection->settings);
 	newconnection = newvio->privdata;
 	newconnection->ssl_context = connection->ssl_context;
 	newconnection->ssl_handle = SSL_new(newconnection->ssl_context);
 	
-	if (!SSL_set_fd(newconnection->ssl_handle, fd))
+	if (!SSL_set_fd(newconnection->ssl_handle, afd))
 		return mowgli_vio_err_sslerrcode(newvio, ERR_get_error());
 
 	if ((ret = SSL_accept(newconnection->ssl_handle)) != 1)
@@ -255,6 +260,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 
 static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 	const SSL_METHOD *method;
 
@@ -289,11 +295,11 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	
 	SSL_set_connect_state(connection->ssl_handle);
 	
-	if (!SSL_set_fd(connection->ssl_handle, vio->fd))
+	if (!SSL_set_fd(connection->ssl_handle, fd))
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
-	/* XXX not what we want for blocking sockets if they're in use! */
-	SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
+	if (vio->eventloop)
+		SSL_CTX_set_mode(connection->ssl_context, SSL_MODE_ENABLE_PARTIAL_WRITE);
 
 	if ((ret = SSL_connect(connection->ssl_handle)) != 1)
 	{
@@ -401,6 +407,7 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 
 int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 {
+	const int fd = mowgli_vio_getfd(vio);
 	mowgli_ssl_connection_t *connection = vio->privdata;
 
 	return_val_if_fail(connection->ssl_handle != NULL, -1);
@@ -414,7 +421,7 @@ int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 	MOWGLI_VIO_SET_CLOSED(vio);
 
 	/* FIXME - doesn't verify a proper SSL shutdown! */
-	close(vio->fd);
+	close(fd);
 	return 0;
 }
 

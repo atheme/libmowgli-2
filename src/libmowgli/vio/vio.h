@@ -92,8 +92,10 @@ typedef struct {
 struct _mowgli_vio {
 	mowgli_vio_ops_t ops;
 
-	mowgli_eventloop_io_t *io;
-	mowgli_descriptor_t fd;
+	union {
+		mowgli_eventloop_io_t *io;
+		mowgli_descriptor_t fd;
+	};
 
 	mowgli_eventloop_t *eventloop;
 
@@ -101,7 +103,7 @@ struct _mowgli_vio {
 
 	mowgli_vio_error_t error;
 
-	int flags;
+	unsigned int flags;
 
 	void *userdata;
 	void *privdata;
@@ -149,6 +151,22 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 		vio->flags |= flag;
 	else
 		vio->flags &= ~flag;
+}
+
+
+/* Get file descriptor */
+static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
+{
+	return_val_if_fail(vio, 0);
+
+	if (vio->eventloop)
+	{
+		mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(vio->io);
+		if (pollable)
+			return pollable->fd;
+	}
+
+	return vio->fd;
 }
 
 
