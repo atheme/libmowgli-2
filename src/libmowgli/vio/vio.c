@@ -63,6 +63,11 @@ mowgli_vio_evops_t mowgli_vio_default_evops = {
 	.write_cb = nullio_func
 };
 
+/* mowgli_vio_create - create a VIO object on the heap
+ *
+ * inputs - userdata for the VIO object
+ * outputs - a VIO object
+ */
 mowgli_vio_t * mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
@@ -79,6 +84,12 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
 	return vio;
 }
 
+/* mowgli_vio_init - initalise a VIO object previously allocated
+ * only use this if you know what you're doing, otherwise use mowgli_vio_create
+ *
+ * inputs - VIO object, userdata
+ * outputs - None
+ */
 void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 {
 	vio->fd = -1;
@@ -91,6 +102,11 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 	vio->userdata = userdata;
 }
 
+/* mowgli_vio_eventloop_attach - attach a VIO object to an eventloop
+ *
+ * inputs - VIO object, eventloop, ops to use for the eventloop
+ * outputs - None
+ */
 void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
 {
 	const int fd = vio->fd;
@@ -117,6 +133,11 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	}
 }
 
+/* mowgli_vio_eventloop_detach - detach VIO object from eventloop
+ *
+ * inputs - VIO object
+ * output - None
+ */
 void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 {
 	const int fd = mowgli_vio_getfd(vio);
@@ -131,6 +152,11 @@ void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 	vio->fd = fd;
 }
 
+/* mowgli_vio_destroy - eliminate a VIO object
+ *
+ * inputs - VIO object
+ * output - None
+ */
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
 	mowgli_vio_eventloop_detach(vio);
@@ -139,6 +165,12 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
 		mowgli_heap_free(vio_heap, vio);
 }
 
+/* mowgli_vio_err_errcode - Signal an error using the specified char *foo(int err) callback
+ * Usually the callback can be strerror, but it can use anything else that fits the mould.
+ *
+ * inputs - VIO object, callback, error code.
+ * outputs - Error code from mowgli_vio_error function, any output to terminal/log files/etc.
+ */
 int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode)
 {
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
@@ -147,6 +179,11 @@ int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int er
 	return mowgli_vio_error(vio);
 }
 
+/* mowgli_vio_err_sslerrcode - Signal an SSL error
+ *
+ * inputs - VIO object, error code
+ * outputs - Error code from mowgli_vio_error function, any output to terminal/log files/etc.
+ */
 #ifdef HAVE_OPENSSL
 
 int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)

@@ -22,16 +22,19 @@
 /* Types and structs */
 typedef struct _mowgli_vio mowgli_vio_t;
 
+/* Error type */
 typedef enum {
-	MOWGLI_VIO_ERR_NONE = 0,
-	MOWGLI_VIO_ERR_REMOTE_HANGUP,
-	MOWGLI_VIO_ERR_ERRCODE,
-	MOWGLI_VIO_ERR_API,
-	MOWGLI_VIO_ERR_CUSTOM,
+	MOWGLI_VIO_ERR_NONE = 0,	/* Wat, no error. */
+	MOWGLI_VIO_ERR_REMOTE_HANGUP,	/* Remote end hung up on us, how rude */
+	MOWGLI_VIO_ERR_ERRCODE,		/* An errno error or something like that */
+	MOWGLI_VIO_ERR_API,		/* Programmer was a dumbass */
+	MOWGLI_VIO_ERR_CUSTOM,		/* Use this for custom errors */
 } mowgli_vio_error_type_t;
 
+/* Errors with specific functions correspondng to the VIO op it's named
+ * after */
 typedef enum {
-	MOWGLI_VIO_ERR_OP_NONE = 0,
+	MOWGLI_VIO_ERR_OP_NONE = 0,	/* Wat. */
 	MOWGLI_VIO_ERR_OP_SOCKET,
 	MOWGLI_VIO_ERR_OP_LISTEN,
 	MOWGLI_VIO_ERR_OP_ACCEPT,
@@ -47,24 +50,31 @@ typedef enum {
 typedef struct _mowgli_vio_error {
 	mowgli_vio_error_op_t op;
 	mowgli_vio_error_type_t type;
-	int code;
-	char string[128];
+	unsigned long code;	/* Unsigned long for OpenSSL fuckery */
+	char string[128];	/* Friendly name for error */
 } mowgli_vio_error_t;
 
+/* Custom sockaddr member to have a uniform sockaddr as opposed to the
+ * bullshit in the Berkeley sockets API with struct sockaddr/struct
+ * sockaddr_storage/struct sockaddr_in/struct sockaddr_in6 and associated
+ * API inconsistency and braindamage
+ */
 typedef struct _mowgli_vio_sockaddr {
 	struct sockaddr_storage addr;
 	socklen_t addrlen;
 } mowgli_vio_sockaddr_t;
 
 #ifndef INET6_ADDRSTRLEN
-#define INET6_ADDRSTRLEN 46
+#define INET6_ADDRSTRLEN 46	/* Good enough I tell you */
 #endif
 
+/* Socket data */
 typedef struct _mowgli_vio_sockdata {
 	char host[INET6_ADDRSTRLEN];	/* max length of IPv6 address */
 	uint16_t port;
 } mowgli_vio_sockdata_t;
 
+/* Various typedefs bleh */
 typedef int mowgli_vio_func_t(mowgli_vio_t *);
 typedef int mowgli_vio_bind_connect_func_t(mowgli_vio_t *, mowgli_vio_sockaddr_t *);
 typedef int mowgli_vio_read_func_t(mowgli_vio_t *, void *, size_t);
@@ -77,6 +87,7 @@ typedef int mowgli_vio_listen_func_t(mowgli_vio_t *, int);
 typedef int mowgli_vio_socket_func_t(mowgli_vio_t *, int, int, int);
 typedef int mowgli_vio_seek_func_t(mowgli_vio_t *, long, int);
 
+/* These are workalikes vis-a-vis the Berkeley sockets API */
 typedef struct {
 	mowgli_vio_socket_func_t *socket;
 	mowgli_vio_bind_connect_func_t *bind;
@@ -93,32 +104,48 @@ typedef struct {
 	mowgli_vio_func_t *tell;
 } mowgli_vio_ops_t;
 
+/* Callbacks for eventloop stuff */
 typedef struct {
 	mowgli_eventloop_io_cb_t *read_cb;
 	mowgli_eventloop_io_cb_t *write_cb;
 } mowgli_vio_evops_t;
 
 struct _mowgli_vio {
-	mowgli_vio_ops_t *ops;
-	mowgli_vio_evops_t *evops;
+	mowgli_vio_ops_t *ops;		/* VIO operations */
+	mowgli_vio_evops_t *evops;	/* Eventloop operations */
 
+	/* eventloop IO object or descriptor
+	 * If the eventloop member is non-null use io
+	 * else use fd
+	 */
 	union {
 		mowgli_eventloop_io_t *io;
 		mowgli_descriptor_t fd;
 	};
 
+	/* Eventloop object we're attached to */
 	mowgli_eventloop_t *eventloop;
 
+	/* struct sockaddr portable workalike -- usage is
+	 * context specific.
+	 *
+	 * For accept()'ed VIO objects, this is the client's
+	 * struct sockaddr stuff, for connect()'ed objects it
+	 * is the remote end's sockaddr (even with previous call
+	 * to bind, for bind()'ed objects it is the sockaddr passed
+	 * to bind
+	 */
 	mowgli_vio_sockaddr_t addr;
 
-	mowgli_vio_error_t error;
+	mowgli_vio_error_t error; /* Error information lives here */
 
-	unsigned int flags;
+	unsigned int flags;	/* Connection flags */
 
-	void *userdata;
-	void *privdata;
+	void *userdata;		/* User data for VIO object */
+	void *privdata;		/* Private data for stuff like SSL */
 };
 
+/* SSL settings... members subject to change */
 typedef struct _mowgli_vio_ssl_settings {
 	char cert_path[FILENAME_MAX];
 	char privatekey_path[FILENAME_MAX];
@@ -240,13 +267,17 @@ static inline int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void
 static inline int mowgli_vio_openssl_default_close(mowgli_vio_t *vio) NOSSLSUPPORT
 #endif
 
+/* Default ops -- change these if you want something besides the default */
 extern mowgli_vio_ops_t mowgli_vio_default_ops;
+
+/* Default evops -- they do nothing unless you change them */
 extern mowgli_vio_evops_t mowgli_vio_default_evops;
 
 
 /* Sundry operations on vio functables */
 #define mowgli_vio_set_op(vio, op, func) vio->ops->op = func;
 
+/* Wrappers for the VIO ops */
 #define mowgli_vio_socket(vio, ...)	vio->ops->socket(vio, __VA_ARGS__)
 #define mowgli_vio_listen(vio, ...)	vio->ops->listen(vio, __VA_ARGS__)
 #define mowgli_vio_bind(vio, ...)	vio->ops->bind(vio, __VA_ARGS__)
