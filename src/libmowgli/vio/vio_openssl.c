@@ -43,7 +43,9 @@ static mowgli_heap_t *ssl_heap = NULL;
 
 static bool openssl_init = false;
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings)
+static mowgli_vio_ops_t *openssl_ops = NULL;
+
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
 {
 	mowgli_ssl_connection_t *connection; 
 
@@ -58,6 +60,19 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 	else
 		/* Greatest compat without being terribly insecure */
 		connection->settings.ssl_version = MOWGLI_VIO_SSLFLAGS_SSLV3;
+
+	if (ops == NULL)
+	{
+		if (!openssl_ops)
+		{
+			openssl_ops = mowgli_alloc(sizeof(mowgli_vio_ops_t));
+			memcpy(openssl_ops, &mowgli_vio_default_ops, sizeof(mowgli_vio_ops_t));
+		}
+
+		vio->ops = openssl_ops;
+	}
+	else
+		vio->ops = ops;
 
 	/* Change ops */
 	mowgli_vio_set_op(vio, connect, mowgli_vio_openssl_default_connect);
@@ -213,7 +228,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 
 	newvio->fd = afd;
 
-	mowgli_vio_openssl_setssl(newvio, &connection->settings);
+	mowgli_vio_openssl_setssl(newvio, &connection->settings, vio->ops);
 	newconnection = newvio->privdata;
 	newconnection->ssl_context = connection->ssl_context;
 	newconnection->ssl_handle = SSL_new(newconnection->ssl_context);

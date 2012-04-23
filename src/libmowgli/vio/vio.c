@@ -52,6 +52,17 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 	.tell = mowgli_vio_default_tell,
 };
 
+static void nullio_func(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+{
+	mowgli_log("NULLOP for vio::eventloop called");
+}
+
+/* Null ops */
+mowgli_vio_evops_t mowgli_vio_default_evops = {
+	.read_cb = nullio_func,
+	.write_cb = nullio_func
+};
+
 mowgli_vio_t * mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
@@ -75,12 +86,12 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 	vio->flags = 0;
 
 	/* Default ops */
-	vio->ops = mowgli_vio_default_ops;
+	vio->ops = &mowgli_vio_default_ops;
 
 	vio->userdata = userdata;
 }
 
-void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop)
+void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
 {
 	const int fd = vio->fd;
 	
@@ -92,6 +103,12 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 		vio->eventloop = eventloop;
 		/* You're probably going to want this */
 		mowgli_pollable_set_nonblocking(vio->io, true);
+
+		if (evops)
+			vio->evops = evops;
+		else
+			vio->evops = &mowgli_vio_default_evops;
+			
 	}
 	else
 	{

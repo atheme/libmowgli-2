@@ -23,7 +23,7 @@
 typedef struct _mowgli_vio mowgli_vio_t;
 
 typedef enum {
-	MOWGLI_VIO_ERR_NONE,
+	MOWGLI_VIO_ERR_NONE = 0,
 	MOWGLI_VIO_ERR_REMOTE_HANGUP,
 	MOWGLI_VIO_ERR_ERRCODE,
 	MOWGLI_VIO_ERR_API,
@@ -31,7 +31,7 @@ typedef enum {
 } mowgli_vio_error_type_t;
 
 typedef enum {
-	MOWGLI_VIO_ERR_OP_NONE,
+	MOWGLI_VIO_ERR_OP_NONE = 0,
 	MOWGLI_VIO_ERR_OP_SOCKET,
 	MOWGLI_VIO_ERR_OP_LISTEN,
 	MOWGLI_VIO_ERR_OP_ACCEPT,
@@ -56,8 +56,12 @@ typedef struct _mowgli_vio_sockaddr {
 	socklen_t addrlen;
 } mowgli_vio_sockaddr_t;
 
+#ifndef INET6_ADDRSTRLEN
+#define INET6_ADDRSTRLEN 46
+#endif
+
 typedef struct _mowgli_vio_sockdata {
-	char host[39];	/* max length of IPv6 address */
+	char host[INET6_ADDRSTRLEN];	/* max length of IPv6 address */
 	uint16_t port;
 } mowgli_vio_sockdata_t;
 
@@ -89,8 +93,14 @@ typedef struct {
 	mowgli_vio_func_t *tell;
 } mowgli_vio_ops_t;
 
+typedef struct {
+	mowgli_eventloop_io_cb_t *read_cb;
+	mowgli_eventloop_io_cb_t *write_cb;
+} mowgli_vio_evops_t;
+
 struct _mowgli_vio {
-	mowgli_vio_ops_t ops;
+	mowgli_vio_ops_t *ops;
+	mowgli_vio_evops_t *evops;
 
 	union {
 		mowgli_eventloop_io_t *io;
@@ -184,7 +194,7 @@ extern mowgli_vio_t * mowgli_vio_create(void *userdata);
 extern void mowgli_vio_init(mowgli_vio_t *vio, void *userdata);
 extern void mowgli_vio_destroy(mowgli_vio_t *vio);
 
-extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop);
+extern void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops);
 extern void mowgli_vio_eventloop_detach(mowgli_vio_t *vio);
 
 extern mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port);
@@ -208,7 +218,7 @@ extern int mowgli_vio_default_tell(mowgli_vio_t *vio);
 extern int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode);
 extern int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode);
 
-extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings);
+extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops);
 /* These are void ptr's so they can be null ops if SSL isn't available */
 extern void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
@@ -231,24 +241,25 @@ static int mowgli_vio_openssl_default_close(mowgli_vio_t *vio) NOSSLSUPPORT
 #endif
 
 extern mowgli_vio_ops_t mowgli_vio_default_ops;
+extern mowgli_vio_evops_t mowgli_vio_default_evops;
 
 
 /* Sundry operations on vio functables */
-#define mowgli_vio_set_op(vio, op, func) vio->ops.op = func;
+#define mowgli_vio_set_op(vio, op, func) vio->ops->op = func;
 
-#define mowgli_vio_socket(vio, ...)	vio->ops.socket(vio, __VA_ARGS__)
-#define mowgli_vio_listen(vio, ...)	vio->ops.listen(vio, __VA_ARGS__)
-#define mowgli_vio_bind(vio, ...)	vio->ops.bind(vio, __VA_ARGS__)
-#define mowgli_vio_accept(vio, ...)	vio->ops.accept(vio, __VA_ARGS__)
-#define mowgli_vio_connect(vio, ...)	vio->ops.connect(vio, __VA_ARGS__)
-#define mowgli_vio_read(vio, ...)	vio->ops.read(vio, __VA_ARGS__)
-#define mowgli_vio_write(vio, ...)	vio->ops.write(vio, __VA_ARGS__)
-#define mowgli_vio_sendto(vio, ...)	vio->ops.sendto(vio, __VA_ARGS__)
-#define mowgli_vio_recvfrom(vio, ...)	vio->ops.recvfrom(vio, __VA_ARGS__)
-#define mowgli_vio_error(vio)		vio->ops.error(vio);
-#define mowgli_vio_close(vio)		vio->ops.close(vio);
-#define mowgli_vio_seek(vio, ...)	vio->ops.seek(vio, __VA_ARGS__)
-#define mowgli_vio_tell(vio)		vio->ops.tell(vio)
+#define mowgli_vio_socket(vio, ...)	vio->ops->socket(vio, __VA_ARGS__)
+#define mowgli_vio_listen(vio, ...)	vio->ops->listen(vio, __VA_ARGS__)
+#define mowgli_vio_bind(vio, ...)	vio->ops->bind(vio, __VA_ARGS__)
+#define mowgli_vio_accept(vio, ...)	vio->ops->accept(vio, __VA_ARGS__)
+#define mowgli_vio_connect(vio, ...)	vio->ops->connect(vio, __VA_ARGS__)
+#define mowgli_vio_read(vio, ...)	vio->ops->read(vio, __VA_ARGS__)
+#define mowgli_vio_write(vio, ...)	vio->ops->write(vio, __VA_ARGS__)
+#define mowgli_vio_sendto(vio, ...)	vio->ops->sendto(vio, __VA_ARGS__)
+#define mowgli_vio_recvfrom(vio, ...)	vio->ops->recvfrom(vio, __VA_ARGS__)
+#define mowgli_vio_error(vio)		vio->ops->error(vio);
+#define mowgli_vio_close(vio)		vio->ops->close(vio);
+#define mowgli_vio_seek(vio, ...)	vio->ops->seek(vio, __VA_ARGS__)
+#define mowgli_vio_tell(vio)		vio->ops->tell(vio)
 
 #endif
 
