@@ -147,8 +147,8 @@ struct _mowgli_vio {
 
 /* SSL settings... members subject to change */
 typedef struct _mowgli_vio_ssl_settings {
-	char cert_path[FILENAME_MAX];
-	char privatekey_path[FILENAME_MAX];
+	const char *cert_path;
+	const char *privatekey_path;
 	int ssl_version;
 	int (*password_func)(char *, int, int, void *);
 	int (*verify_func)(int, void *);
