@@ -112,7 +112,13 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	const int fd = vio->fd;
 	
 	return_if_fail(vio);
-	return_if_fail(vio->eventloop);
+
+	/* Check for previous attachment */
+	if (vio->eventloop)
+	{
+		mowgli_log("VIO object [%p] is already attached to eventloop [%p]; attempted to attach new eventloop [%p]", vio, vio->eventloop, eventloop);
+		return;
+	}
 
 	if ((vio->io = mowgli_pollable_create(eventloop, fd, vio->userdata)) != NULL)
 	{
