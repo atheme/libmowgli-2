@@ -215,6 +215,24 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDREAD, false);	\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 
+#define MOWGLI_VIO_SETREAD(vio)							\
+	if (vio->eventloop && vio->io && vio->evops && vio->evops->read_cb)	\
+	{   									\
+		mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, vio->evops->read_cb); \
+	}
+
+#define MOWGLI_VIO_SETWRITE(vio)						\
+	if (vio->eventloop && vio->io && vio->evops && vio->evops->write_cb)	\
+	{									\
+		 mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_WRITE, vio->evops->write_cb); \
+	}
+
+#define MOWGLI_VIO_UNSETWRITE(vio)	\
+	if (vio->eventloop && vio->io)	\
+	{				\
+		mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL); \
+	}
+
 
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);

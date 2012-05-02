@@ -244,9 +244,11 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		{
 		case SSL_ERROR_WANT_READ:
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+			MOWGLI_VIO_SETREAD(vio)
 			return 0;
 		case SSL_ERROR_WANT_WRITE:
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+			MOWGLI_VIO_SETWRITE(vio)
 			return 0;
 		case SSL_ERROR_ZERO_RETURN:
 			return 0;
@@ -320,9 +322,15 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	{
 		int err = SSL_get_error(connection->ssl_handle, ret);
 		if (err == SSL_ERROR_WANT_READ)
+		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+			MOWGLI_VIO_SETREAD(vio)
+		}
 		else if (err == SSL_ERROR_WANT_WRITE)
+		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+			MOWGLI_VIO_SETWRITE(vio)
+		}
 		else if (err == SSL_ERROR_WANT_CONNECT)
 		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
@@ -371,7 +379,10 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 	if(read)
 		ret = (int)SSL_read(connection->ssl_handle, readbuf, len);
 	else
+	{
 		ret = (int)SSL_write(connection->ssl_handle, writebuf, len);
+		MOWGLI_VIO_UNSETWRITE(vio)
+	}
 
 	if (ret < 0)
 	{
@@ -379,9 +390,11 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 		{
 		case SSL_ERROR_WANT_READ:
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
+			MOWGLI_VIO_SETREAD(vio)
 			return 0;
 		case SSL_ERROR_WANT_WRITE:
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+			MOWGLI_VIO_SETWRITE(vio)
 			return 0;
 		case SSL_ERROR_ZERO_RETURN:
 			return 0;

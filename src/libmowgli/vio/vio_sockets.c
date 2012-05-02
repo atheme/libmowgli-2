@@ -152,17 +152,13 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	if ((ret = (int)recv(fd, buffer, len, 0)) < 0)
 	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
+		
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 			return mowgli_vio_err_errcode(vio, strerror, errno);
-		}
 		else if (errno != 0)
-		{
 			/* Further reads unnecessary */
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 			return 0;
-		}
 
 		if (ret == 0)
 		{
@@ -193,21 +189,20 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 
 	if ((ret = (int)send(fd, buffer, len, 0)) == -1)
 	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
+		MOWGLI_VIO_UNSETWRITE(vio)
+
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 			return mowgli_vio_err_errcode(vio, strerror, errno);
-		}
 		else
-		{
 			/* Further writes unnecessary */
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 			return 0;
-		}
 	}
 
 	/* Set this for edge-triggered interfaces */
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+
+	MOWGLI_VIO_SETWRITE(vio)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -224,20 +219,18 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len,
 
 	if ((ret = (int)sendto(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
 	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
+		MOWGLI_VIO_UNSETWRITE(vio)
+
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 			return mowgli_vio_err_errcode(vio, strerror, errno);
-		}
 		else
-		{
 			/* Further writes unnecessary */
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 			return 0;
-		}
 	}
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+	MOWGLI_VIO_SETWRITE(vio)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -254,17 +247,13 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 
 	if ((ret = (int)recvfrom(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
 	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
+
 		if (!mowgli_eventloop_ignore_errno(errno))
-		{
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 			return mowgli_vio_err_errcode(vio, strerror, errno);
-		}
 		else if (errno != 0)
-		{
 			/* Further reads unnecessary */
-			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 			return 0;
-		}
 
 		if (ret == 0)
 		{
