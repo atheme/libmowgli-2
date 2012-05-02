@@ -27,6 +27,8 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 {
 	int fd;
 
+	return_val_if_fail(vio, -255);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_SOCKET;
 
 	/* We can't call socket with AF_UNSPEC on most platforms >_> */
@@ -52,6 +54,8 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
+	return_val_if_fail(fd != -1, -255);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
 
 	if (bind(fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
@@ -66,6 +70,8 @@ int mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 int mowgli_vio_default_listen(mowgli_vio_t *vio, int backlog)
 {
 	const int fd = mowgli_vio_getfd(vio);
+
+	return_val_if_fail(fd != -1, -255);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 
@@ -84,6 +90,8 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int afd;
+
+	return_val_if_fail(fd != -1, -255);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_ACCEPT;
 
@@ -117,6 +125,8 @@ int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
+	return_val_if_fail(fd != -1, -255);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
 	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
@@ -145,6 +155,8 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
+
+	return_val_if_fail(fd != -1, -255);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
@@ -183,6 +195,8 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
+	return_val_if_fail(fd != -1, -255);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
@@ -213,6 +227,8 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len,
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
 
+	return_val_if_fail(fd != -1, -255);
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
@@ -240,6 +256,8 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
+
+	return_val_if_fail(fd != -1, -255);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 
@@ -316,6 +334,8 @@ int mowgli_vio_default_close(mowgli_vio_t *vio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
+	return_val_if_fail(fd != -1, -255);
+
 	MOWGLI_VIO_SET_CLOSED(vio);
 #ifndef _WIN32
 	close(fd);
@@ -327,6 +347,7 @@ int mowgli_vio_default_close(mowgli_vio_t *vio)
 
 int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence)
 {
+	return_val_if_fail(vio, -255);
 	vio->error.op = MOWGLI_VIO_ERR_OP_SEEK;
 	errno = ENOSYS;
 	return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -334,6 +355,7 @@ int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence)
 
 int mowgli_vio_default_tell(mowgli_vio_t *vio)
 {
+	return_val_if_fail(vio, -255)
 	vio->error.op = MOWGLI_VIO_ERR_OP_TELL;
 	errno = ENOSYS;
 	return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -343,6 +365,9 @@ int mowgli_vio_default_tell(mowgli_vio_t *vio)
 mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *addr, int port)
 {
 	struct sockaddr_storage saddr;
+
+	return_val_if_fail(naddr, NULL);
+	return_val_if_fail(addr, NULL);
 
 	if (naddr == NULL)
 		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
@@ -401,6 +426,10 @@ mowgli_vio_sockaddr_t * mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *n
 int mowgli_vio_sockaddr_info(const mowgli_vio_sockaddr_t *addr, mowgli_vio_sockdata_t *data)
 {
 	const void *sockptr;
+
+	return_val_if_fail(addr, -255);
+	return_val_if_fail(data, -255);
+
 	const struct sockaddr *saddr = (const struct sockaddr *)&addr->addr;
 
 	if (saddr->sa_family == AF_INET)

@@ -47,7 +47,9 @@ static mowgli_vio_ops_t *openssl_ops = NULL;
 
 int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
 {
-	mowgli_ssl_connection_t *connection; 
+	mowgli_ssl_connection_t *connection;
+
+	return_val_if_fail(vio, -255);
 
 	if (!ssl_heap)
 		ssl_heap = mowgli_heap_create(sizeof(mowgli_ssl_connection_t), 64, BH_NOW);
@@ -98,12 +100,14 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 /* Returns void so they can be stubs */
 void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
 {
+	return_val_if_fail(vio, NULL);
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	return connection->ssl_handle;
 }
 
 void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 {
+	return_val_if_fail(vio, NULL);
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	return connection->ssl_context;
 }
@@ -111,6 +115,9 @@ void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	const int fd = mowgli_vio_getfd(vio);
+
+	return_val_if_fail(fd != -1, -255);
+
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
@@ -141,6 +148,8 @@ int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t 
 
 int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 {
+	return_val_if_fail(vio, -255);
+
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	const SSL_METHOD *method;
 	const int fd = mowgli_vio_getfd(vio);
@@ -205,6 +214,9 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	const int fd = mowgli_vio_getfd(vio);
 	int afd;
 	int ret;
+
+	return_val_if_fail(fd != -1, -255);
+
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	mowgli_ssl_connection_t *newconnection;
 

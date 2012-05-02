@@ -194,7 +194,7 @@ static inline void mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
 /* Get file descriptor */
 static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 {
-	return_val_if_fail(vio, 0);
+	return_val_if_fail(vio, -1);
 
 	if (vio->eventloop)
 	{
