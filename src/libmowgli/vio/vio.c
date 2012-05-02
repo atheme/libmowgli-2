@@ -87,6 +87,8 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
  */
 void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 {
+	return_if_fail(vio);
+
 	vio->fd = -1;
 
 	vio->flags = 0;
@@ -104,9 +106,10 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
  */
 void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
 {
-	const int fd = vio->fd;
-	
 	return_if_fail(vio);
+	return_if_fail(eventloop);
+
+	const int fd = vio->fd;
 
 	/* Check for previous attachment */
 	if (vio->eventloop)
@@ -144,6 +147,8 @@ void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
+	return_if_fail(fd != -1);
+
 	return_if_fail(vio != NULL);
 	return_if_fail(vio->io != NULL);
 	return_if_fail(vio->eventloop != NULL);
@@ -161,6 +166,8 @@ void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
  */
 void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
+	return_if_fail(vio);
+
 	mowgli_vio_eventloop_detach(vio);
 
 	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISONHEAP))
@@ -175,6 +182,8 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
  */
 int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode)
 {
+	return_val_if_fail(vio, -255);
+
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
 	vio->error.code = errcode;
 	mowgli_strlcpy(vio->error.string, int_to_error(errcode), sizeof(vio->error.string));
@@ -188,8 +197,10 @@ int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int er
  */
 #ifdef HAVE_OPENSSL
 
-int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
+int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 {
+	return_val_if_fail(vio, -255);
+
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
 	vio->error.code = errcode;
 	ERR_error_string_n(errcode, vio->error.string, sizeof(vio->error.string));
@@ -198,8 +209,10 @@ int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
 
 #else
 
-int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode)
+int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 {
+	return_if_fail(vio);
+
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
 	vio->error.code = errcode;
 	mowgli_strlcpy(vio->error.string, "Unknown SSL error", sizeof(vio->error.string));

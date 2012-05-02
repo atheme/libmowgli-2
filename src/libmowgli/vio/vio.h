@@ -261,7 +261,7 @@ extern int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence);
 extern int mowgli_vio_default_tell(mowgli_vio_t *vio);
 
 extern int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode);
-extern int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, int errcode);
+extern int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode);
 
 extern int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops);
 /* These are void ptr's so they can be null ops if SSL isn't available */
