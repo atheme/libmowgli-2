@@ -52,15 +52,10 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 	.tell = mowgli_vio_default_tell,
 };
 
-static void nullio_func(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
-{
-	mowgli_log("NULLOP for vio::eventloop called");
-}
-
 /* Null ops */
 mowgli_vio_evops_t mowgli_vio_default_evops = {
-	.read_cb = nullio_func,
-	.write_cb = nullio_func
+	.read_cb = NULL,
+	.write_cb = NULL
 };
 
 /* mowgli_vio_create - create a VIO object on the heap
@@ -104,7 +99,7 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 
 /* mowgli_vio_eventloop_attach - attach a VIO object to an eventloop
  *
- * inputs - VIO object, eventloop, ops to use for the eventloop
+ * inputs - VIO object, eventloop, ops to use for the eventloop (optional but recommended)
  * outputs - None
  */
 void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
@@ -129,6 +124,7 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 		if (evops)
 			vio->evops = evops;
 		else
+			/* Default NULL ops */
 			vio->evops = &mowgli_vio_default_evops;
 			
 	}
