@@ -121,6 +121,36 @@ mowgli_strdup(const char *in)
 }
 
 /*
+ * \brief Duplicate a string of a specified length using mowgli_alloc() using a specific policy.
+ */
+char *
+mowgli_strndup_using_policy(mowgli_allocation_policy_t *policy, const char *in, size_t size)
+{
+    char *out;
+    size_t len;
+
+    return_val_if_fail(in != NULL, NULL);
+
+    len = strlen(in) + 1;
+    if (size < len)
+        len = size;
+
+    out = mowgli_alloc_using_policy(policy, len);
+    mowgli_strlcpy(out, in, len);
+
+    return out;
+}
+
+/*
+ * \brief Duplicate a string of a specified length using mowgli_alloc() using a specific policy.
+ */
+char *
+mowgli_strndup(const char *in, size_t size)
+{
+    return mowgli_strndup_using_policy(_mowgli_allocator, in, size);
+}
+
+/*
  * \brief Allocates an array of data that contains "count" objects,
  * of "size" size.
  *

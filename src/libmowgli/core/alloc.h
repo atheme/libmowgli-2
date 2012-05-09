@@ -27,10 +27,12 @@
 extern void * mowgli_alloc_array_using_policy(mowgli_allocation_policy_t *policy, size_t size, size_t count);
 extern void * mowgli_alloc_using_policy(mowgli_allocation_policy_t *policy, size_t size);
 extern char * mowgli_strdup_using_policy(mowgli_allocation_policy_t *policy, const char *in);
+extern char * mowgli_strndup_using_policy(mowgli_allocation_policy_t *policy, const char *in, size_t size);
 
 extern void * mowgli_alloc_array(size_t size, size_t count);
 extern void * mowgli_alloc(size_t size);
 extern char * mowgli_strdup(const char *in);
+extern char * mowgli_strndup(const char *in, size_t size);
 extern void mowgli_free(void *ptr);
 
 #endif
