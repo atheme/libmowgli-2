@@ -35,7 +35,7 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 
 void write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
 {
-	printf("> %s\n", buf);
+	printf("-> %s\n", buf);
 	mowgli_linebuf_write(linebuf, buf, len);
 }
 
@@ -114,7 +114,7 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 	strncpy(str, line, sizeof(str));
 	str[len + 1] = '\0';
 
-	printf("-> %s\n", str);
+	printf("<- %s\n", str);
 
 	/* Since this is just a basic example, we don't have a real dispatcher :p */
 	if (strstr(str, "PING"))

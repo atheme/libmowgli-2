@@ -31,10 +31,12 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf);
 
 static int mowgli_linebuf_error(mowgli_vio_t *vio);
 
+#ifdef NOTYET
 static mowgli_vio_evops_t linebuf_evops = {
 	.read_cb = mowgli_linebuf_read_data,
 	.write_cb = mowgli_linebuf_write_data
 };
+#endif
 
 mowgli_linebuf_t *
 mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
@@ -73,7 +75,11 @@ void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventl
 	return_if_fail(linebuf->vio != NULL);
 	return_if_fail((linebuf->vio->flags & MOWGLI_VIO_FLAGS_ISCLOSED) == 0);
 
+#ifdef NOTYET
 	mowgli_vio_eventloop_attach(linebuf->vio, eventloop, &linebuf_evops);
+#else
+	mowgli_vio_eventloop_attach(linebuf->vio, eventloop, NULL);
+#endif
 	mowgli_pollable_setselect(eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_READ, mowgli_linebuf_read_data);
 	mowgli_pollable_setselect(eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 
@@ -158,20 +164,30 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
 	int ret;
 
+	mowgli_log("Called mowgli_linebuf_write_data");
+
 	if ((ret = mowgli_vio_write(linebuf->vio, buffer->buffer, buffer->buflen)) <= 0)
 	{
 		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
+		{
 			/* If we have a genuine error, we shouldn't come back to this func 
 			 * Otherwise we'll try again. */
-			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
-		return;
+			if (ret != 0)
+			{
+				mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+				mowgli_log("mowgli_vio_write returned error [%d]: %s", linebuf->vio->error.code, linebuf->vio->error.string);
+				return;
+			}
+		}
 	}
 
 	buffer->buflen -= ret;
 
 	/* Anything else to write? */
-	if (buffer->buflen == 0)
+	if (buffer->buflen == 0 && !mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+	else
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
 void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
