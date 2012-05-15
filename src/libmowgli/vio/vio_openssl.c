@@ -303,7 +303,7 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 
 	if ((ret = SSL_connect(connection->ssl_handle)) != 1)
 	{
-		int err = SSL_get_error(connection->ssl_handle, ret);
+		unsigned long err = SSL_get_error(connection->ssl_handle, ret);
 		if (err == SSL_ERROR_WANT_READ)
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
 		else if (err == SSL_ERROR_WANT_WRITE)
@@ -315,6 +315,9 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 		}
 		else
 			return mowgli_vio_err_sslerrcode(vio, err);
+
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
+		return 0;
 	}
 
 	/* Connected */

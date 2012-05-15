@@ -156,17 +156,27 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	if ((ret = mowgli_vio_write(linebuf->vio, buffer->buffer, buffer->buflen)) <= 0)
 	{
 		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
+		{
 			/* If we have a genuine error, we shouldn't come back to this func 
 			 * Otherwise we'll try again. */
-			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
-		return;
+		
+			if (ret != 0)
+			{
+				mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+				mowgli_log("mowgli_vio_write returned error [%d]: %s", linebuf->vio->error.code, linebuf->vio->error.string);
+				return;
+			}
+		}
 	}
+
 
 	buffer->buflen -= ret;
 
 	/* Anything else to write? */
-	if (buffer->buflen == 0)
+	if (buffer->buflen == 0 && !mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+	else
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
 void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
