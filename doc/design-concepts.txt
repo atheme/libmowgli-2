@@ -114,3 +114,8 @@ use a coroutine library, such as the work-in-progress mowgli.coroutine.
 
 Pretty much anything you can do with threads, you can do better with something,
 *anything* else.
+
+Please note the Mowgli team will generally not accept intrusive patches to
+add any additional threading support aside from fixes and locking bugs. No
+atomics, no making anything in the library use threads. Don't waste your time.
+
