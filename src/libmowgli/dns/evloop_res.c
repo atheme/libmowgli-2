@@ -7,9 +7,6 @@
  * The authors takes no responsibility for any damage or loss
  * of property which results from the use of this software.
  *
- * $Id: res.c 3301 2007-03-28 15:04:06Z jilles $
- * from Hybrid Id: res.c 459 2006-02-12 22:21:37Z db $
- *
  * July 1999 - Rewrote a bunch of stuff here. Change hostent builder code,
  *     added callbacks and reference counting of returned hostents.
  *     --Bleep (Thomas Helvey <tomh@inxpress.net>)
@@ -149,6 +146,24 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 	return 0;
 }
 
+int mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respath)
+{
+#ifndef _WIN32
+	mowgli_dns_evloop_t *state = dns->dns_state;
+
+	return_val_if_fail(dns, -1);
+
+	state->resolvconf = respath;
+
+	if (!state->dns_init)
+		return mowgli_dns_evloop_restart(dns);
+	
+	return 0;
+#else
+	mowgli_log("Unimplemented on Windows. :(");
+#endif
+}
+
 /* 
  * mowgli_dns_evloop_restart - reread resolv.conf, reopen socket
  */
@@ -176,21 +191,31 @@ void mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
 
 #ifndef _WIN32
 
-/* parse_resvconf() inputs - NONE output - -1 if failure 0 if success side effects - fills in
- * state->nsaddr_list */
+/* parse_resvconf()
+ * inputs - NONE
+ * output - -1 if failure, 0 if success
+ * side effects - fills in state->nsaddr_list
+ */
 static int parse_resvconf(mowgli_dns_t *dns)
 {
 	char *p;
 	char *opt;
 	char *arg;
+	const char *respath;
 	char input[MOWGLI_DNS_MAXLINE];
 	FILE *file;
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
-	/* XXX "/etc/resolv.conf" should be from a define in setup.h perhaps for cygwin support etc.
-	 * this hardcodes it to unix for now -db */
-	if ((file = fopen("/etc/resolv.conf", "r")) == NULL)
+	if (state->resolvconf)
+		respath = state->resolvconf;
+	else
+		respath = "/etc/resolv.conf";
+	
+	if ((file = fopen(respath, "r")) == NULL)
+	{
+		mowgli_log("Failed to open %s: %s", respath, strerror(errno));
 		return -1;
+	}
 
 	while (fgets(input, sizeof(input), file) != NULL)
 	{
@@ -234,6 +259,9 @@ static int parse_resvconf(mowgli_dns_t *dns)
 	}
 
 	fclose(file);
+
+	state->dns_init = true;
+
 	return 0;
 }
 
@@ -256,8 +284,10 @@ parse_windows_resolvers(mowgli_dns_t *dns)
 #endif
 
 
-/* add_nameserver() input - either an IPV4 address in dotted quad or an IPV6 address in : format
- * output - NONE side effects - entry in state->nsaddr_list is filled in as needed */
+/* add_nameserver()
+ * input - either an IPV4 address in dotted quad or an IPV6 address in : format
+ * output - NONE
+ * side effects - entry in state->nsaddr_list is filled in as needed */
 static void add_nameserver(mowgli_dns_t *dns, const char *arg)
 {
 	struct addrinfo hints, *res;
