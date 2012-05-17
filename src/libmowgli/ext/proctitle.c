@@ -3,7 +3,8 @@
  * Below is their copyright header.
  *
  * Do note I've made extensive changes to this code, including adding
- * Linux (and Irix?) prctl support.
+ * Linux (and Irix?) prctl support. Also added support for searching for
+ * argc/argv.
  */
 
 /*--------------------------------------------------------------------
@@ -118,8 +119,8 @@ char **mowgli_argv = NULL;
 static bool get_argv_from_env(int *argc, char ***argv)
 {
         char **ptr;
-	*argc = 0;
 	const int argmax = sysconf(_SC_ARG_MAX);
+	*argc = 0;
 
 	/* Go two steps behind environ -- on many systems (Solaris and Linux)
 	 * argv lives here. Keep going backwards until we reach argc, stored at
