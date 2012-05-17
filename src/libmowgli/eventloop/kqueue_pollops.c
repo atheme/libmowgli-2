@@ -162,13 +162,11 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->events[i].udata;
 
-		if (priv->events[i].filter == EVFILT_READ &&
-				pollable->read_function != NULL)
-			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+		if (priv->events[i].filter == EVFILT_READ)
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->events[i].filter == EVFILT_WRITE &&
-				pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+		if (priv->events[i].filter == EVFILT_WRITE)
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 
 		/* XXX Perhaps we need to recheck read_function and
 		 * write_function now.

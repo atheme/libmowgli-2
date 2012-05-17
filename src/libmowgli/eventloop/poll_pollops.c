@@ -191,7 +191,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 #endif
 
 				priv->pollfds[slot].events &= ~(POLLRDNORM | POLLIN);
-				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 			}
 		}
 
@@ -210,7 +210,7 @@ static void mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time
 #endif
 
 				priv->pollfds[slot].events &= ~(POLLWRNORM | POLLOUT);
-				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 			}
 		}
 	}

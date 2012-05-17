@@ -165,11 +165,11 @@ static void mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->pfd[i].portev_user;
 
-		if (priv->pfd[i].portev_events & (POLLIN | POLLHUP | POLLERR) && pollable->read_function != NULL)
-			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+		if (priv->pfd[i].portev_events & (POLLIN | POLLHUP | POLLERR))
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->pfd[i].portev_events & (POLLOUT | POLLHUP | POLLERR) && pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+		if (priv->pfd[i].portev_events & (POLLOUT | POLLHUP | POLLERR))
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 	}
 }
 

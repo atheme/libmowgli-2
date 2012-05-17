@@ -86,3 +86,30 @@ void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool
 	ioctlsocket(pollable->fd, FIONBIO, &mode);
 #endif
 }
+
+void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir)
+{
+	mowgli_eventloop_io_cb_t *event_function;
+
+	return_if_fail(eventloop != NULL);
+	return_if_fail(pollable != NULL);
+
+	switch (dir)
+	{
+	case MOWGLI_EVENTLOOP_IO_READ:
+		event_function = pollable->read_function;
+		break;
+	case MOWGLI_EVENTLOOP_IO_WRITE:
+		event_function = pollable->write_function;
+		break;
+	default:
+		event_function = NULL;
+		return;
+	}
+
+	if (event_function == NULL)
+		return;
+
+	event_function(eventloop, pollable, dir, pollable->userdata);
+}
+
