@@ -142,7 +142,7 @@ static bool get_argv_from_env(int *argc, char ***argv)
 	 *
 	 * XXX -- probably does need some better bounds checking... At the very
 	 * least it does take care to ensure ARG_MAX has not been overstepped,
-	 * but this is likely too small of a value, but it is the minimum.
+	 * but this is likely too large of a value, but it is the minimum.
 	 * Again, see above notes about the safety of this on Linux and System
 	 * V, but again, I cannot vouch for its safety elsewhere.
 	 *
