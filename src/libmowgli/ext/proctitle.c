@@ -36,7 +36,9 @@
 #include <sys/prctl.h>
 #endif
 
+#ifndef _WIN32
 extern char **environ;
+#endif
 
 /*
  * Alternative ways of updating ps display:
@@ -109,19 +111,149 @@ static size_t ps_buffer_cur_len;	/* nominal strlen(ps_buffer) */
 static int save_argc;
 static char **save_argv;
 
+int mowgli_argc = 0;
+char **mowgli_argv = NULL;
+
+#ifndef _WIN32
+static bool get_argv_from_env(int *argc, char ***argv)
+{
+        char **ptr;
+	*argc = 0;
+	const int argmax = sysconf(_SC_ARG_MAX);
+
+	/* Go two steps behind environ -- on many systems (Solaris and Linux)
+	 * argv lives here. Keep going backwards until we reach argc, stored at
+	 * argv[-1]. This is really twisted, but eh... the only better way is
+	 * to explicitly get them.. which is annoying for the programmer and
+	 * impossible for cloned processes. :(
+	 *
+	 * To determine whether or not we've reached argc, we check to see if
+	 * the amount of args we have stepped through equals the raw value
+	 * of the data at environ[-n] (where n is the number of iterations).
+	 * if it does, we've found it.
+	 *
+	 * I think issues are unlikely to be encountered with this code since
+	 * we only do it on System V and Linux.. and they work the same way wrt
+	 * argv and environ layout. Don't you DARE use this on other platforms
+	 * without first making ULLONG_MAX% sure this is how things are laid
+	 * out there and our assumptions hold true. Otherwise, err on the side
+	 * of caution. Please. For the sake of you and your loved ones.
+	 *
+	 * XXX -- probably does need some better bounds checking... At the very
+	 * least it does take care to ensure ARG_MAX has not been overstepped,
+	 * but this is likely too small of a value, but it is the minimum.
+	 * Again, see above notes about the safety of this on Linux and System
+	 * V, but again, I cannot vouch for its safety elsewhere.
+	 *
+	 * --Elizabeth
+	 */
+        for (ptr = environ - 2, *argc = 0;
+             (*((int *)ptr) != *argc) && *argc <= argmax;
+             ptr--, *argc++);
+
+        /* Whoops, we're pointing at argc! */
+        ptr++;
+	
+	*argv = ptr;
+
+	return true;
+}
+
+static bool
+get_argv_from_proc(int *argc, char ***argv)
+{
+	/* This is the preferred (read: MUCH SAFER THAN get_argv_from_env!)
+	 * way of doing things. It works on Linux. Might work other places that
+	 * so happen to use procfs (FreeBSD but joy be to them, they have the
+	 * glorious setproctitle() function so this won't get used there)
+	 */
+
+	char filename[32]; /* Should be good enough */
+	char **ptr = environ - 1;
+	size_t counter = 0;
+	pid_t pid;
+	FILE *f;
+
+	if ((pid = getpid()) == -1)
+		return false;
+
+	/* get the content of /proc/PID/cmdline */
+	snprintf(filename, sizeof(filename), "/proc/%lld/cmdline", (long long)pid);
+	if ((f = fopen(filename, "rb")) == NULL)
+	{
+		mowgli_log("opening '%s' failed", filename);
+		return false;
+	}
+	
+	while (!feof(f) && !ferror(f))
+	{
+		char buf[512];
+		size_t len;
+		char *c, *n;
+		
+		if ((len = fread(buf, sizeof(char), sizeof(buf), f)) == 0)
+			return false;
+
+		n = buf + len;
+
+		/* Scan input */
+		for (c = buf; c != n; c++)
+			if (*c == '\0')
+				counter++;
+	}
+
+	if (ferror(f))
+	{
+		mowgli_log("error reading file %s", filename);
+		return false;
+	}
+
+	/* Get argv and argc values */
+	*argv = (char **)(ptr - counter);
+	*argc = *(int *)((ptr - counter) - 1);
+
+	fclose(f);
+
+	/* Check for consistency */
+	if (*argc != (int)counter)
+	{
+		mowgli_log("cmdline parsing inconsistency!");
+		return false;
+	}
+
+	return true;
+}
+
+#endif
+
+bool
+mowgli_get_args(int *argc, char ***argv)
+{
+#ifndef _WIN32
+	if (get_argv_from_proc(argc, argv))
+		return true;
+
+	/* Bleh try this now */
+	if (get_argv_from_env(argc, argv))
+		return true;
+#else
+#warning "Implement me..."
+#endif
+
+	/* Nope :( */
+	return false;
+}
+
 /*
- * Call this early in startup to save the original argc/argv values.
+ * Save the original argc/argv values.
  * If needed, we make a copy of the original argv[] array to preserve it
  * from being clobbered by subsequent ps_display actions.
- *
- * (The original argv[] will not be overwritten by this routine, but may be
- * overwritten during mowgli_proctitle_set. Also, the physical location of the
- * environment strings may be moved, so this should be called before any code
- * that might try to hang onto a getenv() result.)
  */
 char **
 mowgli_proctitle_init(int argc, char **argv)
 {
+	if (argc == 0 || argv == NULL)
+		
 	save_argc = argc;
 	save_argv = argv;
 
@@ -207,6 +339,9 @@ mowgli_proctitle_init(int argc, char **argv)
 
 #endif   /* MOWGLI_SETPROC_USE_CHANGE_ARGV or MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
+	mowgli_argc = argc;
+	mowgli_argv = argv;
+	
 	return argv;
 }
 
@@ -239,7 +374,6 @@ mowgli_proctitle_set(const char *fmt, ...)
 		save_argv[i] = ps_buffer + ps_buffer_size;
 
 	/* Pad unused bytes */
-	printf("%d %d\n", ps_buffer_size, ps_buffer_cur_len);
 	memset(ps_buffer + ps_buffer_cur_len, PS_PADDING, ps_buffer_size - ps_buffer_cur_len + 1);
 #endif
 
@@ -252,7 +386,6 @@ mowgli_proctitle_set(const char *fmt, ...)
 	char procbuf[16];
 	mowgli_strlcpy(procbuf, ps_buffer, sizeof(procbuf));
 	prctl(PR_SET_NAME, procbuf, 0, 0, 0);
-	printf("%s\n", procbuf);
 #endif
 
 #ifdef MOWGLI_SETPROC_USE_PSTAT
