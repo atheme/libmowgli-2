@@ -91,10 +91,10 @@ static void mowgli_qnx_eventloop_event_cb(select_context_t *ctp, mowgli_descript
 	return_if_fail(eventloop != NULL);
 
 	if (flags & (SELECT_FLAG_READ | SELECT_FLAG_EXCEPT))
-		pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+		mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
 	if (flags & (SELECT_FLAG_WRITE | SELECT_FLAG_EXCEPT))
-		pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+		mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 }
 
 static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)

@@ -177,11 +177,11 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->pfd[i].data.ptr;
 
-		if (priv->pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR) && pollable->read_function != NULL)
-			pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+		if (priv->pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR))
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR) && pollable->write_function != NULL)
-			pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+		if (priv->pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR))
+			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 	}
 }
 

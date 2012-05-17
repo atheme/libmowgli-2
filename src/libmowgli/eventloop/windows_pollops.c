@@ -252,11 +252,11 @@ static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int d
 
 			WSAEnumNetworkEvents(pollable->fd, priv->pfd[pollable->slot], &events);
 
-			if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB) && pollable->read_function != NULL)
-				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+			if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB))
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-			if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE) && pollable->write_function != NULL)
-				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+			if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE))
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 		}
 	}
 

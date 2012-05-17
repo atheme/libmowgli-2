@@ -164,13 +164,13 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 		{
 			pollable = n->data;
 
-			if ((FD_ISSET(pollable->fd, &rfds) || FD_ISSET(pollable->fd, &efds)) && pollable->read_function)
+			if ((FD_ISSET(pollable->fd, &rfds) || FD_ISSET(pollable->fd, &efds)))
 			{
 #ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
 #endif
 
-				pollable->read_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ, pollable->userdata);
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 			}
 		}
 
@@ -178,13 +178,13 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 		{
 			pollable = n->data;
 
-			if ((FD_ISSET(pollable->fd, &wfds) || FD_ISSET(pollable->fd, &efds)) && pollable->write_function)
+			if ((FD_ISSET(pollable->fd, &wfds) || FD_ISSET(pollable->fd, &efds)))
 			{
 #ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
 #endif
 
-				pollable->write_function(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE, pollable->userdata);
+				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 			}
 		}
 	}
