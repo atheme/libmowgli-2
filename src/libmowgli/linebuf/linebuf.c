@@ -164,8 +164,6 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
 	int ret;
 
-	mowgli_log("Called mowgli_linebuf_write_data");
-
 	if ((ret = mowgli_vio_write(linebuf->vio, buffer->buffer, buffer->buflen)) <= 0)
 	{
 		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
