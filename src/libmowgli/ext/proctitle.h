@@ -14,8 +14,8 @@
 
 extern bool mowgli_proctitle_update;
 
-extern char **mowgli_argc;
-extern int mowgli_argv;
+extern char **mowgli_argv;
+extern int mowgli_argc;
 
 extern bool mowgli_get_args(int *argc, char ***argv);
 
