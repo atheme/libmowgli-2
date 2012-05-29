@@ -150,7 +150,7 @@ static bool get_argv_from_env(int *argc, char ***argv)
 	 */
         for (ptr = environ - 2, *argc = 0;
              (*((int *)ptr) != *argc) && *argc <= argmax;
-             ptr--, *argc++);
+             ptr--, (*argc)++);
 
         /* Whoops, we're pointing at argc! */
         ptr++;
