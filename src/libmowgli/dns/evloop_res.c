@@ -83,8 +83,8 @@ static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const
 static void query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
 static int send_res_msg(mowgli_dns_t *dns, const char *buf, int len, int count);
 static void resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
-static int check_question(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob);
-static int proc_answer(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *, char *);
+static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob);
+static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *, char *);
 static mowgli_dns_reslist_t *find_id(mowgli_dns_t *dns, int id);
 static mowgli_dns_reply_t *make_dnsreply(mowgli_dns_reslist_t *request);
 static void res_readreply(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
@@ -754,7 +754,7 @@ static void resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
  * name we queried (to guard against late replies from previous
  * queries with the same id).
  */
-static int check_question(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
+static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
 {
 	char hostbuf[MOWGLI_DNS_RES_HOSTLEN + 1];	/* working buffer */
 	unsigned char *current;				/* current position in buf */
@@ -779,7 +779,7 @@ static int check_question(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowg
 /* 
  * proc_answer - process name server reply
  */
-static int proc_answer(mowgli_dns_t *dns, mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
+static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
 {
 	char hostbuf[MOWGLI_DNS_RES_HOSTLEN + 100];	/* working buffer */
 	unsigned char *current;				/* current position in buf */
@@ -949,7 +949,7 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	if (!res_ourserver(dns, &lsin.addr))
 		return 1;
 
-	if (!check_question(dns, request, header, buf, buf + rc))
+	if (!check_question(request, header, buf, buf + rc))
 		return 1;
 
 	if ((header->rcode != MOWGLI_DNS_NO_ERRORS) || (header->ancount == 0))
@@ -974,7 +974,7 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	/* If this fails there was an error decoding the received packet, 
 	 * give up. -- jilles
 	 */
-	answer_count = proc_answer(dns, request, header, buf, buf + rc);
+	answer_count = proc_answer(request, header, buf, buf + rc);
 
 	if (answer_count)
 	{
