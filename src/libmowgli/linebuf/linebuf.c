@@ -86,6 +86,15 @@ void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventl
 	linebuf->eventloop = eventloop;
 }
 
+/* Detach the linebuf instance from the eventloop */
+void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf)
+{
+	return_if_fail(linebuf != NULL);
+	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_READ, NULL);
+	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+	mowgli_vio_eventloop_detach(linebuf->vio);
+}
+
 void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 {
 	mowgli_vio_destroy(linebuf->vio);
