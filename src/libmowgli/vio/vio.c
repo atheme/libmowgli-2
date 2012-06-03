@@ -41,6 +41,7 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 	.bind = mowgli_vio_default_bind,
 	.listen = mowgli_vio_default_listen,
 	.accept = mowgli_vio_default_accept,
+	.reuseaddr = mowgli_vio_default_reuseaddr,
 	.connect = mowgli_vio_default_connect,
 	.read = mowgli_vio_default_read,
 	.write = mowgli_vio_default_write,
