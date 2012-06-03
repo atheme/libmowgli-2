@@ -121,6 +121,22 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	return 0;
 }
 
+int mowgli_vio_default_reuseaddr(mowgli_vio_t *vio)
+{
+	int fd = mowgli_vio_getfd(vio);
+	int reuse = 1;
+
+	return_val_if_fail(fd != -1, -255);
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_REUSEADDR;
+
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse)) < 0)
+		return mowgli_vio_err_errcode(vio, strerror, errno);
+
+	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
+	return 0;
+}
+
 int mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	const int fd = mowgli_vio_getfd(vio);
