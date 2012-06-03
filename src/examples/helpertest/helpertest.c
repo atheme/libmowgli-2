@@ -27,14 +27,14 @@ int helper_count = 0;
 
 void timer_oneshot(mowgli_eventloop_helper_proc_t *helper)
 {
-	mowgli_writef(helper->out_fd, "oneshot timer hit\n");
+	mowgli_writef(helper->fd, "oneshot timer hit\n");
 }
 
 void timer_tick(mowgli_eventloop_helper_proc_t *helper)
 {
 	static int ticks = 0;
 
-	mowgli_writef(helper->out_fd, "tick: %d\n", ++ticks);
+	mowgli_writef(helper->fd, "tick: %d\n", ++ticks);
 
 	if (ticks > 10)
 		mowgli_eventloop_break(helper->eventloop);
@@ -44,14 +44,14 @@ void helper_start(mowgli_eventloop_helper_proc_t *helper, void *userdata)
 {
 	mowgli_eventloop_t *eventloop = helper->eventloop;
 
-	mowgli_writef(helper->out_fd, "hi from pid %d\n", getpid());
+	mowgli_writef(helper->fd, "hi from pid %d\n", getpid());
 
 	mowgli_timer_add(eventloop, "timer_tick", (mowgli_event_dispatch_func_t *) timer_tick, helper, 1);
 	mowgli_timer_add_once(eventloop, "timer_oneshot", (mowgli_event_dispatch_func_t *) timer_oneshot, helper, 5);
 
 	mowgli_eventloop_run(eventloop);
 
-	mowgli_writef(helper->out_fd, "eventloop halted\n");
+	mowgli_writef(helper->fd, "eventloop halted\n");
 
 	mowgli_eventloop_destroy(eventloop);
 }
@@ -78,10 +78,10 @@ void helper_read(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgl
 	mowgli_eventloop_helper_proc_t *helper = mowgli_eventloop_io_helper(io);
 
 	bzero(buf, sizeof buf);
-	r = read(helper->in_fd, buf, sizeof buf);
+	r = read(helper->fd, buf, sizeof buf);
 
 	if (r > 0)
-		printf("helper %p [%d/%d]: %s", helper, helper->child->pid, helper->in_fd, buf);
+		printf("helper %p [%d/%d]: %s", helper, helper->child->pid, helper->fd, buf);
 	else if (r <= 0)
 	{
 		helper_count--;
