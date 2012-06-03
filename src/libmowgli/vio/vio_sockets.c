@@ -178,7 +178,7 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recv(fd, buffer, len, 0)) < 0)
+	if ((ret = (int)recv(fd, buffer, len, 0)) <= 0)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 		
