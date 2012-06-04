@@ -27,6 +27,7 @@
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
 typedef void mowgli_linebuf_readline_cb_t(mowgli_linebuf_t *, char *, size_t, void *);
+typedef void mowgli_linebuf_shutdown_cb_t(mowgli_linebuf_t *, void *);
 
 extern mowgli_linebuf_t * mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata);
 /* XXX these are unfortunately named and will change */
@@ -37,6 +38,7 @@ extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
 extern void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len);
 extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...);
+extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf, mowgli_linebuf_shutdown_cb_t *cb);
 
 struct _mowgli_linebuf_buf {
 	char *buffer;
@@ -52,8 +54,12 @@ struct _mowgli_linebuf_buf {
 /* Informative */
 #define MOWGLI_LINEBUF_LINE_HASNULLCHAR		0x0004
 
+/* State */
+#define MOWGLI_LINEBUF_SHUTTING_DOWN		0x0100
+
 struct _mowgli_linebuf {
 	mowgli_linebuf_readline_cb_t *readline_cb;
+	mowgli_linebuf_shutdown_cb_t *shutdown_cb;
 
 	mowgli_vio_t *vio;
 

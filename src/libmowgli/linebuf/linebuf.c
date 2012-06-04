@@ -28,6 +28,7 @@ static mowgli_heap_t *linebuf_heap = NULL;
 static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf);
+static void mowgli_linebuf_do_shutdown(mowgli_linebuf_t *linebuf);
 
 static int mowgli_linebuf_error(mowgli_vio_t *vio);
 
@@ -191,10 +192,14 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 	buffer->buflen -= ret;
 
 	/* Anything else to write? */
-	if (buffer->buflen == 0 && !mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
-		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
-	else
+	if (buffer->buflen == 0) {
+		if (!mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
+			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+		if ((linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN) != 0)
+			mowgli_linebuf_do_shutdown(linebuf);
+	} else {
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
+	}
 }
 
 void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
@@ -218,6 +223,9 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	return_if_fail(len > 0);
 	return_if_fail(data != NULL);
 
+	if ((linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN) != 0)
+		return;
+
 	if (linebuf->writebuf.buflen + len + delim_len > linebuf->writebuf.maxbuflen)
 	{
 		linebuf->flags |= MOWGLI_LINEBUF_ERR_WRITEBUF_FULL;
@@ -232,6 +240,19 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 
 	/* Schedule our write */
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
+}
+
+void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf, mowgli_linebuf_shutdown_cb_t *cb)
+{
+	return_if_fail(linebuf != NULL);
+	// A null callback makes no sense. Just close your socket, bro.
+	return_if_fail(cb != NULL);
+
+	linebuf->flags |= MOWGLI_LINEBUF_SHUTTING_DOWN;
+	linebuf->shutdown_cb = cb;
+
+	if (linebuf->writebuf.buflen == 0)
+		mowgli_linebuf_do_shutdown(linebuf);
 }
 
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
@@ -267,7 +288,8 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 		if (linebuf->return_normal_strings)
 			*cptr = '\0';
 
-		linebuf->readline_cb(linebuf, line_start, cptr - line_start, linebuf->userdata);
+		if ((linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN) == 0)
+			linebuf->readline_cb(linebuf, line_start, cptr - line_start, linebuf->userdata);
 
 		/* Next line starts here; begin scanning and set the start of it */
 		len += delim_len;
@@ -294,6 +316,12 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 	}
 	else
 		buffer->buflen = 0;
+}
+
+static void mowgli_linebuf_do_shutdown(mowgli_linebuf_t *linebuf)
+{
+	if (linebuf && linebuf->shutdown_cb)
+		linebuf->shutdown_cb(linebuf, linebuf->userdata);
 }
 
 static int mowgli_linebuf_error(mowgli_vio_t *vio)
