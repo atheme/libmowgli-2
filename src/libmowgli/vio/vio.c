@@ -171,6 +171,9 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
 
 	mowgli_vio_eventloop_detach(vio);
 
+	if (!mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED))
+		mowgli_vio_close(vio);
+
 	if (mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISONHEAP))
 		mowgli_heap_free(vio_heap, vio);
 }
