@@ -470,7 +470,7 @@ int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 
 #else
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings)
+int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
 {
 	mowgli_log("OpenSSL requested on a VIO object, but mowgli was built without OpenSSL support...");
 	return -1;
