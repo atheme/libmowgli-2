@@ -39,17 +39,17 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 	timer->func = func;
 	timer->name = name;
 	timer->arg = arg;
-	timer->when = mowgli_eventloop_get_time(eventloop) + when;
+	timer->deadline = mowgli_eventloop_get_time(eventloop) + when;
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if (eventloop->deadline <= mowgli_eventloop_get_time(eventloop) || timer->when <= eventloop->deadline)
-		eventloop->deadline = timer->when;
+	if (eventloop->deadline <= mowgli_eventloop_get_time(eventloop) || timer->deadline <= eventloop->deadline)
+		eventloop->deadline = timer->deadline;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
 
 #ifdef DEBUG
-	mowgli_log("[timer(%p) add when:%d active:%d] [eventloop deadline:%d]", timer, timer->when, timer->active, eventloop->deadline);
+	mowgli_log("[timer(%p) add when:%d active:%d] [eventloop deadline:%d]", timer, timer->deadline, timer->active, eventloop->deadline);
 #endif
 
 	return timer;
@@ -94,7 +94,7 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 	{
 		mowgli_eventloop_timer_t *timer = n->data;
 
-		if (timer->active && timer->when <= currtime)
+		if (timer->active && timer->deadline <= currtime)
 		{
 			/* now we call it */
 			eventloop->last_ran = timer->name;
@@ -105,7 +105,7 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 
 			/* event is scheduled more than once */
 			if (timer->frequency)
-				timer->when = currtime + timer->frequency;
+				timer->deadline = currtime + timer->frequency;
 			else
 			{
 				/* XXX: yuck.  find a better way to handle this. */
@@ -130,11 +130,11 @@ time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 		{
 			mowgli_eventloop_timer_t *timer = n->data;
 
-			if (timer->active && (timer->when < eventloop->deadline || eventloop->deadline == -1))
-				eventloop->deadline = timer->when;
+			if (timer->active && (timer->deadline < eventloop->deadline || eventloop->deadline == -1))
+				eventloop->deadline = timer->deadline;
 
 #ifdef DEBUG
-			mowgli_log("timer %p active:%d when:%ld deadline:%ld", timer, timer->active, timer->when, eventloop->deadline);
+			mowgli_log("timer %p active:%d when:%ld deadline:%ld", timer, timer->active, timer->deadline, eventloop->deadline);
 #endif
 		}
 	}

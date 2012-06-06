@@ -142,7 +142,7 @@ typedef struct {
 	void *arg;
 	const char *name;
 	time_t frequency;
-	time_t when;
+	time_t deadline;
 	bool active;
 } mowgli_eventloop_timer_t;
 
