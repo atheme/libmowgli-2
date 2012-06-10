@@ -223,7 +223,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	return_if_fail(len > 0);
 	return_if_fail(data != NULL);
 
-	if (!(linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN))
+	if (linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN)
 		return;
 
 	if (linebuf->writebuf.buflen + len + delim_len > linebuf->writebuf.maxbuflen)
