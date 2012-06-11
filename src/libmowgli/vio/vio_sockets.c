@@ -230,9 +230,10 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 	}
 
 	/* Set this for edge-triggered interfaces */
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
-
-	MOWGLI_VIO_SETWRITE(vio)
+	if (ret < (int)len) {
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+		MOWGLI_VIO_SETWRITE(vio)
+	}
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
