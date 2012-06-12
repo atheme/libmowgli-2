@@ -182,13 +182,15 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 		
-		if (!mowgli_eventloop_ignore_errno(errno))
-			return mowgli_vio_err_errcode(vio, strerror, errno);
-		else if (errno != 0)
-			/* Further reads unnecessary */
-			return 0;
-
-		if (ret == 0)
+		if (ret < 0)
+		{
+			if (!mowgli_eventloop_ignore_errno(errno))
+				return mowgli_vio_err_errcode(vio, strerror, errno);
+			else if (errno != 0)
+				/* Further reads unnecessary */
+				return 0;
+		}
+		else
 		{
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
@@ -230,7 +232,8 @@ int mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 	}
 
 	/* Set this for edge-triggered interfaces */
-	if (ret < (int)len) {
+	if (ret < (int)len)
+	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
 		MOWGLI_VIO_SETWRITE(vio)
 	}
@@ -262,8 +265,11 @@ int mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len,
 			return 0;
 	}
 
-	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
-	MOWGLI_VIO_SETWRITE(vio)
+	if (ret < (int)len)
+	{
+		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
+		MOWGLI_VIO_SETWRITE(vio)
+	}
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_NONE;
 	return ret;
@@ -284,13 +290,15 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 
-		if (!mowgli_eventloop_ignore_errno(errno))
-			return mowgli_vio_err_errcode(vio, strerror, errno);
-		else if (errno != 0)
-			/* Further reads unnecessary */
-			return 0;
-
-		if (ret == 0)
+		if (ret < 0)
+		{
+			if (!mowgli_eventloop_ignore_errno(errno))
+				return mowgli_vio_err_errcode(vio, strerror, errno);
+			else if (errno != 0)
+				/* Further reads unnecessary */
+				return 0;
+		}
+		else
 		{
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
