@@ -7,22 +7,37 @@
 
 #include <mowgli.h>
 
+/* TOC:
+ * 0. JSON subsystem constants
+ * 1. Reference counters
+ * 2. Object creation and deletion
+ * 3. Serializer (a.k.a. formatter, printer, etc.)
+ * 4. Deserializer (a.k.a. parser, etc.)
+ */
+
+/*
+ * 0. JSON SUBSYSTEM CONSTANTS
+ */
+
 #define JSON_REFCOUNT_CONSTANT -42
 
-static mowgli_json_t json_null = {
+static mowgli_json_t json_null =
+{
 	.tag = MOWGLI_JSON_TAG_NULL,
 	.refcount = JSON_REFCOUNT_CONSTANT,
 };
 mowgli_json_t *mowgli_json_null = &json_null;
 
-static mowgli_json_t json_true = {
+static mowgli_json_t json_true =
+{
 	.tag = MOWGLI_JSON_TAG_BOOLEAN,
 	.refcount = JSON_REFCOUNT_CONSTANT,
 	.v_bool = true,
 };
 mowgli_json_t *mowgli_json_true = &json_true;
 
-static mowgli_json_t json_false = {
+static mowgli_json_t json_false =
+{
 	.tag = MOWGLI_JSON_TAG_BOOLEAN,
 	.refcount = JSON_REFCOUNT_CONSTANT,
 	.v_bool = false,
@@ -36,11 +51,16 @@ static void destroy_extra_array(mowgli_json_t *n);
 static void destroy_extra_object(mowgli_json_t *n);
 
 typedef void (*destroy_extra_cb_t)(mowgli_json_t*);
-static destroy_extra_cb_t destroy_extra[] = {
+static destroy_extra_cb_t destroy_extra[] =
+{
 	[MOWGLI_JSON_TAG_STRING] = destroy_extra_string,
 	[MOWGLI_JSON_TAG_ARRAY] = destroy_extra_array,
 	[MOWGLI_JSON_TAG_OBJECT] = destroy_extra_object,
 };
+
+/*
+ * 1. REFERENCE COUNTERS
+ */
 
 mowgli_json_t *mowgli_json_incref(mowgli_json_t *n)
 {
@@ -59,13 +79,18 @@ mowgli_json_t *mowgli_json_decref(mowgli_json_t *n)
 
 	n->refcount--;
 
-	if (n->refcount <= 0) {
+	if (n->refcount <= 0)
+	{
 		json_destroy(n);
 		return NULL;
 	}
 
 	return n;
 }
+
+/*
+ * 2. OBJECT CREATION AND DELETION
+ */
 
 static mowgli_json_t *json_alloc(mowgli_json_tag_t tag)
 {
@@ -134,7 +159,8 @@ static void destroy_extra_array(mowgli_json_t *n)
 {
 	mowgli_node_t *cur, *next;
 
-	MOWGLI_LIST_FOREACH_SAFE(cur, next, n->v_array->head) {
+	MOWGLI_LIST_FOREACH_SAFE(cur, next, n->v_array->head)
+	{
 		mowgli_json_decref((mowgli_json_t*)cur->data);
 		mowgli_node_delete(cur, n->v_array);
 	}
@@ -157,3 +183,11 @@ static void destroy_extra_object(mowgli_json_t *n)
 {
 	mowgli_patricia_destroy(n->v_object, destroy_extra_object_cb, NULL);
 }
+
+/*
+ * 3. SERIALIZER (A.K.A. FORMATTER, PRINTER, ETC.)
+ */
+
+/*
+ * 4. DESERIALIZER (A.K.A. PARSER, ETC.)
+ */
