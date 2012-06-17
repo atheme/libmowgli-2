@@ -8,14 +8,16 @@ SRCS = confparse.c 			\
        getopt_long.c			\
        global_storage.c 		\
        program_opts.c			\
-       proctitle.c
+       proctitle.c			\
+       json.c
 
 INCLUDES = confparse.h			\
 	   error_backtrace.h		\
 	   getopt_long.h		\
 	   global_storage.h		\
 	   program_opts.h		\
-	   proctitle.h
+	   proctitle.h			\
+	   json.h
 
 include ../../../buildsys.mk
 

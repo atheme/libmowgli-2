@@ -88,6 +88,8 @@ MOWGLI_DECLS_START
 #include "ext/confparse.h"
 #include "ext/program_opts.h"
 
+#include "ext/json.h"
+
 #include "linebuf/linebuf.h"
 #include "dns/dns.h"
 
