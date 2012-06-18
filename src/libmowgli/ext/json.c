@@ -246,13 +246,17 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 
 	mowgli_string_append_char(str, '"');
 
-	for (i=0; i<len; i++) {
+	for (i=0; i<len; i++)
+	{
 		c = p[i];
 
-		if (c < 0x20 || c > 0x7f) {
+		if (c < 0x20 || c > 0x7f)
+		{
 			mowgli_string_append_char(str, '\\');
 
-			switch (c) {
+			switch (c)
+			{
+			case '"': mowgli_string_append_char(str, '"'); break;
 			case '\\': mowgli_string_append_char(str, '\\'); break;
 			//case '/': mowgli_string_append_char(str, '/'); break;
 			case '\b': mowgli_string_append_char(str, 'b'); break;
@@ -269,7 +273,9 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 				mowgli_string_append_char(str, serialize_hex_digits[(c >> 0) & 0xf]);
 			}
 
-		} else {
+		}
+		else
+		{
 			mowgli_string_append_char(str, c);
 		}
 	}
@@ -288,7 +294,8 @@ static void serialize_array(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 	mowgli_string_append_char(str, '[');
 	serialize_pretty_break(str, pretty);
 
-	MOWGLI_LIST_FOREACH(cur, n->v_array->head) {
+	MOWGLI_LIST_FOREACH(cur, n->v_array->head)
+	{
 		serialize_pretty_indent(str, pretty);
 		mowgli_json_serialize(cur->data, str, serialize_pretty_increment(pretty));
 
