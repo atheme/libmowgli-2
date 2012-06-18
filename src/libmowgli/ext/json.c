@@ -191,22 +191,25 @@ static void destroy_extra_object(mowgli_json_t *n)
 #define TAB_STRING "    "
 #define TAB_LEN 4
 
-static void serialize_pretty_break(mowgli_string_t *str, int pretty)
+static void serialize_pretty_indent(mowgli_string_t *str, int pretty)
 {
 	int i;
 
+	for (i=0; i<pretty; i++)
+		mowgli_string_append(str, TAB_STRING, TAB_LEN);
+}
+
+static void serialize_pretty_break(mowgli_string_t *str, int pretty)
+{
 	if (pretty < 1)
 		return;
 
 	mowgli_string_append_char(str, '\n');
-
-	for (i=0; i<pretty-1; i++)
-		mowgli_string_append(str, TAB_STRING, TAB_LEN);
 }
 
 static int serialize_pretty_increment(int pretty)
 {
-	return (pretty ? 0 : pretty + 1);
+	return (pretty > 0 ? pretty + 1 : 0);
 }
 
 static void serialize_boolean(mowgli_json_t *n, mowgli_string_t *str, int pretty)
@@ -235,6 +238,7 @@ static void serialize_float(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 	mowgli_string_append(str, buf, len);
 }
 
+static const char *serialize_hex_digits = "0123456789abcdef";
 static void serialize_string_data(const char *p, size_t len, mowgli_string_t *str)
 {
 	unsigned i;
@@ -261,8 +265,8 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 				mowgli_string_append_char(str, 'u');
 				mowgli_string_append_char(str, '0');
 				mowgli_string_append_char(str, '0');
-				mowgli_string_append_char(str, (c >> 4) & 0xf);
-				mowgli_string_append_char(str, (c >> 0) & 0xf);
+				mowgli_string_append_char(str, serialize_hex_digits[(c >> 4) & 0xf]);
+				mowgli_string_append_char(str, serialize_hex_digits[(c >> 0) & 0xf]);
 			}
 
 		} else {
@@ -285,6 +289,7 @@ static void serialize_array(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 	serialize_pretty_break(str, pretty);
 
 	MOWGLI_LIST_FOREACH(cur, n->v_array->head) {
+		serialize_pretty_indent(str, pretty);
 		mowgli_json_serialize(cur->data, str, serialize_pretty_increment(pretty));
 
 		if (cur->next != NULL)
@@ -292,6 +297,7 @@ static void serialize_array(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 		serialize_pretty_break(str, pretty);
 	}
 
+	serialize_pretty_indent(str, pretty - 1);
 	mowgli_string_append_char(str, ']');
 }
 
@@ -308,12 +314,15 @@ static int serialize_object_cb(const char *key, void *data, void *privdata)
 
 	priv->remaining--;
 
+	serialize_pretty_indent(priv->str, priv->pretty);
+
 	serialize_string_data(key, strlen(key), priv->str);
 	mowgli_string_append_char(priv->str, ':');
 	if (priv->pretty)
 		mowgli_string_append_char(priv->str, ' ');
 
-	mowgli_json_serialize(data, priv->str, priv->pretty + 1);
+	mowgli_json_serialize(data, priv->str,
+			serialize_pretty_increment(priv->pretty));
 
 	if (priv->remaining)
 		mowgli_string_append_char(priv->str, ',');
@@ -327,12 +336,14 @@ static void serialize_object(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 	struct serialize_object_priv priv;
 
 	mowgli_string_append_char(str, '{');
+	serialize_pretty_break(str, pretty);
 
-	priv.pretty = pretty + 1;
+	priv.pretty = pretty;
 	priv.remaining = mowgli_patricia_size(n->v_object);
 	priv.str = str;
 	mowgli_patricia_foreach(n->v_object, serialize_object_cb, &priv);
 
+	serialize_pretty_indent(str, pretty - 1);
 	mowgli_string_append_char(str, '}');
 }
 
