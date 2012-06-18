@@ -188,6 +188,173 @@ static void destroy_extra_object(mowgli_json_t *n)
  * 3. SERIALIZER (A.K.A. FORMATTER, PRINTER, ETC.)
  */
 
+#define TAB_STRING "    "
+#define TAB_LEN 4
+
+static void serialize_pretty_break(mowgli_string_t *str, int pretty)
+{
+	int i;
+
+	if (pretty < 1)
+		return;
+
+	mowgli_string_append_char(str, '\n');
+
+	for (i=0; i<pretty-1; i++)
+		mowgli_string_append(str, TAB_STRING, TAB_LEN);
+}
+
+static int serialize_pretty_increment(int pretty)
+{
+	return (pretty ? 0 : pretty + 1);
+}
+
+static void serialize_boolean(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	if (n->v_bool)
+		mowgli_string_append(str, "true", 4);
+	else
+		mowgli_string_append(str, "false", 5);
+}
+
+static void serialize_int(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	char buf[32];
+	size_t len;
+
+	len = snprintf(buf, 32, "%d", n->v_int);
+	mowgli_string_append(str, buf, len);
+}
+
+static void serialize_float(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	char buf[32];
+	size_t len;
+
+	len = snprintf(buf, 32, "%g", n->v_float);
+	mowgli_string_append(str, buf, len);
+}
+
+static void serialize_string_data(const char *p, size_t len, mowgli_string_t *str)
+{
+	unsigned i;
+	unsigned char c;
+
+	mowgli_string_append_char(str, '"');
+
+	for (i=0; i<len; i++) {
+		c = p[i];
+
+		if (c < 0x20 || c > 0x7f) {
+			mowgli_string_append_char(str, '\\');
+
+			switch (c) {
+			case '\\': mowgli_string_append_char(str, '\\'); break;
+			//case '/': mowgli_string_append_char(str, '/'); break;
+			case '\b': mowgli_string_append_char(str, 'b'); break;
+			case '\f': mowgli_string_append_char(str, 'f'); break;
+			case '\n': mowgli_string_append_char(str, 'n'); break;
+			case '\r': mowgli_string_append_char(str, 'r'); break;
+			case '\t': mowgli_string_append_char(str, 't'); break;
+			default:
+				/* TODO: fix this... */
+				mowgli_string_append_char(str, 'u');
+				mowgli_string_append_char(str, '0');
+				mowgli_string_append_char(str, '0');
+				mowgli_string_append_char(str, (c >> 4) & 0xf);
+				mowgli_string_append_char(str, (c >> 0) & 0xf);
+			}
+
+		} else {
+			mowgli_string_append_char(str, c);
+		}
+	}
+
+	mowgli_string_append_char(str, '"');
+}
+static void serialize_string(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	serialize_string_data(n->v_string->str, n->v_string->pos, str);
+}
+
+static void serialize_array(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	mowgli_node_t *cur;
+
+	mowgli_string_append_char(str, '[');
+	serialize_pretty_break(str, pretty);
+
+	MOWGLI_LIST_FOREACH(cur, n->v_array->head) {
+		mowgli_json_serialize(cur->data, str, serialize_pretty_increment(pretty));
+
+		if (cur->next != NULL)
+			mowgli_string_append_char(str, ',');
+		serialize_pretty_break(str, pretty);
+	}
+
+	mowgli_string_append_char(str, ']');
+}
+
+struct serialize_object_priv /* lol, this is bullshit */
+{
+	int pretty;
+	int remaining;
+	mowgli_string_t *str;
+};
+
+static int serialize_object_cb(const char *key, void *data, void *privdata)
+{
+	struct serialize_object_priv *priv = privdata;
+
+	priv->remaining--;
+
+	serialize_string_data(key, strlen(key), priv->str);
+	mowgli_string_append_char(priv->str, ':');
+	if (priv->pretty)
+		mowgli_string_append_char(priv->str, ' ');
+
+	mowgli_json_serialize(data, priv->str, priv->pretty + 1);
+
+	if (priv->remaining)
+		mowgli_string_append_char(priv->str, ',');
+	serialize_pretty_break(priv->str, priv->pretty);
+
+	return 0;
+}
+
+static void serialize_object(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	struct serialize_object_priv priv;
+
+	mowgli_string_append_char(str, '{');
+
+	priv.pretty = pretty + 1;
+	priv.remaining = mowgli_patricia_size(n->v_object);
+	priv.str = str;
+	mowgli_patricia_foreach(n->v_object, serialize_object_cb, &priv);
+
+	mowgli_string_append_char(str, '}');
+}
+
+typedef void (*serializer_t)(mowgli_json_t*,mowgli_string_t*,int);
+static serializer_t serializers[] =
+{
+	[MOWGLI_JSON_TAG_BOOLEAN] = serialize_boolean,
+	[MOWGLI_JSON_TAG_INTEGER] = serialize_int,
+	[MOWGLI_JSON_TAG_FLOAT] = serialize_float,
+	[MOWGLI_JSON_TAG_STRING] = serialize_string,
+	[MOWGLI_JSON_TAG_ARRAY] = serialize_array,
+	[MOWGLI_JSON_TAG_OBJECT] = serialize_object,
+};
+
+void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	if (n && serializers[n->tag])
+		serializers[n->tag](n, str, pretty);
+	else
+		mowgli_string_append(str, "null", 4);
+}
+
 /*
  * 4. DESERIALIZER (A.K.A. PARSER, ETC.)
  */

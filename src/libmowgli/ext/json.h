@@ -58,7 +58,7 @@ struct _mowgli_json_t {
 					   (n)->v_float : (n)->v_int)
 #define MOWGLI_JSON_STRING(n)		((n)->v_string)
 #define MOWGLI_JSON_STRING_STR(n)	((n)->v_string->str)
-#define MOWGLI_JSON_STRING_LEN(n)	((n)->v_string->size)
+#define MOWGLI_JSON_STRING_LEN(n)	((n)->v_string->pos)
 #define MOWGLI_JSON_ARRAY(n)		((n)->v_array)
 #define MOWGLI_JSON_ARRAY_LEN(n)	((n)->v_array->count)
 #define MOWGLI_JSON_OBJECT(n)		((n)->v_object)
@@ -85,5 +85,7 @@ extern mowgli_json_t *mowgli_json_create_string_n(const char *str, unsigned len)
 extern mowgli_json_t *mowgli_json_create_string(const char *str);
 extern mowgli_json_t *mowgli_json_create_array(void);
 extern mowgli_json_t *mowgli_json_create_object(void);
+
+extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty);
 
 #endif
