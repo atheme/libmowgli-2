@@ -239,6 +239,7 @@ static void serialize_float(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 }
 
 static const char *serialize_hex_digits = "0123456789abcdef";
+static const char *serialize_escape = "\"\\\b\f\n\r\t";
 static void serialize_string_data(const char *p, size_t len, mowgli_string_t *str)
 {
 	unsigned i;
@@ -250,7 +251,7 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 	{
 		c = p[i];
 
-		if (c < 0x20 || c > 0x7f)
+		if (strchr(serialize_escape, c))
 		{
 			mowgli_string_append_char(str, '\\');
 
@@ -264,15 +265,20 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 			case '\n': mowgli_string_append_char(str, 'n'); break;
 			case '\r': mowgli_string_append_char(str, 'r'); break;
 			case '\t': mowgli_string_append_char(str, 't'); break;
-			default:
-				/* TODO: fix this... */
-				mowgli_string_append_char(str, 'u');
-				mowgli_string_append_char(str, '0');
-				mowgli_string_append_char(str, '0');
-				mowgli_string_append_char(str, serialize_hex_digits[(c >> 4) & 0xf]);
-				mowgli_string_append_char(str, serialize_hex_digits[(c >> 0) & 0xf]);
+			default: // hurrr
+				mowgli_string_append_char(str, c);
 			}
+		}
+		else if (c < 0x20 || c > 0x7f)
+		{
+			mowgli_string_append_char(str, '\\');
 
+			/* TODO: fix this... */
+			mowgli_string_append_char(str, 'u');
+			mowgli_string_append_char(str, '0');
+			mowgli_string_append_char(str, '0');
+			mowgli_string_append_char(str, serialize_hex_digits[(c >> 4) & 0xf]);
+			mowgli_string_append_char(str, serialize_hex_digits[(c >> 0) & 0xf]);
 		}
 		else
 		{
