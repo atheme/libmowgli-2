@@ -37,10 +37,11 @@ mowgli_module_t mowgli_module_open(const char *path)
 {
 	void *handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
+	if (handle == NULL)
+	{
+		mowgli_log("Failed to open %s: %s", path, dlerror());
+		return NULL;
+	}
 
 	return handle;
 }
@@ -53,10 +54,11 @@ void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 
 	handle = dlsym(module, symbol);
 
-	/* make sure we have something. make this an assertion so that 
-	 * there is feedback if something happens. (poor programming practice).
-	 */
-	return_val_if_fail(handle != NULL, NULL);
+	if (handle == NULL)
+	{
+		mowgli_log("Failed to find symbol %s: %s", symbol, dlerror());
+		return NULL;
+	}
 
 	return handle;
 }
