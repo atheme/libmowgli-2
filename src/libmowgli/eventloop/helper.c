@@ -197,7 +197,10 @@ mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t
 	switch (dir) {
 	case MOWGLI_EVENTLOOP_IO_READ:
 		if (helper->read_function != NULL)
-			return helper->read_function(eventloop, helper, MOWGLI_EVENTLOOP_IO_READ, helper->userdata);
+        {
+			helper->read_function(eventloop, helper, MOWGLI_EVENTLOOP_IO_READ, helper->userdata);
+            return;
+        }
 	default:
 		break;
 	}
