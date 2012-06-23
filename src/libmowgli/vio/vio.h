@@ -296,7 +296,7 @@ extern mowgli_vio_evops_t mowgli_vio_default_evops;
 
 
 /* Sundry operations on vio functables */
-#define mowgli_vio_set_op(vio, op, func) vio->ops->op = func;
+#define mowgli_vio_ops_set_op(ops, op, func) ops->op = func;
 
 /* Wrappers for the VIO ops */
 #define mowgli_vio_socket(vio, ...)	vio->ops->socket(vio, __VA_ARGS__)
