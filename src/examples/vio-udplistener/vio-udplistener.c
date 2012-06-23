@@ -18,7 +18,7 @@ int main (void)
 	mowgli_vio_t *vio = mowgli_vio_create(NULL);
 	mowgli_vio_sockaddr_t addr;
 	
-	mowgli_vio_sockaddr_create(&addr, PROTO, LISTEN, 31337);
+	mowgli_vio_sockaddr_create(&addr, PROTO, LISTEN, PORT);
 
 	if (mowgli_vio_socket(vio, PROTO, SOCK_DGRAM, 0))
 		return EXIT_FAILURE;
