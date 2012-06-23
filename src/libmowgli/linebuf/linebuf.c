@@ -157,9 +157,12 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 
 	if ((ret = mowgli_vio_read(linebuf->vio, bufpos, offset)) <= 0)
 	{
-		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
-			/* Let's never come back here */
-			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, NULL);
+		if (linebuf->vio->error.type == MOWGLI_VIO_ERR_NONE)
+			return;
+
+		/* Let's never come back here */
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, NULL);
+		mowgli_linebuf_do_shutdown(linebuf);
 		return;
 	}
 
