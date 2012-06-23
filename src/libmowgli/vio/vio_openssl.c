@@ -419,8 +419,7 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 				vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 				mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
-				mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, true);
+				MOWGLI_VIO_SET_CLOSED(vio)
 	
 				return mowgli_vio_error(vio);
 			}

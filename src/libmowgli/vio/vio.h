@@ -217,6 +217,8 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDREAD, false);	\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 
+#define MOWGLI_VIO_IS_CLOSED(v) mowgli_vio_hasflag(v, MOWGLI_VIO_FLAGS_ISCLOSED)
+
 #define MOWGLI_VIO_SETREAD(vio)							\
 	if (vio->eventloop && vio->io && vio->evops && vio->evops->read_cb)	\
 	{   									\
@@ -234,7 +236,6 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 	{				\
 		mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL); \
 	}
-
 
 /* Decls */
 extern mowgli_vio_t * mowgli_vio_create(void *userdata);
