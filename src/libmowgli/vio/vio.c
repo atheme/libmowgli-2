@@ -169,7 +169,8 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
 {
 	return_if_fail(vio);
 
-	mowgli_vio_eventloop_detach(vio);
+	if (vio->eventloop != NULL)
+		mowgli_vio_eventloop_detach(vio);
 
 	if (!mowgli_vio_hasflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED))
 		mowgli_vio_close(vio);

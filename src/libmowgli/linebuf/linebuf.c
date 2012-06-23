@@ -59,6 +59,8 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 	mowgli_linebuf_setbuflen(&(linebuf->readbuf), 65536);
 	mowgli_linebuf_setbuflen(&(linebuf->writebuf), 65536);
 
+	linebuf->eventloop = NULL;
+
 	linebuf->return_normal_strings = true; /* This is generally what you want, but beware of malicious \0's in input data! */
 
 	linebuf->userdata = userdata;
@@ -91,13 +93,18 @@ void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventl
 void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf)
 {
 	return_if_fail(linebuf != NULL);
+	return_if_fail(linebuf->eventloop != NULL);
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_READ, NULL);
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 	mowgli_vio_eventloop_detach(linebuf->vio);
+	linebuf->eventloop = NULL;
 }
 
 void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 {
+	if (linebuf->eventloop != NULL)
+		mowgli_linebuf_detach_from_eventloop(linebuf);
+
 	mowgli_vio_destroy(linebuf->vio);
 
 	mowgli_free(linebuf->readbuf.buffer);
