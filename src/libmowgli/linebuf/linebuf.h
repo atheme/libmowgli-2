@@ -38,7 +38,7 @@ extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
 extern void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len);
 extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...);
-extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf, mowgli_linebuf_shutdown_cb_t *cb);
+extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf);
 
 struct _mowgli_linebuf_buf {
 	char *buffer;
