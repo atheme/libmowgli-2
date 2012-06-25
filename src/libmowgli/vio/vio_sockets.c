@@ -40,7 +40,7 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 
 	vio->fd = fd;
 
-	if (family == SOCK_STREAM)
+	if (type == SOCK_STREAM)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCLOSED, false);
