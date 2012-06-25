@@ -157,9 +157,12 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 
 	if ((ret = mowgli_vio_read(linebuf->vio, bufpos, offset)) <= 0)
 	{
-		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
-			/* Let's never come back here */
-			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, NULL);
+		if (linebuf->vio->error.type == MOWGLI_VIO_ERR_NONE)
+			return;
+
+		/* Let's never come back here */
+		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_READ, NULL);
+		mowgli_linebuf_do_shutdown(linebuf);
 		return;
 	}
 
@@ -249,14 +252,11 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
-void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf, mowgli_linebuf_shutdown_cb_t *cb)
+void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf)
 {
 	return_if_fail(linebuf != NULL);
-	/* A null callback makes no sense. Just close your socket, bro. */
-	return_if_fail(cb != NULL);
 
 	linebuf->flags |= MOWGLI_LINEBUF_SHUTTING_DOWN;
-	linebuf->shutdown_cb = cb;
 
 	if (linebuf->writebuf.buflen == 0)
 		mowgli_linebuf_do_shutdown(linebuf);
