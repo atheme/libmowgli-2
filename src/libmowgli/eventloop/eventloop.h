@@ -175,7 +175,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	time_ = tp.tv_sec;
 #elif defined(_WIN32)
 	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
-	static OSVERSIONINFOEX &winver = NULL;
+	static OSVERSIONINFOEX *winver = NULL;
 	if (winver == NULL)
 	{
 		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
