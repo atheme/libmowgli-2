@@ -180,7 +180,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	{
 		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
 		winver->dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-		if (!GetVersionEx(winver))
+		if (!GetVersionEx((OSVERSIONINFO*)winver))
 		{
 			mowgli_free(winver);
 			winver = NULL; /* FIXME */
