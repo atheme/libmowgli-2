@@ -175,14 +175,18 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	time_ = tp.tv_sec;
 #elif defined(_WIN32)
 	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
-	static OSVERSIONINFOEX winver = NULL;
+	static OSVERSIONINFOEX &winver = NULL;
 	if (winver == NULL)
 	{
-		winver.dwOSVersionInfoSize = sizeof(winver);
-		if (!GetVersionEx((OSVERSIONINFO*)&winver))
-			winver = NULL; /* XXX */
+		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
+		winver->dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+		if (!GetVersionEx(winver))
+		{
+			mowgli_free(winver);
+			winver = NULL; /* FIXME */
+		}
 	}
-	if (winver && winver.dwMajorVersion >= 6)
+	if (winver && winver->dwMajorVersion >= 6)
 	{
 		HINSTANCE hKernel32;
 		*(FARPROC*)&GetTickCount64 = GetProcAddress(hKernel32, "GetTickCount64");
