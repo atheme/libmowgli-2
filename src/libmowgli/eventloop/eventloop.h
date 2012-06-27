@@ -162,7 +162,38 @@ static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
 
 static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 {
-	mowgli_eventloop_set_time(eventloop, time(NULL));
+	long long time_;
+#if defined(CLOCK_MONOTONIC)
+	struct timespec tp;
+
+	clock_gettime(CLOCK_MONOTONIC, &tp);
+	time_ = tp.tv_sec;
+#elif defined(CLOCK_HIGHRES)
+	struct timespec tp;
+
+	clock_gettime(CLOCK_HIGHRES, &tp);
+	time_ = tp.tv_sec;
+#elif defined(_WIN32)
+	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
+	if (winver.dwMajorVersion >= 6)
+	{
+		HINSTANCE hKernel32;
+		*(FARPROC*)&GetTickCount64 = GetProcAddress(hKernel32, "GetTickCount64");
+                if (GetTickCount64 == NULL)
+			time_ = time(NULL);
+		else
+			time_ = (int)(GetTickCount64() * 1e-3);
+	}
+#elif defined(__APPLE__)
+	static mach_timebase_info_data_t timebase;
+	if (timebase.denom == 0)
+		mach_timebase_info(&timebase);
+
+	time_ = (int)(mach_absolute_time() * timebase.numer / timebase.denom * 1e-9);
+#else
+	time_ = time(NULL);
+#endif
+	mowgli_eventloop_set_time(eventloop, (time_t)time_);
 }
 
 static inline bool mowgli_eventloop_ignore_errno(int error)

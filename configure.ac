@@ -107,6 +107,7 @@ case "$target" in
    CPPFLAGS="$CFLAGS $PTHREAD_CFLAGS"
    LIBS="$PTHREAD_LIBS $LIBS"
    AC_CHECK_LIB(dl, dlopen, [LIBS="$LIBS -ldl"])
+   AC_CHECK_LIB(rt, clock_gettime, [LIBS="$LIBS -lrt"])
    ;;
 esac
 AC_SUBST([LIBMOWGLI_OS])
