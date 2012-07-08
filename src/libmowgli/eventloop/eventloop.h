@@ -174,6 +174,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	clock_gettime(CLOCK_HIGHRES, &tp);
 	time_ = tp.tv_sec;
 #elif defined(_WIN32)
+#if 0
 	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
 	static OSVERSIONINFOEX *winver = NULL;
 	if (winver == NULL)
@@ -195,6 +196,9 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 		else
 			time_ = (int)(GetTickCount64() * 1e-3);
 	}
+#else
+	time_ = time(NULL);
+#endif /* 0 */
 #elif defined(__APPLE__)
 	static mach_timebase_info_data_t timebase;
 	if (timebase.denom == 0)
