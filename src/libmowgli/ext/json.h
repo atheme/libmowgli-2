@@ -60,7 +60,6 @@ struct _mowgli_json_t {
 #define MOWGLI_JSON_STRING_STR(n)	((n)->v_string->str)
 #define MOWGLI_JSON_STRING_LEN(n)	((n)->v_string->pos)
 #define MOWGLI_JSON_ARRAY(n)		((n)->v_array)
-#define MOWGLI_JSON_ARRAY_LEN(n)	((n)->v_array->count)
 #define MOWGLI_JSON_OBJECT(n)		((n)->v_object)
 
 /* Users of the JSON parser/formatter are not required to use these
@@ -85,6 +84,8 @@ extern mowgli_json_t *mowgli_json_create_string_n(const char *str, unsigned len)
 extern mowgli_json_t *mowgli_json_create_string(const char *str);
 extern mowgli_json_t *mowgli_json_create_array(void);
 extern mowgli_json_t *mowgli_json_create_object(void);
+
+#include "json-inline.h"
 
 extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty);
 

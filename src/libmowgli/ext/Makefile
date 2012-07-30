@@ -17,7 +17,8 @@ INCLUDES = confparse.h			\
 	   global_storage.h		\
 	   program_opts.h		\
 	   proctitle.h			\
-	   json.h
+	   json.h			\
+	   json-inline.h
 
 include ../../../buildsys.mk
 
