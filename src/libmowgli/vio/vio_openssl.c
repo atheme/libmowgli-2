@@ -77,12 +77,12 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 		vio->ops = ops;
 
 	/* Change ops */
-	mowgli_vio_ops_set_op(ops, connect, mowgli_vio_openssl_default_connect);
-	mowgli_vio_ops_set_op(ops, read, mowgli_vio_openssl_default_read);
-	mowgli_vio_ops_set_op(ops, write, mowgli_vio_openssl_default_write);
-	mowgli_vio_ops_set_op(ops, close, mowgli_vio_openssl_default_close);
-	mowgli_vio_ops_set_op(ops, accept, mowgli_vio_openssl_default_accept);
-	mowgli_vio_ops_set_op(ops, listen, mowgli_vio_openssl_default_listen);
+	mowgli_vio_ops_set_op(vio->ops, connect, mowgli_vio_openssl_default_connect);
+	mowgli_vio_ops_set_op(vio->ops, read, mowgli_vio_openssl_default_read);
+	mowgli_vio_ops_set_op(vio->ops, write, mowgli_vio_openssl_default_write);
+	mowgli_vio_ops_set_op(vio->ops, close, mowgli_vio_openssl_default_close);
+	mowgli_vio_ops_set_op(vio->ops, accept, mowgli_vio_openssl_default_accept);
+	mowgli_vio_ops_set_op(vio->ops, listen, mowgli_vio_openssl_default_listen);
 
 	/* SSL setup */
 	if (!openssl_init)
