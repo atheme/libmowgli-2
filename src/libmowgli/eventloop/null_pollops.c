@@ -33,7 +33,7 @@ void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int tim
 	currtime = mowgli_eventloop_get_time(eventloop);
 	delay = mowgli_eventloop_next_timer(eventloop);
 
-	if (delay <= currtime)
+	while (delay <= currtime)
 	{
 		mowgli_eventloop_run_timers(eventloop);
 		mowgli_eventloop_synchronize(eventloop);
@@ -45,12 +45,7 @@ void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int tim
 	if (timeout)
 		t = timeout;
 	else
-	{
-		if (delay <= currtime)
-			t = -1;
-		else
-			t = (delay - currtime) * 1000;
-	}
+		t = (delay - currtime) * 1000;
 
 #ifdef DEBUG
 	mowgli_log("delay: %ld, currtime: %ld, select period: %d", delay, currtime, t);
