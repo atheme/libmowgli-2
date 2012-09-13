@@ -174,9 +174,10 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	clock_gettime(CLOCK_HIGHRES, &tp);
 	time_ = tp.tv_sec;
 #elif defined(_WIN32)
-#if 0
 	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
 	static OSVERSIONINFOEX *winver = NULL;
+	static bool load_err = false;
+
 	if (winver == NULL)
 	{
 		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
@@ -189,16 +190,28 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	}
 	if (winver && winver->dwMajorVersion >= 6)
 	{
-		HINSTANCE hKernel32;
-		*(FARPROC*)&GetTickCount64 = GetProcAddress(hKernel32, "GetTickCount64");
-                if (GetTickCount64 == NULL)
+		if (GetTickCount64 == NULL && !load_err)
+		{
+			HINSTANCE hKernel32;
+
+			hKernel32 = GetModuleHandle("KERNEL32");
+			GetTickCount64 = GetProcAddress(hKernel32, "GetTickCount64");
+
+			if (GetTickCount64 == NULL)
+				load_err = true;
+		}
+
+		if (load_err)
 			time_ = time(NULL);
 		else
+		{
+			soft_assert(GetTickCount64 != NULL);
+
 			time_ = (int)(GetTickCount64() * 1e-3);
+		}
 	}
-#else
-	time_ = time(NULL);
-#endif /* 0 */
+	else
+		time_ = time(NULL);
 #elif defined(__APPLE__)
 	static mach_timebase_info_data_t timebase;
 	if (timebase.denom == 0)
