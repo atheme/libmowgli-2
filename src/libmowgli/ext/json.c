@@ -382,3 +382,147 @@ void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty)
 /*
  * 4. DESERIALIZER (A.K.A. PARSER, ETC.)
  */
+
+/* LL(1) parser format:
+
+   Terminal symbols: { } [ ] : , STR NUM ID
+
+   Rule table:
+       0. [invalid]
+
+       1. <json-document> := <object>
+       2. <json-document> := <array>
+      
+       3.         <value> := <object> 
+       4.         <value> := <array> 
+       5.         <value> := STR 
+       6.         <value> := NUM 
+       7.         <value> := ID
+      
+       8.        <object> := { <obj-body>
+       9.      <obj-body> := } 
+      10.      <obj-body> := <obj-elems>
+      11.     <obj-elems> := <obj-elem> <obj-tail>
+      12.      <obj-tail> := , <obj-elems> 
+      13.      <obj-tail> := } 
+      14.      <obj-elem> := STR : <value>
+      
+      15.         <array> := [ <arr-body>
+      16.      <arr-body> := ]
+      17.      <arr-body> := <arr-elems>
+      18.     <arr-elems> := <value> <arr-tail>
+      19.      <arr-tail> := , <arr-elems>
+      20.      <arr-tail> := ]
+   
+   Transition table:
+                   {    }    [    ]    :    ,  STR  NUM   ID
+                 ---  ---  ---  ---  ---  ---  ---  ---  ---
+   json-document   1         2
+           value   3         4                   5    6    7
+          object   8
+        obj-body        9                       10
+       obj-elems                                11
+        obj-tail       13                  12
+        obj-elem                                14
+           array            15
+        arr-body  18        18   16             18   18   18
+       arr-elems   3         4                   5    6    7
+        arr-tail                 20        19
+   
+   These two tables are effectively a program for an LL(1) parser. The
+   hard work has been done. The remaining steps are to attach appropriate
+   actions to the rules above, and to implement the LL(1) parsing
+   algorithm.
+ */
+
+enum ll_sym {
+	SYM_NONE,
+
+	TS_BEGIN_OBJECT,  /* { */
+	TS_END_OBJECT,    /* } */
+	TS_BEGIN_ARRAY,   /* [ */
+	TS_END_ARRAY,     /* ] */
+	TS_NAME_SEP,      /* : */
+	TS_VALUE_SEP,     /* , */
+	TS_STRING,
+	TS_NUMBER,
+	TS_IDENTIFIER,
+
+	NTS_JSON_DOCUMENT,
+	NTS_VALUE,
+	NTS_OBJECT,
+	NTS_OBJ_BODY,
+	NTS_OBJ_ELEMS,
+	NTS_OBJ_TAIL,
+	NTS_OBJ_ELEM,
+	NTS_ARRAY,
+	NTS_ARR_BODY,
+	NTS_ARR_ELEMS,
+	NTS_ARR_TAIL,
+
+	SYM_COUNT
+};
+
+/* The LL(1) parser table. */
+static unsigned char ll_table[SYM_COUNT][SYM_COUNT] = {
+	[NTS_JSON_DOCUMENT][TS_BEGIN_OBJECT] = 1,
+	[NTS_JSON_DOCUMENT][TS_BEGIN_ARRAY] = 2,
+
+	[NTS_VALUE][TS_BEGIN_OBJECT] = 3,
+	[NTS_VALUE][TS_BEGIN_ARRAY] = 4,
+	[NTS_VALUE][TS_STRING] = 5,
+	[NTS_VALUE][TS_NUMBER] = 6,
+	[NTS_VALUE][TS_IDENTIFIER] = 7,
+
+	[NTS_OBJECT][TS_BEGIN_OBJECT] = 8,
+	[NTS_OBJ_BODY][TS_END_OBJECT] = 9,
+	[NTS_OBJ_BODY][TS_STRING] = 10,
+	[NTS_OBJ_ELEMS][TS_STRING] = 11,
+	[NTS_OBJ_TAIL][TS_END_OBJECT] = 13,
+	[NTS_OBJ_TAIL][TS_VALUE_SEP] = 12,
+	[NTS_OBJ_ELEM][TS_STRING] = 14,
+
+	[NTS_ARRAY][TS_BEGIN_ARRAY] = 15,
+	[NTS_ARR_BODY][TS_BEGIN_OBJECT] = 18,
+	[NTS_ARR_BODY][TS_BEGIN_ARRAY] = 18,
+	[NTS_ARR_BODY][TS_END_ARRAY] = 16,
+	[NTS_ARR_BODY][TS_STRING] = 18,
+	[NTS_ARR_BODY][TS_NUMBER] = 18,
+	[NTS_ARR_BODY][TS_IDENTIFIER] = 18,
+	[NTS_ARR_ELEMS][TS_BEGIN_OBJECT] = 3,
+	[NTS_ARR_ELEMS][TS_BEGIN_ARRAY] = 4,
+	[NTS_ARR_ELEMS][TS_STRING] = 5,
+	[NTS_ARR_ELEMS][TS_NUMBER] = 6,
+	[NTS_ARR_ELEMS][TS_IDENTIFIER] = 7,
+	[NTS_ARR_TAIL][TS_END_ARRAY] = 20,
+	[NTS_ARR_TAIL][TS_VALUE_SEP] = 19,
+};
+
+/* The LL(1) rule table */
+static enum ll_sym ll_rules[][3] = {
+	{ 0 }, /* 0 */
+
+	{ NTS_OBJECT },
+	{ NTS_ARRAY },
+
+	{ NTS_OBJECT },
+	{ NTS_ARRAY },
+	{ TS_STRING }, /* 5 */
+	{ TS_NUMBER },
+	{ TS_IDENTIFIER },
+
+	{ TS_BEGIN_OBJECT, NTS_OBJ_BODY },
+	{ TS_END_OBJECT },
+	{ NTS_OBJ_ELEMS }, /* 10 */
+	{ NTS_OBJ_ELEM, NTS_OBJ_TAIL },
+	{ TS_VALUE_SEP, NTS_OBJ_ELEMS },
+	{ TS_END_OBJECT },
+	{ TS_STRING, TS_NAME_SEP, NTS_VALUE },
+
+	{ TS_BEGIN_ARRAY, NTS_ARR_BODY }, /* 15 */
+	{ TS_END_ARRAY },
+	{ NTS_ARR_ELEMS },
+	{ NTS_VALUE, NTS_ARR_TAIL },
+	{ TS_VALUE_SEP, NTS_ARR_TAIL },
+	{ TS_END_ARRAY }, /* 20 */
+};
