@@ -463,6 +463,36 @@ enum ll_sym {
 	SYM_COUNT
 };
 
+/* Human-readable versions of symbols used in errors, etc. */
+static char *ll_sym_name[] = {
+	[SYM_NONE] = "(none)",
+
+	[TS_BEGIN_OBJECT] = "'{'",
+	[TS_END_OBJECT] = "'}'",
+	[TS_BEGIN_ARRAY] = "'['",
+	[TS_END_ARRAY] = "']'",
+	[TS_NAME_SEP] = "':'",
+	[TS_VALUE_SEP] = "','",
+	[TS_STRING] = "string",
+	[TS_NUMBER] = "number",
+	[TS_IDENTIFIER] = "identifier",
+
+	[NTS_JSON_DOCUMENT] = "json-document",
+	[NTS_VALUE] = "value",
+	[NTS_OBJECT] = "object",
+	[NTS_OBJ_BODY] = "object body",
+	[NTS_OBJ_ELEMS] = "object elements",
+	[NTS_OBJ_TAIL] = "object tail",
+	[NTS_OBJ_ELEM] = "object element",
+
+	[NTS_ARRAY] = "array",
+	[NTS_ARR_BODY] = "array body",
+	[NTS_ARR_ELEMS] = "array elements",
+	[NTS_ARR_TAIL] = "array tail",
+
+	[SYM_COUNT] = "(none)",
+};
+
 /* The LL(1) parser table. */
 static unsigned char ll_table[SYM_COUNT][SYM_COUNT] = {
 	[NTS_JSON_DOCUMENT][TS_BEGIN_OBJECT] = 1,
