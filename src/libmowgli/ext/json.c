@@ -19,6 +19,8 @@
  * 0. JSON SUBSYSTEM CONSTANTS
  */
 
+#define LL_STACK_SIZE 128
+
 #define JSON_REFCOUNT_CONSTANT -42
 
 static mowgli_json_t json_null =
@@ -273,7 +275,7 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 		{
 			mowgli_string_append_char(str, '\\');
 
-			/* TODO: fix this... */
+			/* XXX: \u output does not do UTF-8 */
 			mowgli_string_append_char(str, 'u');
 			mowgli_string_append_char(str, '0');
 			mowgli_string_append_char(str, '0');
@@ -425,8 +427,8 @@ void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty)
         obj-tail       13                  12
         obj-elem                                14
            array            15
-        arr-body  18        18   16             18   18   18
-       arr-elems   3         4                   5    6    7
+        arr-body  17        17   16             17   17   17
+       arr-elems  18        18                  18   18   18
         arr-tail                 20        19
    
    These two tables are effectively a program for an LL(1) parser. The
@@ -513,17 +515,17 @@ static unsigned char ll_table[SYM_COUNT][SYM_COUNT] = {
 	[NTS_OBJ_ELEM][TS_STRING] = 14,
 
 	[NTS_ARRAY][TS_BEGIN_ARRAY] = 15,
-	[NTS_ARR_BODY][TS_BEGIN_OBJECT] = 18,
-	[NTS_ARR_BODY][TS_BEGIN_ARRAY] = 18,
+	[NTS_ARR_BODY][TS_BEGIN_OBJECT] = 17,
+	[NTS_ARR_BODY][TS_BEGIN_ARRAY] = 17,
 	[NTS_ARR_BODY][TS_END_ARRAY] = 16,
-	[NTS_ARR_BODY][TS_STRING] = 18,
-	[NTS_ARR_BODY][TS_NUMBER] = 18,
-	[NTS_ARR_BODY][TS_IDENTIFIER] = 18,
-	[NTS_ARR_ELEMS][TS_BEGIN_OBJECT] = 3,
-	[NTS_ARR_ELEMS][TS_BEGIN_ARRAY] = 4,
-	[NTS_ARR_ELEMS][TS_STRING] = 5,
-	[NTS_ARR_ELEMS][TS_NUMBER] = 6,
-	[NTS_ARR_ELEMS][TS_IDENTIFIER] = 7,
+	[NTS_ARR_BODY][TS_STRING] = 17,
+	[NTS_ARR_BODY][TS_NUMBER] = 17,
+	[NTS_ARR_BODY][TS_IDENTIFIER] = 17,
+	[NTS_ARR_ELEMS][TS_BEGIN_OBJECT] = 18,
+	[NTS_ARR_ELEMS][TS_BEGIN_ARRAY] = 18,
+	[NTS_ARR_ELEMS][TS_STRING] = 18,
+	[NTS_ARR_ELEMS][TS_NUMBER] = 18,
+	[NTS_ARR_ELEMS][TS_IDENTIFIER] = 18,
 	[NTS_ARR_TAIL][TS_END_ARRAY] = 20,
 	[NTS_ARR_TAIL][TS_VALUE_SEP] = 19,
 };
@@ -553,6 +555,340 @@ static enum ll_sym ll_rules[][3] = {
 	{ TS_END_ARRAY },
 	{ NTS_ARR_ELEMS },
 	{ NTS_VALUE, NTS_ARR_TAIL },
-	{ TS_VALUE_SEP, NTS_ARR_TAIL },
+	{ TS_VALUE_SEP, NTS_ARR_ELEMS },
 	{ TS_END_ARRAY }, /* 20 */
 };
+
+struct ll_token {
+	enum ll_sym sym;
+	mowgli_json_t *val;
+};
+
+/* typedef'd to mowgli_json_parse_t in json.h */
+struct _mowgli_json_parse_t {
+	/* output queue */
+	mowgli_list_t *out;
+
+	/* parser */
+	enum ll_sym stack[LL_STACK_SIZE];
+	unsigned top;
+
+	/* lexer */
+	mowgli_string_t *buf;
+	enum {
+		LEX_LIMBO,
+		LEX_STRING,
+		LEX_STRING_ESC,
+		LEX_STRING_ESC_U,
+		LEX_NUMBER,
+		LEX_IDENTIFIER
+	} lex;
+	unsigned lex_u;
+};
+
+static struct ll_token *ll_token_alloc(enum ll_sym sym, mowgli_json_t *val)
+{
+	struct ll_token *tok;
+
+	tok = mowgli_alloc(sizeof(*tok));
+	tok->sym = sym;
+	tok->val = val;
+
+	return tok;
+}
+
+static void ll_token_free(struct ll_token *tok)
+{
+	mowgli_free(tok);
+}
+
+static void ll_push(mowgli_json_parse_t *parse, enum ll_sym sym)
+{
+	parse->stack[parse->top++] = sym;
+}
+
+static enum ll_sym ll_pop(mowgli_json_parse_t *parse)
+{
+	if (parse->top <= 0)
+		return SYM_NONE;
+
+	return parse->stack[--parse->top];
+}
+
+static bool ll_stack_empty(mowgli_json_parse_t *parse)
+{
+	return parse->top == 0;
+}
+
+mowgli_json_parse_t *mowgli_json_parse_create(void)
+{
+	mowgli_json_parse_t *parse;
+
+	parse = mowgli_alloc(sizeof(*parse));
+
+	parse->out = mowgli_list_create();
+	parse->top = 0;
+	parse->buf = mowgli_string_create();
+	parse->lex = LEX_LIMBO;
+
+	ll_push(parse, NTS_JSON_DOCUMENT);
+
+	return parse;
+}
+
+void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
+{
+	return_if_fail(parse != NULL);
+
+	mowgli_list_free(parse->out);
+	mowgli_string_destroy(parse->buf);
+
+	mowgli_free(parse);
+}
+
+static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	enum ll_sym top, sym;
+	int rule, i;
+
+	for (;;) {
+		if (ll_stack_empty(parse)) {
+			mowgli_log("Unexpected %s after JSON input", ll_sym_name[tok->sym]);
+			break;
+		}
+
+		top = ll_pop(parse);
+		if (top == tok->sym) {
+			/* perfect! */
+			break;
+		}
+
+		rule = ll_table[top][tok->sym];
+		if (rule == 0) {
+			mowgli_log("Expected %s, got %s", ll_sym_name[top],
+						ll_sym_name[tok->sym]);
+			break;
+		}
+
+		for (i=2; i>=0; i--) {
+			sym = ll_rules[rule][i];
+			if (sym != SYM_NONE)
+				ll_push(parse, sym);
+		}
+	}
+}
+
+static void lex_easy(mowgli_json_parse_t *parse, enum ll_sym sym)
+{
+	ll_parse(parse, ll_token_alloc(sym, NULL));
+}
+
+static void lex_append(mowgli_json_parse_t *parse, char c)
+{
+	mowgli_string_append_char(parse->buf, c);
+}
+
+static mowgli_json_t *lex_string_scan(char *s, size_t n)
+{
+	mowgli_json_t *val;
+	mowgli_string_t *str;
+	char ubuf[5];
+	char *end = s + n;
+
+	val = mowgli_json_create_string("");
+	str = val->v_string;
+
+	ubuf[4] = '\0'; /* always */
+
+	while (s < end) {
+		if (*s == '\\') {
+			/* Should this be moved to a separate function? */
+			s++;
+			switch (*s) {
+			case '\"':
+			case '\\':
+			case '/':
+				mowgli_string_append_char(str, *s);
+				break;
+
+			case 'b': mowgli_string_append_char(str, 0x8); break;
+			case 'f': mowgli_string_append_char(str, 0xc); break;
+			case 'n': mowgli_string_append_char(str, 0xa); break;
+			case 'r': mowgli_string_append_char(str, 0xd); break;
+			case 't': mowgli_string_append_char(str, 0x9); break;
+
+			/* XXX: this is not the right way to parse \u */
+			case 'u':
+				s++;
+				if (end - s < 4) {
+					/* error */
+				} else {
+					memcpy(ubuf, s, 4);
+					mowgli_string_append_char(str, strtol(ubuf, NULL, 16) & 0xff);
+				}
+				s+=3; /* +3 points to last char */
+				break;
+
+			default: /* aww */
+				break;
+			}
+		} else {
+			mowgli_string_append_char(str, *s);
+		}
+
+		s++;
+	}
+
+	return val;
+}
+
+static void lex_tokenize(mowgli_json_parse_t *parse)
+{
+	char *s = parse->buf->str;
+	size_t n = parse->buf->pos;
+	enum ll_sym sym = SYM_NONE;
+	mowgli_json_t *val = NULL;
+
+	switch (parse->lex) {
+	case LEX_STRING:
+		sym = TS_STRING;
+		val = lex_string_scan(s, n);
+		break;
+
+	case LEX_NUMBER:
+		if (strchr(s, '.') || strchr(s, 'e')) {
+			val = mowgli_json_create_float(strtod(s, NULL));
+		} else {
+			val = mowgli_json_create_integer(strtol(s, NULL, 0));
+		}
+		sym = TS_NUMBER;
+		break;
+
+	case LEX_IDENTIFIER:
+		sym = TS_IDENTIFIER;
+		if (!strcmp(s, "null")) {
+			val = mowgli_json_null;
+		} else if (!strcmp(s, "true")) {
+			val = mowgli_json_true;
+		} else if (!strcmp(s, "false")) {
+			val = mowgli_json_false;
+		} else {
+			val = mowgli_json_null;
+			/* error condition! */
+		}
+		break;
+
+	default:
+		/* we should not be tokenizing here! */
+		break;
+	}
+
+	mowgli_string_reset(parse->buf);
+	parse->lex = LEX_LIMBO;
+
+	ll_parse(parse, ll_token_alloc(sym, val));
+}
+
+/* lex_char returns true if it wants the char to be sent through again */
+static bool lex_char(mowgli_json_parse_t *parse, char c)
+{
+	switch (parse->lex) {
+	case LEX_LIMBO:
+		/* the easy ones */
+		switch (c) {
+		case '{': lex_easy(parse, TS_BEGIN_OBJECT); return false;
+		case '}': lex_easy(parse, TS_END_OBJECT); return false;
+		case '[': lex_easy(parse, TS_BEGIN_ARRAY); return false;
+		case ']': lex_easy(parse, TS_END_ARRAY); return false;
+		case ':': lex_easy(parse, TS_NAME_SEP); return false;
+		case ',': lex_easy(parse, TS_VALUE_SEP); return false;
+		}
+
+		if (c == '-' || c == '.' || isdigit(c)) {
+			parse->lex = LEX_NUMBER;
+			return true;
+		} else if (isalpha(c)) {
+			parse->lex = LEX_IDENTIFIER;
+			return true;
+		} else if (c == '"') {
+			parse->lex = LEX_STRING;
+			return false;
+		} else if (isspace(c)) {
+			return false;
+		}
+
+		/* If control reaches this point, it is an error. We
+		   should indicate this somehow, but for now we'll just
+		   ignore it.  */
+		return false;
+
+	case LEX_STRING:
+
+		if (c == '\\') {
+			lex_append(parse, c);
+			parse->lex = LEX_STRING_ESC;
+		} else if (c == '"') {
+			lex_tokenize(parse);
+		} else {
+			lex_append(parse, c);
+		}
+
+		return false;
+
+	case LEX_STRING_ESC:
+		lex_append(parse, c);
+
+		if (c == 'u') {
+			parse->lex_u = 0;
+			parse->lex = LEX_STRING_ESC_U;
+		} else {
+			parse->lex = LEX_STRING;
+		}
+
+		return false;
+
+	case LEX_STRING_ESC_U:
+		lex_append(parse, c);
+
+		parse->lex_u++;
+		if (parse->lex_u >= 4)
+			parse->lex = LEX_STRING;
+
+		return false;
+
+	case LEX_NUMBER:
+		if (c == '-' || c == '.' || isdigit(c) || toupper(c) == 'E') {
+			lex_append(parse, c);
+			return false;
+		} else {
+			lex_tokenize(parse);
+			return true;
+		}
+
+		break;
+
+	case LEX_IDENTIFIER:
+		if (isalpha(c)) {
+			lex_append(parse, c);
+			return false;
+		} else {
+			lex_tokenize(parse);
+			return true;
+		}
+
+		break;
+	}
+
+	/* This should never happen... */
+	parse->lex = LEX_LIMBO;
+	return false;
+}
+
+void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len)
+{
+	while (len > 0) {
+		while(lex_char(parse, *data)) { /* lex repeatedly */ }
+		data++;
+		len--;
+	}
+}
