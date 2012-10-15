@@ -465,6 +465,36 @@ enum ll_sym {
 	SYM_COUNT
 };
 
+struct ll_token {
+	enum ll_sym sym;
+	mowgli_json_t *val;
+};
+
+/* typedef'd to mowgli_json_parse_t in json.h */
+struct _mowgli_json_parse_t {
+	/* output queue */
+	mowgli_list_t *out;
+
+	/* parser */
+	mowgli_list_t *build;
+	enum ll_sym stack[LL_STACK_SIZE];
+	unsigned top;
+
+	/* lexer */
+	mowgli_string_t *buf;
+	enum {
+		LEX_LIMBO,
+		LEX_STRING,
+		LEX_STRING_ESC,
+		LEX_STRING_ESC_U,
+		LEX_NUMBER,
+		LEX_IDENTIFIER
+	} lex;
+	unsigned lex_u;
+};
+
+typedef void ll_action_t(mowgli_json_parse_t*, struct ll_token *tok);
+
 /* Human-readable versions of symbols used in errors, etc. */
 static char *ll_sym_name[] = {
 	[SYM_NONE] = "(none)",
@@ -559,33 +589,6 @@ static enum ll_sym ll_rules[][3] = {
 	{ TS_END_ARRAY }, /* 20 */
 };
 
-struct ll_token {
-	enum ll_sym sym;
-	mowgli_json_t *val;
-};
-
-/* typedef'd to mowgli_json_parse_t in json.h */
-struct _mowgli_json_parse_t {
-	/* output queue */
-	mowgli_list_t *out;
-
-	/* parser */
-	enum ll_sym stack[LL_STACK_SIZE];
-	unsigned top;
-
-	/* lexer */
-	mowgli_string_t *buf;
-	enum {
-		LEX_LIMBO,
-		LEX_STRING,
-		LEX_STRING_ESC,
-		LEX_STRING_ESC_U,
-		LEX_NUMBER,
-		LEX_IDENTIFIER
-	} lex;
-	unsigned lex_u;
-};
-
 static struct ll_token *ll_token_alloc(enum ll_sym sym, mowgli_json_t *val)
 {
 	struct ll_token *tok;
@@ -601,6 +604,155 @@ static void ll_token_free(struct ll_token *tok)
 {
 	mowgli_free(tok);
 }
+
+static bool parse_out_empty(mowgli_json_parse_t *parse)
+{
+	return MOWGLI_LIST_LENGTH(parse->out) == 0;
+}
+
+static void parse_out_enqueue(mowgli_json_parse_t *parse, mowgli_json_t *val)
+{
+	mowgli_node_add(val, mowgli_node_create(), parse->out);
+}
+
+static mowgli_json_t *parse_out_dequeue(mowgli_json_parse_t *parse)
+{
+	mowgli_json_t *n;
+	mowgli_node_t *head;
+
+	if (MOWGLI_LIST_LENGTH(parse->out) == 0)
+		return NULL;
+
+	head = parse->out->head;
+	if (head == NULL)
+		return NULL;
+
+	n = head->data;
+	mowgli_node_delete(head, parse->out);
+	mowgli_node_free(head);
+
+	return n;
+}
+
+static void ll_build_push(mowgli_json_parse_t *parse, mowgli_json_t *val)
+{
+	mowgli_node_add_head(val, mowgli_node_create(), parse->build);
+}
+
+static mowgli_json_t *ll_build_pop(mowgli_json_parse_t *parse)
+{
+	mowgli_json_t *n;
+	mowgli_node_t *head;
+
+	if (MOWGLI_LIST_LENGTH(parse->build) == 0)
+		return NULL;
+
+	head = parse->build->head;
+	if (head == NULL) /* shouldn't happen... */
+		return NULL;
+
+	n = head->data;
+	mowgli_node_delete(head, parse->build);
+	mowgli_node_free(head);
+
+	return n;
+}
+
+static bool ll_build_empty(mowgli_json_parse_t *parse)
+{
+	return MOWGLI_LIST_LENGTH(parse->build) == 0;
+}
+
+static mowgli_json_t obj_start_marker;
+static mowgli_json_t arr_start_marker;
+
+static void ll_act_echo(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	ll_build_push(parse, tok->val);
+}
+
+static void ll_act_obj_start(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	ll_build_push(parse, &obj_start_marker);
+}
+
+static void ll_act_obj_end(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	mowgli_json_t *obj;
+	mowgli_json_t *key, *val;
+
+	obj = mowgli_json_incref(mowgli_json_create_object());
+
+	for (;;) {
+		val = ll_build_pop(parse);
+		if (val == &obj_start_marker)
+			break;
+
+		key = ll_build_pop(parse);
+		if (key == &obj_start_marker)
+			break; /* should never happen, but in case */
+		if (MOWGLI_JSON_TAG(key) != MOWGLI_JSON_TAG_STRING)
+			break; /* should also never happen */
+
+		mowgli_json_object_add(obj, MOWGLI_JSON_STRING_STR(key), val);
+		mowgli_json_decref(key);
+		mowgli_json_decref(val);
+	}
+
+	ll_build_push(parse, obj);
+}
+
+static void ll_act_arr_start(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	ll_build_push(parse, &arr_start_marker);
+}
+
+static void ll_act_arr_end(mowgli_json_parse_t *parse, struct ll_token *tok)
+{
+	mowgli_json_t *arr;
+	mowgli_json_t *val;
+
+	arr = mowgli_json_incref(mowgli_json_create_array());
+
+	for (;;) {
+		val = ll_build_pop(parse);
+		if (val == &arr_start_marker)
+			break;
+
+		mowgli_json_array_add_head(arr, val);
+		mowgli_json_decref(val);
+	}
+
+	ll_build_push(parse, arr);
+}
+
+static ll_action_t *ll_action[] = {
+	NULL, /* 0 */
+
+	NULL,
+	NULL,
+
+	NULL,
+	NULL,
+	ll_act_echo, /* 5 */
+	ll_act_echo,
+	ll_act_echo,
+
+	ll_act_obj_start,
+	ll_act_obj_end,
+	NULL, /* 10 */
+	NULL,
+	NULL,
+	ll_act_obj_end,
+	ll_act_echo,
+
+	ll_act_arr_start, /* 15 */
+	ll_act_arr_end,
+	NULL,
+	NULL,
+	NULL,
+	ll_act_arr_end, /* 20 */
+};
 
 static void ll_push(mowgli_json_parse_t *parse, enum ll_sym sym)
 {
@@ -620,30 +772,18 @@ static bool ll_stack_empty(mowgli_json_parse_t *parse)
 	return parse->top == 0;
 }
 
-mowgli_json_parse_t *mowgli_json_parse_create(void)
+static void ll_cycle(mowgli_json_parse_t *parse)
 {
-	mowgli_json_parse_t *parse;
+	mowgli_json_t *n;
 
-	parse = mowgli_alloc(sizeof(*parse));
+	n = ll_build_pop(parse);
+	if (n == NULL)
+		return; /* should not happen */
 
-	parse->out = mowgli_list_create();
-	parse->top = 0;
-	parse->buf = mowgli_string_create();
-	parse->lex = LEX_LIMBO;
+	parse_out_enqueue(parse, n);
 
-	ll_push(parse, NTS_JSON_DOCUMENT);
-
-	return parse;
-}
-
-void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
-{
-	return_if_fail(parse != NULL);
-
-	mowgli_list_free(parse->out);
-	mowgli_string_destroy(parse->buf);
-
-	mowgli_free(parse);
+	/* build stack should be empty here, but just in case, we empty it */
+	ll_build_empty(parse);
 }
 
 static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
@@ -660,6 +800,10 @@ static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
 		top = ll_pop(parse);
 		if (top == tok->sym) {
 			/* perfect! */
+
+			if (ll_stack_empty(parse))
+				ll_cycle(parse);
+
 			break;
 		}
 
@@ -669,6 +813,9 @@ static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
 						ll_sym_name[tok->sym]);
 			break;
 		}
+
+		if (ll_action[rule] != NULL)
+			ll_action[rule](parse, tok);
 
 		for (i=2; i>=0; i--) {
 			sym = ll_rules[rule][i];
@@ -695,7 +842,7 @@ static mowgli_json_t *lex_string_scan(char *s, size_t n)
 	char ubuf[5];
 	char *end = s + n;
 
-	val = mowgli_json_create_string("");
+	val = mowgli_json_incref(mowgli_json_create_string(""));
 	str = val->v_string;
 
 	ubuf[4] = '\0'; /* always */
@@ -757,9 +904,9 @@ static void lex_tokenize(mowgli_json_parse_t *parse)
 
 	case LEX_NUMBER:
 		if (strchr(s, '.') || strchr(s, 'e')) {
-			val = mowgli_json_create_float(strtod(s, NULL));
+			val = mowgli_json_incref(mowgli_json_create_float(strtod(s, NULL)));
 		} else {
-			val = mowgli_json_create_integer(strtol(s, NULL, 0));
+			val = mowgli_json_incref(mowgli_json_create_integer(strtol(s, NULL, 0)));
 		}
 		sym = TS_NUMBER;
 		break;
@@ -884,6 +1031,35 @@ static bool lex_char(mowgli_json_parse_t *parse, char c)
 	return false;
 }
 
+mowgli_json_parse_t *mowgli_json_parse_create(void)
+{
+	mowgli_json_parse_t *parse;
+
+	parse = mowgli_alloc(sizeof(*parse));
+
+	parse->out = mowgli_list_create();
+	parse->build = mowgli_list_create();
+	parse->top = 0;
+	parse->buf = mowgli_string_create();
+	parse->lex = LEX_LIMBO;
+
+	ll_push(parse, NTS_JSON_DOCUMENT);
+
+	return parse;
+}
+
+void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
+{
+	return_if_fail(parse != NULL);
+
+	/* TODO: properly empty these lists */
+	mowgli_list_free(parse->out);
+	mowgli_list_free(parse->build);
+	mowgli_string_destroy(parse->buf);
+
+	mowgli_free(parse);
+}
+
 void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len)
 {
 	while (len > 0) {
@@ -891,4 +1067,14 @@ void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len)
 		data++;
 		len--;
 	}
+}
+
+bool mowgli_json_parse_more(mowgli_json_parse_t *parse)
+{
+	return !parse_out_empty(parse);
+}
+
+mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse)
+{
+	return parse_out_dequeue(parse);
 }
