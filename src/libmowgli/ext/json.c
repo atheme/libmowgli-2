@@ -90,6 +90,47 @@ mowgli_json_t *mowgli_json_decref(mowgli_json_t *n)
 	return n;
 }
 
+/* Debugging tool to recursively dump reference counts for an object
+   and any children it may have.  This function will never be called
+   outside of development, so is commented here.
+void dump_refs(mowgli_json_t *n)
+{
+	char *s = "unk";
+	mowgli_patricia_iteration_state_t st;
+
+	switch (n->tag) {
+	case MOWGLI_JSON_TAG_NULL: s = "null"; break;
+	case MOWGLI_JSON_TAG_BOOLEAN: s = "boolean"; break;
+	case MOWGLI_JSON_TAG_INTEGER: s = "integer"; break;
+	case MOWGLI_JSON_TAG_FLOAT: s = "float"; break;
+	case MOWGLI_JSON_TAG_STRING: s = "string"; break;
+	case MOWGLI_JSON_TAG_ARRAY: s = "array"; break;
+	case MOWGLI_JSON_TAG_OBJECT: s = "object"; break;
+	}
+
+	if (n->refcount == JSON_REFCOUNT_CONSTANT)
+		printf("- %s\n", s);
+	else
+		printf("%d %s\n", n->refcount, s);
+
+	if (n->tag == MOWGLI_JSON_TAG_ARRAY) {
+		mowgli_node_t *cur;
+
+		MOWGLI_LIST_FOREACH(cur, n->v_array->head) {
+			dump_refs(cur->data);
+		}
+	} else if (n->tag == MOWGLI_JSON_TAG_OBJECT) {
+		mowgli_json_t *cur;
+
+		mowgli_patricia_foreach_start(n->v_object, &st);
+		while ((cur = mowgli_patricia_foreach_cur(n->v_object, &st)) != NULL) {
+			dump_refs(cur);
+			mowgli_patricia_foreach_next(n->v_object, &st);
+		}
+	}
+}
+*/
+
 /*
  * 2. OBJECT CREATION AND DELETION
  */
@@ -602,6 +643,7 @@ static struct ll_token *ll_token_alloc(enum ll_sym sym, mowgli_json_t *val)
 
 static void ll_token_free(struct ll_token *tok)
 {
+	mowgli_json_decref(tok->val);
 	mowgli_free(tok);
 }
 
@@ -663,12 +705,16 @@ static bool ll_build_empty(mowgli_json_parse_t *parse)
 	return MOWGLI_LIST_LENGTH(parse->build) == 0;
 }
 
-static mowgli_json_t obj_start_marker;
-static mowgli_json_t arr_start_marker;
+static mowgli_json_t obj_start_marker = {
+	.refcount = JSON_REFCOUNT_CONSTANT,
+};
+static mowgli_json_t arr_start_marker = {
+	.refcount = JSON_REFCOUNT_CONSTANT,
+};
 
 static void ll_act_echo(mowgli_json_parse_t *parse, struct ll_token *tok)
 {
-	ll_build_push(parse, tok->val);
+	ll_build_push(parse, mowgli_json_incref(tok->val));
 }
 
 static void ll_act_obj_start(mowgli_json_parse_t *parse, struct ll_token *tok)
@@ -823,6 +869,8 @@ static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
 				ll_push(parse, sym);
 		}
 	}
+
+	ll_token_free(tok);
 }
 
 static void lex_easy(mowgli_json_parse_t *parse, enum ll_sym sym)
