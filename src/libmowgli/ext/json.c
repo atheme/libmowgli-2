@@ -511,10 +511,15 @@ struct ll_token {
 	mowgli_json_t *val;
 };
 
+#define ERRBUFSIZE 128
+
 /* typedef'd to mowgli_json_parse_t in json.h */
 struct _mowgli_json_parse_t {
 	/* output queue */
 	mowgli_list_t *out;
+
+	/* error buffer */
+	char error[ERRBUFSIZE];
 
 	/* parser */
 	mowgli_list_t *build;
@@ -674,6 +679,17 @@ static mowgli_json_t *parse_out_dequeue(mowgli_json_parse_t *parse)
 	mowgli_node_free(head);
 
 	return n;
+}
+
+static void parse_error(mowgli_json_parse_t *parse, const char *fmt, ...)
+{
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(parse->error, ERRBUFSIZE, fmt, va);
+	va_end(va);
+
+	/* TODO: shut down everything, yadda yadda */
 }
 
 static void ll_build_push(mowgli_json_parse_t *parse, mowgli_json_t *val)
@@ -839,7 +855,7 @@ static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
 
 	for (;;) {
 		if (ll_stack_empty(parse)) {
-			mowgli_log("Unexpected %s after JSON input", ll_sym_name[tok->sym]);
+			parse_error(parse, "Unexpected %s after JSON input", ll_sym_name[tok->sym]);
 			break;
 		}
 
@@ -855,7 +871,7 @@ static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
 
 		rule = ll_table[top][tok->sym];
 		if (rule == 0) {
-			mowgli_log("Expected %s, got %s", ll_sym_name[top],
+			parse_error(parse, "Expected %s, got %s", ll_sym_name[top],
 						ll_sym_name[tok->sym]);
 			break;
 		}
@@ -1012,9 +1028,8 @@ static bool lex_char(mowgli_json_parse_t *parse, char c)
 			return false;
 		}
 
-		/* If control reaches this point, it is an error. We
-		   should indicate this somehow, but for now we'll just
-		   ignore it.  */
+		parse_error(parse, "Cannot process character '%c' in input stream", c);
+
 		return false;
 
 	case LEX_STRING:
@@ -1086,6 +1101,7 @@ mowgli_json_parse_t *mowgli_json_parse_create(void)
 	parse = mowgli_alloc(sizeof(*parse));
 
 	parse->out = mowgli_list_create();
+	parse->error[0] = '\0';
 	parse->build = mowgli_list_create();
 	parse->top = 0;
 	parse->buf = mowgli_string_create();
@@ -1098,9 +1114,15 @@ mowgli_json_parse_t *mowgli_json_parse_create(void)
 
 void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
 {
+	mowgli_node_t *n;
+
 	return_if_fail(parse != NULL);
 
-	/* TODO: properly empty these lists */
+	MOWGLI_LIST_FOREACH(n, parse->out->head)
+		mowgli_json_decref(n->data);
+	MOWGLI_LIST_FOREACH(n, parse->build->head)
+		mowgli_json_decref(n->data);
+
 	mowgli_list_free(parse->out);
 	mowgli_list_free(parse->build);
 	mowgli_string_destroy(parse->buf);
@@ -1111,10 +1133,22 @@ void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
 void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len)
 {
 	while (len > 0) {
-		while(lex_char(parse, *data)) { /* lex repeatedly */ }
+		/* We cannot continue parsing if there's an error! */
+		if (mowgli_json_parse_error(parse))
+			return;
+
+		while(lex_char(parse, *data));
+
 		data++;
 		len--;
 	}
+}
+
+char *mowgli_json_parse_error(mowgli_json_parse_t *parse)
+{
+	if (parse->error[0])
+		return parse->error;
+	return NULL;
 }
 
 bool mowgli_json_parse_more(mowgli_json_parse_t *parse)
