@@ -98,4 +98,6 @@ extern char *mowgli_json_parse_error(mowgli_json_parse_t *parse);
 extern bool mowgli_json_parse_more(mowgli_json_parse_t *parse);
 extern mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse);
 
+extern mowgli_json_t *mowgli_json_parse_file(const char *path);
+
 #endif

@@ -1152,3 +1152,44 @@ mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse)
 {
 	return parse_out_dequeue(parse);
 }
+
+mowgli_json_t *mowgli_json_parse_file(const char *path)
+{
+	mowgli_json_parse_t *parse;
+	char *s;
+	char buf[512];
+	size_t n;
+	mowgli_json_t *ret;
+	FILE *f;
+
+	f = fopen(path, "r");
+	if (f == NULL) {
+		mowgli_log("Could not open %s for reading", path);
+		return NULL;
+	}
+
+	parse = mowgli_json_parse_create();
+
+	s = NULL;
+	while (!feof(f) && s == NULL) {
+		n = fread(buf, 1, 512, f);
+		mowgli_json_parse_data(parse, buf, n);
+
+		s = mowgli_json_parse_error(parse);
+	}
+
+	if (s != NULL) {
+		mowgli_log("%s: %s", path, s);
+		ret = NULL;
+	} else {
+		ret = mowgli_json_parse_next(parse);
+		if (ret == NULL)
+			mowgli_log("%s: Incomplete JSON document", path);
+	}
+
+	mowgli_json_parse_destroy(parse);
+
+	fclose(f);
+
+	return ret;
+}
