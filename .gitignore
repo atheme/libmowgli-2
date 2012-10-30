@@ -21,6 +21,7 @@ src/examples/memslice-bench/memslice-bench
 src/examples/vio-udplistener/vio-udplistener
 src/examples/futuretest/futuretest
 src/examples/async_resolver/async_resolver
+src/examples/jsontest/jsontest
 .deps
 *.dylib
 *.o
