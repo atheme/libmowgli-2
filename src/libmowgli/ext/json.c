@@ -716,11 +716,6 @@ static mowgli_json_t *ll_build_pop(mowgli_json_parse_t *parse)
 	return n;
 }
 
-static bool ll_build_empty(mowgli_json_parse_t *parse)
-{
-	return MOWGLI_LIST_LENGTH(parse->build) == 0;
-}
-
 static mowgli_json_t obj_start_marker = {
 	.refcount = JSON_REFCOUNT_CONSTANT,
 };
@@ -843,9 +838,6 @@ static void ll_cycle(mowgli_json_parse_t *parse)
 		return; /* should not happen */
 
 	parse_out_enqueue(parse, n);
-
-	/* build stack should be empty here, but just in case, we empty it */
-	ll_build_empty(parse);
 }
 
 static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
