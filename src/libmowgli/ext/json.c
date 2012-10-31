@@ -522,6 +522,7 @@ struct _mowgli_json_parse_t {
 	char error[ERRBUFSIZE];
 
 	/* parser */
+	bool multidoc;
 	mowgli_list_t *build;
 	enum ll_sym stack[LL_STACK_SIZE];
 	unsigned top;
@@ -834,10 +835,11 @@ static void ll_cycle(mowgli_json_parse_t *parse)
 	mowgli_json_t *n;
 
 	n = ll_build_pop(parse);
-	if (n == NULL)
-		return; /* should not happen */
+	if (n != NULL)
+		parse_out_enqueue(parse, n);
 
-	parse_out_enqueue(parse, n);
+	if (parse->multidoc)
+		ll_push(parse, NTS_JSON_DOCUMENT);
 }
 
 static void ll_parse(mowgli_json_parse_t *parse, struct ll_token *tok)
@@ -1086,7 +1088,7 @@ static bool lex_char(mowgli_json_parse_t *parse, char c)
 	return false;
 }
 
-mowgli_json_parse_t *mowgli_json_parse_create(void)
+mowgli_json_parse_t *mowgli_json_parse_create(bool multidoc)
 {
 	mowgli_json_parse_t *parse;
 
@@ -1094,6 +1096,7 @@ mowgli_json_parse_t *mowgli_json_parse_create(void)
 
 	parse->out = mowgli_list_create();
 	parse->error[0] = '\0';
+	parse->multidoc = multidoc;
 	parse->build = mowgli_list_create();
 	parse->top = 0;
 	parse->buf = mowgli_string_create();
@@ -1122,7 +1125,7 @@ void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
 	mowgli_free(parse);
 }
 
-void mowgli_json_parse_reset(mowgli_json_parse_t *parse)
+void mowgli_json_parse_reset(mowgli_json_parse_t *parse, bool multidoc)
 {
 	mowgli_node_t *n, *tn;
 
@@ -1140,6 +1143,7 @@ void mowgli_json_parse_reset(mowgli_json_parse_t *parse)
 	}
 
 	parse->error[0] = '\0';
+	parse->multidoc = multidoc;
 	parse->top = 0;
 
 	if (parse->buf == NULL)
@@ -1196,7 +1200,7 @@ mowgli_json_t *mowgli_json_parse_file(const char *path)
 	mowgli_json_t *ret;
 	FILE *f;
 
-	mowgli_json_parse_reset(&static_parser);
+	mowgli_json_parse_reset(&static_parser, false);
 
 	f = fopen(path, "r");
 	if (f == NULL) {
@@ -1231,7 +1235,7 @@ mowgli_json_t *mowgli_json_parse_string(const char *data)
 	mowgli_json_t *ret;
 	char *s;
 
-	mowgli_json_parse_reset(&static_parser);
+	mowgli_json_parse_reset(&static_parser, false);
 
 	mowgli_json_parse_data(&static_parser, data, strlen(data));
 

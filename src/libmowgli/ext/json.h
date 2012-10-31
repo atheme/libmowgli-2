@@ -5,6 +5,39 @@
  * Structs and functions for interacting with JSON documents from C
  */
 
+/* A note about refcounting:
+
+   Since JSON cannot represent recursive structures, it makes sense
+   to use refcounting. If a recursive structure is created then it's
+   guaranteed to be the programmer's fault, and the programmer deserves
+   every memory leak he gets.
+
+   When cared for and fed daily, refcounting is a very nifty tool. Entire
+   structures can be destroyed cleanly by a single mowgli_json_decref. To
+   fully take advantage of this, know the refcounting rules:
+
+     o  JSON objects as arguments should NEVER have a reference for
+        the callee.  If the callee wants to keep the object somewhere,
+        they will incref themselves.
+
+     o  When returning a JSON object, be sure to leave a single reference
+        for the caller. (If you tried to decref before returning, you
+        could potentially drop the refcount to zero.)
+
+     o  Newly created structures are the sole exception to the previous
+        rule. This is because it is useful to be able to use constructors
+        as arguments to functions as follows:
+          mowgli_json_object_add(obj, "sum", mowgli_json_create_integer(10));
+        Note that this ONLY applies to the mowgli_json_create_*
+        constructors provided by mowgli.json. The typical case of
+        assigning a new structure to a variable name then looks like this:
+          my_integer = mowgli_json_incref(mowgli_json_create_integer(0));
+
+   Since failure to pay attention to reference counts will cause memory
+   problems, *always double check your reference counting*!
+
+   --aji */
+
 #ifndef MOWGLI_JSON_H
 #define MOWGLI_JSON_H
 
@@ -91,16 +124,20 @@ extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pr
 
 typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
 
-/* extended parsing interface */
-extern mowgli_json_parse_t *mowgli_json_parse_create(void);
+/* extended parsing interface. The 'multidoc' parameter here indicates
+   whether we intend to parse multiple documents from a single data source
+   or not.  If you are expecting exactly one complete JSON document,
+   indicate 'false'. */
+extern mowgli_json_parse_t *mowgli_json_parse_create(bool multidoc);
 extern void mowgli_json_parse_destroy(mowgli_json_parse_t *parse);
-extern void mowgli_json_parse_reset(mowgli_json_parse_t *parse);
+extern void mowgli_json_parse_reset(mowgli_json_parse_t *parse, bool multidoc);
 extern void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len);
 extern char *mowgli_json_parse_error(mowgli_json_parse_t *parse);
 extern bool mowgli_json_parse_more(mowgli_json_parse_t *parse);
 extern mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse);
 
-/* simple parsing interface */
+/* Simple parsing interface. These expect the given data source to
+   represent exactly one complete JSON document */
 extern mowgli_json_t *mowgli_json_parse_file(const char *path);
 extern mowgli_json_t *mowgli_json_parse_string(const char *data);
 
