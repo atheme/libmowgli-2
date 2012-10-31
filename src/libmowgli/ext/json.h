@@ -94,6 +94,7 @@ typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
 /* extended parsing interface */
 extern mowgli_json_parse_t *mowgli_json_parse_create(void);
 extern void mowgli_json_parse_destroy(mowgli_json_parse_t *parse);
+extern void mowgli_json_parse_reset(mowgli_json_parse_t *parse);
 extern void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len);
 extern char *mowgli_json_parse_error(mowgli_json_parse_t *parse);
 extern bool mowgli_json_parse_more(mowgli_json_parse_t *parse);

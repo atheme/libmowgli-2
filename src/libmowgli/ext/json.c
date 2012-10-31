@@ -1122,6 +1122,35 @@ void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
 	mowgli_free(parse);
 }
 
+void mowgli_json_parse_reset(mowgli_json_parse_t *parse)
+{
+	mowgli_node_t *n, *tn;
+
+	if (parse->out == NULL)
+		parse->out = mowgli_list_create();
+	if (parse->build == NULL)
+		parse->build = mowgli_list_create();
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, parse->out->head) {
+		mowgli_json_decref(n->data);
+		mowgli_node_delete(n, parse->out);
+	}
+	MOWGLI_LIST_FOREACH_SAFE(n, tn, parse->build->head) {
+		mowgli_json_decref(n->data);
+		mowgli_node_delete(n, parse->build);
+	}
+
+	parse->error[0] = '\0';
+	parse->top = 0;
+
+	if (parse->buf == NULL)
+		parse->buf = mowgli_string_create();
+	else
+		mowgli_string_reset(parse->buf);
+	parse->lex = LEX_LIMBO;
+
+	ll_push(parse, NTS_JSON_DOCUMENT);
+}
+
 void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len)
 {
 	while (len > 0) {
@@ -1153,14 +1182,21 @@ mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse)
 	return parse_out_dequeue(parse);
 }
 
+/* Note: Static parsers like these should last the life of the program,
+   since mowgli_json_parse_destroy will attempt to mowgli_free the
+   parser. */
+
+static mowgli_json_parse_t static_parser;
+
 mowgli_json_t *mowgli_json_parse_file(const char *path)
 {
-	mowgli_json_parse_t *parse;
 	char *s;
 	char buf[512];
 	size_t n;
 	mowgli_json_t *ret;
 	FILE *f;
+
+	mowgli_json_parse_reset(&static_parser);
 
 	f = fopen(path, "r");
 	if (f == NULL) {
@@ -1168,26 +1204,22 @@ mowgli_json_t *mowgli_json_parse_file(const char *path)
 		return NULL;
 	}
 
-	parse = mowgli_json_parse_create();
-
 	s = NULL;
 	while (!feof(f) && s == NULL) {
 		n = fread(buf, 1, 512, f);
-		mowgli_json_parse_data(parse, buf, n);
+		mowgli_json_parse_data(&static_parser, buf, n);
 
-		s = mowgli_json_parse_error(parse);
+		s = mowgli_json_parse_error(&static_parser);
 	}
 
 	if (s != NULL) {
 		mowgli_log("%s: %s", path, s);
 		ret = NULL;
 	} else {
-		ret = mowgli_json_parse_next(parse);
+		ret = mowgli_json_parse_next(&static_parser);
 		if (ret == NULL)
 			mowgli_log("%s: Incomplete JSON document", path);
 	}
-
-	mowgli_json_parse_destroy(parse);
 
 	fclose(f);
 
@@ -1196,24 +1228,21 @@ mowgli_json_t *mowgli_json_parse_file(const char *path)
 
 mowgli_json_t *mowgli_json_parse_string(const char *data)
 {
-	mowgli_json_parse_t *parse;
 	mowgli_json_t *ret;
 	char *s;
 
-	parse = mowgli_json_parse_create();
+	mowgli_json_parse_reset(&static_parser);
 
-	mowgli_json_parse_data(parse, data, strlen(data));
+	mowgli_json_parse_data(&static_parser, data, strlen(data));
 
-	if ((s = mowgli_json_parse_error(parse)) != NULL) {
+	if ((s = mowgli_json_parse_error(&static_parser)) != NULL) {
 		mowgli_log("%s", s);
 		ret = NULL;
 	} else {
-		ret = mowgli_json_parse_next(parse);
+		ret = mowgli_json_parse_next(&static_parser);
 		if (ret == NULL)
 			mowgli_log("Incomplete JSON document");
 	}
-
-	mowgli_json_parse_destroy(parse);
 
 	return ret;
 }
