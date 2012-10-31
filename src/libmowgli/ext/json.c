@@ -1122,7 +1122,7 @@ void mowgli_json_parse_destroy(mowgli_json_parse_t *parse)
 	mowgli_free(parse);
 }
 
-void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len)
+void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len)
 {
 	while (len > 0) {
 		/* We cannot continue parsing if there's an error! */
@@ -1190,6 +1190,30 @@ mowgli_json_t *mowgli_json_parse_file(const char *path)
 	mowgli_json_parse_destroy(parse);
 
 	fclose(f);
+
+	return ret;
+}
+
+mowgli_json_t *mowgli_json_parse_string(const char *data)
+{
+	mowgli_json_parse_t *parse;
+	mowgli_json_t *ret;
+	char *s;
+
+	parse = mowgli_json_parse_create();
+
+	mowgli_json_parse_data(parse, data, strlen(data));
+
+	if ((s = mowgli_json_parse_error(parse)) != NULL) {
+		mowgli_log("%s", s);
+		ret = NULL;
+	} else {
+		ret = mowgli_json_parse_next(parse);
+		if (ret == NULL)
+			mowgli_log("Incomplete JSON document");
+	}
+
+	mowgli_json_parse_destroy(parse);
 
 	return ret;
 }

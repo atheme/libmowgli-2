@@ -91,13 +91,16 @@ extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pr
 
 typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
 
+/* extended parsing interface */
 extern mowgli_json_parse_t *mowgli_json_parse_create(void);
 extern void mowgli_json_parse_destroy(mowgli_json_parse_t *parse);
-extern void mowgli_json_parse_data(mowgli_json_parse_t *parse, char *data, size_t len);
+extern void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len);
 extern char *mowgli_json_parse_error(mowgli_json_parse_t *parse);
 extern bool mowgli_json_parse_more(mowgli_json_parse_t *parse);
 extern mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse);
 
+/* simple parsing interface */
 extern mowgli_json_t *mowgli_json_parse_file(const char *path);
+extern mowgli_json_t *mowgli_json_parse_string(const char *data);
 
 #endif
