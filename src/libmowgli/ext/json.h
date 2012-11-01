@@ -122,8 +122,6 @@ extern mowgli_json_t *mowgli_json_create_object(void);
 
 extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty);
 
-typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
-
 /* extended parsing interface. The 'multidoc' parameter here indicates
    whether we intend to parse multiple documents from a single data source
    or not.  If you are expecting exactly one complete JSON document,
