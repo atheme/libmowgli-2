@@ -34,7 +34,7 @@ static mowgli_json_t json_true =
 {
 	.tag = MOWGLI_JSON_TAG_BOOLEAN,
 	.refcount = JSON_REFCOUNT_CONSTANT,
-	.v_bool = true,
+	{ .v_bool = true, }
 };
 mowgli_json_t *mowgli_json_true = &json_true;
 
@@ -42,7 +42,7 @@ static mowgli_json_t json_false =
 {
 	.tag = MOWGLI_JSON_TAG_BOOLEAN,
 	.refcount = JSON_REFCOUNT_CONSTANT,
-	.v_bool = false,
+	{ .v_bool = false, }
 };
 mowgli_json_t *mowgli_json_false = &json_false;
 
