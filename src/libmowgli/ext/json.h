@@ -113,7 +113,7 @@ extern mowgli_json_t *mowgli_json_create_float(double v_float);
 /* #define mowgli_json_create_number(V) _Generic((V), \
 	int: mowgli_json_create_integer, \
 	double: mowgli_json_create_float)(V) */
-extern mowgli_json_t *mowgli_json_create_string_n(const char *str, unsigned len);
+extern mowgli_json_t *mowgli_json_create_string_n(const char *str, size_t len);
 extern mowgli_json_t *mowgli_json_create_string(const char *str);
 extern mowgli_json_t *mowgli_json_create_array(void);
 extern mowgli_json_t *mowgli_json_create_object(void);
