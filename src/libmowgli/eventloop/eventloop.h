@@ -131,6 +131,8 @@ struct _mowgli_eventloop {
 	bool death_requested;
 
 	void *data;
+
+	time_t epochbias;
 };
 
 typedef void mowgli_event_dispatch_func_t(void *userdata);
@@ -157,7 +159,7 @@ static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
 {
 	return_val_if_fail(eventloop != NULL, 0);
 
-	return eventloop->currtime;
+	return eventloop->epochbias + eventloop->currtime;
 }
 
 static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
@@ -222,6 +224,13 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	time_ = time(NULL);
 #endif
 	mowgli_eventloop_set_time(eventloop, (time_t)time_);
+}
+
+/* Sets the bias of eventloop->currtime relative to Jan 1 00:00:00 1970 */
+static inline void mowgli_eventloop_calibrate(mowgli_eventloop_t *eventloop)
+{
+	mowgli_eventloop_synchronize(eventloop);
+	eventloop->epochbias = time(NULL) - eventloop->currtime;
 }
 
 static inline bool mowgli_eventloop_ignore_errno(int error)

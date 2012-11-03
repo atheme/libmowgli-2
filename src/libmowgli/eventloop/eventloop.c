@@ -87,7 +87,7 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 	eventloop->eventloop_ops->pollsetup(eventloop);
 
-	mowgli_eventloop_synchronize(eventloop);
+	mowgli_eventloop_calibrate(eventloop);
 
 	return eventloop;
 }
