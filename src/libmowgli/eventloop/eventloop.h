@@ -21,6 +21,13 @@
 #ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 #define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
 
+#ifdef MOWGLI_OS_OSX
+
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+
+#endif
+
 #ifndef _WIN32
 
 typedef int mowgli_descriptor_t;
@@ -175,7 +182,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 
 	clock_gettime(CLOCK_HIGHRES, &tp);
 	time_ = tp.tv_sec;
-#elif defined(_WIN32)
+#elif defined(MOWGLI_OS_WIN)
 	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
 	static OSVERSIONINFOEX *winver = NULL;
 	static bool load_err = false;
@@ -214,7 +221,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	}
 	else
 		time_ = time(NULL);
-#elif defined(__APPLE__)
+#elif defined(MOWGLI_OS_OSX)
 	static mach_timebase_info_data_t timebase;
 	if (timebase.denom == 0)
 		mach_timebase_info(&timebase);
