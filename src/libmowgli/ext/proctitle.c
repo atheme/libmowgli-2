@@ -30,14 +30,14 @@
 #include <machine/vmparam.h>	/* for old BSD */
 #include <sys/exec.h>
 #endif
-#if defined(__darwin__)
+#ifdef MOWGLI_OS_OSX
 #include <crt_externs.h>
 #endif
 #ifdef HAVE_SYS_PRCTL_H
 #include <sys/prctl.h>
 #endif
 
-#ifndef _WIN32
+#if !defined(MOWGLI_OS_WIN) || !defined(MOWGLI_OS_OSX)
 extern char **environ;
 #endif
 
@@ -328,7 +328,7 @@ mowgli_proctitle_init(int argc, char **argv)
 		new_argv[i] = mowgli_strdup(argv[i]);
 	new_argv[argc] = NULL;
 
-#if defined(__darwin__)
+#ifdef MOWGLI_OS_OSX
 	/*
 	 * Darwin (and perhaps other NeXT-derived platforms?) has a static
 	 * copy of the argv pointer, which we may fix like so:
@@ -342,7 +342,7 @@ mowgli_proctitle_init(int argc, char **argv)
 
 	mowgli_argc = argc;
 	mowgli_argv = argv;
-	
+
 	return argv;
 }
 
