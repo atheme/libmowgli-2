@@ -231,7 +231,7 @@ get_argv_from_proc(int *argc, char ***argv)
 bool
 mowgli_get_args(int *argc, char ***argv)
 {
-#if !defined(MOWGLI_OS_WIN) || !defined(MOWGLI_OS_OSX)
+#if !defined(MOWGLI_OS_WIN) && !defined(MOWGLI_OS_OSX)
 	if (get_argv_from_proc(argc, argv))
 		return true;
 
