@@ -37,7 +37,7 @@
 #include <sys/prctl.h>
 #endif
 
-#if !defined(MOWGLI_OS_WIN) || !defined(MOWGLI_OS_OSX)
+#if !defined(MOWGLI_OS_WIN) && !defined(MOWGLI_OS_OSX)
 extern char **environ;
 #endif
 
@@ -115,7 +115,7 @@ static char **save_argv;
 int mowgli_argc = 0;
 char **mowgli_argv = NULL;
 
-#ifndef _WIN32
+#if !defined(MOWGLI_OS_WIN) && !defined(MOWGLI_OS_OSX)
 static bool get_argv_from_env(int *argc, char ***argv)
 {
         char **ptr;
@@ -154,11 +154,12 @@ static bool get_argv_from_env(int *argc, char ***argv)
 
         /* Whoops, we're pointing at argc! */
         ptr++;
-	
+
 	*argv = ptr;
 
 	return true;
 }
+#endif
 
 static bool
 get_argv_from_proc(int *argc, char ***argv)
@@ -225,18 +226,17 @@ get_argv_from_proc(int *argc, char ***argv)
 	return true;
 }
 
-#endif
-
 bool
 mowgli_get_args(int *argc, char ***argv)
 {
-#ifndef _WIN32
+#if !defined(MOWGLI_OS_WIN)
 	if (get_argv_from_proc(argc, argv))
 		return true;
-
+#if !defined(MOWGLI_OS_DARWIN)
 	/* Bleh try this now */
 	if (get_argv_from_env(argc, argv))
 		return true;
+#endif
 #else
 #warning "Implement me..."
 #endif
