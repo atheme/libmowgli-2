@@ -161,6 +161,7 @@ static bool get_argv_from_env(int *argc, char ***argv)
 }
 #endif
 
+#if !defined(MOWGLI_OS_OSX)
 static bool
 get_argv_from_proc(int *argc, char ***argv)
 {
@@ -225,6 +226,7 @@ get_argv_from_proc(int *argc, char ***argv)
 
 	return true;
 }
+#endif
 
 bool
 mowgli_get_args(int *argc, char ***argv)
@@ -232,7 +234,7 @@ mowgli_get_args(int *argc, char ***argv)
 #if !defined(MOWGLI_OS_WIN)
 	if (get_argv_from_proc(argc, argv))
 		return true;
-#if !defined(MOWGLI_OS_DARWIN)
+#if !defined(MOWGLI_OS_OSX)
 	/* Bleh try this now */
 	if (get_argv_from_env(argc, argv))
 		return true;
