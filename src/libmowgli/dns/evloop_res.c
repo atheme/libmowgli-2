@@ -437,13 +437,14 @@ static void timeout_resolver(void *arg)
 {
 	mowgli_dns_t *dns = arg;
 	mowgli_dns_evloop_t *state = dns->dns_state;
-	time_t next;
+	time_t now, next;
 
-	next = timeout_query_list(dns, mowgli_eventloop_get_time(state->eventloop));
+	now = mowgli_eventloop_get_time(state->eventloop);
+	next = timeout_query_list(dns, now);
 
 	/* Reschedule */
 	mowgli_timer_destroy(state->eventloop, state->timeout_resolver_timer);
-	mowgli_timer_add(state->eventloop, "timeout_resolver", timeout_resolver, dns, next);
+	mowgli_timer_add(state->eventloop, "timeout_resolver", timeout_resolver, dns, next - now);
 }
 
 
