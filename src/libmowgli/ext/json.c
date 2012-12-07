@@ -234,20 +234,20 @@ static void destroy_extra_object(mowgli_json_t *n)
 #define TAB_STRING "    "
 #define TAB_LEN 4
 
-static void serialize_pretty_indent(mowgli_string_t *str, int pretty)
+static void serialize_pretty_indent(mowgli_json_output_t *out, int pretty)
 {
 	int i;
 
 	for (i=0; i<pretty; i++)
-		mowgli_string_append(str, TAB_STRING, TAB_LEN);
+		out->append(out, TAB_STRING, TAB_LEN);
 }
 
-static void serialize_pretty_break(mowgli_string_t *str, int pretty)
+static void serialize_pretty_break(mowgli_json_output_t *out, int pretty)
 {
 	if (pretty < 1)
 		return;
 
-	mowgli_string_append_char(str, '\n');
+	out->append_char(out, '\n');
 }
 
 static int serialize_pretty_increment(int pretty)
@@ -255,40 +255,40 @@ static int serialize_pretty_increment(int pretty)
 	return (pretty > 0 ? pretty + 1 : 0);
 }
 
-static void serialize_boolean(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_boolean(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	if (n->v_bool)
-		mowgli_string_append(str, "true", 4);
+		out->append(out, "true", 4);
 	else
-		mowgli_string_append(str, "false", 5);
+		out->append(out, "false", 5);
 }
 
-static void serialize_int(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_int(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	char buf[32];
 	size_t len;
 
 	len = snprintf(buf, 32, "%d", n->v_int);
-	mowgli_string_append(str, buf, len);
+	out->append(out, buf, len);
 }
 
-static void serialize_float(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_float(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	char buf[32];
 	size_t len;
 
 	len = snprintf(buf, 32, "%g", n->v_float);
-	mowgli_string_append(str, buf, len);
+	out->append(out, buf, len);
 }
 
 static const char *serialize_hex_digits = "0123456789abcdef";
 static const char *serialize_escape = "\"\\\b\f\n\r\t";
-static void serialize_string_data(const char *p, size_t len, mowgli_string_t *str)
+static void serialize_string_data(const char *p, size_t len, mowgli_json_output_t *out)
 {
 	unsigned i;
 	unsigned char c;
 
-	mowgli_string_append_char(str, '"');
+	out->append_char(out, '"');
 
 	for (i=0; i<len; i++)
 	{
@@ -296,72 +296,72 @@ static void serialize_string_data(const char *p, size_t len, mowgli_string_t *st
 
 		if (strchr(serialize_escape, c))
 		{
-			mowgli_string_append_char(str, '\\');
+			out->append_char(out, '\\');
 
 			switch (c)
 			{
-			case '"': mowgli_string_append_char(str, '"'); break;
-			case '\\': mowgli_string_append_char(str, '\\'); break;
-			//case '/': mowgli_string_append_char(str, '/'); break;
-			case '\b': mowgli_string_append_char(str, 'b'); break;
-			case '\f': mowgli_string_append_char(str, 'f'); break;
-			case '\n': mowgli_string_append_char(str, 'n'); break;
-			case '\r': mowgli_string_append_char(str, 'r'); break;
-			case '\t': mowgli_string_append_char(str, 't'); break;
+			case '"': out->append_char(out, '"'); break;
+			case '\\': out->append_char(out, '\\'); break;
+			//case '/': out->append_char(out, '/'); break;
+			case '\b': out->append_char(out, 'b'); break;
+			case '\f': out->append_char(out, 'f'); break;
+			case '\n': out->append_char(out, 'n'); break;
+			case '\r': out->append_char(out, 'r'); break;
+			case '\t': out->append_char(out, 't'); break;
 			default: // hurrr
-				mowgli_string_append_char(str, c);
+				out->append_char(out, c);
 			}
 		}
 		else if (c < 0x20 || c > 0x7f)
 		{
-			mowgli_string_append_char(str, '\\');
+			out->append_char(out, '\\');
 
 			/* XXX: \u output does not do UTF-8 */
-			mowgli_string_append_char(str, 'u');
-			mowgli_string_append_char(str, '0');
-			mowgli_string_append_char(str, '0');
-			mowgli_string_append_char(str, serialize_hex_digits[(c >> 4) & 0xf]);
-			mowgli_string_append_char(str, serialize_hex_digits[(c >> 0) & 0xf]);
+			out->append_char(out, 'u');
+			out->append_char(out, '0');
+			out->append_char(out, '0');
+			out->append_char(out, serialize_hex_digits[(c >> 4) & 0xf]);
+			out->append_char(out, serialize_hex_digits[(c >> 0) & 0xf]);
 		}
 		else
 		{
-			mowgli_string_append_char(str, c);
+			out->append_char(out, c);
 		}
 	}
 
-	mowgli_string_append_char(str, '"');
+	out->append_char(out, '"');
 }
-static void serialize_string(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_string(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
-	serialize_string_data(n->v_string->str, n->v_string->pos, str);
+	serialize_string_data(n->v_string->str, n->v_string->pos, out);
 }
 
-static void serialize_array(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_array(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	mowgli_node_t *cur;
 
-	mowgli_string_append_char(str, '[');
-	serialize_pretty_break(str, pretty);
+	out->append_char(out, '[');
+	serialize_pretty_break(out, pretty);
 
 	MOWGLI_LIST_FOREACH(cur, n->v_array->head)
 	{
-		serialize_pretty_indent(str, pretty);
-		mowgli_json_serialize(cur->data, str, serialize_pretty_increment(pretty));
+		serialize_pretty_indent(out, pretty);
+		mowgli_json_serialize(cur->data, out, serialize_pretty_increment(pretty));
 
 		if (cur->next != NULL)
-			mowgli_string_append_char(str, ',');
-		serialize_pretty_break(str, pretty);
+			out->append_char(out, ',');
+		serialize_pretty_break(out, pretty);
 	}
 
-	serialize_pretty_indent(str, pretty - 1);
-	mowgli_string_append_char(str, ']');
+	serialize_pretty_indent(out, pretty - 1);
+	out->append_char(out, ']');
 }
 
 struct serialize_object_priv /* lol, this is bullshit */
 {
 	int pretty;
 	int remaining;
-	mowgli_string_t *str;
+	mowgli_json_output_t *out;
 };
 
 static int serialize_object_cb(const char *key, void *data, void *privdata)
@@ -370,40 +370,40 @@ static int serialize_object_cb(const char *key, void *data, void *privdata)
 
 	priv->remaining--;
 
-	serialize_pretty_indent(priv->str, priv->pretty);
+	serialize_pretty_indent(priv->out, priv->pretty);
 
-	serialize_string_data(key, strlen(key), priv->str);
-	mowgli_string_append_char(priv->str, ':');
+	serialize_string_data(key, strlen(key), priv->out);
+	priv->out->append_char(priv->out, ':');
 	if (priv->pretty)
-		mowgli_string_append_char(priv->str, ' ');
+		priv->out->append_char(priv->out, ' ');
 
-	mowgli_json_serialize(data, priv->str,
+	mowgli_json_serialize(data, priv->out,
 			serialize_pretty_increment(priv->pretty));
 
 	if (priv->remaining)
-		mowgli_string_append_char(priv->str, ',');
-	serialize_pretty_break(priv->str, priv->pretty);
+		priv->out->append_char(priv->out, ',');
+	serialize_pretty_break(priv->out, priv->pretty);
 
 	return 0;
 }
 
-static void serialize_object(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+static void serialize_object(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	struct serialize_object_priv priv;
 
-	mowgli_string_append_char(str, '{');
-	serialize_pretty_break(str, pretty);
+	out->append_char(out, '{');
+	serialize_pretty_break(out, pretty);
 
 	priv.pretty = pretty;
 	priv.remaining = mowgli_patricia_size(n->v_object);
-	priv.str = str;
+	priv.out = out;
 	mowgli_patricia_foreach(n->v_object, serialize_object_cb, &priv);
 
-	serialize_pretty_indent(str, pretty - 1);
-	mowgli_string_append_char(str, '}');
+	serialize_pretty_indent(out, pretty - 1);
+	out->append_char(out, '}');
 }
 
-typedef void (*serializer_t)(mowgli_json_t*,mowgli_string_t*,int);
+typedef void (*serializer_t)(mowgli_json_t*,mowgli_json_output_t*,int);
 static serializer_t serializers[] =
 {
 	[MOWGLI_JSON_TAG_BOOLEAN] = serialize_boolean,
@@ -414,12 +414,33 @@ static serializer_t serializers[] =
 	[MOWGLI_JSON_TAG_OBJECT] = serialize_object,
 };
 
-void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+void mowgli_json_serialize(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
 	if (n && serializers[n->tag])
-		serializers[n->tag](n, str, pretty);
+		serializers[n->tag](n, out, pretty);
 	else
-		mowgli_string_append(str, "null", 4);
+		out->append(out, "null", 4);
+}
+
+static void to_string_append(mowgli_json_output_t *out, const char *str, size_t len)
+{
+	mowgli_string_append(out->priv, str, len);
+}
+
+static void to_string_append_char(mowgli_json_output_t *out, const char c)
+{
+	mowgli_string_append_char(out->priv, c);
+}
+
+void mowgli_json_serialize_to_string(mowgli_json_t *n, mowgli_string_t *str, int pretty)
+{
+	mowgli_json_output_t out;
+
+	out.append = to_string_append;
+	out.append_char = to_string_append_char;
+	out.priv = str;
+
+	mowgli_json_serialize(n, &out, pretty);
 }
 
 /*

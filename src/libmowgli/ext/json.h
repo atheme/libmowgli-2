@@ -79,7 +79,7 @@ struct _mowgli_json_t {
 	};
 };
 
-/* Helper macros useful for cleanly interacting with mowgil_json_t
+/* Helper macros useful for cleanly interacting with mowgli_json_t
    structs. These are just helpers and are not intended to provide a
    consistent interface. They are as likely to change as the mowgli_json_t
    struct itself. */
@@ -120,7 +120,16 @@ extern mowgli_json_t *mowgli_json_create_object(void);
 
 #include "json-inline.h"
 
-extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_string_t *str, int pretty);
+typedef struct _mowgli_json_output_t mowgli_json_output_t;
+
+struct _mowgli_json_output_t {
+	void (*append)(mowgli_json_output_t *out, const char *str, size_t len);
+	void (*append_char)(mowgli_json_output_t *out, const char c);
+	void *priv;
+};
+
+extern void mowgli_json_serialize(mowgli_json_t *n, mowgli_json_output_t *out, int pretty);
+extern void mowgli_json_serialize_to_string(mowgli_json_t *n, mowgli_string_t *str, int pretty);
 
 /* extended parsing interface. The 'multidoc' parameter here indicates
    whether we intend to parse multiple documents from a single data source

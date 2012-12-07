@@ -6,7 +6,7 @@ void dump_json(mowgli_json_t *n)
 {
 	mowgli_string_reset(serialized);
 
-	mowgli_json_serialize(n, serialized, 1);
+	mowgli_json_serialize_to_string(n, serialized, 1);
 
 	printf("%s\n", serialized->str);
 }
