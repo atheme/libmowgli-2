@@ -593,39 +593,61 @@ static char *ll_sym_name[] = {
 	[SYM_COUNT] = "(none)",
 };
 
-/* The LL(1) parser table. */
+/* The LL(1) parser table. Uglier than it could have been, unfortunately */
 static unsigned char ll_table[SYM_COUNT][SYM_COUNT] = {
-	[NTS_JSON_DOCUMENT][TS_BEGIN_OBJECT] = 1,
-	[NTS_JSON_DOCUMENT][TS_BEGIN_ARRAY] = 2,
+	[NTS_JSON_DOCUMENT] = {
+		[TS_BEGIN_OBJECT] = 1,
+		[TS_BEGIN_ARRAY] = 2,
+	},
 
-	[NTS_VALUE][TS_BEGIN_OBJECT] = 3,
-	[NTS_VALUE][TS_BEGIN_ARRAY] = 4,
-	[NTS_VALUE][TS_STRING] = 5,
-	[NTS_VALUE][TS_NUMBER] = 6,
-	[NTS_VALUE][TS_IDENTIFIER] = 7,
+	[NTS_VALUE] = {
+		[TS_BEGIN_OBJECT] = 3,
+		[TS_BEGIN_ARRAY] = 4,
+		[TS_STRING] = 5,
+		[TS_NUMBER] = 6,
+		[TS_IDENTIFIER] = 7,
+	},
 
-	[NTS_OBJECT][TS_BEGIN_OBJECT] = 8,
-	[NTS_OBJ_BODY][TS_END_OBJECT] = 9,
-	[NTS_OBJ_BODY][TS_STRING] = 10,
-	[NTS_OBJ_ELEMS][TS_STRING] = 11,
-	[NTS_OBJ_TAIL][TS_END_OBJECT] = 13,
-	[NTS_OBJ_TAIL][TS_VALUE_SEP] = 12,
-	[NTS_OBJ_ELEM][TS_STRING] = 14,
+	[NTS_OBJECT] = {
+		[TS_BEGIN_OBJECT] = 8,
+	},
+	[NTS_OBJ_BODY] = {
+		[TS_END_OBJECT] = 9,
+		[TS_STRING] = 10,
+	},
+	[NTS_OBJ_ELEMS] = {
+		[TS_STRING] = 11,
+	},
+	[NTS_OBJ_TAIL] = {
+		[TS_END_OBJECT] = 13,
+		[TS_VALUE_SEP] = 12,
+	},
+	[NTS_OBJ_ELEM] = {
+		[TS_STRING] = 14,
+	},
 
-	[NTS_ARRAY][TS_BEGIN_ARRAY] = 15,
-	[NTS_ARR_BODY][TS_BEGIN_OBJECT] = 17,
-	[NTS_ARR_BODY][TS_BEGIN_ARRAY] = 17,
-	[NTS_ARR_BODY][TS_END_ARRAY] = 16,
-	[NTS_ARR_BODY][TS_STRING] = 17,
-	[NTS_ARR_BODY][TS_NUMBER] = 17,
-	[NTS_ARR_BODY][TS_IDENTIFIER] = 17,
-	[NTS_ARR_ELEMS][TS_BEGIN_OBJECT] = 18,
-	[NTS_ARR_ELEMS][TS_BEGIN_ARRAY] = 18,
-	[NTS_ARR_ELEMS][TS_STRING] = 18,
-	[NTS_ARR_ELEMS][TS_NUMBER] = 18,
-	[NTS_ARR_ELEMS][TS_IDENTIFIER] = 18,
-	[NTS_ARR_TAIL][TS_END_ARRAY] = 20,
-	[NTS_ARR_TAIL][TS_VALUE_SEP] = 19,
+	[NTS_ARRAY] = {
+		[TS_BEGIN_ARRAY] = 15,
+	},
+	[NTS_ARR_BODY] = {
+		[TS_BEGIN_OBJECT] = 17,
+		[TS_BEGIN_ARRAY] = 17,
+		[TS_END_ARRAY] = 16,
+		[TS_STRING] = 17,
+		[TS_NUMBER] = 17,
+		[TS_IDENTIFIER] = 17,
+	},
+	[NTS_ARR_ELEMS] = {
+		[TS_BEGIN_OBJECT] = 18,
+		[TS_BEGIN_ARRAY] = 18,
+		[TS_STRING] = 18,
+		[TS_NUMBER] = 18,
+		[TS_IDENTIFIER] = 18,
+	},
+	[NTS_ARR_TAIL] = {
+		[TS_END_ARRAY] = 20,
+		[TS_VALUE_SEP] = 19,
+	},
 };
 
 /* The LL(1) rule table */
