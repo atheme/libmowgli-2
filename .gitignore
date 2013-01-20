@@ -22,6 +22,7 @@ src/examples/vio-udplistener/vio-udplistener
 src/examples/futuretest/futuretest
 src/examples/async_resolver/async_resolver
 src/examples/jsontest/jsontest
+src/examples/jsontest/test.json
 .deps
 *.dylib
 *.o
