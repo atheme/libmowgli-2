@@ -18,7 +18,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dns.h"
+#include "mowgli.h"
 
 mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation)
 {

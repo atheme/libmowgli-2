@@ -21,8 +21,6 @@
 #ifndef __MOWGLI_DNS_DNS_H__
 #define __MOWGLI_DNS_DNS_H__
 
-#include "mowgli.h"
-
 /* Longest hostname we're willing to work with */
 #define MOWGLI_DNS_RES_HOSTLEN 512
 

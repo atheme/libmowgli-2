@@ -41,8 +41,6 @@
 #ifndef MOWGLI_JSON_H
 #define MOWGLI_JSON_H
 
-#include <mowgli.h>
-
 /* Types with public definitons */
 typedef enum _mowgli_json_tag_t mowgli_json_tag_t;
 typedef struct _mowgli_json_t mowgli_json_t;

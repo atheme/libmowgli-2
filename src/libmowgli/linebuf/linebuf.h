@@ -21,9 +21,6 @@
 #ifndef __MOWGLI_LINEBUF_LINEBUF_H__
 #define __MOWGLI_LINEBUF_LINEBUF_H__
 
-#include "eventloop/eventloop.h"
-#include "vio/vio.h"
-
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
 typedef void mowgli_linebuf_readline_cb_t(mowgli_linebuf_t *, char *, size_t, void *);

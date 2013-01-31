@@ -67,7 +67,7 @@
 /* Original copyright ISC as above. Code modified specifically for ircd use from the following
  * orginal files in bind ... res_comp.c ns_name.c ns_netint.c res_init.c - Dianora */
 
-#include "dns.h"
+#include "mowgli.h"
 
 #ifdef _WIN32
 #define EMSGSIZE	WSAEMSGSIZE

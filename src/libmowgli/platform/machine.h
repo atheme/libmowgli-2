@@ -21,8 +21,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
-
 /* Machine environment specific macros, mostly sourced from this URL:
  * http://sourceforge.net/apps/mediawiki/predef/
  *
