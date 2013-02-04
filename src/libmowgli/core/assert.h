@@ -43,4 +43,6 @@
 		return (y); \
 	}
 
+#define return_null_if_fail(x, ...) return_val_if_fail(x, NULL, ##__VA_ARGS__);
+
 #endif
