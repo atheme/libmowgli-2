@@ -26,25 +26,33 @@
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
-#define mowgli_log_warning(x, ...) mowgli_log("warning: #x", ##__VA_ARGS__);
+#define mowgli_log_warning(...) \
+	mowgli_log_prefix("warning: ", __VA_ARGS__)
 
-#define mowgli_log_error(x, ...) mowgli_log("error: #x", ##__VA_ARGS__)
+#define mowgli_log_error(...) \
+ 	mowgli_log_prefix("error: ", __VA_ARGS__)
 
-#define mowgli_log_fatal(x, ...) \
+#define mowgli_log_fatal(...) \
 	do { \
-		mowgli_log("fatal: #x", ##__VA_ARGS__); \
+		mowgli_log_prefix("fatal: ", __VA_ARGS__); \
 		abort(); \
 	} while(0)
 
-#ifdef MOWGLI_COMPILER_GCC_COMPAT
-#define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+#if defined MOWGLI_COMPILER_GCC_COMPAT
+#define _FUNCARG __PRETTY_FUNCTION__
 #elif defined MOWGLI_COMPILER_MSVC
-#define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
+#define _FUNCARG __FUNCTION__
 #else
-#define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define _FUNCARG __func__
 #endif
 
-extern void mowgli_log_real(const char *file, int line, const char *func, const char *buf, ...);
+#define mowgli_log(...) \
+	mowgli_log_real(__FILE__, __LINE__, _FUNCARG, NULL, __VA_ARGS__);
+
+#define mowgli_log_prefix(prefix, ...) \
+	mowgli_log_real(__FILE__, __LINE__, _FUNCARG, prefix, __VA_ARGS__);
+
+extern void mowgli_log_real(const char *file, int line, const char *func, const char *prefix, const char *buf, ...);
 
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 

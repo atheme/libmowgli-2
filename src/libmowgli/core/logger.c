@@ -30,7 +30,7 @@ void mowgli_log_cb_default(const char *buf)
 
 static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
 
-void mowgli_log_real(const char *file, int line, const char *func, const char *fmt, ...)
+void mowgli_log_real(const char *file, int line, const char *func, const char *prefix, const char *fmt, ...)
 {
 	char buf[65535];
 	char snbuf[65535];
@@ -40,7 +40,10 @@ void mowgli_log_real(const char *file, int line, const char *func, const char *f
 	vsnprintf(snbuf, 65535, fmt, va);
 	va_end(va);
 
-	snprintf(buf, 65535, "(%s:%d) [%s]: %s", file, line, func, snbuf);
+	if(prefix != NULL)
+		snprintf(buf, 65535, "(%s:%d) [%s]: %s: %s", file, line, func, prefix, snbuf);
+	else
+		snprintf(buf, 65535, "(%s:%d) [%s]: %s", file, line, func, snbuf);
 
 	mowgli_log_cb(buf);
 }
