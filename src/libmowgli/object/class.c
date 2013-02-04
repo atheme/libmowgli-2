@@ -36,15 +36,12 @@ static void _object_key_canon(char *str)
 
 void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic)
 {
+	return_if_fail(klass != NULL);
+	return_if_fail(mowgli_object_class_find_by_name(name) == NULL);
+
 	/* if the object_class dictionary has not yet been initialized, we will want to do that. */
 	if (mowgli_object_class_dict == NULL)
 		mowgli_object_class_dict = mowgli_patricia_create(_object_key_canon);
-
-	if (klass == NULL)
-		mowgli_throw_exception_fatal(mowgli.object_class.invalid_object_class_exception);
-
-	if (mowgli_object_class_find_by_name(name) != NULL)
-		mowgli_throw_exception_fatal(mowgli.object_class.duplicate_object_class_exception);
 
 	/* initialize object_class::name */
 	klass->name = mowgli_strdup(name);
@@ -66,10 +63,10 @@ void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mo
 
 int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_class_t *klass2)
 {
-	mowgli_node_t *n;
+	return_val_if_fail(klass1 != NULL, 0);
+	return_val_if_fail(klass2 != NULL, 0);
 
-	if (klass1 == NULL || klass2 == NULL)
-		mowgli_throw_exception_val(mowgli.object_class.invalid_object_class_exception, 0);
+	mowgli_node_t *n;
 
 	MOWGLI_LIST_FOREACH(n, klass1->derivitives.head)
 	{
@@ -84,8 +81,8 @@ int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_
 
 void mowgli_object_class_set_derivitive(mowgli_object_class_t *klass, mowgli_object_class_t *parent)
 {
-	if (klass == NULL || parent == NULL)
-		mowgli_throw_exception_fatal(mowgli.object_class.invalid_object_class_exception);
+	return_if_fail(klass != NULL);
+	return_if_fail(parent != NULL);
 
 	mowgli_node_add(klass, mowgli_node_create(), &parent->derivitives);
 }
@@ -112,13 +109,10 @@ mowgli_object_class_t *mowgli_object_class_find_by_name(const char *name)
 
 void mowgli_object_class_destroy(mowgli_object_class_t *klass)
 {
+	return_if_fail(klass != NULL);
+	return_if_fail(klass->dynamic == TRUE);
+
 	mowgli_node_t *n, *tn;
-
-	if (klass == NULL)
-		mowgli_throw_exception_fatal(mowgli.object_class.invalid_object_class_exception);
-
-	if (klass->dynamic != TRUE)
-		mowgli_throw_exception_fatal(mowgli.object_class.nondynamic_object_class_exception);
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, klass->derivitives.head)
 	{
