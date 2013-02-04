@@ -26,6 +26,16 @@
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
+#define mowgli_log_warning(x, ...) mowgli_log("warning: #x", ##__VA_ARGS__);
+
+#define mowgli_log_error(x, ...) mowgli_log("error: #x", ##__VA_ARGS__)
+
+#define mowgli_log_fatal(x, ...) \
+	do { \
+		mowgli_log("fatal: #x", ##__VA_ARGS__); \
+		abort(); \
+	} while(0)
+
 #ifdef MOWGLI_COMPILER_GCC_COMPAT
 #define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
 #elif defined MOWGLI_COMPILER_MSVC
