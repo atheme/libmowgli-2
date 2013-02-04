@@ -28,18 +28,18 @@
 
 #define soft_assert(x, ...) \
 	if (!(x)) { \
-		mowgli_warning(_assert_msg(x),  ##__VA_ARGS__); \
+		mowgli_log_warning(_assert_msg(x),  ##__VA_ARGS__); \
 	}
 
 #define return_if_fail(x, ...) \
 	if (!(x)) { \
-		mowgli_warning(_assert_msg(x), ##__VA_ARGS__); \
+		mowgli_log_warning(_assert_msg(x), ##__VA_ARGS__); \
 		return; \
 	}
 
 #define return_val_if_fail(x, y, ...) \
 	if (!(x)) { \
-		mowgli_warning(_assert_msg(x), ##__VA_ARGS__); \
+		mowgli_log_warning(_assert_msg(x), ##__VA_ARGS__); \
 		return (y); \
 	}
 
