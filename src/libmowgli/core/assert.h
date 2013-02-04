@@ -24,25 +24,31 @@
 #ifndef __MOWGLI_ASSERT_H__
 #define __MOWGLI_ASSERT_H__
 
-#define _assert_msg(x) "sssertion '#x' failed."
+#define _assert_msg(exp) "assertion '#exp' failed."
 
-#define soft_assert(x, ...) \
-	if (!(x)) { \
-		mowgli_log_warning(_assert_msg(x),  ##__VA_ARGS__); \
-	}
+#define soft_assert(exp) \
+	do { \
+		if (!(exp)) { \
+			mowgli_log_warning(_assert_msg(exp)); \
+		} \
+	} while(0)
 
-#define return_if_fail(x, ...) \
-	if (!(x)) { \
-		mowgli_log_warning(_assert_msg(x), ##__VA_ARGS__); \
-		return; \
-	}
+#define return_if_fail(exp) \
+	do { \
+		if (!(exp)) { \
+			mowgli_log_warning(_assert_msg(exp)); \
+			return; \
+		} \
+	} while(0)
 
-#define return_val_if_fail(x, y, ...) \
-	if (!(x)) { \
-		mowgli_log_warning(_assert_msg(x), ##__VA_ARGS__); \
-		return (y); \
-	}
+#define return_val_if_fail(exp, val) \
+	do { \
+		if (!(exp)) { \
+			mowgli_log_warning(_assert_msg(exp)); \
+			return (val); \
+		} \
+	} while(0)
 
-#define return_null_if_fail(x, ...) return_val_if_fail(x, NULL, ##__VA_ARGS__);
+#define return_null_if_fail(exp) return_val_if_fail(exp, NULL)
 
 #endif

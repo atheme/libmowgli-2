@@ -178,7 +178,7 @@ const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
  */
 int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 {
-	return_val_if_fail(self != NULL, 0)
+	return_val_if_fail(self != NULL, 0);
 
 	mowgli_node_t *n;
 	mowgli_argstack_element_t *e;
