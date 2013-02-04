@@ -52,6 +52,7 @@ void mowgli_log_set_cb(mowgli_log_cb_t callback)
 	mowgli_log_cb = callback;
 }
 
+/* TODO: remove next time there is a LIB_MAJOR bump */
 void mowgli_soft_assert_log(const char *asrt, const char *file, int line, const char *function)
 {
 	char buf[65535];
