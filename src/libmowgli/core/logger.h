@@ -26,9 +26,9 @@
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
-#ifdef __GNUC__
+#ifdef MOWGLI_COMPILER_GCC_COMPAT
 #define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
-#elif defined _MSC_VER
+#elif defined MOWGLI_COMPILER_MSVC
 #define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
 #else
 #define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __func__, __VA_ARGS__)
