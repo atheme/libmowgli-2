@@ -24,7 +24,7 @@
 #ifndef __MOWGLI_ASSERT_H__
 #define __MOWGLI_ASSERT_H__
 
-#define _assert_msg(exp) "assertion '#exp' failed."
+#define _assert_msg(exp) "assertion '" #exp  "' failed."
 
 #define soft_assert(exp) \
 	do { \
