@@ -23,7 +23,7 @@
 
 #include "mowgli.h"
 
-char _mowgli_log_buf[65536];
+char _mowgli_log_buf[4096];
 mowgli_log_cb_t _mowgli_log_cb;
 
 void mowgli_log_cb_default(const char *buf) {
@@ -31,7 +31,7 @@ void mowgli_log_cb_default(const char *buf) {
 }
 
 void mowgli_log_bootstrap() {
-	_mowgli_log_buf[65535] = 0;
+	_mowgli_log_buf[4095] = 0;
 	_mowgli_log_cb = mowgli_log_cb_default;
 }
 
@@ -44,17 +44,15 @@ void mowgli_log_set_cb(mowgli_log_cb_t callback) {
 /* TODO: remove next time there is a LIB_MAJOR bump */
 void mowgli_log_real(const char *file, int line, const char *func,
 		const char *fmt, ...) {
-	int len = snprintf(_mowgli_log_buf, 65534, "(%s:%d %s): ", file, line,
+	int len = snprintf(_mowgli_log_buf, 4095, "(%s:%d %s): ", file, line,
 			func);
-
-	len--;
 
 	char *buf = &_mowgli_log_buf[len];
 
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(buf, 65534 - len, fmt, va);
+	vsnprintf(buf, 4095 - len, fmt, va);
 	va_end(va);
 
 	_mowgli_log_cb(_mowgli_log_buf);
@@ -63,7 +61,7 @@ void mowgli_log_real(const char *file, int line, const char *func,
 /* TODO: remove next time there is a LIB_MAJOR bump */
 void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
 		const char *function) {
-	snprintf(_mowgli_log_buf, 65534,
+	snprintf(_mowgli_log_buf, 4095,
 			"(%s:%d %s): critical: Assertion '%s' failed.", file, line,
 			function, asrt);
 
