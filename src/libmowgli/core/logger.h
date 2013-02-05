@@ -52,8 +52,26 @@
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
-extern void mowgli_log_prefix_real(const char *file, int line,
-		const char *func,	const char *prefix, const char *fmt, ...);
+extern char _mowgli_log_buf[65536];
+extern mowgli_log_cb_t _mowgli_log_cb;
+
+static inline void mowgli_log_prefix_real(const char *file, int line,
+		const char *func, const char *prefix, const char *fmt, ...) {
+
+	int len = snprintf(_mowgli_log_buf, 65534, "(%s:%d %s): %s", file, line,
+			func, prefix);
+
+	char *buf = &_mowgli_log_buf[len];
+
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(buf, 65534 - len, fmt, va);
+	va_end(va);
+
+	_mowgli_log_cb(_mowgli_log_buf);
+}
+
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 
 #endif

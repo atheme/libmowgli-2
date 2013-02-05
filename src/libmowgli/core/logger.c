@@ -23,61 +23,49 @@
 
 #include "mowgli.h"
 
-char buf1[65536];
-char buf2[65536];
+char _mowgli_log_buf[65536];
+mowgli_log_cb_t _mowgli_log_cb;
 
 void mowgli_log_cb_default(const char *buf) {
 	fprintf(stderr, "%s\n", buf);
 }
 
-static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
-
 void mowgli_log_bootstrap() {
-	buf1[65535] = 0;
-	buf2[65535] = 0;
-}
-
-/* TODO: remove next time there is a LIB_MAJOR bump */
-void mowgli_log_real(const char *file, int line, const char *func,
-		const char *fmt, ...) {
-	va_list va;
-
-	va_start(va, fmt);
-	vsnprintf(buf1, 65534, fmt, va);
-	va_end(va);
-
-	snprintf(buf2, 65534, "(%s:%d) [%s]: %s", file, line, func, buf1);
-
-	mowgli_log_cb(buf2);
-}
-
-void mowgli_log_prefix_real(const char *file, int line, const char *func,
-		const char *prefix, const char *fmt, ...) {
-	va_list va;
-
-	va_start(va, fmt);
-	vsnprintf(buf1, 65534, fmt, va);
-	va_end(va);
-
-	snprintf(buf2, 65534, "(%s:%d) [%s]: %s%s", file, line, func,
-			prefix, buf1);
-
-	mowgli_log_cb(buf2);
+	_mowgli_log_buf[65535] = 0;
+	_mowgli_log_cb = mowgli_log_cb_default;
 }
 
 void mowgli_log_set_cb(mowgli_log_cb_t callback) {
 	return_if_fail(callback != NULL);
 
-	mowgli_log_cb = callback;
+	_mowgli_log_cb = callback;
+}
+
+/* TODO: remove next time there is a LIB_MAJOR bump */
+void mowgli_log_real(const char *file, int line, const char *func,
+		const char *fmt, ...) {
+	int len = snprintf(_mowgli_log_buf, 65534, "(%s:%d %s): ", file, line,
+			func);
+
+	len--;
+
+	char *buf = &_mowgli_log_buf[len];
+
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(buf, 65534 - len, fmt, va);
+	va_end(va);
+
+	_mowgli_log_cb(_mowgli_log_buf);
 }
 
 /* TODO: remove next time there is a LIB_MAJOR bump */
 void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
 		const char *function) {
-	char buf[65535];
+	snprintf(_mowgli_log_buf, 65534,
+			"(%s:%d %s): critical: Assertion '%s' failed.", file, line,
+			function, asrt);
 
-	snprintf(buf, sizeof buf, "(%s:%d) [%s]: critical: Assertion '%s' failed.",
-			file, line, function, asrt);
-
-	mowgli_log_cb(buf);
+	_mowgli_log_cb(_mowgli_log_buf);
 }
