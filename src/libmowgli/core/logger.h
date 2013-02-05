@@ -24,8 +24,6 @@
 #ifndef __MOWGLI_LOGGER_H__
 #define __MOWGLI_LOGGER_H__
 
-typedef void (*mowgli_log_cb_t)(const char *);
-
 #define mowgli_log_warning(...) \
 	mowgli_log_prefix("warning: ", __VA_ARGS__)
 
@@ -47,13 +45,15 @@ typedef void (*mowgli_log_cb_t)(const char *);
 #endif
 
 #define mowgli_log(...) \
-	mowgli_log_real(__FILE__, __LINE__, _FUNCARG, NULL, __VA_ARGS__);
+	mowgli_log_prefix("", __VA_ARGS__);
 
 #define mowgli_log_prefix(prefix, ...) \
-	mowgli_log_real(__FILE__, __LINE__, _FUNCARG, prefix, __VA_ARGS__);
+	mowgli_log_prefix_real(__FILE__, __LINE__, _FUNCARG, prefix, __VA_ARGS__);
 
-extern void mowgli_log_real(const char *file, int line, const char *func, const char *prefix, const char *buf, ...);
+typedef void (*mowgli_log_cb_t)(const char *);
 
+extern void mowgli_log_prefix_real(const char *file, int line,
+		const char *func,	const char *prefix, const char *fmt, ...);
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 
 #endif

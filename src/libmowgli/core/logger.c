@@ -23,44 +23,56 @@
 
 #include "mowgli.h"
 
-void mowgli_log_cb_default(const char *buf)
-{
+char buf1[65535];
+char buf2[65535];
+
+void mowgli_log_cb_default(const char *buf) {
 	fprintf(stderr, "%s\n", buf);
 }
 
 static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
 
-void mowgli_log_real(const char *file, int line, const char *func, const char *prefix, const char *fmt, ...)
-{
-	char buf[65535];
-	char snbuf[65535];
+/* TODO: remove next time there is a LIB_MAJOR bump */
+void mowgli_log_real(const char *file, int line, const char *func,
+		const char *fmt, ...) {
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(snbuf, 65535, fmt, va);
+	vsnprintf(buf1, 65534, fmt, va);
 	va_end(va);
 
-	if(prefix != NULL)
-		snprintf(buf, 65535, "(%s:%d) [%s]: %s: %s", file, line, func, prefix, snbuf);
-	else
-		snprintf(buf, 65535, "(%s:%d) [%s]: %s", file, line, func, snbuf);
+	snprintf(buf2, 65534, "(%s:%d) [%s]: %s", file, line, func, buf1);
 
-	mowgli_log_cb(buf);
+	mowgli_log_cb(buf2);
 }
 
-void mowgli_log_set_cb(mowgli_log_cb_t callback)
-{
+void mowgli_log_prefix_real(const char *file, int line, const char *func,
+		const char *prefix, const char *fmt, ...) {
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(buf1, 65534, fmt, va);
+	va_end(va);
+
+	snprintf(buf2, 65534, "(%s:%d) [%s]: %s%s", file, line, func,
+			prefix, buf1);
+
+	mowgli_log_cb(buf2);
+}
+
+void mowgli_log_set_cb(mowgli_log_cb_t callback) {
 	return_if_fail(callback != NULL);
 
 	mowgli_log_cb = callback;
 }
 
 /* TODO: remove next time there is a LIB_MAJOR bump */
-void mowgli_soft_assert_log(const char *asrt, const char *file, int line, const char *function)
-{
+void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
+		const char *function) {
 	char buf[65535];
 
-	snprintf(buf, sizeof buf, "(%s:%d) [%s]: critical: Assertion '%s' failed.", file, line, function, asrt);
+	snprintf(buf, sizeof buf, "(%s:%d) [%s]: critical: Assertion '%s' failed.",
+			file, line, function, asrt);
 
 	mowgli_log_cb(buf);
 }
