@@ -26,6 +26,7 @@
 extern void mowgli_log_bootstrap(void);
 extern void mowgli_node_bootstrap(void);
 extern void mowgli_queue_bootstrap(void);
+extern void mowgli_object_class_bootstrap(void);
 extern void mowgli_argstack_bootstrap(void);
 extern void mowgli_bitvector_bootstrap(void);
 extern void mowgli_global_storage_bootstrap(void);
@@ -47,6 +48,7 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 	mowgli_log_bootstrap();
 	mowgli_node_bootstrap();
 	mowgli_queue_bootstrap();
+	mowgli_object_class_bootstrap();
 	mowgli_argstack_bootstrap();
 	mowgli_bitvector_bootstrap();
 	mowgli_global_storage_bootstrap();

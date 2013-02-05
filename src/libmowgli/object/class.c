@@ -23,7 +23,7 @@
 
 #include "mowgli.h"
 
-static mowgli_patricia_t *mowgli_object_class_dict = NULL;
+static mowgli_patricia_t *mowgli_object_class_dict;
 
 static void _object_key_canon(char *str)
 {
@@ -34,14 +34,14 @@ static void _object_key_canon(char *str)
 	}
 }
 
+void mowgli_object_class_bootstrap() {
+	mowgli_object_class_dict = mowgli_patricia_create(_object_key_canon);
+}
+
 void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(mowgli_object_class_find_by_name(name) == NULL);
-
-	/* if the object_class dictionary has not yet been initialized, we will want to do that. */
-	if (mowgli_object_class_dict == NULL)
-		mowgli_object_class_dict = mowgli_patricia_create(_object_key_canon);
 
 	/* initialize object_class::name */
 	klass->name = mowgli_strdup(name);
