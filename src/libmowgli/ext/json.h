@@ -42,12 +42,7 @@
 #define MOWGLI_JSON_H
 
 /* Types with public definitons */
-typedef enum _mowgli_json_tag_t mowgli_json_tag_t;
-typedef struct _mowgli_json_t mowgli_json_t;
-/* Types whose definitons are kept private */
-typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
-
-enum _mowgli_json_tag_t {
+typedef enum {
 	MOWGLI_JSON_TAG_NULL,
 	MOWGLI_JSON_TAG_BOOLEAN,
 	/* JSON does not distinguish between integers or floating points
@@ -58,7 +53,10 @@ enum _mowgli_json_tag_t {
 	MOWGLI_JSON_TAG_STRING,
 	MOWGLI_JSON_TAG_ARRAY,
 	MOWGLI_JSON_TAG_OBJECT,
-};
+} mowgli_json_tag_t;
+typedef struct _mowgli_json_t mowgli_json_t;
+/* Types whose definitons are kept private */
+typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
 
 struct _mowgli_json_t {
 	mowgli_json_tag_t tag;
