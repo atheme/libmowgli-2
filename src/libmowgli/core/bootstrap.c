@@ -23,6 +23,8 @@
 
 #include "mowgli.h"
 
+extern void mowgli_log_bootstrap(void);
+
 MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 {
 	static bool bootstrapped = 0;
@@ -37,6 +39,7 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 #endif
 
 	/* initial bootstrap */
+	mowgli_log_bootstrap();
 	mowgli_node_bootstrap();
 	mowgli_queue_bootstrap();
 	mowgli_argstack_bootstrap();

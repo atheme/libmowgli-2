@@ -23,14 +23,19 @@
 
 #include "mowgli.h"
 
-char buf1[65535];
-char buf2[65535];
+char buf1[65536];
+char buf2[65536];
 
 void mowgli_log_cb_default(const char *buf) {
 	fprintf(stderr, "%s\n", buf);
 }
 
 static mowgli_log_cb_t mowgli_log_cb = mowgli_log_cb_default;
+
+void mowgli_log_bootstrap() {
+	buf1[65535] = 0;
+	buf2[65535] = 0;
+}
 
 /* TODO: remove next time there is a LIB_MAJOR bump */
 void mowgli_log_real(const char *file, int line, const char *func,
