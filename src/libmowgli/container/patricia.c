@@ -1022,7 +1022,7 @@ void mowgli_patricia_stats(mowgli_patricia_t *dict, void (*cb)(const char *line,
 				dict->id, dict->count);
 	else
 		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
-				dict, dict->count);
+				(void *)dict, dict->count);
 	cb(str, privdata);
 	maxdepth = 0;
 	if (dict->count > 0)
