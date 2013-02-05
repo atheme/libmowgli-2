@@ -80,12 +80,12 @@ static inline void mowgli_json_object_add(mowgli_json_t *obj, const char *key, m
 
 static inline mowgli_json_t *mowgli_json_object_retrieve(mowgli_json_t *obj, const char *key)
 {
-	return mowgli_patricia_retrieve(MOWGLI_JSON_OBJECT(obj), key);
+	return (mowgli_json_t*)mowgli_patricia_retrieve(MOWGLI_JSON_OBJECT(obj), key);
 }
 
 static inline mowgli_json_t *mowgli_json_object_delete(mowgli_json_t *obj, const char *key)
 {
-	return mowgli_patricia_delete(MOWGLI_JSON_OBJECT(obj), key);
+	return (mowgli_json_t*)mowgli_patricia_delete(MOWGLI_JSON_OBJECT(obj), key);
 }
 
 #endif
