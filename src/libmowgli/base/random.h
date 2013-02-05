@@ -28,9 +28,6 @@
 struct mowgli_random_;
 typedef struct mowgli_random_ mowgli_random_t;
 
-/* object class initialization. */
-extern void mowgli_random_bootstrap(void);
-
 /* construction and destruction. */
 extern mowgli_random_t *mowgli_random_create(void);
 extern mowgli_random_t *mowgli_random_create_with_seed(unsigned int seed);

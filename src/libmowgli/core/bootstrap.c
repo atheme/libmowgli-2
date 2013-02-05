@@ -24,6 +24,16 @@
 #include "mowgli.h"
 
 extern void mowgli_log_bootstrap(void);
+extern void mowgli_node_bootstrap(void);
+extern void mowgli_queue_bootstrap(void);
+extern void mowgli_argstack_bootstrap(void);
+extern void mowgli_bitvector_bootstrap(void);
+extern void mowgli_global_storage_bootstrap(void);
+extern void mowgli_hook_bootstrap(void);
+extern void mowgli_random_bootstrap(void);
+extern void mowgli_allocation_policy_bootstrap(void);
+extern void mowgli_allocator_bootstrap(void);
+extern void mowgli_memslice_bootstrap(void);
 
 /* TODO: rename to mowgli_bootstrap next time there is a LIB_MAJOR bump */
 MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
