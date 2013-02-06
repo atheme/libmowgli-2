@@ -77,7 +77,7 @@ void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char 
 				i += arg;
 				break;
 			default:
-				mowgli_throw_exception(mowgli.formatter.unhandled_type_exception);
+				mowgli_log("unhandled type");
 				break;
 			}
 

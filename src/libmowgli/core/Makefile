@@ -17,7 +17,6 @@ INCLUDES = bootstrap.h		\
 	   allocation_policy.h	\
 	   allocator.h		\
 	   assert.h		\
-	   exception.h		\
 	   heap.h		\
 	   iterator.h		\
 	   logger.h		\

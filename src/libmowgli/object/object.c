@@ -159,6 +159,6 @@ void mowgli_object_unref(void *object)
 				free(obj);
 		}
 		else
-			mowgli_throw_exception(mowgli.object.invalid_object_class_exception);
+			mowgli_log_warning("invalid object class");
 	}
 }

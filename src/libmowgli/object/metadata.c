@@ -25,14 +25,11 @@
 
 void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
 {
+	return_if_fail(self != NULL);
+	return_if_fail(key != NULL);
+
 	mowgli_object_metadata_entry_t *e = NULL;
 	mowgli_node_t *n;
-
-	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_metadata.invalid_object_exception);
-
-	if (key == NULL)
-		mowgli_throw_exception(mowgli.null_pointer_exception);
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
@@ -57,14 +54,11 @@ void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, vo
 
 void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 {
+	return_if_fail(self != NULL);
+	return_if_fail(key != NULL);
+
 	mowgli_object_metadata_entry_t *e;
 	mowgli_node_t *n, *tn;
-
-	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_metadata.invalid_object_exception);
-
-	if (key == NULL)
-		mowgli_throw_exception(mowgli.null_pointer_exception);
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->metadata.head)
 	{
@@ -83,14 +77,11 @@ void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 
 void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 {
+	return_null_if_fail(self != NULL);
+	return_null_if_fail(key != NULL);
+
 	mowgli_object_metadata_entry_t *e;
 	mowgli_node_t *n;
-
-	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.object_metadata.invalid_object_exception, NULL);
-
-	if (key == NULL)
-		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{

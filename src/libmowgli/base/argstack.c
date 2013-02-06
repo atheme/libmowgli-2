@@ -72,12 +72,11 @@ void mowgli_argstack_bootstrap(void)
  */
 mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 {
+	return_null_if_fail(descstr != NULL);
+
 	const char *cp = descstr;
 	mowgli_argstack_t *out = mowgli_alloc(sizeof(mowgli_argstack_t));
 	mowgli_object_init(mowgli_object(out), descstr, &klass, NULL);
-
-	if (descstr == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
 
 	while (*cp)
 	{
@@ -104,7 +103,8 @@ mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_l
 		default:
 			va_end(va);
 			mowgli_object_unref(out);
-			mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
+			mowgli_log_warning("invalid description");
+			return NULL;
 			break;
 		}
 
@@ -129,11 +129,10 @@ mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_l
  */
 mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
 {
+	return_null_if_fail(descstr != NULL);
+
 	va_list va;
 	mowgli_argstack_t *out;
-
-	if (descstr == NULL)
-		mowgli_throw_exception_val(mowgli.argstack.invalid_description, NULL);
 
 	va_start(va, descstr);
 	out = mowgli_argstack_create_from_va_list(descstr, va);
@@ -154,11 +153,10 @@ mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
  */
 const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
 {
+	return_null_if_fail(self != NULL);
+
 	mowgli_node_t *n;
 	mowgli_argstack_element_t *e;
-
-	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -180,11 +178,10 @@ const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
  */
 int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 {
+	return_val_if_fail(self != NULL, 0);
+
 	mowgli_node_t *n;
 	mowgli_argstack_element_t *e;
-
-	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.null_pointer_exception, 0);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -206,11 +203,10 @@ int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
  */
 mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
 {
+	return_val_if_fail(self != NULL, false);
+
 	mowgli_node_t *n;
 	mowgli_argstack_element_t *e;
-
-	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.null_pointer_exception, FALSE);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);
@@ -232,11 +228,10 @@ mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
  */
 void *mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
 {
+	return_null_if_fail(self != NULL);
+
 	mowgli_node_t *n;
 	mowgli_argstack_element_t *e;
-
-	if (self == NULL)
-		mowgli_throw_exception_val(mowgli.null_pointer_exception, NULL);
 
 	n = self->stack.head;
 	mowgli_node_delete(n, &self->stack);

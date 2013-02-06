@@ -45,7 +45,6 @@ MOWGLI_DECLS_START
 
 #include "core/logger.h"
 #include "core/assert.h"
-#include "core/exception.h"
 #include "core/iterator.h"
 
 #include "container/list.h"
