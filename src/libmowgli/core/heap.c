@@ -205,7 +205,7 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 #endif
 
 	if(mowgli_mutex_init(&bh->mutex) != 0)
-		mowgli_throw_exception_fatal("heap mutex can't be created");
+		mowgli_log_fatal("heap mutex can't be created");
 
 	if (flags & BH_NOW)
 	{
@@ -251,7 +251,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	mowgli_heap_elem_header_t *h;
 
 	if(mowgli_mutex_lock(&heap->mutex) != 0)
-		mowgli_throw_exception_fatal("heap mutex can't be locked");
+		mowgli_log_fatal("heap mutex can't be locked");
 
 	/* no free space? */
 	if (heap->free_elems == 0)
@@ -319,7 +319,7 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	mowgli_heap_elem_header_t *h;
 
 	if(mowgli_mutex_lock(&heap->mutex) != 0)
-		mowgli_throw_exception_fatal("heap mutex can't be locked");
+		mowgli_log_fatal("heap mutex can't be locked");
 
 	h = (mowgli_heap_elem_header_t *)((char *)data - sizeof(mowgli_heap_elem_header_t));
 	b = h->un.block;

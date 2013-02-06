@@ -24,21 +24,53 @@
 #ifndef __MOWGLI_LOGGER_H__
 #define __MOWGLI_LOGGER_H__
 
-typedef void (*mowgli_log_cb_t)(const char *);
+#define mowgli_log_warning(...) \
+	mowgli_log_prefix("warning: ", __VA_ARGS__)
 
-#ifdef __GNUC__
-# define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
-#elif defined _MSC_VER
-# if _MSC_VER <= 1200
-   static __inline void mowgli_log(char *fmt, ...) { /* TODO/UNSUPPORTED */ }
-# else
-#  define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __FUNCTION__, __VA_ARGS__)
-# endif
+#define mowgli_log_error(...) \
+ 	mowgli_log_prefix("error: ", __VA_ARGS__)
+
+#define mowgli_log_fatal(...) \
+	do { \
+		mowgli_log_prefix("fatal: ", __VA_ARGS__); \
+		abort(); \
+	} while(0)
+
+#if defined MOWGLI_COMPILER_GCC_COMPAT
+#define _FUNCARG __PRETTY_FUNCTION__
+#elif defined MOWGLI_COMPILER_MSVC
+#define _FUNCARG __FUNCTION__
 #else
-# define mowgli_log(...) mowgli_log_real(__FILE__, __LINE__, __func__, __VA_ARGS__)
+#define _FUNCARG __func__
 #endif
 
-extern void mowgli_log_real(const char *file, int line, const char *func, const char *buf, ...);
+#define mowgli_log(...) \
+	mowgli_log_prefix("", __VA_ARGS__);
+
+#define mowgli_log_prefix(prefix, ...) \
+	mowgli_log_prefix_real(__FILE__, __LINE__, _FUNCARG, prefix, __VA_ARGS__);
+
+typedef void (*mowgli_log_cb_t)(const char *);
+
+extern char _mowgli_log_buf[4096];
+extern mowgli_log_cb_t _mowgli_log_cb;
+
+static inline void mowgli_log_prefix_real(const char *file, int line,
+		const char *func, const char *prefix, const char *fmt, ...) {
+
+	int len = snprintf(_mowgli_log_buf, 4095, "(%s:%d %s): %s", file, line,
+			func, prefix);
+
+	char *buf = &_mowgli_log_buf[len];
+
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(buf, 4095 - len, fmt, va);
+	va_end(va);
+
+	_mowgli_log_cb(_mowgli_log_buf);
+}
 
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 

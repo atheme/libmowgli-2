@@ -26,14 +26,12 @@
 void
 mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 {
-	mowgli_node_t *n;
-	char *bt_msg;
-
 	return_if_fail(e != NULL);
 	return_if_fail(delim != NULL);
+	return_if_fail(MOWGLI_LIST_LENGTH(&e->bt) != 0);
 
-	if (MOWGLI_LIST_LENGTH(&e->bt) == 0)
-		mowgli_throw_exception(mowgli.error_backtrace.no_backtrace);
+	mowgli_node_t *n;
+	char *bt_msg;
 
 	MOWGLI_LIST_FOREACH(n, e->bt.head)
 	{

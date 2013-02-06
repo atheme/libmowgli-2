@@ -26,7 +26,6 @@
 
 typedef mowgli_iterator_t mowgli_queue_t;
 
-extern void mowgli_queue_bootstrap(void);
 extern mowgli_queue_t *mowgli_queue_push(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_shift(mowgli_queue_t *head, void *data);
 extern mowgli_queue_t *mowgli_queue_remove(mowgli_queue_t *head);

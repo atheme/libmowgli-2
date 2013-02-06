@@ -379,7 +379,7 @@ int mowgli_vio_default_seek(mowgli_vio_t *vio, long offset, int whence)
 
 int mowgli_vio_default_tell(mowgli_vio_t *vio)
 {
-	return_val_if_fail(vio, -255)
+	return_val_if_fail(vio, -255);
 	vio->error.op = MOWGLI_VIO_ERR_OP_TELL;
 	errno = ENOSYS;
 	return mowgli_vio_err_errcode(vio, strerror, errno);

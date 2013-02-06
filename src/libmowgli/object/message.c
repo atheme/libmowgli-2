@@ -25,24 +25,18 @@
 
 void mowgli_object_class_message_handler_attach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
 {
-	if (klass == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_object_class_exception);
-
-	if (sig == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_signal_exception);
+	return_if_fail(klass != NULL);
+	return_if_fail(sig != NULL);
 
 	mowgli_node_add(sig, mowgli_node_create(), &klass->message_handlers);
 }
 
 void mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
 {
+	return_if_fail(klass != NULL);
+	return_if_fail(sig != NULL);
+
 	mowgli_node_t *n;
-
-	if (klass == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_object_class_exception);
-
-	if (sig == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_signal_exception);
 
 	n = mowgli_node_find(sig, &klass->message_handlers);
 	mowgli_node_delete(n, &klass->message_handlers);
@@ -51,24 +45,18 @@ void mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mo
 
 void mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
 {
-	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_object_exception);
-
-	if (sig == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_signal_exception);
+	return_if_fail(self != NULL);
+	return_if_fail(sig != NULL);
 
 	mowgli_node_add(sig, mowgli_node_create(), &self->message_handlers);
 }
 
 void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
 {
+	return_if_fail(self != NULL);
+	return_if_fail(sig != NULL);
+
 	mowgli_node_t *n;
-
-	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_object_exception);
-
-	if (sig == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_signal_exception);
 
 	n = mowgli_node_find(sig, &self->message_handlers);
 	mowgli_node_delete(n, &self->message_handlers);
@@ -77,16 +65,13 @@ void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_m
 
 void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 {
+	return_if_fail(self != NULL);
+	return_if_fail(name != NULL);
+
 	mowgli_argstack_t *stack;
 	mowgli_object_message_handler_t *sig = NULL;
 	mowgli_node_t *n;
 	va_list va;
-
-	if (self == NULL)
-		mowgli_throw_exception(mowgli.object_messaging.invalid_object_exception);
-
-	if (name == NULL)
-		mowgli_throw_exception(mowgli.null_pointer_exception);
 
 	/* try to find a signal to compile the argument stack from, we start with self::klass first. */
 	MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)
