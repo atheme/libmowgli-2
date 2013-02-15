@@ -25,7 +25,7 @@
 
 size_t _mowgli_cacheline_size;
 
-void mowgli_cacheline_init(void) {
+void mowgli_cacheline_bootstrap(void) {
 #ifdef MOWGLI_OS_LINUX
 	_mowgli_cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif MOWGLI_OS_OSX
