@@ -48,7 +48,7 @@ void mowgli_cacheline_init(void) {
 		}
 	}
 
-  atheme_free(buffer);
+  mowgli_free(buffer);
 #undef SLPI
 #else
 	// This is often true
