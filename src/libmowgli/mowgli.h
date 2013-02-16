@@ -42,6 +42,7 @@ MOWGLI_DECLS_START
 
 #include "platform/constructor.h"
 #include "platform/machine.h"
+#include "platform/cacheline.h"
 
 #include "core/logger.h"
 #include "core/assert.h"
