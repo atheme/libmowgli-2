@@ -90,7 +90,7 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 {
 	return_if_fail(vio);
 
-	vio->fd = -1;
+	vio->io.fd = -1;
 
 	vio->flags = 0;
 
@@ -110,20 +110,20 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	return_if_fail(vio);
 	return_if_fail(eventloop);
 
-	const int fd = vio->fd;
+	const int fd = vio->io.fd;
 
 	/* Check for previous attachment */
 	if (vio->eventloop)
 	{
-		mowgli_log("VIO object [%p] is already attached to eventloop [%p]; attempted to attach new eventloop [%p]", vio, vio->eventloop, eventloop);
+		mowgli_log("VIO object [%p] is already attached to eventloop [%p]; attempted to attach new eventloop [%p]", (void *)vio, (void *)vio->eventloop, (void *)eventloop);
 		return;
 	}
 
-	if ((vio->io = mowgli_pollable_create(eventloop, fd, vio->userdata)) != NULL)
+	if ((vio->io.e = mowgli_pollable_create(eventloop, fd, vio->userdata)) != NULL)
 	{
 		vio->eventloop = eventloop;
 		/* You're probably going to want this */
-		mowgli_pollable_set_nonblocking(vio->io, true);
+		mowgli_pollable_set_nonblocking(vio->io.e, true);
 
 		if (evops)
 			vio->evops = evops;
@@ -134,8 +134,8 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	}
 	else
 	{
-		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", vio);
-		vio->fd = fd; /* May have been clobbered */
+		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", (void *)vio);
+		vio->io.fd = fd; /* May have been clobbered */
 	}
 }
 
@@ -151,13 +151,13 @@ void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 	return_if_fail(fd != -1);
 
 	return_if_fail(vio != NULL);
-	return_if_fail(vio->io != NULL);
+	return_if_fail(vio->io.e != NULL);
 	return_if_fail(vio->eventloop != NULL);
 
-	mowgli_pollable_destroy(vio->eventloop, vio->io);
+	mowgli_pollable_destroy(vio->eventloop, vio->io.e);
 
 	vio->eventloop = NULL;
-	vio->fd = fd;
+	vio->io.fd = fd;
 }
 
 /* mowgli_vio_destroy - eliminate a VIO object
