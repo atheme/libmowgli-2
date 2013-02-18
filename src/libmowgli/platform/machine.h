@@ -62,9 +62,9 @@
 
 #if defined __GNUC__
 #define MOWGLI_COMPILER_GCC_COMPAT
-#define _MOWGLI_COMPILER_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#define MOWGLI_COMPILER_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #else
-#define _MOWGLI_COMPILER_GCC_VERSION (0)
+#define MOWGLI_COMPILER_GCC_VERSION (0)
 #endif
 
 #if defined __amd64__ || defined __amd64 || defined __x86_64__ || defined __x86_64 || defined _M_X64 || defined _M_AMD64

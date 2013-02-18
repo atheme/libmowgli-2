@@ -50,7 +50,7 @@
 #endif
 
 /* Hot and cold paths */
-#if _MOWGLI_COMPILER_GCC_VERSION > 403000
+#if MOWGLI_COMPILER_GCC_VERSION > 403000
 #define MOWGLI_HOT(proto)  proto __attribute__((hot))
 #define MOWGLI_COLD(proto) proto __attribute__((cold))
 #else
@@ -58,7 +58,7 @@
 #define MOWGLI_COLD(proto) proto
 #endif
 
-#if _MOWGLI_COMPILER_GCC_VERSION > 408000
+#if MOWGLI_COMPILER_GCC_VERSION > 408000
 #define MOWGLI_HOT_LABEL(label)  label __attribute__((hot))
 #define MOWGLI_COLD_LABEL(label) label __attribute__((cold))
 #else
