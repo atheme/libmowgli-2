@@ -24,8 +24,7 @@
 #ifndef __MOWGLI_PLATFORM_CONSTRUCTOR_H__
 #define __MOWGLI_PLATFORM_CONSTRUCTOR_H__
 
-#ifdef _MSC_VER
-
+#if defined MOWGLI_COMPILER_MSVC
 /*
  * Automatic constructors are not yet officially supported in MSVC, however,
  * there is a similar feature where functions in the ".CRT$XCU" section are
@@ -38,17 +37,18 @@
 	static void __cdecl func(void); \
 	__declspec(allocate(".CRT$XCU")) void (__cdecl *func##_)(void) = func; \
 	static void __cdecl func(void)
-
-#elif defined(__GNUC__) || defined(__SUNPRO_C)
-
+#elif defined MOWGLI_COMPILER_GCC_COMPAT
+#if MOWGLI_COMPILER_GCC_VERSION >= 403000
 #define MOWGLI_BOOTSTRAP_FUNC(func) \
-	static void func(void) __attribute__((constructor)); \
+	static void func(void) __attribute__((cold, constructor, flatten)); \
 	static void func(void)
-
 #else
-
+#define MOWGLI_BOOTSTRAP_FUNC(func) \
+	static void func(void) __attribute__((constructor, flatten)); \
+	static void func(void)
+#endif
+#else
 #error MOWGLI_BOOTSTRAP_FUNC not implemented for your platform :(
-
 #endif
 
 #endif
