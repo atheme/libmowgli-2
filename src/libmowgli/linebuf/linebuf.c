@@ -193,7 +193,7 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 			if (ret != 0)
 			{
 				mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
-				mowgli_log("mowgli_vio_write returned error [%d]: %s", linebuf->vio->error.code, linebuf->vio->error.string);
+				mowgli_log("mowgli_vio_write returned error [%ld]: %s", linebuf->vio->error.code, linebuf->vio->error.string);
 				return;
 			}
 		}

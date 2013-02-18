@@ -81,7 +81,7 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 
 	if (mowgli_mutex_init(&eventloop->mutex) != 0)
 	{
-		mowgli_log("couldn't create mutex for eventloop %p, aborting...", eventloop);
+		mowgli_log("couldn't create mutex for eventloop %p, aborting...", (void *)eventloop);
 		abort();
 	}
 

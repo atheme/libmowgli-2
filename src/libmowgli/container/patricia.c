@@ -510,7 +510,7 @@ void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
 
 	if (STATE_CUR(state) == NULL)
 	{
-		mowgli_log("mowgli_patricia_foreach_next(): called again after iteration finished on dtree<%p>", dtree);
+		mowgli_log("mowgli_patricia_foreach_next(): called again after iteration finished on dtree<%p>", (void *)dtree);
 		return;
 	}
 
@@ -537,7 +537,7 @@ void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
 				{
 					if (strcmp(next->leaf.key, leaf->key) < 0)
 					{
-						mowgli_log("mowgli_patricia_foreach_next(): iteration went backwards (libmowgli bug) on dtree<%p>", dtree);
+						mowgli_log("mowgli_patricia_foreach_next(): iteration went backwards (libmowgli bug) on dtree<%p>", (void *)dtree);
 						STATE_NEXT(state) = NULL;
 						return;
 					}
