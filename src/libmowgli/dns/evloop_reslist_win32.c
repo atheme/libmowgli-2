@@ -17,8 +17,9 @@
  * without express or implied warranty.
  */
 
-#ifdef _WIN32
 #include "mowgli.h"
+
+#ifdef MOWGLI_OS_WINDOWS
 #include <windows.h>
 #include <iphlpapi.h>
 
