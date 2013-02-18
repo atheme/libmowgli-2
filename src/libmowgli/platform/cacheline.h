@@ -24,10 +24,6 @@
 #ifndef __MOWGLI_PLATFORM_CACHELINE_H__
 #define __MOWGLI_PLATFORM_CACHELINE_H__
 
-extern size_t _mowgli_cacheline_size;
-
-static inline size_t mowgli_cacheline_size(void) {
-	return _mowgli_cacheline_size;
-}
+extern size_t mowgli_cacheline_size(void);
 
 #endif

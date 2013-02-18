@@ -23,14 +23,13 @@
 
 #include "mowgli.h"
 
-size_t _mowgli_cacheline_size;
+size_t cacheline_size;
 
 void mowgli_cacheline_bootstrap(void) {
 #ifdef MOWGLI_OS_LINUX
-	_mowgli_cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif MOWGLI_OS_OSX
-	sysctlbyname("hw.cachelinesize", &_mowgli_cacheline_size, 
-			sizeof(size_t), 0, 0);
+	sysctlbyname("hw.cachelinesize", &cacheline_size, sizeof(size_t), 0, 0);
 #elif MOWGLI_OS_WIN
 	DWORD buf_size = 0;
 	DWORD i = 0;
@@ -42,7 +41,7 @@ void mowgli_cacheline_bootstrap(void) {
 
 	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i) {
 		if (buf[i].Relationship == RelationCache && buf[i].Cache.Level == 1) {
-			_mowgli_cacheline_size = buf[i].Cache.LineSize;
+			cacheline_size = buf[i].Cache.LineSize;
 			break;
 		}
 	}
@@ -51,9 +50,10 @@ void mowgli_cacheline_bootstrap(void) {
 #else
 	// This is often true
 #ifdef MOWGLI_CPU_BITS_32
-	_mowgli_cacheline_size = 32;
+	cacheline_size = 32;
 #else
-	_mowgli_cacheline_size = 64;
+	cacheline_size = 64;
 #endif
 #endif
 }
+
