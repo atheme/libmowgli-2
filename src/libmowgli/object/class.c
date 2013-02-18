@@ -98,7 +98,7 @@ void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *opdata, m
 	if (mowgli_object_class_check_cast(object->klass, klass))
 		return object;
 
-	mowgli_log("Invalid reinterpreted cast from %s<%p> to %s", object->klass->name, klass->name);
+	mowgli_log("Invalid reinterpreted cast from %s<%p> to %s", object->klass->name, (void *)object, klass->name);
 	return NULL;
 }
 

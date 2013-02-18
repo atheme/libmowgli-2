@@ -238,7 +238,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 			return 0;
 	}
 
-	newvio->fd = afd;
+	newvio->io.fd = afd;
 
 	mowgli_vio_openssl_setssl(newvio, &connection->settings, vio->ops);
 	newconnection = newvio->privdata;

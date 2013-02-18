@@ -1,8 +1,7 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * logger.h: Event and debugging message logging.
+ * cacheline.c: Platform specific routines to get L1 cache line size
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
  * Copyright (c) 2013 Patrick McFarland <pmcfarland@adterrasperaspera.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -22,40 +21,43 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_LOGGER_H__
-#define __MOWGLI_LOGGER_H__
+#include "mowgli.h"
 
-typedef void (*mowgli_log_cb_t)(const char *);
+size_t cacheline_size;
 
-extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
+void mowgli_cacheline_bootstrap(void) {
+#ifdef MOWGLI_OS_LINUX
+	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+#elif MOWGLI_OS_OSX
+	sysctlbyname("hw.cachelinesize", &cacheline_size, sizeof(size_t), 0, 0);
+#elif MOWGLI_OS_WIN
+	DWORD buf_size = 0;
+	DWORD i = 0;
+	SLPI *buf = 0;
 
-#define mowgli_log(...) \
-	mowgli_log_prefix("", __VA_ARGS__);
+	GetLogicalProcessorInformation(0, &buf_size);
+	buf = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *)mowgli_alloc(buf_size);
+	GetLogicalProcessorInformation(&buf[0], &buf_size);
 
-#define mowgli_log_warning(...) \
-	mowgli_log_prefix("warning: ", __VA_ARGS__)
+	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i) {
+		if (buf[i].Relationship == RelationCache && buf[i].Cache.Level == 1) {
+			cacheline_size = buf[i].Cache.LineSize;
+			break;
+		}
+	}
 
-#define mowgli_log_error(...) \
- 	mowgli_log_prefix("error: ", __VA_ARGS__)
-
-#define mowgli_log_fatal(...) \
-	do { \
-		mowgli_log_prefix("fatal: ", __VA_ARGS__); \
-		abort(); \
-	} while(0)
-
-#define mowgli_log_prefix(prefix, ...) \
-	mowgli_log_prefix_real(__FILE__, __LINE__, _MOWGLI_FUNCNAME, prefix, __VA_ARGS__)
-
-extern MOWGLI_COLD(MOWGLI_PRINTF(void mowgli_log_prefix_real(const char *file,
-		int line,	const char *func, const char *prefix, const char *fmt, ...), 5));
-
-#if defined MOWGLI_COMPILER_GCC_COMPAT
-#define _MOWGLI_FUNCNAME __PRETTY_FUNCTION__
-#elif defined MOWGLI_COMPILER_MSVC
-#define _MOWGLI_FUNCNAME __FUNCTION__
+  mowgli_free(buffer);
 #else
-#define _MOWGLI_FUNCNAME __func__
+	// This is often true
+#ifdef MOWGLI_CPU_BITS_32
+	cacheline_size = 32;
+#else
+	cacheline_size = 64;
 #endif
+#endif
+}
 
-#endif
+size_t mowgli_cacheline_size(void) {
+	return cacheline_size;
+}
+

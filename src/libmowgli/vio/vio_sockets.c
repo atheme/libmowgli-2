@@ -38,7 +38,7 @@ int mowgli_vio_default_socket(mowgli_vio_t *vio, int family, int type, int proto
 	if ((fd = socket(family, type, proto)) == -1)
 		return mowgli_vio_err_errcode(vio, strerror, errno);
 
-	vio->fd = fd;
+	vio->io.fd = fd;
 
 	if (type == SOCK_STREAM)
 	{
@@ -111,7 +111,7 @@ int mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 			return 0;
 	}
 
-	newvio->fd = afd;
+	newvio->io.fd = afd;
 
 	/* The new VIO object is most certainly not a server */
 	mowgli_vio_setflag(newvio, MOWGLI_VIO_FLAGS_ISCLIENT, true);

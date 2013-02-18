@@ -121,9 +121,9 @@ struct _mowgli_vio {
 	 * else use fd
 	 */
 	union {
-		mowgli_eventloop_io_t *io;
+		mowgli_eventloop_io_t *e;
 		mowgli_descriptor_t fd;
-	};
+	} io;
 
 	/* Eventloop object we're attached to */
 	mowgli_eventloop_t *eventloop;
@@ -200,12 +200,12 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 
 	if (vio->eventloop)
 	{
-		mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(vio->io);
+		mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(vio->io.e);
 		if (pollable)
 			return pollable->fd;
 	}
 
-	return vio->fd;
+	return vio->io.fd;
 }
 
 
@@ -220,21 +220,21 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 #define MOWGLI_VIO_IS_CLOSED(v) mowgli_vio_hasflag(v, MOWGLI_VIO_FLAGS_ISCLOSED)
 
 #define MOWGLI_VIO_SETREAD(vio)							\
-	if (vio->eventloop && vio->io && vio->evops && vio->evops->read_cb)	\
+	if (vio->eventloop && vio->io.e && vio->evops && vio->evops->read_cb)	\
 	{   									\
-		mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_READ, vio->evops->read_cb); \
+		mowgli_pollable_setselect(vio->eventloop, vio->io.e, MOWGLI_EVENTLOOP_IO_READ, vio->evops->read_cb); \
 	}
 
 #define MOWGLI_VIO_SETWRITE(vio)						\
-	if (vio->eventloop && vio->io && vio->evops && vio->evops->write_cb)	\
+	if (vio->eventloop && vio->io.e && vio->evops && vio->evops->write_cb)	\
 	{									\
-		 mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_WRITE, vio->evops->write_cb); \
+		 mowgli_pollable_setselect(vio->eventloop, vio->io.e, MOWGLI_EVENTLOOP_IO_WRITE, vio->evops->write_cb); \
 	}
 
 #define MOWGLI_VIO_UNSETWRITE(vio)	\
-	if (vio->eventloop && vio->io)	\
+	if (vio->eventloop && vio->io.e)	\
 	{				\
-		mowgli_pollable_setselect(vio->eventloop, vio->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL); \
+		mowgli_pollable_setselect(vio->eventloop, vio->io.e, MOWGLI_EVENTLOOP_IO_WRITE, NULL); \
 	}
 
 /* Decls */

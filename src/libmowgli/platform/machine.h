@@ -2,7 +2,7 @@
  * libmowgli: A collection of useful routines for programming.
  * machine.h: Defines to discover what machine we're on easily
  *
- * Copyright (c) 2012 Patrick McFarland <pmcfarland@adterrasperaspera.com>
+ * Copyright (c) 2012, 2013 Patrick McFarland <pmcfarland@adterrasperaspera.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -62,6 +62,9 @@
 
 #if defined __GNUC__
 #define MOWGLI_COMPILER_GCC_COMPAT
+#define MOWGLI_COMPILER_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#else
+#define MOWGLI_COMPILER_GCC_VERSION (0)
 #endif
 
 #if defined __amd64__ || defined __amd64 || defined __x86_64__ || defined __x86_64 || defined _M_X64 || defined _M_AMD64

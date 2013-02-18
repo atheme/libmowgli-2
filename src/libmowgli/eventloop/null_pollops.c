@@ -85,7 +85,7 @@ static void mowgli_null_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_
 
 static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
-	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", pollable);
+	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", (void *)pollable);
 
 	switch (dir)
 	{

@@ -674,7 +674,7 @@ void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
 
 	if (state->cur == NULL)
 	{
-		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", dtree);
+		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", (void*)dtree);
 		return;
 	}
 
@@ -748,7 +748,7 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
 
 	if (delem->key == NULL)
 	{
-		mowgli_log("major WTF: delem->key is NULL, not adding node.", key);
+		mowgli_log("major WTF: delem->key<%p> is NULL, not adding node.", (void *)key);
 		mowgli_heap_free(elem_heap, delem);
 		return NULL;
 	}
@@ -884,7 +884,7 @@ void mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *l
 				dict->id, dict->count);
 	else
 		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
-				dict, dict->count);
+				(void*)dict, dict->count);
 	cb(str, privdata);
 	maxdepth = 0;
 	if (dict->root != NULL)
