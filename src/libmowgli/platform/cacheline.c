@@ -57,3 +57,7 @@ void mowgli_cacheline_bootstrap(void) {
 #endif
 }
 
+size_t mowgli_cacheline_size(void) {
+	return cacheline_size;
+}
+
