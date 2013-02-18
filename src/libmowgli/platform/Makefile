@@ -7,7 +7,7 @@ SUBDIRS = win32
 
 SRCS = cacheline.c
 
-INCLUDES = cacheline.h constructor.h machine.h
+INCLUDES = attributes.h cacheline.h constructor.h machine.h
 
 include ../../../buildsys.mk
 
