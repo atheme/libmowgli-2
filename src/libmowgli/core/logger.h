@@ -3,6 +3,7 @@
  * logger.h: Event and debugging message logging.
  *
  * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2013 Patrick McFarland <pmcfarland@adterrasperaspera.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -24,6 +25,13 @@
 #ifndef __MOWGLI_LOGGER_H__
 #define __MOWGLI_LOGGER_H__
 
+typedef void (*mowgli_log_cb_t)(const char *);
+
+extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
+
+#define mowgli_log(...) \
+	mowgli_log_prefix("", __VA_ARGS__);
+
 #define mowgli_log_warning(...) \
 	mowgli_log_prefix("warning: ", __VA_ARGS__)
 
@@ -36,42 +44,18 @@
 		abort(); \
 	} while(0)
 
-#if defined MOWGLI_COMPILER_GCC_COMPAT
-#define _FUNCARG __PRETTY_FUNCTION__
-#elif defined MOWGLI_COMPILER_MSVC
-#define _FUNCARG __FUNCTION__
-#else
-#define _FUNCARG __func__
-#endif
-
-#define mowgli_log(...) \
-	mowgli_log_prefix("", __VA_ARGS__);
-
 #define mowgli_log_prefix(prefix, ...) \
-	mowgli_log_prefix_real(__FILE__, __LINE__, _FUNCARG, prefix, __VA_ARGS__);
+	mowgli_log_prefix_real(__FILE__, __LINE__, _MOWGLI_FUNCNAME, prefix, __VA_ARGS__)
 
-typedef void (*mowgli_log_cb_t)(const char *);
+extern MOWGLI_COLD(MOWGLI_PRINTF(void mowgli_log_prefix_real(const char *file,
+		int line,	const char *func, const char *prefix, const char *fmt, ...), 5));
 
-extern char _mowgli_log_buf[4096];
-extern mowgli_log_cb_t _mowgli_log_cb;
-
-static inline void mowgli_log_prefix_real(const char *file, int line,
-		const char *func, const char *prefix, const char *fmt, ...) {
-
-	int len = snprintf(_mowgli_log_buf, 4095, "(%s:%d %s): %s", file, line,
-			func, prefix);
-
-	char *buf = &_mowgli_log_buf[len];
-
-	va_list va;
-
-	va_start(va, fmt);
-	vsnprintf(buf, 4095 - len, fmt, va);
-	va_end(va);
-
-	_mowgli_log_cb(_mowgli_log_buf);
-}
-
-extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
+#if defined MOWGLI_COMPILER_GCC_COMPAT
+#define _MOWGLI_FUNCNAME __PRETTY_FUNCTION__
+#elif defined MOWGLI_COMPILER_MSVC
+#define _MOWGLI_FUNCNAME __FUNCTION__
+#else
+#define _MOWGLI_FUNCNAME __func__
+#endif
 
 #endif
