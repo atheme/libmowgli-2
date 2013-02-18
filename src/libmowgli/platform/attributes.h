@@ -33,15 +33,6 @@
 #define MOWGLI_DEPRECATED(proto, msg) proto
 #endif
 
-/* Always inline */
-#if defined MOWGLI_COMPILER_GCC_COMPAT
-#define MOWGLI_ALWAYSINLINE(proto) proto __attribute__((always_inline))
-#elif defined MOWGLI_COMPILER_MSVC
-#define MOWGLI_ALWAYSINLINE(proto) __forceinline proto
-#else
-#define MOWGLI_ALWAYSINLINE(proto) inline proto
-#endif
-
 /* printf, n is number of args to skip to get to fmt */
 #if defined MOWGLI_COMPILER_GCC_COMPAT
 #define MOWGLI_PRINTF(proto, n) proto __attribute__((format (printf, n, n + 1)))
