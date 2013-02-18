@@ -32,16 +32,15 @@ void mowgli_cacheline_bootstrap(void) {
 	sysctlbyname("hw.cachelinesize", &_mowgli_cacheline_size, 
 			sizeof(size_t), 0, 0);
 #elif MOWGLI_OS_WIN
-#define SLPI SYSTEM_LOGICAL_PROCESSOR_INFORMATION
 	DWORD buf_size = 0;
 	DWORD i = 0;
 	SLPI *buf = 0;
 
 	GetLogicalProcessorInformation(0, &buf_size);
-	buf = (SLPI *)atheme_alloc(buf_size);
+	buf = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *)mowgli_alloc(buf_size);
 	GetLogicalProcessorInformation(&buf[0], &buf_size);
 
-	for (i = 0; i != buf_size / sizeof(SLPI); ++i) {
+	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i) {
 		if (buf[i].Relationship == RelationCache && buf[i].Cache.Level == 1) {
 			_mowgli_cacheline_size = buf[i].Cache.LineSize;
 			break;
@@ -49,7 +48,6 @@ void mowgli_cacheline_bootstrap(void) {
 	}
 
   mowgli_free(buffer);
-#undef SLPI
 #else
 	// This is often true
 #ifdef MOWGLI_CPU_BITS_32
