@@ -62,9 +62,6 @@ struct _mowgli_json_t {
 	mowgli_json_tag_t tag;
 	int refcount;
 
-	/* NOTE: unnamed unions like this are a GNU extension and probably
-	   not supported in many other compilers. Options need to be
-	   discussed */
 	union {
 		bool v_bool;
 		int v_int;
@@ -72,7 +69,7 @@ struct _mowgli_json_t {
 		mowgli_string_t *v_string;
 		mowgli_list_t *v_array;
 		mowgli_patricia_t *v_object;
-	};
+	} v;
 };
 
 /* Helper macros useful for cleanly interacting with mowgli_json_t
@@ -80,16 +77,16 @@ struct _mowgli_json_t {
    consistent interface. They are as likely to change as the mowgli_json_t
    struct itself. */
 #define MOWGLI_JSON_TAG(n)		((n)->tag)
-#define MOWGLI_JSON_BOOLEAN(n)		((n)->v_bool)
-#define MOWGLI_JSON_INTEGER(n)		((n)->v_int)
-#define MOWGLI_JSON_FLOAT(n)		((n)->v_float)
+#define MOWGLI_JSON_BOOLEAN(n)		((n)->v.v_bool)
+#define MOWGLI_JSON_INTEGER(n)		((n)->v.v_int)
+#define MOWGLI_JSON_FLOAT(n)		((n)->v.v_float)
 #define MOWGLI_JSON_NUMBER(n)		((n)->tag == MOWGLI_JSON_TAG_FLOAT ? \
-					   (n)->v_float : (n)->v_int)
-#define MOWGLI_JSON_STRING(n)		((n)->v_string)
-#define MOWGLI_JSON_STRING_STR(n)	((n)->v_string->str)
-#define MOWGLI_JSON_STRING_LEN(n)	((n)->v_string->pos)
-#define MOWGLI_JSON_ARRAY(n)		((n)->v_array)
-#define MOWGLI_JSON_OBJECT(n)		((n)->v_object)
+					   (n)->v.v_float : (n)->v.v_int)
+#define MOWGLI_JSON_STRING(n)		((n)->v.v_string)
+#define MOWGLI_JSON_STRING_STR(n)	((n)->v.v_string->str)
+#define MOWGLI_JSON_STRING_LEN(n)	((n)->v.v_string->pos)
+#define MOWGLI_JSON_ARRAY(n)		((n)->v.v_array)
+#define MOWGLI_JSON_OBJECT(n)		((n)->v.v_object)
 
 /* Users of the JSON parser/formatter are not required to use these
    constants, but the parser will ALWAYS parse the symbols "null",
