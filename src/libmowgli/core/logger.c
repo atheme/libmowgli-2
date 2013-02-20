@@ -23,7 +23,9 @@
 
 #include "mowgli.h"
 
-char _mowgli_log_buf[4096];
+#define MOWGLI_LOG_BUF_SIZE 4096
+
+char _mowgli_log_buf[MOWGLI_LOG_BUF_SIZE];
 mowgli_log_cb_t _mowgli_log_cb;
 
 void mowgli_log_cb_default(const char *buf) {
@@ -31,7 +33,6 @@ void mowgli_log_cb_default(const char *buf) {
 }
 
 void mowgli_log_bootstrap() {
-	_mowgli_log_buf[4095] = 0;
 	_mowgli_log_cb = mowgli_log_cb_default;
 }
 
@@ -39,6 +40,22 @@ void mowgli_log_set_cb(mowgli_log_cb_t callback) {
 	return_if_fail(callback != NULL);
 
 	_mowgli_log_cb = callback;
+}
+
+void mowgli_log_prefix_real(const char *file, int line, const char *func,
+		const char *prefix, const char *fmt, ...) {
+	int len = snprintf(_mowgli_log_buf, MOWGLI_LOG_BUF_SIZE, "(%s:%d %s): %s",
+			file, line, func, prefix);
+
+	char *buf = &_mowgli_log_buf[len];
+
+	va_list va;
+
+	va_start(va, fmt);
+	vsnprintf(buf, MOWGLI_LOG_BUF_SIZE - len, fmt, va);
+	va_end(va);
+
+	_mowgli_log_cb(_mowgli_log_buf);
 }
 
 /* TODO: remove next time there is a LIB_MAJOR bump */

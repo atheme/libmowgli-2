@@ -35,6 +35,7 @@ extern void mowgli_random_bootstrap(void);
 extern void mowgli_allocation_policy_bootstrap(void);
 extern void mowgli_allocator_bootstrap(void);
 extern void mowgli_memslice_bootstrap(void);
+extern void mowgli_cacheline_bootstrap(void);
 
 /* TODO: rename to mowgli_bootstrap next time there is a LIB_MAJOR bump */
 MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
@@ -57,6 +58,7 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 	mowgli_allocation_policy_bootstrap();
 	mowgli_allocator_bootstrap();
 	mowgli_memslice_bootstrap();
+	mowgli_cacheline_bootstrap();
 
 #ifdef _WIN32
 	extern void mowgli_winsock_bootstrap(void);

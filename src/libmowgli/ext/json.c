@@ -160,14 +160,14 @@ static void json_destroy(mowgli_json_t *n)
 mowgli_json_t *mowgli_json_create_integer(int v_int)
 {
 	mowgli_json_t *n = json_alloc(MOWGLI_JSON_TAG_INTEGER);
-	n->v_int = v_int;
+	n->v.v_int = v_int;
 	return n;
 }
 
 mowgli_json_t *mowgli_json_create_float(double v_float)
 {
 	mowgli_json_t *n = json_alloc(MOWGLI_JSON_TAG_FLOAT);
-	n->v_float = v_float;
+	n->v.v_float = v_float;
 	return n;
 }
 
@@ -175,8 +175,8 @@ mowgli_json_t *mowgli_json_create_string_n(const char *str, size_t len)
 {
 	mowgli_json_t *n = json_alloc(MOWGLI_JSON_TAG_STRING);
 
-	n->v_string = mowgli_string_create();
-	mowgli_string_append(n->v_string, str, len);
+	n->v.v_string = mowgli_string_create();
+	mowgli_string_append(n->v.v_string, str, len);
 
 	return n;
 }
@@ -188,13 +188,13 @@ mowgli_json_t *mowgli_json_create_string(const char *str)
 
 static void destroy_extra_string(mowgli_json_t *n)
 {
-	mowgli_string_destroy(n->v_string);
+	mowgli_string_destroy(n->v.v_string);
 }
 
 mowgli_json_t *mowgli_json_create_array(void)
 {
 	mowgli_json_t *n = json_alloc(MOWGLI_JSON_TAG_ARRAY);
-	n->v_array = mowgli_list_create();
+	n->v.v_array = mowgli_list_create();
 	return n;
 }
 
@@ -202,19 +202,19 @@ static void destroy_extra_array(mowgli_json_t *n)
 {
 	mowgli_node_t *cur, *next;
 
-	MOWGLI_LIST_FOREACH_SAFE(cur, next, n->v_array->head)
+	MOWGLI_LIST_FOREACH_SAFE(cur, next, n->v.v_array->head)
 	{
 		mowgli_json_decref((mowgli_json_t*)cur->data);
-		mowgli_node_delete(cur, n->v_array);
+		mowgli_node_delete(cur, n->v.v_array);
 	}
 
-	mowgli_list_free(n->v_array);
+	mowgli_list_free(n->v.v_array);
 }
 
 mowgli_json_t *mowgli_json_create_object(void)
 {
 	mowgli_json_t *n = json_alloc(MOWGLI_JSON_TAG_OBJECT);
-	n->v_object = mowgli_patricia_create(NULL);
+	n->v.v_object = mowgli_patricia_create(NULL);
 	return n;
 }
 
@@ -224,7 +224,7 @@ static void destroy_extra_object_cb(const char *key, void *data, void *privdata)
 }
 static void destroy_extra_object(mowgli_json_t *n)
 {
-	mowgli_patricia_destroy(n->v_object, destroy_extra_object_cb, NULL);
+	mowgli_patricia_destroy(n->v.v_object, destroy_extra_object_cb, NULL);
 }
 
 /*
@@ -257,7 +257,7 @@ static int serialize_pretty_increment(int pretty)
 
 static void serialize_boolean(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
-	if (n->v_bool)
+	if (n->v.v_bool)
 		out->append(out, "true", 4);
 	else
 		out->append(out, "false", 5);
@@ -268,7 +268,7 @@ static void serialize_int(mowgli_json_t *n, mowgli_json_output_t *out, int prett
 	char buf[32];
 	size_t len;
 
-	len = snprintf(buf, 32, "%d", n->v_int);
+	len = snprintf(buf, 32, "%d", n->v.v_int);
 	out->append(out, buf, len);
 }
 
@@ -277,7 +277,7 @@ static void serialize_float(mowgli_json_t *n, mowgli_json_output_t *out, int pre
 	char buf[32];
 	size_t len;
 
-	len = snprintf(buf, 32, "%g", n->v_float);
+	len = snprintf(buf, 32, "%g", n->v.v_float);
 	out->append(out, buf, len);
 }
 
@@ -333,7 +333,7 @@ static void serialize_string_data(const char *p, size_t len, mowgli_json_output_
 }
 static void serialize_string(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
 {
-	serialize_string_data(n->v_string->str, n->v_string->pos, out);
+	serialize_string_data(n->v.v_string->str, n->v.v_string->pos, out);
 }
 
 static void serialize_array(mowgli_json_t *n, mowgli_json_output_t *out, int pretty)
@@ -343,7 +343,7 @@ static void serialize_array(mowgli_json_t *n, mowgli_json_output_t *out, int pre
 	out->append_char(out, '[');
 	serialize_pretty_break(out, pretty);
 
-	MOWGLI_LIST_FOREACH(cur, n->v_array->head)
+	MOWGLI_LIST_FOREACH(cur, n->v.v_array->head)
 	{
 		serialize_pretty_indent(out, pretty);
 		mowgli_json_serialize(cur->data, out, serialize_pretty_increment(pretty));
@@ -395,9 +395,9 @@ static void serialize_object(mowgli_json_t *n, mowgli_json_output_t *out, int pr
 	serialize_pretty_break(out, pretty);
 
 	priv.pretty = pretty;
-	priv.remaining = mowgli_patricia_size(n->v_object);
+	priv.remaining = mowgli_patricia_size(n->v.v_object);
 	priv.out = out;
-	mowgli_patricia_foreach(n->v_object, serialize_object_cb, &priv);
+	mowgli_patricia_foreach(n->v.v_object, serialize_object_cb, &priv);
 
 	serialize_pretty_indent(out, pretty - 1);
 	out->append_char(out, '}');
@@ -944,7 +944,7 @@ static mowgli_json_t *lex_string_scan(char *s, size_t n)
 	char *end = s + n;
 
 	val = mowgli_json_incref(mowgli_json_create_string(""));
-	str = val->v_string;
+	str = val->v.v_string;
 
 	ubuf[4] = '\0'; /* always */
 

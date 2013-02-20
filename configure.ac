@@ -43,7 +43,7 @@ fi
 AC_PATH_PROG(AR, ar)
 AC_PATH_PROG(RANLIB, ranlib)
 
-LIBMOWGLI_MODULES="core base container dns eventloop ext linebuf module object thread vio"
+LIBMOWGLI_MODULES="core base container dns eventloop ext linebuf module object platform thread vio"
 AC_SUBST(LIBMOWGLI_MODULES)
 
 LIBMOWGLI_MODULE_BUILD="$(echo && echo x)"
