@@ -78,7 +78,7 @@ void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l)
 	{
 		l->head = n;
 		l->tail = n;
-		l->count++;
+		l->count = 1;
 		return;
 	}
 
@@ -110,11 +110,11 @@ void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l)
 	n->data = data;
 
 	/* first node? */
-	if (!l->head)
+	if (l->head == NULL)
 	{
 		l->head = n;
 		l->tail = n;
-		l->count++;
+		l->count = 1;
 		return;
 	}
 
