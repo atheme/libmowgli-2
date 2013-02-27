@@ -28,9 +28,9 @@ size_t cacheline_size;
 void mowgli_cacheline_bootstrap(void) {
 #ifdef MOWGLI_OS_LINUX
 	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-#elif MOWGLI_OS_OSX
+#elif defined(MOWGLI_OS_OSX)
 	sysctlbyname("hw.cachelinesize", &cacheline_size, sizeof(size_t), 0, 0);
-#elif MOWGLI_OS_WIN
+#elif defined(MOWGLI_OS_WIN)
 	DWORD buf_size = 0;
 	DWORD i = 0;
 	SLPI *buf = 0;
