@@ -256,8 +256,8 @@
 #elif defined sun || defined __sun
 #define MOWGLI_OS_SOLARIS
 #define MOWGLI_OS solaris
-#define MOWGLI_OS_THREADS_POSIX
-#define MOWGLI_OS_THREADS posix
+#define MOWGLI_OS_THREADS_SOLARIS
+#define MOWGLI_OS_THREADS solaris
 #define MOWGLI_OS_MUTEX_POSIX
 #define MOWGLI_OS_MUTEX posix
 #define MOWGLI_OS_UNIX_TYPE
