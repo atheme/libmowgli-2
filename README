@@ -24,21 +24,22 @@ It contains:
     - mowgli.assert: Various assertion routines that can be used.
     - mowgli.bitvector: Bitmasks with an unlimited level of precision.
     - mowgli.patricia: A keyword-backed definition hashtable class.
-    - mowgli.error_backtrace: Provide feedback to users on what caused the
-                              error they are recieving.
-    - mowgli.exception: Assertions with user feedback.
+    - mowgli.error_backtrace: Provide feedback to users on what caused
+                              the error they are recieving.
     - mowgli.formatter: A simple token formatter which is sometimes useful.
     - mowgli.global_storage: A simple global storage library.
     - mowgli.hash: A portable implementation of the FNV-1 hash.
     - mowgli.heap: An optimistic heap-based memory allocator
-    - mowgli.hook: A simple hooks API you can use for your application, which
-                   allows for hooks to provide both application data and user data.
-    - mowgli.list: A high performance linked lists implementation with O(1) scalability
-                   for most common operations.
+    - mowgli.hook: A simple hooks API you can use for your application,
+                   which allows for hooks to provide both application
+                   data and user data.
+    - mowgli.json: A simple, flexible, reentrant JSON parser
+    - mowgli.list: A high performance linked lists implementation with
+                   O(1) scalability for most common operations.
     - mowgli.logger: An internal class for handling logging of exceptions.
     - mowgli.module: A wrapper around dlopen(3) and dlsym(3).
-    - mowgli.object: A simple class which provides reference counted pointers and
-                     polymorphism of structs.
+    - mowgli.object: A simple class which provides reference counted
+                     pointers and polymorphism of structs.
     - mowgli.object_class: Classing and subclassing for objects.
     - mowgli.object_metadata: Metadata for objects.
     - mowgli.object_messaging: Messaging and signalling for objects.
@@ -50,11 +51,10 @@ It contains:
     - mowgli.linebuf: A line-buffering implementation for clients.
     - mowgli.thread: Minimal thread abstraction.
 
-More classes will be added with later releases. Please contact
-nenolod -at- atheme.org if you have suggestions on what should be 
-implemented.
+More classes will be added with later releases. Please use GitHub's
+issue tracker if you have suggestions on what should be implemented.
 
-More information is available at http://www.atheme.org/projects/mowgli.shtml.
+More information is available at http://www.atheme.org/projects/mowgli.
 
 
 Installation
@@ -66,14 +66,13 @@ Installation is fairly typical:
   $ make
   $ sudo make install
 
-(If sudo isn't on your system, su to root. On GNU systems you can even 
-do "su -c 'make install'", which is basically the same thing as using 
-sudo.)
+(If sudo isn't on your system, su to root. On GNU systems you can even do
+"su -c 'make install'", which is basically the same thing as using sudo.)
 
 
 Bug Reports
 -----------
 
-Bugs can be reported on our tracker at http://jira.atheme.org against the
-libmowgli product.
+Bugs can be reported using the GitHub issue tracker on the libmowgli-2
+project page: https://github.com/atheme/libmowgli-2/issues
 
