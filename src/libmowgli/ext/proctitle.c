@@ -127,6 +127,7 @@ mowgli_proctitle_init(int argc, char **argv)
 		
 	save_argc = argc;
 	save_argv = argv;
+	int i;
 
 #if defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
 
@@ -136,7 +137,6 @@ mowgli_proctitle_init(int argc, char **argv)
 	 */
 	char *end_of_area = NULL;
 	char **new_environ;
-	int i;
 
 	/*
 	 * check for contiguous argv strings
@@ -191,7 +191,6 @@ mowgli_proctitle_init(int argc, char **argv)
 	 */
 
 	char **new_argv;
-	int i;
 
 	new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
 	for (i = 0; i < argc; i++)

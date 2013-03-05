@@ -28,7 +28,11 @@
 #ifdef MOWGLI_OS_UNIX_TYPE
 # include <thread.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# define MOWGLI_NATIVE_THREAD_DECL(name)	thread_t (name)
+# ifdef MOWGLI_OS_THREADS_SOLARIS
+#  define  MOWGLI_NATIVE_THREAD_DECL(name) pthread_t (name)
+# else
+#  define MOWGLI_NATIVE_THREAD_DECL(name) thread_t (name)
+# endif
 #elif defined MOWGLI_OS_WIN
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
 # define MOWGLI_NATIVE_THREAD_DECL(name) 	HANDLE (name)
