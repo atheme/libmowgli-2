@@ -54,7 +54,7 @@ More classes will be added with later releases. Please contact
 nenolod -at- atheme.org if you have suggestions on what should be 
 implemented.
 
-More information is available at http://www.atheme.org/projects/mowgli.shtml.
+More information is available at http://www.atheme.org/projects/mowgli.
 
 
 Installation
@@ -74,6 +74,6 @@ sudo.)
 Bug Reports
 -----------
 
-Bugs can be reported on our tracker at http://jira.atheme.org against the
-libmowgli product.
+Bugs can be reported on our tracker at https://github.com/atheme/libmowgli-2/issues
+against the libmowgli product.
 
