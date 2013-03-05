@@ -37,12 +37,6 @@
 # define snprintf			_snprintf
 #endif
 
-struct timezone {
-	int tz_minuteswest;
-	int tz_dsttime;
-};
-
-extern int gettimeofday(struct timeval *tv, struct timezone *tz);
 extern int setenv(const char *name, const char *value, int overwrite);
 extern int pipe(int pipefd[2]);
 extern int socketpair(int domain, int type, int protocol, int pipefd[2]);

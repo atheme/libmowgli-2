@@ -33,7 +33,7 @@ void mowgli_cacheline_bootstrap(void) {
 #elif defined(MOWGLI_OS_WIN)
 	DWORD buf_size = 0;
 	DWORD i = 0;
-	SLPI *buf = 0;
+	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buf = 0;
 
 	GetLogicalProcessorInformation(0, &buf_size);
 	buf = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *)mowgli_alloc(buf_size);
@@ -46,7 +46,7 @@ void mowgli_cacheline_bootstrap(void) {
 		}
 	}
 
-  mowgli_free(buffer);
+  mowgli_free(buf);
 #else
 	// This is often true
 #ifdef MOWGLI_CPU_BITS_32

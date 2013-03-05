@@ -19,7 +19,7 @@
 
 #include "mowgli.h"
 
-#ifdef MOWGLI_OS_WINDOWS
+#ifdef MOWGLI_OS_WIN
 #include <windows.h>
 #include <iphlpapi.h>
 
