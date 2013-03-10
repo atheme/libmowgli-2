@@ -50,6 +50,7 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 	linebuf = mowgli_heap_alloc(linebuf_heap);
 
 	linebuf->delim = "\r\n"; /* Sane default */
+	linebuf->endl = "\r\n";
 	linebuf->readline_cb = cb;
 
 	linebuf->flags = 0;
@@ -228,7 +229,7 @@ void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
 void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 {
 	char *ptr = linebuf->writebuf.buffer + linebuf->writebuf.buflen;
-	int delim_len = strlen(linebuf->delim);
+	int endl_len = strlen(linebuf->endl);
 
 	return_if_fail(len > 0);
 	return_if_fail(data != NULL);
@@ -236,7 +237,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	if (linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN)
 		return;
 
-	if (linebuf->writebuf.buflen + len + delim_len > linebuf->writebuf.maxbuflen)
+	if (linebuf->writebuf.buflen + len + endl_len > linebuf->writebuf.maxbuflen)
 	{
 		linebuf->flags |= MOWGLI_LINEBUF_ERR_WRITEBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
@@ -244,9 +245,9 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	}
 
 	memcpy((void *)ptr, data, len);
-	memcpy((void *)(ptr + len), linebuf->delim, delim_len);
+	memcpy((void *)(ptr + len), linebuf->endl, endl_len);
 
-	linebuf->writebuf.buflen += len + delim_len;
+	linebuf->writebuf.buflen += len + endl_len;
 
 	/* Schedule our write */
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io.e, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
@@ -265,7 +266,6 @@ void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf)
 static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 {
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
-	size_t delim_len = strlen(linebuf->delim);
 
 	char *line_start;
 	char *cptr;
@@ -279,7 +279,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 
 	while (len < buffer->buflen)
 	{
-		if (memcmp((void *)cptr, linebuf->delim, delim_len) != 0)
+		if (!strchr(linebuf->delim, *cptr))
 		{
 			if (*cptr == '\0')
 				/* Warn about unexpected null chars in the string */
@@ -299,8 +299,12 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 			linebuf->readline_cb(linebuf, line_start, cptr - line_start, linebuf->userdata);
 
 		/* Next line starts here; begin scanning and set the start of it */
-		len += delim_len;
-		cptr += delim_len;
+		while (strchr(linebuf->delim, *cptr))
+		{
+			len++;
+			cptr++;
+		}
+
 		line_start = cptr;
 
 		/* Reset this for next line */

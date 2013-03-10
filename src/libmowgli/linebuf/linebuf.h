@@ -61,6 +61,7 @@ struct _mowgli_linebuf {
 	mowgli_vio_t *vio;
 
 	const char *delim;
+	const char *endl;
 
 	int flags;
 
