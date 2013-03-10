@@ -49,8 +49,8 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 
 	linebuf = mowgli_heap_alloc(linebuf_heap);
 
-	linebuf->delim = "\r\n"; /* Sane default */
-	linebuf->endl = "\r\n";
+	/* Sane default */
+	mowgli_linebuf_delim(linebuf, "\r\n", "\r\n");
 	linebuf->readline_cb = cb;
 
 	linebuf->flags = 0;
@@ -136,6 +136,17 @@ void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
 	}
 
 	buffer->maxbuflen = buflen;
+}
+
+void mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *endl)
+{
+	return_if_fail(linebuf != NULL);
+	return_if_fail(delim != NULL && *delim != '\0');
+	return_if_fail(endl != NULL && *endl != '\0');
+
+	linebuf->delim = delim;
+	linebuf->endl = endl;
+	linebuf->endl_len = strlen(endl);
 }
 
 static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
@@ -229,7 +240,6 @@ void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
 void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 {
 	char *ptr = linebuf->writebuf.buffer + linebuf->writebuf.buflen;
-	int endl_len = strlen(linebuf->endl);
 
 	return_if_fail(len > 0);
 	return_if_fail(data != NULL);
@@ -237,7 +247,7 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	if (linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN)
 		return;
 
-	if (linebuf->writebuf.buflen + len + endl_len > linebuf->writebuf.maxbuflen)
+	if (linebuf->writebuf.buflen + len + linebuf->endl_len > linebuf->writebuf.maxbuflen)
 	{
 		linebuf->flags |= MOWGLI_LINEBUF_ERR_WRITEBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
@@ -245,9 +255,9 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	}
 
 	memcpy((void *)ptr, data, len);
-	memcpy((void *)(ptr + len), linebuf->endl, endl_len);
+	memcpy((void *)(ptr + len), linebuf->endl, linebuf->endl_len);
 
-	linebuf->writebuf.buflen += len + endl_len;
+	linebuf->writebuf.buflen += len + linebuf->endl_len;
 
 	/* Schedule our write */
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io.e, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);

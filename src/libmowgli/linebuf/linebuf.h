@@ -33,6 +33,7 @@ extern void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 
 extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
+extern void mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *endl);
 extern void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len);
 extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...);
 extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf);
@@ -62,6 +63,7 @@ struct _mowgli_linebuf {
 
 	const char *delim;
 	const char *endl;
+	size_t endl_len;
 
 	int flags;
 
