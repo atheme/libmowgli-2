@@ -30,7 +30,7 @@ typedef void (*mowgli_log_cb_t)(const char *);
 extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
 
 #define mowgli_log(...) \
-	mowgli_log_prefix("", __VA_ARGS__);
+	mowgli_log_prefix("", __VA_ARGS__)
 
 #define mowgli_log_warning(...) \
 	mowgli_log_prefix("warning: ", __VA_ARGS__)
