@@ -119,7 +119,7 @@ int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t 
 	return_val_if_fail(fd != -1, -255);
 
 	mowgli_ssl_connection_t *connection = vio->privdata;
-	
+
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
 	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
@@ -173,7 +173,7 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 		/* Compat method */
 		method = SSLv23_server_method();
 	}
-	
+
 	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
@@ -184,7 +184,7 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 
 	SSL_set_accept_state(connection->ssl_handle);
 	SSL_CTX_set_options(connection->ssl_context, SSL_OP_SINGLE_DH_USE);
-	
+
 	if (connection->settings.password_func)
 	{
 		SSL_CTX_set_default_passwd_cb(connection->ssl_context, connection->settings.password_func);
@@ -244,7 +244,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	newconnection = newvio->privdata;
 	newconnection->ssl_context = connection->ssl_context;
 	newconnection->ssl_handle = SSL_new(newconnection->ssl_context);
-	
+
 	if (!SSL_set_fd(newconnection->ssl_handle, afd))
 		return mowgli_vio_err_sslerrcode(newvio, ERR_get_error());
 
@@ -321,9 +321,9 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 	if (connection->ssl_handle == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
-	
+
 	SSL_set_connect_state(connection->ssl_handle);
-	
+
 	if (!SSL_set_fd(connection->ssl_handle, fd))
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
@@ -350,7 +350,7 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 		}
 		else
 			return mowgli_vio_err_sslerrcode(vio, err);
-	
+
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
 		return 0;
 	}
@@ -419,13 +419,13 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 				vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 				mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-				MOWGLI_VIO_SET_CLOSED(vio)
-	
+				MOWGLI_VIO_SET_CLOSED(vio);
+
 				return mowgli_vio_error(vio);
 			}
 
 			break;
-		
+
 		default:
 			err = ERR_get_error();
 			break;

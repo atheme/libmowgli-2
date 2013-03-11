@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Elizabeth J. Myers. All rights reserved. 
+ * Copyright (c) 2012 Elizabeth J. Myers. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -215,7 +215,7 @@ static inline mowgli_descriptor_t mowgli_vio_getfd(mowgli_vio_t *vio)
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISCLOSED, true);		\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);	\
 	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDREAD, false);	\
-	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
+	mowgli_vio_setflag(v, MOWGLI_VIO_FLAGS_NEEDWRITE, false)
 
 #define MOWGLI_VIO_IS_CLOSED(v) mowgli_vio_hasflag(v, MOWGLI_VIO_FLAGS_ISCLOSED)
 
@@ -297,7 +297,7 @@ extern mowgli_vio_evops_t mowgli_vio_default_evops;
 
 
 /* Sundry operations on vio functables */
-#define mowgli_vio_ops_set_op(ops, op, func) ops->op = func;
+#define mowgli_vio_ops_set_op(ops, op, func) ops->op = func
 
 /* Wrappers for the VIO ops */
 #define mowgli_vio_socket(vio, ...)	vio->ops->socket(vio, __VA_ARGS__)
@@ -310,8 +310,8 @@ extern mowgli_vio_evops_t mowgli_vio_default_evops;
 #define mowgli_vio_write(vio, ...)	vio->ops->write(vio, __VA_ARGS__)
 #define mowgli_vio_sendto(vio, ...)	vio->ops->sendto(vio, __VA_ARGS__)
 #define mowgli_vio_recvfrom(vio, ...)	vio->ops->recvfrom(vio, __VA_ARGS__)
-#define mowgli_vio_error(vio)		vio->ops->error(vio);
-#define mowgli_vio_close(vio)		vio->ops->close(vio);
+#define mowgli_vio_error(vio)		vio->ops->error(vio)
+#define mowgli_vio_close(vio)		vio->ops->close(vio)
 #define mowgli_vio_seek(vio, ...)	vio->ops->seek(vio, __VA_ARGS__)
 #define mowgli_vio_tell(vio)		vio->ops->tell(vio)
 

@@ -181,7 +181,7 @@ int mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 	if ((ret = (int)recv(fd, buffer, len, 0)) <= 0)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
-		
+
 		if (ret < 0)
 		{
 			if (!mowgli_eventloop_ignore_errno(errno))
@@ -303,7 +303,7 @@ int mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mow
 			vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 			mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
 
-			MOWGLI_VIO_SET_CLOSED(vio)
+			MOWGLI_VIO_SET_CLOSED(vio);
 
 			return mowgli_vio_error(vio);
 		}
