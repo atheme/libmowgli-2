@@ -41,7 +41,7 @@ extern void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *ob
 extern mowgli_object_class_t *mowgli_object_class_find_by_name(const char *name);
 extern void mowgli_object_class_destroy(mowgli_object_class_t *klass);
 
-#define MOWGLI_REINTERPRET_CAST(object, klass) (klass *) mowgli_object_class_reinterpret_impl(object, mowgli_object_class_find_by_name( # klass ));
+#define MOWGLI_REINTERPRET_CAST(object, klass) (klass *) mowgli_object_class_reinterpret_impl(object, mowgli_object_class_find_by_name( # klass ))
 
 #define mowgli_forced_cast(from_type, to_type, from, to)\
 do {                                                    \
