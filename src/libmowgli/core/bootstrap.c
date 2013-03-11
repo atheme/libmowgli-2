@@ -42,7 +42,7 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 {
 	static bool bootstrapped = 0;
 
-	if(bootstrapped)
+	if (bootstrapped)
 		return;
 
 	/* initial bootstrap */
@@ -73,7 +73,8 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 	bootstrapped = true;
 }
 
-void mowgli_init(void)
+void
+mowgli_init(void)
 {
 	mowgli_log("mowgli_init() is a deprecated function, provided only for backwards compatibility with Mowgli-1.  You should remove it if you no longer support using Mowgli-1.");
 }

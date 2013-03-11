@@ -31,17 +31,18 @@
 
 #ifdef NOTYET
 
-#ifdef _WIN32
+# ifdef _WIN32
 
-#ifndef _WIN32_WINNT
+#  ifndef _WIN32_WINNT
 
-int fork(void)
+int
+fork(void)
 {
-#warning fork is not possible on your platform in any sane way, sorry :(
+#   warning fork is not possible on your platform in any sane way, sorry :(
 	return -ENOSYS;
 }
 
-#else
+#  else
 
 extern NTSTATUS NTAPI CsrCallClientServer(void *message, void *userdata, uint32_t opcode, uint32_t size);
 
@@ -50,7 +51,8 @@ extern NTSTATUS NTAPI CsrCallClientServer(void *message, void *userdata, uint32_
  *
  * Not sure what dummy1/dummy2 do, but they're junk as far as I can see.
  */
-struct csrss_message {
+struct csrss_message
+{
 	uint32_t dummy1;
 	uint32_t opcode;
 	uint32_t status;
@@ -73,14 +75,12 @@ inherit_handles(void)
 		p = mowgli_alloc_array(sizeof(uint32_t), n);
 	}
 
-	info = (SYSTEM_HANDLE_INFORMATION *) (p + 1);
+	info = (SYSTEM_HANDLE_INFORMATION *)(p + 1);
 	pid = GetCurrentProcessId();
 
 	for (i = 0; i < *p; i++)
-	{
 		if (info[i].ProcessId == pid)
-			SetHandleInformation((HANDLE) h[i].Handle, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
-	}
+			SetHandleInformation((HANDLE)h[i].Handle, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
 
 	mowgli_free(p);
 }
@@ -88,27 +88,34 @@ inherit_handles(void)
 static inline void
 request_csrss_session(HANDLE proc_handle, HANDLE thread_handle, uint32_t pid, uint32_t tid)
 {
-	struct {
+	struct
+	{
 		PORT_MESSAGE port_message;
 		struct csrss_message csrss_message;
+
 		PROCESS_INFORMATION process_information;
 		CLIENT_ID debugger;
 		uint32_t flags;
 		uint32_t vdminfo[2];
-	} csrmsg = {{0}, {0}, {proc_handle, thread_handle, pid, tid}, {0}, 0, {0}};
+	} csrmsg =
+	{
+		{ 0 }, { 0 }, { proc_handle, thread_handle, pid, tid }, { 0 }, 0, { 0 }
+	};
 
 	CsrCallClientServer(&csrmsg, NULL, 0x10000, sizeof csrmsg);
 }
 
-int child(void)
+int
+child(void)
 {
 	typedef BOOL (*CsrpConnectToServer)(PWSTR);
 
-	CsrpConnectToServer (0x77F8F65D) (L"\\Windows");
+	CsrpConnectToServer(0x77F8F65D) (L"\\Windows");
 	__asm__("mov eax, 0; mov esp, ebp; pop ebp; ret");
 }
 
-int fork(void)
+int
+fork(void)
 {
 	HANDLE proc_handle, thread_handle;
 	OBJECT_ATTRIBUTES oa = { sizeof(oa) };
@@ -127,14 +134,14 @@ int fork(void)
 
 	/* now set up a thread for that process using a context, cloning the current thread ... */
 	ZwGetContextThread(NtCurrentThread(), &context);
-	context.Eip = (unsigned long) child;
+	context.Eip = (unsigned long)child;
 
 	/* set up a stack for the thread now that the child sentinel is set up ... */
-	ZwQueryVirtualMemory(NtCurrentProcess(), (void *) context.Esp, MemoryBasicInformation,
+	ZwQueryVirtualMemory(NtCurrentProcess(), (void *)context.Esp, MemoryBasicInformation,
 			     &mbi, sizeof mbi, 0);
 
-	stack = (USER_STACK){0, 0, ((char *) mbi.BaseAddress) + mbi.RegionSize,
-			     mbi.BaseAddress, mbi.AllocationBase};
+	stack = (USER_STACK) {0, 0, ((char *)mbi.BaseAddress) + mbi.RegionSize,
+			      mbi.BaseAddress, mbi.AllocationBase };
 
 	/* now spawn the thread! */
 	ZwCreateThread(&thread_handle, THREAD_ALL_ACCESS, &oa, proc_handle, &cid, &context, &stack, TRUE);
@@ -147,7 +154,7 @@ int fork(void)
 	ZwWriteVirtualMemory(process_handle, tbi.TebBaseAddress, &tib->ExceptionList, sizeof(tib->ExceptionList), 0);
 
 	/* ready to go, now request a CSRSS session */
-	request_csrss_session(process_handle, thread_handle, (uint32_t) cid.UniqueProcess, (uint32_t) cid.UniqueThread);
+	request_csrss_session(process_handle, thread_handle, (uint32_t)cid.UniqueProcess, (uint32_t)cid.UniqueThread);
 
 	/* CSRSS session set up or we segfaulted by now, so unfreeze the child... */
 	ZwResumeThread(thread_handle, 0);
@@ -156,11 +163,11 @@ int fork(void)
 	ZwClose(thread_handle);
 	ZwClose(process_handle);
 
-	return (int) cid.UniqueProcess;
+	return (int)cid.UniqueProcess;
 }
 
-#endif
+#  endif
 
-#endif
+# endif
 
 #endif

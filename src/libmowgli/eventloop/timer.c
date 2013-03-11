@@ -23,8 +23,8 @@
 
 static mowgli_heap_t *timer_heap = NULL;
 
-static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *eventloop,
-	const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when, time_t frequency)
+static mowgli_eventloop_timer_t *
+mowgli_timer_add_real(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when, time_t frequency)
 {
 	mowgli_eventloop_timer_t *timer;
 
@@ -43,7 +43,7 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if (eventloop->deadline <= mowgli_eventloop_get_time(eventloop) || timer->deadline <= eventloop->deadline)
+	if ((eventloop->deadline <= mowgli_eventloop_get_time(eventloop)) || (timer->deadline <= eventloop->deadline))
 		eventloop->deadline = timer->deadline;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
@@ -56,19 +56,22 @@ static mowgli_eventloop_timer_t *mowgli_timer_add_real(mowgli_eventloop_t *event
 }
 
 /* add an event to the table to be continually ran */
-mowgli_eventloop_timer_t *mowgli_timer_add(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when)
+mowgli_eventloop_timer_t *
+mowgli_timer_add(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when)
 {
 	return mowgli_timer_add_real(eventloop, name, func, arg, when, when);
 }
 
 /* adds an event to the table to be ran only once */
-mowgli_eventloop_timer_t *mowgli_timer_add_once(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when)
+mowgli_eventloop_timer_t *
+mowgli_timer_add_once(mowgli_eventloop_t *eventloop, const char *name, mowgli_event_dispatch_func_t *func, void *arg, time_t when)
 {
 	return mowgli_timer_add_real(eventloop, name, func, arg, when, 0);
 }
 
 /* delete an event from the table */
-void mowgli_timer_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_timer_t *timer)
+void
+mowgli_timer_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_timer_t *timer)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(timer != NULL);
@@ -81,7 +84,8 @@ void mowgli_timer_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_timer_
 }
 
 /* checks all pending events */
-void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 {
 	mowgli_node_t *n, *tn;
 	time_t currtime;
@@ -94,7 +98,7 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 	{
 		mowgli_eventloop_timer_t *timer = n->data;
 
-		if (timer->active && timer->deadline <= currtime)
+		if (timer->active && (timer->deadline <= currtime))
 		{
 			/* now we call it */
 			eventloop->last_ran = timer->name;
@@ -105,7 +109,9 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 
 			/* event is scheduled more than once */
 			if (timer->frequency)
+			{
 				timer->deadline = currtime + timer->frequency;
+			}
 			else
 			{
 				/* XXX: yuck.  find a better way to handle this. */
@@ -118,26 +124,25 @@ void mowgli_eventloop_run_timers(mowgli_eventloop_t *eventloop)
 }
 
 /* returns the time the next mowgli_timer_run() should happen */
-time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
+time_t
+mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 {
 	mowgli_node_t *n;
 
 	return_val_if_fail(eventloop != NULL, 0);
 
 	if (eventloop->deadline == -1)
-	{
 		MOWGLI_ITER_FOREACH(n, eventloop->timer_list.head)
 		{
 			mowgli_eventloop_timer_t *timer = n->data;
 
-			if (timer->active && (timer->deadline < eventloop->deadline || eventloop->deadline == -1))
+			if (timer->active && ((timer->deadline < eventloop->deadline) || (eventloop->deadline == -1)))
 				eventloop->deadline = timer->deadline;
 
 #ifdef DEBUG
 			mowgli_log("timer %p active:%d when:%ld deadline:%ld", timer, timer->active, timer->deadline, eventloop->deadline);
 #endif
 		}
-	}
 
 #ifdef DEBUG
 	mowgli_log("eventloop deadline:%ld", eventloop->deadline);
@@ -147,7 +152,8 @@ time_t mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 }
 
 /* finds an event in the table */
-mowgli_eventloop_timer_t *mowgli_timer_find(mowgli_eventloop_t *eventloop, mowgli_event_dispatch_func_t *func, void *arg)
+mowgli_eventloop_timer_t *
+mowgli_timer_find(mowgli_eventloop_t *eventloop, mowgli_event_dispatch_func_t *func, void *arg)
 {
 	mowgli_node_t *n;
 
@@ -158,7 +164,7 @@ mowgli_eventloop_timer_t *mowgli_timer_find(mowgli_eventloop_t *eventloop, mowgl
 	{
 		mowgli_eventloop_timer_t *timer = n->data;
 
-		if (timer->func == func && timer->arg == arg)
+		if ((timer->func == func) && (timer->arg == arg))
 			return timer;
 	}
 

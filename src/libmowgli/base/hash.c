@@ -25,12 +25,13 @@
 
 #define HASHINIT 0x811c9dc5
 #define HASHBITS 16
-#define HASHSIZE (1 << HASHBITS)  /* 2^16 = 65536 */
+#define HASHSIZE (1 << HASHBITS)/* 2^16 = 65536 */
 
-int mowgli_fnv_hash_string(const char *p)
+int
+mowgli_fnv_hash_string(const char *p)
 {
 	static int htoast = 0;
-        unsigned int hval = HASHINIT;
+	unsigned int hval = HASHINIT;
 
 	if (htoast == 0)
 	{
@@ -39,21 +40,23 @@ int mowgli_fnv_hash_string(const char *p)
 		mowgli_object_unref(r);
 	}
 
-        if (!p)
-                return (0);
-        for (; *p != '\0'; ++p)
-        {
-                hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-                hval ^= (tolower(*p) ^ htoast);
-        }
+	if (!p)
+		return 0;
 
-        return ((hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE);
+	for (; *p != '\0'; ++p)
+	{
+		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+		hval ^= (tolower(*p) ^ htoast);
+	}
+
+	return (hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE;
 }
 
-int mowgli_fnv_hash(unsigned int *p)
+int
+mowgli_fnv_hash(unsigned int *p)
 {
 	static int htoast = 0;
-        unsigned int hval = HASHINIT;
+	unsigned int hval = HASHINIT;
 
 	if (htoast == 0)
 	{
@@ -62,13 +65,14 @@ int mowgli_fnv_hash(unsigned int *p)
 		mowgli_object_unref(r);
 	}
 
-        if (!p)
-                return (0);
-        for (; *p != '\0'; ++p)
-        {
-                hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-                hval ^= (tolower(*p) ^ htoast);
-        }
+	if (!p)
+		return 0;
 
-        return ((hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE);
+	for (; *p != '\0'; ++p)
+	{
+		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
+		hval ^= (tolower(*p) ^ htoast);
+	}
+
+	return (hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE;
 }

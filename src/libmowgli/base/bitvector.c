@@ -39,7 +39,8 @@ static mowgli_object_class_t klass;
  * Side Effects:
  *       - the mowgli_bitvector_t object class is registered.
  */
-void mowgli_bitvector_bootstrap(void)
+void
+mowgli_bitvector_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_bitvector_t", mowgli_free, FALSE);
 }
@@ -58,14 +59,16 @@ void mowgli_bitvector_bootstrap(void)
  * Side Effects:
  *       - none
  */
-mowgli_bitvector_t *mowgli_bitvector_create(int bits)
+mowgli_bitvector_t *
+mowgli_bitvector_create(int bits)
 {
-	mowgli_bitvector_t *bv = (mowgli_bitvector_t *) mowgli_alloc(sizeof(mowgli_bitvector_t));
+	mowgli_bitvector_t *bv = (mowgli_bitvector_t *)mowgli_alloc(sizeof(mowgli_bitvector_t));
+
 	mowgli_object_init(mowgli_object(bv), "mowgli_bitvector_t", &klass, NULL);
 
-	bv->bits    = bits;
+	bv->bits = bits;
 	bv->divisor = sizeof(int);
-	bv->vector  = (unsigned int *) mowgli_alloc_array(bv->divisor, bv->bits / bv->divisor);
+	bv->vector = (unsigned int *)mowgli_alloc_array(bv->divisor, bv->bits / bv->divisor);
 
 	return bv;
 }
@@ -86,19 +89,20 @@ mowgli_bitvector_t *mowgli_bitvector_create(int bits)
  * Side Effects:
  *       - a bit is either set ON or OFF in the bitvector.
  */
-void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val)
+void
+mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val)
 {
 	int value = 1 << slot;
 
-	switch(val)
+	switch (val)
 	{
-		case FALSE:
-			bv->vector[bv->bits / bv->divisor] &= ~value;
-			break;
-		default:
-		case TRUE:
-			bv->vector[bv->bits / bv->divisor] |= value;
-			break;
+	case FALSE:
+		bv->vector[bv->bits / bv->divisor] &= ~value;
+		break;
+	default:
+	case TRUE:
+		bv->vector[bv->bits / bv->divisor] |= value;
+		break;
 	}
 }
 
@@ -118,7 +122,8 @@ void mowgli_bitvector_set(mowgli_bitvector_t *bv, int slot, mowgli_boolean_t val
  * Side Effects:
  *       - none
  */
-mowgli_boolean_t mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot)
+mowgli_boolean_t
+mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot)
 {
 	int mask = 1 << slot;
 
@@ -139,7 +144,8 @@ mowgli_boolean_t mowgli_bitvector_get(mowgli_bitvector_t *bv, int slot)
  * Side Effects:
  *       - none
  */
-mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
+mowgli_bitvector_t *
+mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
 {
 	int bits, iter, bs;
 	mowgli_bitvector_t *out;
@@ -179,7 +185,8 @@ mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mowgli_bit
  * Side Effects:
  *       - none
  */
-mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
+mowgli_bitvector_t *
+mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
 {
 	int bits, iter, bs;
 	mowgli_bitvector_t *out;
@@ -220,19 +227,18 @@ mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvect
  * Side Effects:
  *       - none
  */
-mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
+mowgli_boolean_t
+mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2)
 {
-	int iter, bs;	
+	int iter, bs;
 	mowgli_boolean_t ret = TRUE;
 
 	/* cache the size of the bitvector in memory. */
 	bs = bv1->bits / bv1->divisor;
 
 	for (iter = 0; iter < bs; iter++)
-	{
 		if (!(bv1->vector[iter] & bv2->vector[iter]))
 			ret = FALSE;
-	}
 
 	return ret;
 }

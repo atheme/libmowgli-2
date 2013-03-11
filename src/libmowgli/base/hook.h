@@ -27,20 +27,22 @@
 
 typedef void (*mowgli_hook_function_t)(void *hook_data, void *user_data);
 
-typedef struct {
-    mowgli_hook_function_t func;
-    void *user_data;
-    mowgli_node_t node;
+typedef struct
+{
+	mowgli_hook_function_t func;
+	void *user_data;
+	mowgli_node_t node;
 } mowgli_hook_item_t;
 
-typedef struct {
-    const char *name;
-    mowgli_list_t items;
+typedef struct
+{
+	const char *name;
+	mowgli_list_t items;
 } mowgli_hook_t;
 
 extern void mowgli_hook_register(const char *name);
-extern int  mowgli_hook_associate(const char *name, mowgli_hook_function_t func, void * user_data);
-extern int  mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func);
-extern void mowgli_hook_call(const char *name, void * hook_data);
+extern int mowgli_hook_associate(const char *name, mowgli_hook_function_t func, void *user_data);
+extern int mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func);
+extern void mowgli_hook_call(const char *name, void *hook_data);
 
 #endif

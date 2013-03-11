@@ -23,8 +23,8 @@
 
 #ifdef MOWGLI_OS_OSX
 
-#include <mach/mach.h>
-#include <mach/mach_time.h>
+# include <mach/mach.h>
+# include <mach/mach_time.h>
 
 #endif
 
@@ -38,13 +38,15 @@ typedef SOCKET mowgli_descriptor_t;
 
 #endif
 
-typedef enum {
+typedef enum
+{
 	MOWGLI_EVENTLOOP_TYPE_POLLABLE,
 	MOWGLI_EVENTLOOP_TYPE_HELPER,
 	MOWGLI_EVENTLOOP_TYPE_ERROR = -1
 } mowgli_eventloop_io_type_t;
 
-typedef struct {
+typedef struct
+{
 	mowgli_eventloop_io_type_t type;
 } mowgli_eventloop_io_obj_t;
 
@@ -55,7 +57,8 @@ typedef struct _mowgli_helper mowgli_eventloop_helper_proc_t;
 
 typedef struct _mowgli_linebuf mowgli_linebuf_t;
 
-typedef enum {
+typedef enum
+{
 	MOWGLI_EVENTLOOP_IO_READ,
 	MOWGLI_EVENTLOOP_IO_WRITE,
 	MOWGLI_EVENTLOOP_IO_ERROR = -1
@@ -64,38 +67,42 @@ typedef enum {
 typedef void mowgli_eventloop_io_t;
 
 /* checked casts */
-static inline mowgli_eventloop_pollable_t *mowgli_eventloop_io_pollable(mowgli_eventloop_io_t *io)
+static inline mowgli_eventloop_pollable_t *
+mowgli_eventloop_io_pollable(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_POLLABLE, NULL);
 
-	return (mowgli_eventloop_pollable_t *) io;
+	return (mowgli_eventloop_pollable_t *)io;
 }
 
-static inline mowgli_eventloop_helper_proc_t *mowgli_eventloop_io_helper(mowgli_eventloop_io_t *io)
+static inline mowgli_eventloop_helper_proc_t *
+mowgli_eventloop_io_helper(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_HELPER, NULL);
 
-	return (mowgli_eventloop_helper_proc_t *) io;
+	return (mowgli_eventloop_helper_proc_t *)io;
 }
 
-static inline mowgli_eventloop_io_type_t mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
+static inline mowgli_eventloop_io_type_t
+mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
 
 	return_val_if_fail(io != NULL, MOWGLI_EVENTLOOP_TYPE_ERROR);
 
 	return obj->type;
 }
 
-typedef void mowgli_eventloop_io_cb_t(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
+typedef void mowgli_eventloop_io_cb_t (mowgli_eventloop_t * eventloop, mowgli_eventloop_io_t * io, mowgli_eventloop_io_dir_t dir, void *userdata);
 
-struct _mowgli_pollable {
+struct _mowgli_pollable
+{
 	mowgli_eventloop_io_obj_t type;
 
 	mowgli_descriptor_t fd;
@@ -113,7 +120,8 @@ struct _mowgli_pollable {
 	mowgli_eventloop_t *eventloop;
 };
 
-typedef struct {
+typedef struct
+{
 	void (*timeout_once)(mowgli_eventloop_t *eventloop, int timeout);
 	void (*run_once)(mowgli_eventloop_t *eventloop);
 	void (*pollsetup)(mowgli_eventloop_t *eventloop);
@@ -123,7 +131,8 @@ typedef struct {
 	void (*destroy)(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
 } mowgli_eventloop_ops_t;
 
-struct _mowgli_eventloop {
+struct _mowgli_eventloop
+{
 	time_t currtime;
 	time_t deadline;
 
@@ -142,9 +151,10 @@ struct _mowgli_eventloop {
 	time_t epochbias;
 };
 
-typedef void mowgli_event_dispatch_func_t(void *userdata);
+typedef void mowgli_event_dispatch_func_t (void *userdata);
 
-typedef struct {
+typedef struct
+{
 	mowgli_node_t node;
 
 	mowgli_event_dispatch_func_t *func;
@@ -155,23 +165,27 @@ typedef struct {
 	bool active;
 } mowgli_eventloop_timer_t;
 
-static inline void mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t newtime)
+static inline void
+mowgli_eventloop_set_time(mowgli_eventloop_t *eventloop, time_t newtime)
 {
 	return_if_fail(eventloop != NULL);
 
 	eventloop->currtime = newtime;
 }
 
-static inline time_t mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
+static inline time_t
+mowgli_eventloop_get_time(mowgli_eventloop_t *eventloop)
 {
 	return_val_if_fail(eventloop != NULL, 0);
 
 	return eventloop->epochbias + eventloop->currtime;
 }
 
-static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
+static inline void
+mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 {
 	long long time_;
+
 #if defined(CLOCK_MONOTONIC)
 	struct timespec tp;
 
@@ -183,7 +197,7 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	clock_gettime(CLOCK_HIGHRES, &tp);
 	time_ = tp.tv_sec;
 #elif defined(MOWGLI_OS_WIN)
-	static ULONGLONG (CALLBACK *GetTickCount64) (void) = NULL;
+	static ULONGLONG (CALLBACK *GetTickCount64)(void) = NULL;
 	static OSVERSIONINFOEX *winver = NULL;
 	static bool load_err = false;
 
@@ -191,15 +205,17 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	{
 		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
 		winver->dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-		if (!GetVersionEx((OSVERSIONINFO*)winver))
+
+		if (!GetVersionEx((OSVERSIONINFO *)winver))
 		{
 			mowgli_free(winver);
-			winver = NULL; /* FIXME */
+			winver = NULL;	/* FIXME */
 		}
 	}
-	if (winver && winver->dwMajorVersion >= 6)
+
+	if (winver && (winver->dwMajorVersion >= 6))
 	{
-		if (GetTickCount64 == NULL && !load_err)
+		if ((GetTickCount64 == NULL) && !load_err)
 		{
 			HINSTANCE hKernel32;
 
@@ -211,7 +227,9 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 		}
 
 		if (load_err)
+		{
 			time_ = time(NULL);
+		}
 		else
 		{
 			soft_assert(GetTickCount64 != NULL);
@@ -220,9 +238,13 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 		}
 	}
 	else
+	{
 		time_ = time(NULL);
+	}
+
 #elif defined(MOWGLI_OS_OSX)
 	static mach_timebase_info_data_t timebase;
+
 	if (timebase.denom == 0)
 		mach_timebase_info(&timebase);
 
@@ -234,13 +256,15 @@ static inline void mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 }
 
 /* Sets the bias of eventloop->currtime relative to Jan 1 00:00:00 1970 */
-static inline void mowgli_eventloop_calibrate(mowgli_eventloop_t *eventloop)
+static inline void
+mowgli_eventloop_calibrate(mowgli_eventloop_t *eventloop)
 {
 	mowgli_eventloop_synchronize(eventloop);
 	eventloop->epochbias = time(NULL) - eventloop->currtime;
 }
 
-static inline bool mowgli_eventloop_ignore_errno(int error)
+static inline bool
+mowgli_eventloop_ignore_errno(int error)
 {
 	switch (error)
 	{
@@ -273,9 +297,10 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 	return false;
 }
 
-typedef void mowgli_eventloop_helper_start_fn_t(mowgli_eventloop_helper_proc_t *helper, void *userdata);
+typedef void mowgli_eventloop_helper_start_fn_t (mowgli_eventloop_helper_proc_t * helper, void *userdata);
 
-struct _mowgli_helper {
+struct _mowgli_helper
+{
 	mowgli_eventloop_io_obj_t type;
 
 	mowgli_process_t *child;
@@ -332,4 +357,3 @@ extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollabl
 extern void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir);
 
 #endif
-

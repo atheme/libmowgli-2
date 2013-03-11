@@ -23,7 +23,8 @@
 
 #include "mowgli.h"
 
-void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, mowgli_argstack_t *stack)
+void
+mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, mowgli_argstack_t *stack)
 {
 	size_t pos = 0;
 	char *i = buf;
@@ -42,14 +43,17 @@ void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char 
 
 		pos = strlen(buf);
 
-		switch(*fiter)
+		switch (*fiter)
 		{
 		case '%':
 			fiter++;
 			arg = atoi(fiter);
 			e = mowgli_node_nth_data(&stack->stack, arg - 1);
 
-			while (isdigit(*fiter)) fiter++;
+			while (isdigit(*fiter))
+			{
+				fiter++;
+			}
 
 			if (e == NULL)
 			{
@@ -58,7 +62,7 @@ void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char 
 				continue;
 			}
 
-			switch(e->type)
+			switch (e->type)
 			{
 			case MOWGLI_ARG_STRING:
 				arg = snprintf(i, bufstr - (i - buf), "%s", e->data.string);
@@ -92,7 +96,8 @@ void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char 
 	}
 }
 
-void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...)
+void
+mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...)
 {
 	va_list va;
 	mowgli_argstack_t *stack;
@@ -104,7 +109,8 @@ void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const
 	mowgli_formatter_format_from_argstack(buf, bufstr, fmtstr, descstr, stack);
 }
 
-void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...)
+void
+mowgli_formatter_print(const char *fmtstr, const char *descstr, ...)
 {
 	va_list va;
 	char buf[65535];

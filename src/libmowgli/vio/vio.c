@@ -36,7 +36,8 @@
 static mowgli_heap_t *vio_heap = NULL;
 
 /* Change these to suit your needs for new VIO objects */
-mowgli_vio_ops_t mowgli_vio_default_ops = {
+mowgli_vio_ops_t mowgli_vio_default_ops =
+{
 	.socket = mowgli_vio_default_socket,
 	.bind = mowgli_vio_default_bind,
 	.listen = mowgli_vio_default_listen,
@@ -54,7 +55,8 @@ mowgli_vio_ops_t mowgli_vio_default_ops = {
 };
 
 /* Null ops */
-mowgli_vio_evops_t mowgli_vio_default_evops = {
+mowgli_vio_evops_t mowgli_vio_default_evops =
+{
 	.read_cb = NULL,
 	.write_cb = NULL
 };
@@ -64,7 +66,8 @@ mowgli_vio_evops_t mowgli_vio_default_evops = {
  * inputs - userdata for the VIO object
  * outputs - a VIO object
  */
-mowgli_vio_t * mowgli_vio_create(void *userdata)
+mowgli_vio_t *
+mowgli_vio_create(void *userdata)
 {
 	mowgli_vio_t *vio;
 
@@ -86,7 +89,8 @@ mowgli_vio_t * mowgli_vio_create(void *userdata)
  * inputs - VIO object, userdata
  * outputs - None
  */
-void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
+void
+mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
 {
 	return_if_fail(vio);
 
@@ -105,7 +109,8 @@ void mowgli_vio_init(mowgli_vio_t *vio, void *userdata)
  * inputs - VIO object, eventloop, ops to use for the eventloop (optional but recommended)
  * outputs - None
  */
-void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
+void
+mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mowgli_vio_evops_t *evops)
 {
 	return_if_fail(vio);
 	return_if_fail(eventloop);
@@ -122,6 +127,7 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 	if ((vio->io.e = mowgli_pollable_create(eventloop, fd, vio->userdata)) != NULL)
 	{
 		vio->eventloop = eventloop;
+
 		/* You're probably going to want this */
 		mowgli_pollable_set_nonblocking(vio->io.e, true);
 
@@ -130,12 +136,11 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
 		else
 			/* Default NULL ops */
 			vio->evops = &mowgli_vio_default_evops;
-			
 	}
 	else
 	{
 		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", (void *)vio);
-		vio->io.fd = fd; /* May have been clobbered */
+		vio->io.fd = fd;/* May have been clobbered */
 	}
 }
 
@@ -144,7 +149,8 @@ void mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloo
  * inputs - VIO object
  * output - None
  */
-void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
+void
+mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
@@ -165,7 +171,8 @@ void mowgli_vio_eventloop_detach(mowgli_vio_t *vio)
  * inputs - VIO object
  * output - None
  */
-void mowgli_vio_destroy(mowgli_vio_t *vio)
+void
+mowgli_vio_destroy(mowgli_vio_t *vio)
 {
 	return_if_fail(vio);
 
@@ -185,7 +192,8 @@ void mowgli_vio_destroy(mowgli_vio_t *vio)
  * inputs - VIO object, callback, error code.
  * outputs - Error code from mowgli_vio_error function, any output to terminal/log files/etc.
  */
-int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode)
+int
+mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int errcode)
 {
 	return_val_if_fail(vio, -255);
 
@@ -202,7 +210,8 @@ int mowgli_vio_err_errcode(mowgli_vio_t *vio, char *(*int_to_error)(int), int er
  */
 #ifdef HAVE_OPENSSL
 
-int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
+int
+mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 {
 	return_val_if_fail(vio, -255);
 
@@ -214,7 +223,8 @@ int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 
 #else
 
-int mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
+int
+mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 {
 	return_if_fail(vio);
 

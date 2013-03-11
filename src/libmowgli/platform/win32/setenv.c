@@ -24,8 +24,10 @@
 #include "mowgli.h"
 
 #ifdef _WIN32
-int setenv(const char *name, const char *value, int overwrite)
+int
+setenv(const char *name, const char *value, int overwrite)
 {
 	return !SetEnvironmentVariable(name, value);
 }
+
 #endif

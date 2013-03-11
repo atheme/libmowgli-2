@@ -24,7 +24,8 @@
 #ifndef __MOWGLI_OBJECT_H__
 #define __MOWGLI_OBJECT_H__
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	int refcount;
 	mowgli_object_class_t *klass;
@@ -37,6 +38,6 @@ extern void mowgli_object_init_from_class(mowgli_object_t *, const char *, mowgl
 extern void *mowgli_object_ref(void *);
 extern void mowgli_object_unref(void *);
 
-#define mowgli_object(x) ((mowgli_object_t *) x)
+#define mowgli_object(x) ((mowgli_object_t *)x)
 
 #endif

@@ -26,7 +26,8 @@
 /*
  * bootstrapped allocators so that we can initialise without blowing up
  */
-typedef struct {
+typedef struct
+{
 	mowgli_allocation_policy_t *allocator;
 } alloc_tag_t;
 
@@ -43,7 +44,8 @@ _mowgli_bootstrap_free(void *ptr)
 		free(ptr);
 }
 
-static mowgli_allocation_policy_t _mowgli_allocator_bootstrap = {
+static mowgli_allocation_policy_t _mowgli_allocator_bootstrap =
+{
 	{ 0 },
 	_mowgli_bootstrap_alloc,
 	_mowgli_bootstrap_free
@@ -126,19 +128,20 @@ mowgli_strdup(const char *in)
 char *
 mowgli_strndup_using_policy(mowgli_allocation_policy_t *policy, const char *in, size_t size)
 {
-    char *out;
-    size_t len;
+	char *out;
+	size_t len;
 
-    return_val_if_fail(in != NULL, NULL);
+	return_val_if_fail(in != NULL, NULL);
 
-    len = strlen(in) + 1;
-    if (size < len)
-        len = size;
+	len = strlen(in) + 1;
 
-    out = mowgli_alloc_using_policy(policy, len);
-    mowgli_strlcpy(out, in, len);
+	if (size < len)
+		len = size;
 
-    return out;
+	out = mowgli_alloc_using_policy(policy, len);
+	mowgli_strlcpy(out, in, len);
+
+	return out;
 }
 
 /*
@@ -147,7 +150,7 @@ mowgli_strndup_using_policy(mowgli_allocation_policy_t *policy, const char *in, 
 char *
 mowgli_strndup(const char *in, size_t size)
 {
-    return mowgli_strndup_using_policy(_mowgli_allocator, in, size);
+	return mowgli_strndup_using_policy(_mowgli_allocator, in, size);
 }
 
 /*
@@ -196,7 +199,7 @@ mowgli_free(void *ptr)
 
 	return_if_fail(ptr != NULL);
 
-	tag = (alloc_tag_t *) ((char *)ptr - sizeof(alloc_tag_t));
+	tag = (alloc_tag_t *)((char *)ptr - sizeof(alloc_tag_t));
 	tag->allocator->deallocate(tag);
 }
 

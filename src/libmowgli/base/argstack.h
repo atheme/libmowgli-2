@@ -24,24 +24,29 @@
 #ifndef __MOWGLI_ARGSTACK_H__
 #define __MOWGLI_ARGSTACK_H__
 
-typedef enum {
+typedef enum
+{
 	MOWGLI_ARG_NUMERIC,
 	MOWGLI_ARG_POINTER,
 	MOWGLI_ARG_STRING,
 	MOWGLI_ARG_BOOLEAN
 } mowgli_argstack_element_type_t;
 
-typedef struct {
-	union {
+typedef struct
+{
+	union
+	{
 		int numeric;
 		void *pointer;
 		char *string;
 		mowgli_boolean_t boolean;
 	} data;
+
 	mowgli_argstack_element_type_t type;
 } mowgli_argstack_element_t;
 
-typedef struct {
+typedef struct
+{
 	mowgli_object_t parent;
 	mowgli_list_t stack;
 } mowgli_argstack_t;

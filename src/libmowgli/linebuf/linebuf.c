@@ -33,7 +33,8 @@ static void mowgli_linebuf_do_shutdown(mowgli_linebuf_t *linebuf);
 static int mowgli_linebuf_error(mowgli_vio_t *vio);
 
 #ifdef NOTYET
-static mowgli_vio_evops_t linebuf_evops = {
+static mowgli_vio_evops_t linebuf_evops =
+{
 	.read_cb = mowgli_linebuf_read_data,
 	.write_cb = mowgli_linebuf_write_data
 };
@@ -62,7 +63,7 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 
 	linebuf->eventloop = NULL;
 
-	linebuf->return_normal_strings = true; /* This is generally what you want, but beware of malicious \0's in input data! */
+	linebuf->return_normal_strings = true;	/* This is generally what you want, but beware of malicious \0's in input data! */
 
 	linebuf->userdata = userdata;
 
@@ -72,7 +73,8 @@ mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata)
 }
 
 /* Attach the linebuf instance to the eventloop -- socket must be created first with VIO instance! */
-void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventloop_t *eventloop)
+void
+mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(linebuf != NULL);
@@ -91,7 +93,8 @@ void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventl
 }
 
 /* Detach the linebuf instance from the eventloop */
-void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf)
+void
+mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf)
 {
 	return_if_fail(linebuf != NULL);
 	return_if_fail(linebuf->eventloop != NULL);
@@ -101,7 +104,8 @@ void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf)
 	linebuf->eventloop = NULL;
 }
 
-void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
+void
+mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 {
 	if (linebuf->eventloop != NULL)
 		mowgli_linebuf_detach_from_eventloop(linebuf);
@@ -113,18 +117,21 @@ void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf)
 	mowgli_heap_free(linebuf_heap, linebuf);
 }
 
-void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
+void
+mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
 {
 	return_if_fail(buffer != NULL);
 
 	if (buffer->buffer == NULL)
+	{
 		buffer->buffer = mowgli_alloc(buflen);
+	}
 	else
 	{
 		char tmpbuf[buffer->maxbuflen];
 
 		if (buffer->buflen > 0)
-			memcpy(tmpbuf, buffer->buffer, buffer->maxbuflen); /* Copy into tmp buffer */
+			memcpy(tmpbuf, buffer->buffer, buffer->maxbuflen);	/* Copy into tmp buffer */
 
 		/* Free old buffer and reallocate */
 		mowgli_free(buffer->buffer);
@@ -138,7 +145,8 @@ void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen)
 	buffer->maxbuflen = buflen;
 }
 
-void mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *endl)
+void
+mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *endl)
 {
 	return_if_fail(linebuf != NULL);
 	return_if_fail(delim != NULL && *delim != '\0');
@@ -149,7 +157,8 @@ void mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const ch
 	linebuf->endl_len = strlen(endl);
 }
 
-static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *)userdata;
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
@@ -190,17 +199,16 @@ static void mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_event
 	mowgli_linebuf_process(linebuf);
 }
 
-static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *)userdata;
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
 	int ret;
 
 	if ((ret = mowgli_vio_write(linebuf->vio, buffer->buffer, buffer->buflen)) <= 0)
-	{
 		if (linebuf->vio->error.code != MOWGLI_VIO_ERR_NONE)
-		{
-			/* If we have a genuine error, we shouldn't come back to this func 
+			/* If we have a genuine error, we shouldn't come back to this func
 			 * Otherwise we'll try again. */
 			if (ret != 0)
 			{
@@ -208,23 +216,26 @@ static void mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_even
 				mowgli_log("mowgli_vio_write returned error [%ld]: %s", linebuf->vio->error.code, linebuf->vio->error.string);
 				return;
 			}
-		}
-	}
 
 	buffer->buflen -= ret;
 
 	/* Anything else to write? */
-	if (buffer->buflen == 0) {
+	if (buffer->buflen == 0)
+	{
 		if (!mowgli_vio_hasflag(linebuf->vio, MOWGLI_VIO_FLAGS_NEEDWRITE))
 			mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
+
 		if ((linebuf->flags & MOWGLI_LINEBUF_SHUTTING_DOWN) != 0)
 			mowgli_linebuf_do_shutdown(linebuf);
-	} else {
+	}
+	else
+	{
 		mowgli_pollable_setselect(eventloop, io, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 	}
 }
 
-void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
+void
+mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
 {
 	char buf[linebuf->writebuf.maxbuflen];
 	size_t len;
@@ -237,7 +248,8 @@ void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
 	mowgli_linebuf_write(linebuf, buf, len);
 }
 
-void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
+void
+mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 {
 	char *ptr = linebuf->writebuf.buffer + linebuf->writebuf.buflen;
 
@@ -263,7 +275,8 @@ void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 	mowgli_pollable_setselect(linebuf->eventloop, linebuf->vio->io.e, MOWGLI_EVENTLOOP_IO_WRITE, mowgli_linebuf_write_data);
 }
 
-void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf)
+void
+mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf)
 {
 	return_if_fail(linebuf != NULL);
 
@@ -273,7 +286,8 @@ void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf)
 		mowgli_linebuf_do_shutdown(linebuf);
 }
 
-static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
+static void
+mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 {
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
 
@@ -294,6 +308,7 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 			if (*cptr == '\0')
 				/* Warn about unexpected null chars in the string */
 				linebuf->flags |= MOWGLI_LINEBUF_LINE_HASNULLCHAR;
+
 			cptr++;
 			len++;
 			continue;
@@ -321,9 +336,9 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 		linebuf->flags &= ~MOWGLI_LINEBUF_LINE_HASNULLCHAR;
 	}
 
-	if (linecount == 0 && (buffer->buflen == buffer->maxbuflen))
+	if ((linecount == 0) && (buffer->buflen == buffer->maxbuflen))
 	{
-		/* No more chars will fit in the buffer and we don't have a line 
+		/* No more chars will fit in the buffer and we don't have a line
 		 * We're really screwed, let's trigger an error. */
 		linebuf->flags |= MOWGLI_LINEBUF_ERR_READBUF_FULL;
 		mowgli_linebuf_error(linebuf->vio);
@@ -336,16 +351,20 @@ static void mowgli_linebuf_process(mowgli_linebuf_t *linebuf)
 		memmove(buffer->buffer, line_start, cptr - line_start);
 	}
 	else
+	{
 		buffer->buflen = 0;
+	}
 }
 
-static void mowgli_linebuf_do_shutdown(mowgli_linebuf_t *linebuf)
+static void
+mowgli_linebuf_do_shutdown(mowgli_linebuf_t *linebuf)
 {
 	if (linebuf && linebuf->shutdown_cb)
 		linebuf->shutdown_cb(linebuf, linebuf->userdata);
 }
 
-static int mowgli_linebuf_error(mowgli_vio_t *vio)
+static int
+mowgli_linebuf_error(mowgli_vio_t *vio)
 {
 	mowgli_linebuf_t *linebuf = vio->userdata;
 	mowgli_vio_error_t *error = &(linebuf->vio->error);
@@ -366,4 +385,3 @@ static int mowgli_linebuf_error(mowgli_vio_t *vio)
 	/* Pass this up to higher callback */
 	return mowgli_vio_error(vio);
 }
-

@@ -35,7 +35,7 @@ mowgli_error_context_display(mowgli_error_context_t *e, const char *delim)
 
 	MOWGLI_LIST_FOREACH(n, e->bt.head)
 	{
-		bt_msg = (char *) n->data;
+		bt_msg = (char *)n->data;
 
 		fprintf(stderr, "%s%s", bt_msg, n->next != NULL ? delim : "\n");
 	}
@@ -101,7 +101,7 @@ mowgli_error_context_pop(mowgli_error_context_t *e)
 mowgli_error_context_t *
 mowgli_error_context_create(void)
 {
-	mowgli_error_context_t *out = (mowgli_error_context_t *) mowgli_alloc(sizeof(mowgli_error_context_t));
+	mowgli_error_context_t *out = (mowgli_error_context_t *)mowgli_alloc(sizeof(mowgli_error_context_t));
 
 	return out;
 }

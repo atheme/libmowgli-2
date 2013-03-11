@@ -46,7 +46,8 @@ extern mowgli_eventloop_ops_t _mowgli_kqueue_pollops;
 extern mowgli_eventloop_ops_t _mowgli_winsock_pollops;
 #endif
 
-mowgli_eventloop_t *mowgli_eventloop_create(void)
+mowgli_eventloop_t *
+mowgli_eventloop_create(void)
 {
 	mowgli_eventloop_t *eventloop;
 
@@ -92,7 +93,8 @@ mowgli_eventloop_t *mowgli_eventloop_create(void)
 	return eventloop;
 }
 
-void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 {
 	eventloop->eventloop_ops->pollshutdown(eventloop);
 
@@ -100,7 +102,8 @@ void mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 	mowgli_heap_free(eventloop_heap, eventloop);
 }
 
-void mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
@@ -109,12 +112,15 @@ void mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
 	eventloop->death_requested = false;
 
 	while (!eventloop->death_requested)
+	{
 		eventloop->eventloop_ops->run_once(eventloop);
+	}
 
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
-void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
@@ -125,7 +131,8 @@ void mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
-void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
+void
+mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 {
 	return_if_fail(eventloop != NULL);
 
@@ -139,7 +146,8 @@ void mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
 
-void mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
@@ -147,7 +155,8 @@ void mowgli_eventloop_break(mowgli_eventloop_t *eventloop)
 }
 
 /* convenience function to request null pollops */
-void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop)
+void
+mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop)
 {
 	return_if_fail(eventloop != NULL);
 
@@ -155,14 +164,16 @@ void mowgli_eventloop_timers_only(mowgli_eventloop_t *eventloop)
 }
 
 /* userdata setting/getting functions (for bindings) */
-void *mowgli_eventloop_get_data(mowgli_eventloop_t *eventloop)
+void *
+mowgli_eventloop_get_data(mowgli_eventloop_t *eventloop)
 {
 	return_val_if_fail(eventloop != NULL, NULL);
 
 	return eventloop->data;
 }
 
-void mowgli_eventloop_set_data(mowgli_eventloop_t *eventloop, void *data)
+void
+mowgli_eventloop_set_data(mowgli_eventloop_t *eventloop, void *data)
 {
 	return_if_fail(eventloop != NULL);
 

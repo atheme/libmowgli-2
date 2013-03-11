@@ -26,10 +26,9 @@
 static mowgli_object_class_t klass;
 static mowgli_patricia_t *mowgli_allocation_policy_dict = NULL;
 
-static void _allocation_policy_key_canon(char *str)
-{
-
-}
+static void
+_allocation_policy_key_canon(char *str)
+{ }
 
 void
 mowgli_allocation_policy_bootstrap(void)
@@ -40,8 +39,7 @@ mowgli_allocation_policy_bootstrap(void)
 }
 
 mowgli_allocation_policy_t *
-mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t allocator,
-	mowgli_deallocation_func_t deallocator)
+mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator)
 {
 	mowgli_allocation_policy_t *policy;
 

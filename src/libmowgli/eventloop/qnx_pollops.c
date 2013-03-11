@@ -22,15 +22,17 @@
 
 #ifdef HAVE_DISPATCH_BLOCK
 
-#include <sys/iofunc.h>
-#include <sys/dispatch.h>
+# include <sys/iofunc.h>
+# include <sys/dispatch.h>
 
-typedef struct {
+typedef struct
+{
 	dispatch_t *dpp;
 	dispatch_context_t *ctp;
 } mowgli_qnx_eventloop_private_t;
 
-static void mowgli_qnx_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_qnx_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_qnx_eventloop_private_t *priv;
 
@@ -42,7 +44,8 @@ static void mowgli_qnx_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_qnx_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_qnx_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	mowgli_qnx_eventloop_private_t *priv;
 
@@ -59,7 +62,8 @@ static void mowgli_qnx_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_qnx_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_qnx_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_qnx_eventloop_private_t *priv;
 
@@ -77,7 +81,8 @@ static void mowgli_qnx_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_e
 	}
 }
 
-static void mowgli_qnx_eventloop_event_cb(select_context_t *ctp, mowgli_descriptor_t fd, unsigned int flags, void *userdata)
+static void
+mowgli_qnx_eventloop_event_cb(select_context_t *ctp, mowgli_descriptor_t fd, unsigned int flags, void *userdata)
 {
 	mowgli_eventloop_t *eventloop;
 	mowgli_eventloop_pollable_t *pollable;
@@ -97,10 +102,11 @@ static void mowgli_qnx_eventloop_event_cb(select_context_t *ctp, mowgli_descript
 		mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 }
 
-static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_qnx_eventloop_private_t *priv;
-	select_attr_t attr = {};
+	select_attr_t attr = { };
 	unsigned int old_flags;
 
 	return_if_fail(eventloop != NULL);
@@ -109,9 +115,9 @@ static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli
 	priv = eventloop->poller;
 	old_flags = pollable->slot;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	switch (dir)
 	{
@@ -128,9 +134,9 @@ static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli
 		break;
 	}
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	if (pollable->read_function == NULL)
 		pollable->slot &= ~SELECT_FLAG_READ;
@@ -138,14 +144,13 @@ static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli
 	if (pollable->write_function == NULL)
 		pollable->slot &= ~SELECT_FLAG_WRITE;
 
-	if (old_flags == 0 && pollable->slot == 0)
+	if ((old_flags == 0) && (pollable->slot == 0))
 		return;
 
 	if (old_flags)
 		select_detach(priv->dpp, pollable->fd);
 
 	if (pollable->slot)
-	{
 		if (select_attach(priv->dpp, &attr, pollable->fd, pollable->slot, mowgli_qnx_eventloop_event_cb, pollable) != 0)
 		{
 			if (mowgli_eventloop_ignore_errno(errno))
@@ -153,12 +158,12 @@ static void mowgli_qnx_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli
 
 			mowgli_log("mowgli_qnx_eventloop_setselect(): select_attach failed: %d (%s)", errno, strerror(errno));
 		}
-	}
 
 	return;
 }
 
-static void mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	dispatch_context_t *new_ctp;
 	mowgli_qnx_eventloop_private_t *priv;
@@ -168,14 +173,16 @@ static void mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay
 	priv = eventloop->poller;
 
 	/* set timeout if needed */
-	dispatch_timeout(priv->dpp, delay >= 0 ? &(struct timespec){ .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
+	dispatch_timeout(priv->dpp, delay >= 0 ? &(struct timespec) {.tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	if (priv->ctp != NULL)
 		priv->ctp = dispatch_context_alloc(priv->dpp);
 
 	/* if dispatch_block returns non-NULL, priv->ctp may have been realloc()'d, NULL is error condition */
 	if ((new_ctp = dispatch_block(priv->ctp)) != NULL)
+	{
 		priv->ctp = new_ctp;
+	}
 	else
 	{
 		if (mowgli_eventloop_ignore_errno(errno))
@@ -187,7 +194,8 @@ static void mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay
 	mowgli_eventloop_synchronize(eventloop);
 }
 
-mowgli_eventloop_ops_t _mowgli_qnx_pollops = {
+mowgli_eventloop_ops_t _mowgli_qnx_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_qnx_eventloop_pollsetup,

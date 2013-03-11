@@ -35,18 +35,21 @@
 
 int errors = 0;
 
-void str_canon(char *key)
+void
+str_canon(char *key)
 {
 	return;
 }
 
-void statscb(const char *line, void *data)
+void
+statscb(const char *line, void *data)
 {
 	printf("%s\n", line);
 }
 
 /* assumes data is key */
-static void check_all_retrievable(mowgli_patricia_t *dtree)
+static void
+check_all_retrievable(mowgli_patricia_t *dtree)
 {
 	mowgli_patricia_iteration_state_t state;
 	void *elem, *elem2;
@@ -59,36 +62,44 @@ static void check_all_retrievable(mowgli_patricia_t *dtree)
 	MOWGLI_PATRICIA_FOREACH(elem, &state, dtree)
 	{
 		elem2 = mowgli_patricia_retrieve(dtree, (const char *)elem);
+
 		if (elem2 == NULL)
 		{
 			errors++;
 			printf("failed to find element %s\n",
-					(const char *)elem);
+			       (const char *)elem);
 		}
 		else if (strcmp(elem2, elem))
 		{
 			printf("element %s != %s\n",
-					(const char *)elem,
-					(const char *)elem2);
+			       (const char *)elem,
+			       (const char *)elem2);
 			errors++;
 		}
 		else
+		{
 			printf(".");
+		}
+
 		fflush(stdout);
 		n1++;
+
 		if (n1 > n2 * 2)
 			break;
 	}
+
 	if (n1 != n2)
 	{
 		errors++;
 		printf("number of iterated elements %u != size %u\n", n1, n2);
 	}
+
 	printf("\n");
 	fflush(stdout);
 }
 
-void test_patricia(void)
+void
+test_patricia(void)
 {
 	mowgli_patricia_t *dtree;
 	mowgli_patricia_iteration_state_t state;
@@ -147,7 +158,8 @@ void test_patricia(void)
 	mowgli_patricia_destroy(dtree, NULL, NULL);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	test_patricia();
 

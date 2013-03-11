@@ -25,7 +25,8 @@
 
 static mowgli_patricia_t *mowgli_object_class_dict;
 
-static void _object_key_canon(char *str)
+static void
+_object_key_canon(char *str)
 {
 	while (*str)
 	{
@@ -34,11 +35,14 @@ static void _object_key_canon(char *str)
 	}
 }
 
-void mowgli_object_class_bootstrap() {
+void
+mowgli_object_class_bootstrap()
+{
 	mowgli_object_class_dict = mowgli_patricia_create(_object_key_canon);
 }
 
-void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic)
+void
+mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(mowgli_object_class_find_by_name(name) == NULL);
@@ -61,7 +65,8 @@ void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mo
 	mowgli_patricia_add(mowgli_object_class_dict, klass->name, klass);
 }
 
-int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_class_t *klass2)
+int
+mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_class_t *klass2)
 {
 	return_val_if_fail(klass1 != NULL, 0);
 	return_val_if_fail(klass2 != NULL, 0);
@@ -70,7 +75,7 @@ int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_
 
 	MOWGLI_LIST_FOREACH(n, klass1->derivitives.head)
 	{
-		mowgli_object_class_t *tklass = (mowgli_object_class_t *) n->data;
+		mowgli_object_class_t *tklass = (mowgli_object_class_t *)n->data;
 
 		if (tklass == klass2)
 			return 1;
@@ -79,7 +84,8 @@ int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_
 	return 0;
 }
 
-void mowgli_object_class_set_derivitive(mowgli_object_class_t *klass, mowgli_object_class_t *parent)
+void
+mowgli_object_class_set_derivitive(mowgli_object_class_t *klass, mowgli_object_class_t *parent)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(parent != NULL);
@@ -87,7 +93,8 @@ void mowgli_object_class_set_derivitive(mowgli_object_class_t *klass, mowgli_obj
 	mowgli_node_add(klass, mowgli_node_create(), &parent->derivitives);
 }
 
-void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *opdata, mowgli_object_class_t *klass)
+void *
+mowgli_object_class_reinterpret_impl( /* mowgli_object_t */ void *opdata, mowgli_object_class_t *klass)
 {
 	mowgli_object_t *object = mowgli_object(opdata);
 
@@ -102,12 +109,14 @@ void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *opdata, m
 	return NULL;
 }
 
-mowgli_object_class_t *mowgli_object_class_find_by_name(const char *name)
+mowgli_object_class_t *
+mowgli_object_class_find_by_name(const char *name)
 {
 	return mowgli_patricia_retrieve(mowgli_object_class_dict, name);
 }
 
-void mowgli_object_class_destroy(mowgli_object_class_t *klass)
+void
+mowgli_object_class_destroy(mowgli_object_class_t *klass)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(klass->dynamic == TRUE);

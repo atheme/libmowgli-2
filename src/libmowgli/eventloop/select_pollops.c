@@ -22,15 +22,17 @@
 
 #ifdef HAVE_SELECT
 
-#ifdef HAVE_SYS_SELECT_H
-# include <sys/select.h>
-#endif
+# ifdef HAVE_SYS_SELECT_H
+#  include <sys/select.h>
+# endif
 
-typedef struct {
+typedef struct
+{
 	mowgli_list_t pollable_list;
 } mowgli_select_eventloop_private_t;
 
-static void mowgli_select_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_select_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_select_eventloop_private_t *priv;
 
@@ -40,7 +42,8 @@ static void mowgli_select_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_select_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_select_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	mowgli_node_t *n, *tn;
 	mowgli_select_eventloop_private_t *priv;
@@ -58,7 +61,8 @@ static void mowgli_select_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_select_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_select_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_select_eventloop_private_t *priv;
 
@@ -70,7 +74,8 @@ static void mowgli_select_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgl
 	mowgli_node_delete(&pollable->node, &priv->pollable_list);
 }
 
-static void mowgli_select_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_select_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_select_eventloop_private_t *priv;
 
@@ -79,9 +84,9 @@ static void mowgli_select_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 
 	priv = eventloop->poller;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	if (pollable->read_function || pollable->write_function)
 		mowgli_node_delete(&pollable->node, &priv->pollable_list);
@@ -99,9 +104,9 @@ static void mowgli_select_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 		break;
 	}
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	if (pollable->read_function || pollable->write_function)
 		mowgli_node_add(pollable, &pollable->node, &priv->pollable_list);
@@ -109,7 +114,8 @@ static void mowgli_select_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 	return;
 }
 
-static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_node_t *n, *tn;
 	mowgli_eventloop_pollable_t *pollable;
@@ -126,13 +132,13 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	FD_ZERO(&wfds);
 	FD_ZERO(&efds);
 
-        MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
-        {
+	MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
+	{
 		mowgli_eventloop_pollable_t *pollable = n->data;
 
-#ifdef DEBUG
+# ifdef DEBUG
 		mowgli_log("considering fd %d pollable %p count %d", pollable->fd, pollable, priv->pollable_list.count);
-#endif
+# endif
 
 		if (pollable->read_function || pollable->write_function)
 		{
@@ -166,9 +172,9 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 
 			if ((FD_ISSET(pollable->fd, &rfds) || FD_ISSET(pollable->fd, &efds)))
 			{
-#ifdef DEBUG
+# ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
-#endif
+# endif
 
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 			}
@@ -180,9 +186,9 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 
 			if ((FD_ISSET(pollable->fd, &wfds) || FD_ISSET(pollable->fd, &efds)))
 			{
-#ifdef DEBUG
+# ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);
-#endif
+# endif
 
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 			}
@@ -190,7 +196,8 @@ static void mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	}
 }
 
-mowgli_eventloop_ops_t _mowgli_select_pollops = {
+mowgli_eventloop_ops_t _mowgli_select_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_select_eventloop_pollsetup,

@@ -20,7 +20,8 @@
 
 #include "mowgli.h"
 
-mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation)
+mowgli_dns_t *
+mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation)
 {
 	mowgli_dns_t *dns = mowgli_alloc(sizeof(mowgli_dns_t));
 	const mowgli_dns_ops_t *ops;
@@ -44,7 +45,8 @@ mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementati
 	return dns;
 }
 
-int mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop, const mowgli_dns_ops_t *ops)
+int
+mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop, const mowgli_dns_ops_t *ops)
 {
 	return_val_if_fail(dns != NULL, -1);
 
@@ -53,30 +55,34 @@ int mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop, const mowg
 	return dns->dns_ops->mowgli_dns_init_func_t(dns, eventloop);
 }
 
-void mowgli_dns_destroy(mowgli_dns_t *dns)
+void
+mowgli_dns_destroy(mowgli_dns_t *dns)
 {
 	dns->dns_ops->mowgli_dns_fini_func_t(dns);
 
 	mowgli_free(dns);
 }
 
-int mowgli_dns_restart(mowgli_dns_t *dns)
+int
+mowgli_dns_restart(mowgli_dns_t *dns)
 {
 	return dns->dns_ops->mowgli_dns_restart_func_t(dns);
 }
 
-void mowgli_dns_delete_query(mowgli_dns_t *dns, const mowgli_dns_query_t *query)
+void
+mowgli_dns_delete_query(mowgli_dns_t *dns, const mowgli_dns_query_t *query)
 {
 	dns->dns_ops->mowgli_dns_delete_query_func_t(dns, query);
 }
 
-void mowgli_dns_gethost_byname(mowgli_dns_t *dns, const char *name, mowgli_dns_query_t *query, int type)
+void
+mowgli_dns_gethost_byname(mowgli_dns_t *dns, const char *name, mowgli_dns_query_t *query, int type)
 {
 	dns->dns_ops->mowgli_dns_gethost_byname_func_t(dns, name, query, type);
 }
 
-void mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *addr, mowgli_dns_query_t *query)
+void
+mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *addr, mowgli_dns_query_t *query)
 {
 	dns->dns_ops->mowgli_dns_gethost_byaddr_func_t(dns, addr, query);
 }
-

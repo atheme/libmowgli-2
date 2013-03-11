@@ -27,7 +27,8 @@
 static mowgli_patricia_t *mowgli_hooks = NULL;
 static mowgli_heap_t *mowgli_hook_item_heap;
 
-static void _hook_key_canon(char *str)
+static void
+_hook_key_canon(char *str)
 {
 	while (*str)
 	{
@@ -116,7 +117,7 @@ mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func)
 			mowgli_heap_free(mowgli_hook_item_heap, hookitem);
 
 			return 0;
-	        }
+		}
 	}
 
 	return -1;

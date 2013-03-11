@@ -30,9 +30,10 @@ static mowgli_object_class_t klass;
  *
  * \param vptr pointer to mowgli_argstack_t to destroy.
  */
-static void mowgli_argstack_destroy(void *vptr)
+static void
+mowgli_argstack_destroy(void *vptr)
 {
-	mowgli_argstack_t *self = (mowgli_argstack_t *) vptr;
+	mowgli_argstack_t *self = (mowgli_argstack_t *)vptr;
 	mowgli_node_t *n, *tn;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->stack.head)
@@ -48,17 +49,18 @@ static void mowgli_argstack_destroy(void *vptr)
 
 /*
  * \brief Initialization code for the mowgli.argstack library.
- * 
+ *
  * Side Effects:
  *       - the mowgli_argstack_t object class is registered.
  */
-void mowgli_argstack_bootstrap(void)
+void
+mowgli_argstack_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_argstack_t", mowgli_argstack_destroy, FALSE);
 }
 
 /*
- * \brief Creates an argument stack from a va_list and an appropriate 
+ * \brief Creates an argument stack from a va_list and an appropriate
  * description schema.
  *
  * \param descstr a description string which describes the argument stack, where:
@@ -70,7 +72,8 @@ void mowgli_argstack_bootstrap(void)
  *
  * \return a mowgli_argstack_t (mowgli.argstack) object.
  */
-mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
+mowgli_argstack_t *
+mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 {
 	return_null_if_fail(descstr != NULL);
 
@@ -82,7 +85,7 @@ mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_l
 	{
 		mowgli_argstack_element_t *e = mowgli_alloc(sizeof(mowgli_argstack_element_t));
 
-		switch(*cp)
+		switch (*cp)
 		{
 		case 's':
 			e->data.string = va_arg(va, char *);
@@ -127,7 +130,8 @@ mowgli_argstack_t *mowgli_argstack_create_from_va_list(const char *descstr, va_l
  *
  * \return a mowgli_argstack_t (mowgli.argstack) object.
  */
-mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
+mowgli_argstack_t *
+mowgli_argstack_create(const char *descstr, ...)
 {
 	return_null_if_fail(descstr != NULL);
 
@@ -151,7 +155,8 @@ mowgli_argstack_t *mowgli_argstack_create(const char *descstr, ...)
  * Side Effects:
  *       - the argument is removed from the argstack.
  */
-const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
+const char *
+mowgli_argstack_pop_string(mowgli_argstack_t *self)
 {
 	return_null_if_fail(self != NULL);
 
@@ -176,7 +181,8 @@ const char *mowgli_argstack_pop_string(mowgli_argstack_t *self)
  * Side Effects:
  *       - the argument is removed from the argstack.
  */
-int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
+int
+mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
 {
 	return_val_if_fail(self != NULL, 0);
 
@@ -201,7 +207,8 @@ int mowgli_argstack_pop_numeric(mowgli_argstack_t *self)
  * Side Effects:
  *       - the argument is removed from the argstack.
  */
-mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
+mowgli_boolean_t
+mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
 {
 	return_val_if_fail(self != NULL, false);
 
@@ -226,7 +233,8 @@ mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *self)
  * Side Effects:
  *       - the argument is removed from the argstack.
  */
-void *mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
+void *
+mowgli_argstack_pop_pointer(mowgli_argstack_t *self)
 {
 	return_null_if_fail(self != NULL);
 

@@ -27,27 +27,33 @@
 #define _assert_msg(exp) "assertion '" #exp  "' failed."
 
 #define soft_assert(exp) \
-	do { \
-		if (!(exp)) { \
+	do \
+	{ \
+		if (!(exp)) \
+		{ \
 			mowgli_log_warning(_assert_msg(exp)); \
 		} \
-	} while(0)
+	} while (0)
 
 #define return_if_fail(exp) \
-	do { \
-		if (!(exp)) { \
+	do \
+	{ \
+		if (!(exp)) \
+		{ \
 			mowgli_log_warning(_assert_msg(exp)); \
-			return; \
+			return;	\
 		} \
-	} while(0)
+	} while (0)
 
 #define return_val_if_fail(exp, val) \
-	do { \
-		if (!(exp)) { \
+	do \
+	{ \
+		if (!(exp)) \
+		{ \
 			mowgli_log_warning(_assert_msg(exp)); \
 			return (val); \
 		} \
-	} while(0)
+	} while (0)
 
 #define return_null_if_fail(exp) return_val_if_fail(exp, NULL)
 

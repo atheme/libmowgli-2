@@ -29,18 +29,19 @@
 # include <thread.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
 # ifdef MOWGLI_OS_THREADS_SOLARIS
-#  define  MOWGLI_NATIVE_THREAD_DECL(name) pthread_t (name)
+#  define  MOWGLI_NATIVE_THREAD_DECL(name) pthread_t(name)
 # else
-#  define MOWGLI_NATIVE_THREAD_DECL(name) thread_t (name)
+#  define MOWGLI_NATIVE_THREAD_DECL(name) thread_t(name)
 # endif
 #elif defined MOWGLI_OS_WIN
 # define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# define MOWGLI_NATIVE_THREAD_DECL(name) 	HANDLE (name)
+# define MOWGLI_NATIVE_THREAD_DECL(name) HANDLE(name)
 #else
 # include <pthread.h>
 #endif
 
-typedef struct {
+typedef struct
+{
 #ifdef MOWGLI_FEATURE_HAVE_NATIVE_THREADS
 	MOWGLI_NATIVE_THREAD_DECL(thread);
 #else
@@ -59,10 +60,11 @@ typedef void *(*mowgli_thread_start_fn_t)(mowgli_thread_t *thread, void *userdat
  * portability.  Creating, ending, killing and cleanup functions are presently implemented,
  * and cover approximately 99.999% of uses of thread APIs.  --nenolod
  */
-typedef struct {
+typedef struct
+{
 	int (*thread_create)(mowgli_thread_t *thread, mowgli_thread_start_fn_t start_fn, void *userdata);
 	void (*thread_exit)(mowgli_thread_t *thread);
-	void *(*thread_join)(mowgli_thread_t *thread);
+	void *(*thread_join)(mowgli_thread_t * thread);
 	void (*thread_kill)(mowgli_thread_t *thread);
 	void (*thread_destroy)(mowgli_thread_t *thread);
 } mowgli_thread_ops_t;
@@ -73,10 +75,10 @@ void *mowgli_thread_join(mowgli_thread_t *thread);
 void mowgli_thread_kill(mowgli_thread_t *thread);
 void mowgli_thread_destroy(mowgli_thread_t *thread);
 
-typedef enum {
+typedef enum
+{
 	MOWGLI_THREAD_POLICY_DEFAULT,
 	MOWGLI_THREAD_POLICY_DISABLED,
 } mowgli_thread_policy_t;
 
 #endif
-

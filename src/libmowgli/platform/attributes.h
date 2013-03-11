@@ -26,43 +26,43 @@
 
 /* Deprecated */
 #if defined MOWGLI_COMPILER_GCC_COMPAT
-#define MOWGLI_DEPRECATED(proto, msg) proto __attribute__((deprecated (msg)))
+# define MOWGLI_DEPRECATED(proto, msg) proto __attribute__((deprecated(msg)))
 #elif defined MOWGLI_COMPILER_MSVC
-#define MOWGLI_DEPRECATED(proto, msg) __declspec(deprecated(msg)) proto
+# define MOWGLI_DEPRECATED(proto, msg) __declspec(deprecated(msg)) proto
 #else
-#define MOWGLI_DEPRECATED(proto, msg) proto
+# define MOWGLI_DEPRECATED(proto, msg) proto
 #endif
 
 /* printf, n is number of args to skip to get to fmt */
 #if defined MOWGLI_COMPILER_GCC_COMPAT
-#define MOWGLI_PRINTF(proto, n) proto __attribute__((format (printf, n, n + 1)))
+# define MOWGLI_PRINTF(proto, n) proto __attribute__((format(printf, n, n + 1)))
 #else
-#define MOWGLI_PRINTF(proto) proto
+# define MOWGLI_PRINTF(proto) proto
 #endif
 
 /* Hot and cold paths */
 #if MOWGLI_COMPILER_GCC_VERSION > 403000
-#define MOWGLI_HOT(proto)  proto __attribute__((hot))
-#define MOWGLI_COLD(proto) proto __attribute__((cold))
+# define MOWGLI_HOT(proto) proto __attribute__((hot))
+# define MOWGLI_COLD(proto) proto __attribute__((cold))
 #else
-#define MOWGLI_HOT(proto)  proto
-#define MOWGLI_COLD(proto) proto
+# define MOWGLI_HOT(proto) proto
+# define MOWGLI_COLD(proto) proto
 #endif
 
 #if MOWGLI_COMPILER_GCC_VERSION > 408000
-#define MOWGLI_HOT_LABEL(label)  label __attribute__((hot))
-#define MOWGLI_COLD_LABEL(label) label __attribute__((cold))
+# define MOWGLI_HOT_LABEL(label) label __attribute__((hot))
+# define MOWGLI_COLD_LABEL(label) label __attribute__((cold))
 #else
-#define MOWGLI_HOT_LABEL(label) label
-#define MOWGLI_COLD_LABEL(label) label
+# define MOWGLI_HOT_LABEL(label) label
+# define MOWGLI_COLD_LABEL(label) label
 #endif
 
 /* malloc, n is the arg used for allocation size */
 #ifdef MOWGLI_COMPILER_GCC_COMPAT
-#define MOWGLI_MALLOC(proto, n) \
-	proto __attribute__((malloc, alloc_size (n), warn_unused_result))
+# define MOWGLI_MALLOC(proto, n) \
+	proto __attribute__((malloc, alloc_size(n), warn_unused_result))
 #else
-#define MOWGLI_MALLOC(proto, n) \
+# define MOWGLI_MALLOC(proto, n) \
 	proto
 #endif
 

@@ -27,10 +27,10 @@
 #include "mowgli.h"
 
 static mowgli_signal_handler_t
-mowgli_signal_install_handler_full(int signum, mowgli_signal_handler_t handler,
-			    int *sigtoblock, size_t sigtoblocksize)
+mowgli_signal_install_handler_full(int signum, mowgli_signal_handler_t handler, int *sigtoblock, size_t sigtoblocksize)
 {
 	struct sigaction action, old_action;
+
 	size_t i;
 
 	action.sa_handler = handler;

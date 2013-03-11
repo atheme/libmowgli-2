@@ -25,12 +25,14 @@
 
 mowgli_eventloop_t *eventloop;
 
-void timer_oneshot(void *unused)
+void
+timer_oneshot(void *unused)
 {
 	printf("oneshot timer hit\n");
 }
 
-void timer_tick(void *unused)
+void
+timer_tick(void *unused)
 {
 	static int ticks = 0;
 
@@ -40,7 +42,8 @@ void timer_tick(void *unused)
 		mowgli_eventloop_break(eventloop);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	eventloop = mowgli_eventloop_create();
 

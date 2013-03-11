@@ -23,7 +23,8 @@
 
 #include "mowgli.h"
 
-void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
+void
+mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(key != NULL);
@@ -33,7 +34,7 @@ void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, vo
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *) n->data;
+		e = (mowgli_object_metadata_entry_t *)n->data;
 
 		if (!strcasecmp(e->name, key))
 			break;
@@ -52,7 +53,8 @@ void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, vo
 	mowgli_node_add(e, mowgli_node_create(), &self->metadata);
 }
 
-void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
+void
+mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(key != NULL);
@@ -62,7 +64,7 @@ void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *) n->data;
+		e = (mowgli_object_metadata_entry_t *)n->data;
 
 		if (!strcasecmp(e->name, key))
 		{
@@ -75,7 +77,8 @@ void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 	}
 }
 
-void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
+void *
+mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 {
 	return_null_if_fail(self != NULL);
 	return_null_if_fail(key != NULL);
@@ -85,7 +88,7 @@ void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *) n->data;
+		e = (mowgli_object_metadata_entry_t *)n->data;
 
 		if (!strcasecmp(e->name, key))
 			return e->data;

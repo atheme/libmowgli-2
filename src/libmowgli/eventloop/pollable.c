@@ -22,7 +22,8 @@
 
 static mowgli_heap_t *pollable_heap = NULL;
 
-mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloop, mowgli_descriptor_t fd, void *userdata)
+mowgli_eventloop_pollable_t *
+mowgli_pollable_create(mowgli_eventloop_t *eventloop, mowgli_descriptor_t fd, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable;
 
@@ -41,7 +42,8 @@ mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloo
 	return pollable;
 }
 
-void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+void
+mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(pollable != NULL);
@@ -52,7 +54,8 @@ void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pol
 	mowgli_heap_free(pollable_heap, pollable);
 }
 
-void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+void
+mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(pollable != NULL);
@@ -61,7 +64,8 @@ void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_p
 	eventloop->eventloop_ops->setselect(eventloop, pollable, dir, event_function);
 }
 
-void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking)
+void
+mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking)
 {
 #if defined(HAVE_FCNTL)
 	unsigned long flags;
@@ -87,7 +91,8 @@ void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool
 #endif
 }
 
-void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir)
+void
+mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir)
 {
 	mowgli_eventloop_io_cb_t *event_function;
 
@@ -112,4 +117,3 @@ void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pol
 
 	event_function(eventloop, pollable, dir, pollable->userdata);
 }
-

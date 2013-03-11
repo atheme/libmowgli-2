@@ -26,42 +26,48 @@
 #ifndef _WIN32
 
 /*************
- * This "default" implementation uses pthreads.  Care has been taken to
- * ensure it runs on POSIX 1003.4a (draft 4, aka DECthreads, aka what OSF/1,
- * Tru64, Ultrix, CMU Mach, and HP-UX use) as well as POSIX 1003.1c-1995.
- * As long as you don't try playing with the pthread_attr module or the
- * scheduler routines (which are non-standard and broken anyway, IMO) then
- * it should be relatively easy to maintian d4 compatibility without
- * sacrificing any functionality.
- *************/
-#if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
+* This "default" implementation uses pthreads.  Care has been taken to
+* ensure it runs on POSIX 1003.4a (draft 4, aka DECthreads, aka what OSF/1,
+* Tru64, Ultrix, CMU Mach, and HP-UX use) as well as POSIX 1003.1c-1995.
+* As long as you don't try playing with the pthread_attr module or the
+* scheduler routines (which are non-standard and broken anyway, IMO) then
+* it should be relatively easy to maintian d4 compatibility without
+* sacrificing any functionality.
+*************/
+# if !defined(MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES)
 
-static int mowgli_posix_mutex_create(mowgli_mutex_t *mutex)
+static int
+mowgli_posix_mutex_create(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_init(&mutex->mutex, NULL);
 }
 
-static int mowgli_posix_mutex_lock(mowgli_mutex_t *mutex)
+static int
+mowgli_posix_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_lock(&mutex->mutex);
 }
 
-static int mowgli_posix_mutex_trylock(mowgli_mutex_t *mutex)
+static int
+mowgli_posix_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_trylock(&mutex->mutex);
 }
 
-static int mowgli_posix_mutex_unlock(mowgli_mutex_t *mutex)
+static int
+mowgli_posix_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_unlock(&mutex->mutex);
 }
 
-static int mowgli_posix_mutex_destroy(mowgli_mutex_t *mutex)
+static int
+mowgli_posix_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	return pthread_mutex_destroy(&mutex->mutex);
 }
 
-const mowgli_mutex_ops_t _mowgli_posix_mutex_ops = {
+const mowgli_mutex_ops_t _mowgli_posix_mutex_ops =
+{
 	.mutex_create = mowgli_posix_mutex_create,
 	.mutex_lock = mowgli_posix_mutex_lock,
 	.mutex_trylock = mowgli_posix_mutex_trylock,
@@ -69,6 +75,6 @@ const mowgli_mutex_ops_t _mowgli_posix_mutex_ops = {
 	.mutex_destroy = mowgli_posix_mutex_destroy,
 };
 
-#endif
+# endif
 
 #endif

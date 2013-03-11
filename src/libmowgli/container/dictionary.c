@@ -50,9 +50,10 @@ struct mowgli_dictionary_
  *     - if services runs out of memory and cannot allocate the object,
  *       the program will abort.
  */
-mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
+mowgli_dictionary_t *
+mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *)mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	dtree->compare_cb = compare_cb;
 
@@ -63,7 +64,7 @@ mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_
 }
 
 /*
- * mowgli_dictionary_create_named(const char *name, 
+ * mowgli_dictionary_create_named(const char *name,
  *     mowgli_dictionary_comparator_func_t compare_cb)
  *
  * Dictionary object factory.
@@ -79,10 +80,10 @@ mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_
  *     - if services runs out of memory and cannot allocate the object,
  *       the program will abort.
  */
-mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
-	mowgli_dictionary_comparator_func_t compare_cb)
+mowgli_dictionary_t *
+mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *)mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	dtree->compare_cb = compare_cb;
 	dtree->id = strdup(name);
@@ -110,8 +111,8 @@ mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name,
  * Side Effects:
  *     - the dictionary comparator function is reset.
  */
-void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
-	mowgli_dictionary_comparator_func_t compare_cb)
+void
+mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict, mowgli_dictionary_comparator_func_t compare_cb)
 {
 	return_if_fail(dict != NULL);
 	return_if_fail(compare_cb != NULL);
@@ -166,11 +167,14 @@ mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const void *key)
 	return_val_if_fail(key != NULL, 0);
 
 	elem = mowgli_dictionary_find(dict, key);
+
 	if (elem == NULL)
 		return -1;
 
 	if (!dict->dirty)
+	{
 		return elem->position;
+	}
 	else
 	{
 		mowgli_dictionary_elem_t *delem;
@@ -248,14 +252,14 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
 	 * we initialize n with known values, since it's on stack
 	 * memory. otherwise the dict would become corrupted.
 	 *
- 	 * n is used for temporary storage while the tree is retuned.
+	 * n is used for temporary storage while the tree is retuned.
 	 *    -nenolod
 	 */
 	n.left = n.right = NULL;
 	left = right = &n;
 
 	/* this for(;;) loop is the main workhorse of the rebalancing */
-	for (node = dict->root; ; )
+	for (node = dict->root;;)
 	{
 		if ((ret = dict->compare_cb(key, node->key)) == 0)
 			break;
@@ -333,8 +337,7 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
  *     - a node is linked to the dictionary tree
  */
 void
-mowgli_dictionary_link(mowgli_dictionary_t *dict,
-	mowgli_dictionary_elem_t *delem)
+mowgli_dictionary_link(mowgli_dictionary_t *dict, mowgli_dictionary_elem_t *delem)
 {
 	return_if_fail(dict != NULL);
 	return_if_fail(delem != NULL);
@@ -420,19 +423,25 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 	dict->dirty = true;
 
 	delem = dict->root;
+
 	if (delem == NULL)
 		return;
 
 	if (dict->root->left == NULL)
+	{
 		dict->root = dict->root->right;
+	}
 	else if (dict->root->right == NULL)
+	{
 		dict->root = dict->root->left;
+	}
 	else
 	{
 		/* Make the node with the next highest key the new root.
 		 * This node has a NULL left pointer. */
 		nextnode = delem->next;
 		soft_assert(nextnode->left == NULL);
+
 		if (nextnode == delem->right)
 		{
 			dict->root = nextnode;
@@ -441,8 +450,12 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 		else
 		{
 			parentofnext = delem->right;
+
 			while (parentofnext->left != NULL && parentofnext->left != nextnode)
+			{
 				parentofnext = parentofnext->left;
+			}
+
 			soft_assert(parentofnext->left == nextnode);
 			parentofnext->left = nextnode->right;
 			dict->root = nextnode;
@@ -489,9 +502,8 @@ mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
  *     - if this is called without a callback, the objects bound to the
  *       DTree will not be destroyed.
  */
-void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
-	void (*destroy_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata)
+void
+mowgli_dictionary_destroy(mowgli_dictionary_t *dtree, void (*destroy_cb)(mowgli_dictionary_elem_t *delem, void *privdata), void *privdata)
 {
 	mowgli_dictionary_elem_t *n, *tn;
 
@@ -526,9 +538,8 @@ void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - on success, a dtree is iterated
  */
-void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
-	int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata)
+void
+mowgli_dictionary_foreach(mowgli_dictionary_t *dtree, int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata), void *privdata)
 {
 	mowgli_dictionary_elem_t *n, *tn;
 
@@ -537,7 +548,7 @@ void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, dtree->head)
 	{
 		/* delem_t is a subclass of node_t. */
-		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *) n;
+		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *)n;
 
 		if (foreach_cb != NULL)
 			(*foreach_cb)(delem, privdata);
@@ -563,9 +574,8 @@ void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - a dtree is iterated until the requested conditions are met
  */
-void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
-	void *(*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata)
+void *
+mowgli_dictionary_search(mowgli_dictionary_t *dtree, void *(*foreach_cb)(mowgli_dictionary_elem_t * delem, void *privdata), void *privdata)
 {
 	mowgli_dictionary_elem_t *n, *tn;
 	void *ret = NULL;
@@ -575,7 +585,7 @@ void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, dtree->head)
 	{
 		/* delem_t is a subclass of node_t. */
-		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *) n;
+		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *)n;
 
 		if (foreach_cb != NULL)
 			ret = (*foreach_cb)(delem, privdata);
@@ -603,8 +613,8 @@ void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - the static iterator, &state, is initialized.
  */
-void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state)
+void
+mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state)
 {
 	return_if_fail(dtree != NULL);
 	return_if_fail(state != NULL);
@@ -641,8 +651,8 @@ void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - none
  */
-void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state)
+void *
+mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state)
 {
 	return_val_if_fail(dtree != NULL, NULL);
 	return_val_if_fail(state != NULL, NULL);
@@ -666,15 +676,15 @@ void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - the static iterator, &state, is advanced to a new DTree node.
  */
-void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state)
+void
+mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state)
 {
 	return_if_fail(dtree != NULL);
 	return_if_fail(state != NULL);
 
 	if (state->cur == NULL)
 	{
-		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", (void*)dtree);
+		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", (void *)dtree);
 		return;
 	}
 
@@ -702,7 +712,8 @@ void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
  * Side Effects:
  *     - none
  */
-mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, const void *key)
+mowgli_dictionary_elem_t *
+mowgli_dictionary_find(mowgli_dictionary_t *dict, const void *key)
 {
 	return_val_if_fail(dict != NULL, NULL);
 	return_val_if_fail(key != NULL, NULL);
@@ -733,7 +744,8 @@ mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dict, cons
  * Side Effects:
  *     - data is inserted into the DTree.
  */
-mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const void *key, void *data)
+mowgli_dictionary_elem_t *
+mowgli_dictionary_add(mowgli_dictionary_t *dict, const void *key, void *data)
 {
 	mowgli_dictionary_elem_t *delem;
 
@@ -777,7 +789,8 @@ mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dict, const
  * Notes:
  *     - the returned data needs to be mowgli_freed/released manually!
  */
-void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
+void *
+mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
 {
 	mowgli_dictionary_elem_t *delem = mowgli_dictionary_find(dtree, key);
 	void *data;
@@ -788,7 +801,7 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
 	data = delem->data;
 
 	mowgli_dictionary_unlink_root(dtree);
-	mowgli_heap_free(elem_heap, delem);	
+	mowgli_heap_free(elem_heap, delem);
 
 	return data;
 }
@@ -809,7 +822,8 @@ void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key)
  * Side Effects:
  *     - none
  */
-void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key)
+void *
+mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key)
 {
 	mowgli_dictionary_elem_t *delem = mowgli_dictionary_find(dtree, key);
 
@@ -833,7 +847,8 @@ void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key)
  * Side Effects:
  *     - none
  */
-unsigned int mowgli_dictionary_size(mowgli_dictionary_t *dict)
+unsigned int
+mowgli_dictionary_size(mowgli_dictionary_t *dict)
 {
 	return_val_if_fail(dict != NULL, 0);
 
@@ -848,11 +863,15 @@ stats_recurse(mowgli_dictionary_elem_t *delem, int depth, int *pmaxdepth)
 
 	if (depth > *pmaxdepth)
 		*pmaxdepth = depth;
+
 	result = depth;
+
 	if (delem->left)
 		result += stats_recurse(delem->left, depth + 1, pmaxdepth);
+
 	if (delem->right)
 		result += stats_recurse(delem->right, depth + 1, pmaxdepth);
+
 	return result;
 }
 
@@ -872,7 +891,8 @@ stats_recurse(mowgli_dictionary_elem_t *delem, int depth, int *pmaxdepth)
  * Side Effects:
  *     - callback called with stats text
  */
-void mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, void *privdata), void *privdata)
+void
+mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, void *privdata), void *privdata)
 {
 	char str[256];
 	int sum, maxdepth;
@@ -881,19 +901,24 @@ void mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *l
 
 	if (dict->id != NULL)
 		snprintf(str, sizeof str, "Dictionary stats for %s (%d)",
-				dict->id, dict->count);
+			 dict->id, dict->count);
 	else
 		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
-				(void*)dict, dict->count);
+			 (void *)dict, dict->count);
+
 	cb(str, privdata);
 	maxdepth = 0;
+
 	if (dict->root != NULL)
 	{
 		sum = stats_recurse(dict->root, 0, &maxdepth);
 		snprintf(str, sizeof str, "Depth sum %d Avg depth %d Max depth %d", sum, sum / dict->count, maxdepth);
 	}
 	else
+	{
 		snprintf(str, sizeof str, "Depth sum 0 Avg depth 0 Max depth 0");
+	}
+
 	cb(str, privdata);
 	return;
 }

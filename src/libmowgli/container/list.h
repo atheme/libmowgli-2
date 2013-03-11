@@ -25,13 +25,17 @@
 #define __MOWGLI_LIST_H__
 
 /* macros for linked lists */
-#define MOWGLI_LIST_FOREACH(n, head) for (n = (head); n; n = n->next)  
-#define MOWGLI_LIST_FOREACH_NEXT(n, head) for (n = (head); n->next; n = n->next)
-#define MOWGLI_LIST_FOREACH_PREV(n, tail) for (n = (tail); n; n = n->prev)
+#define MOWGLI_LIST_FOREACH(n, head) \
+	for (n = (head); n; n = n->next)
+#define MOWGLI_LIST_FOREACH_NEXT(n, head) \
+	for (n = (head); n->next; n = n->next)
+#define MOWGLI_LIST_FOREACH_PREV(n, tail) \
+	for (n = (tail); n; n = n->prev)
 
 #define MOWGLI_LIST_LENGTH(list) (list)->count
 
-#define MOWGLI_LIST_FOREACH_SAFE(n, tn, head) for (n = (head), tn = n ? n->next : NULL; n != NULL; n = tn, tn = n ? n->next : NULL)
+#define MOWGLI_LIST_FOREACH_SAFE(n, tn, head) \
+	for (n = (head), tn = n ? n->next : NULL; n != NULL; n = tn, tn = n ? n->next : NULL)
 
 /* list node struct */
 typedef struct mowgli_node_ mowgli_node_t;
@@ -39,15 +43,16 @@ typedef struct mowgli_list_ mowgli_list_t;
 
 struct mowgli_node_
 {
-	struct mowgli_node_ *next, *prev; 
-	void *data;                   /* pointer to real structure */
+	struct mowgli_node_ *next, *prev;
+
+	void *data;	/* pointer to real structure */
 };
 
 /* node list struct */
 struct mowgli_list_
 {
 	mowgli_node_t *head, *tail;
-	size_t count;                    /* how many entries in the list */
+	size_t count;	/* how many entries in the list */
 };
 
 extern mowgli_node_t *mowgli_node_create(void);

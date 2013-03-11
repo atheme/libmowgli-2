@@ -24,7 +24,8 @@
 #ifndef __MOWGLI_OBJECT_METADATA_H__
 #define __MOWGLI_OBJECT_METADATA_H__
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	void *data;
 } mowgli_object_metadata_entry_t;

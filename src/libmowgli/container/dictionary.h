@@ -25,7 +25,7 @@
 #ifndef __MOWGLI_DICTIONARY_H__
 #define __MOWGLI_DICTIONARY_H__
 
-struct mowgli_dictionary_; /* defined in src/dictionary.c */
+struct mowgli_dictionary_;	/* defined in src/dictionary.c */
 
 typedef struct mowgli_dictionary_ mowgli_dictionary_t;
 
@@ -56,7 +56,8 @@ typedef struct mowgli_dictionary_iteration_state_ mowgli_dictionary_iteration_st
 /*
  * this is a convenience macro for inlining iteration of dictionaries.
  */
-#define MOWGLI_DICTIONARY_FOREACH(element, state, dict) for (mowgli_dictionary_foreach_start((dict), (state)); (element = mowgli_dictionary_foreach_cur((dict), (state))); mowgli_dictionary_foreach_next((dict), (state)))
+#define MOWGLI_DICTIONARY_FOREACH(element, state, dict)	\
+	for (mowgli_dictionary_foreach_start((dict), (state)); (element = mowgli_dictionary_foreach_cur((dict), (state))); mowgli_dictionary_foreach_next((dict), (state)))
 
 /*
  * mowgli_dictionary_create() creates a new dictionary tree.
@@ -75,8 +76,7 @@ extern mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name, mow
  * mowgli_dictionary_set_comparator_func() resets the comparator used for lookups and
  * insertions in the DTree structure.
  */
-extern void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict,
-	mowgli_dictionary_comparator_func_t compare_cb);
+extern void mowgli_dictionary_set_comparator_func(mowgli_dictionary_t *dict, mowgli_dictionary_comparator_func_t compare_cb);
 
 /*
  * mowgli_dictionary_get_comparator_func() returns the comparator used for lookups and
@@ -94,9 +94,7 @@ extern int mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const v
  * mowgli_dictionary_destroy() destroys all entries in a dtree, and also optionally calls
  * a defined callback function to destroy any data attached to it.
  */
-extern void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
-	void (*destroy_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata);
+extern void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree, void (*destroy_cb)(mowgli_dictionary_elem_t *delem, void *privdata), void *privdata);
 
 /*
  * mowgli_dictionary_foreach() iterates all entries in a dtree, and also optionally calls
@@ -104,9 +102,7 @@ extern void mowgli_dictionary_destroy(mowgli_dictionary_t *dtree,
  *
  * To shortcircuit iteration, return non-zero from the callback function.
  */
-extern void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
-	int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata);
+extern void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree, int (*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata), void *privdata);
 
 /*
  * mowgli_dictionary_search() iterates all entries in a dtree, and also optionally calls
@@ -115,9 +111,7 @@ extern void mowgli_dictionary_foreach(mowgli_dictionary_t *dtree,
  * When the object is found, a non-NULL is returned from the callback, which results
  * in that object being returned to the user.
  */
-extern void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
-	void *(*foreach_cb)(mowgli_dictionary_elem_t *delem, void *privdata),
-	void *privdata);
+extern void *mowgli_dictionary_search(mowgli_dictionary_t *dtree, void *(*foreach_cb)(mowgli_dictionary_elem_t * delem, void *privdata), void *privdata);
 
 /*
  * mowgli_dictionary_foreach_start() begins an iteration over all items
@@ -125,21 +119,18 @@ extern void *mowgli_dictionary_search(mowgli_dictionary_t *dtree,
  * in progress at a time, it is permitted to remove the current element
  * of the iteration (but not any other element).
  */
-extern void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state);
+extern void mowgli_dictionary_foreach_start(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state);
 
 /*
  * mowgli_dictionary_foreach_cur() returns the current element of the iteration,
  * or NULL if there are no more elements.
  */
-extern void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state);
+extern void *mowgli_dictionary_foreach_cur(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state);
 
 /*
  * mowgli_dictionary_foreach_next() moves to the next element.
  */
-extern void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree,
-	mowgli_dictionary_iteration_state_t *state);
+extern void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree, mowgli_dictionary_iteration_state_t *state);
 
 /*
  * mowgli_dictionary_add() adds a key->value entry to the dictionary tree.

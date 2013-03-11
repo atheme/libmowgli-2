@@ -24,15 +24,21 @@
 #ifndef __MOWGLI_ITERATOR_H__
 #define __MOWGLI_ITERATOR_H__
 
-typedef struct _mowgli_iterator {
+typedef struct _mowgli_iterator
+{
 	struct _mowgli_iterator *prev, *next;
+
 	void *data;
 } mowgli_iterator_t;
 
 /* The following are macros which can be used with iterators. */
-#define MOWGLI_ITER_FOREACH(n, head) for (n = (head); n; n = n->next)
-#define MOWGLI_ITER_FOREACH_NEXT(n, head) for (n = (head); n->next; n = n->next)
-#define MOWGLI_ITER_FOREACH_PREV(n, tail) for (n = (tail); n; n = n->prev)
-#define MOWGLI_ITER_FOREACH_SAFE(n, tn, head) for (n = (head), tn = n ? n->next : NULL; n != NULL; n = tn, tn = n ? n->next : NULL)
+#define MOWGLI_ITER_FOREACH(n, head) \
+	for (n = (head); n; n = n->next)
+#define MOWGLI_ITER_FOREACH_NEXT(n, head) \
+	for (n = (head); n->next; n = n->next)
+#define MOWGLI_ITER_FOREACH_PREV(n, tail) \
+	for (n = (tail); n; n = n->prev)
+#define MOWGLI_ITER_FOREACH_SAFE(n, tn, head) \
+	for (n = (head), tn = n ? n->next : NULL; n != NULL; n = tn, tn = n ? n->next : NULL)
 
 #endif

@@ -24,7 +24,8 @@
 #ifndef __MOWGLI_ERROR_BACKTRACE_H__
 #define __MOWGLI_ERROR_BACKTRACE_H__
 
-typedef struct mowgli_error_context_ {
+typedef struct mowgli_error_context_
+{
 	mowgli_list_t bt;
 } mowgli_error_context_t;
 

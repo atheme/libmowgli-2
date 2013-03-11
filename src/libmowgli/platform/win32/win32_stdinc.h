@@ -26,18 +26,19 @@
 
 #ifdef _WIN32
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <time.h>
+# include <winsock2.h>
+# include <ws2tcpip.h>
+# include <time.h>
 
-#define strcasecmp			_stricmp
-#define strdup				_strdup
-#define usleep(_usecs)		Sleep((_usecs)/1000L)
-#ifdef _MSC_VER
-# define snprintf			_snprintf
-#endif
+# define strcasecmp _stricmp
+# define strdup _strdup
+# define usleep(_usecs) Sleep((_usecs) / 1000L)
+# ifdef _MSC_VER
+#  define snprintf _snprintf
+# endif
 
 extern int setenv(const char *name, const char *value, int overwrite);
+
 extern int pipe(int pipefd[2]);
 extern int socketpair(int domain, int type, int protocol, int pipefd[2]);
 extern int fork(void);
@@ -45,11 +46,11 @@ extern int inet_pton(int af, const char *src, void *dst);
 extern const char *inet_ntop(int af, const void *addr, char *host, size_t hostlen);
 
 /* MSYS autoconf is fucko. */
-#ifndef HAVE_WINSOCK2_H
-#define HAVE_WINSOCK2_H
-#endif
+# ifndef HAVE_WINSOCK2_H
+#  define HAVE_WINSOCK2_H
+# endif
 
-#define HAVE_SELECT
+# define HAVE_SELECT
 
 #endif
 

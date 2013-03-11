@@ -30,10 +30,11 @@
 #endif
 
 #ifndef RTLD_LOCAL
-#define RTLD_LOCAL 0
+# define RTLD_LOCAL 0
 #endif
 
-mowgli_module_t mowgli_module_open(const char *path)
+mowgli_module_t
+mowgli_module_open(const char *path)
 {
 	void *handle = dlopen(path, RTLD_NOW | RTLD_LOCAL);
 
@@ -46,7 +47,8 @@ mowgli_module_t mowgli_module_open(const char *path)
 	return handle;
 }
 
-void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
+void *
+mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 {
 	void *handle;
 
@@ -63,7 +65,8 @@ void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 	return handle;
 }
 
-void mowgli_module_close(mowgli_module_t module)
+void
+mowgli_module_close(mowgli_module_t module)
 {
 	return_if_fail(module != NULL);
 

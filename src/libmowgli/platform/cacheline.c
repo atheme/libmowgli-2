@@ -25,7 +25,9 @@
 
 size_t cacheline_size;
 
-void mowgli_cacheline_bootstrap(void) {
+void
+mowgli_cacheline_bootstrap(void)
+{
 #ifdef MOWGLI_OS_LINUX
 	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif defined(MOWGLI_OS_OSX)
@@ -39,25 +41,27 @@ void mowgli_cacheline_bootstrap(void) {
 	buf = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *)mowgli_alloc(buf_size);
 	GetLogicalProcessorInformation(&buf[0], &buf_size);
 
-	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i) {
-		if (buf[i].Relationship == RelationCache && buf[i].Cache.Level == 1) {
+	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i)
+		if ((buf[i].Relationship == RelationCache) && (buf[i].Cache.Level == 1))
+		{
 			cacheline_size = buf[i].Cache.LineSize;
 			break;
 		}
-	}
 
-  mowgli_free(buf);
+	mowgli_free(buf);
 #else
+
 	// This is often true
-#ifdef MOWGLI_CPU_BITS_32
+# ifdef MOWGLI_CPU_BITS_32
 	cacheline_size = 32;
-#else
+# else
 	cacheline_size = 64;
-#endif
+# endif
 #endif
 }
 
-size_t mowgli_cacheline_size(void) {
+size_t
+mowgli_cacheline_size(void)
+{
 	return cacheline_size;
 }
-

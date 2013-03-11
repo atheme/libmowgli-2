@@ -22,15 +22,17 @@
 
 #ifdef HAVE_SYS_EPOLL_H
 
-#include <sys/epoll.h>
+# include <sys/epoll.h>
 
-typedef struct {
+typedef struct
+{
 	int epoll_fd;
 	int pfd_size;
 	struct epoll_event *pfd;
 } mowgli_epoll_eventloop_private_t;
 
-static void mowgli_epoll_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_epoll_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 
@@ -44,7 +46,8 @@ static void mowgli_epoll_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_epoll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_epoll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 
@@ -59,7 +62,8 @@ static void mowgli_epoll_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_epoll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_epoll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 	struct epoll_event ep_event;
@@ -82,10 +86,12 @@ static void mowgli_epoll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli
 	}
 }
 
-static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 	struct epoll_event ep_event;
+
 	int op = -1;
 	unsigned int old_flags;
 
@@ -95,9 +101,9 @@ static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	priv = eventloop->poller;
 	old_flags = pollable->slot;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	switch (dir)
 	{
@@ -114,9 +120,9 @@ static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 		break;
 	}
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	if (pollable->read_function == NULL)
 		pollable->slot &= ~EPOLLIN;
@@ -124,11 +130,11 @@ static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	if (pollable->write_function == NULL)
 		pollable->slot &= ~EPOLLOUT;
 
-	if (old_flags == 0 && pollable->slot == 0)
+	if ((old_flags == 0) && (pollable->slot == 0))
 		return;
 	else if (pollable->slot <= 0)
 		op = EPOLL_CTL_DEL;
-	else if (old_flags == 0 && pollable->slot != 0)
+	else if ((old_flags == 0) && (pollable->slot != 0))
 		op = EPOLL_CTL_ADD;
 	else if (pollable->slot != old_flags)
 		op = EPOLL_CTL_MOD;
@@ -150,7 +156,8 @@ static void mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	return;
 }
 
-static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 	int i, num, o_errno;
@@ -185,7 +192,8 @@ static void mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	}
 }
 
-mowgli_eventloop_ops_t _mowgli_epoll_pollops = {
+mowgli_eventloop_ops_t _mowgli_epoll_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_epoll_eventloop_pollsetup,

@@ -33,7 +33,8 @@ extern const mowgli_mutex_ops_t _mowgli_null_mutex_ops;
 
 static const mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
 
-static inline const mowgli_mutex_ops_t *get_mutex_platform(void)
+static inline const mowgli_mutex_ops_t *
+get_mutex_platform(void)
 {
 	/* allow for threading policy to set custom mutex ops */
 	if (_mowgli_mutex_ops != NULL)
@@ -50,14 +51,17 @@ static inline const mowgli_mutex_ops_t *get_mutex_platform(void)
 	return &_mowgli_null_mutex_ops;
 }
 
-mowgli_mutex_t *mowgli_mutex_create(void)
+mowgli_mutex_t *
+mowgli_mutex_create(void)
 {
 	mowgli_mutex_t *mutex = mowgli_alloc(sizeof(mowgli_mutex_t));
 
 	return_val_if_fail(mutex != NULL, NULL);
 
 	if (mowgli_mutex_init(mutex))
+	{
 		return mutex;
+	}
 	else
 	{
 		mowgli_free(mutex);
@@ -65,7 +69,8 @@ mowgli_mutex_t *mowgli_mutex_create(void)
 	}
 }
 
-int mowgli_mutex_init(mowgli_mutex_t *mutex)
+int
+mowgli_mutex_init(mowgli_mutex_t *mutex)
 {
 	return_val_if_fail(mutex != NULL, -1);
 
@@ -74,7 +79,8 @@ int mowgli_mutex_init(mowgli_mutex_t *mutex)
 	return mutex->ops->mutex_create(mutex);
 }
 
-int mowgli_mutex_lock(mowgli_mutex_t *mutex)
+int
+mowgli_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return_val_if_fail(mutex != NULL, -1);
 	return_val_if_fail(mutex->ops != NULL, -1);
@@ -82,7 +88,8 @@ int mowgli_mutex_lock(mowgli_mutex_t *mutex)
 	return mutex->ops->mutex_lock(mutex);
 }
 
-int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
+int
+mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return_val_if_fail(mutex != NULL, -1);
 	return_val_if_fail(mutex->ops != NULL, -1);
@@ -90,7 +97,8 @@ int mowgli_mutex_trylock(mowgli_mutex_t *mutex)
 	return mutex->ops->mutex_trylock(mutex);
 }
 
-int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
+int
+mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 {
 	return_val_if_fail(mutex != NULL, -1);
 	return_val_if_fail(mutex->ops != NULL, -1);
@@ -98,7 +106,8 @@ int mowgli_mutex_unlock(mowgli_mutex_t *mutex)
 	return mutex->ops->mutex_unlock(mutex);
 }
 
-int mowgli_mutex_uninit(mowgli_mutex_t *mutex)
+int
+mowgli_mutex_uninit(mowgli_mutex_t *mutex)
 {
 	return_val_if_fail(mutex != NULL, -1);
 	return_val_if_fail(mutex->ops != NULL, -1);
@@ -106,7 +115,8 @@ int mowgli_mutex_uninit(mowgli_mutex_t *mutex)
 	return mutex->ops->mutex_destroy(mutex);
 }
 
-void mowgli_mutex_destroy(mowgli_mutex_t *mutex)
+void
+mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	return_if_fail(mutex != NULL);
 
@@ -114,7 +124,8 @@ void mowgli_mutex_destroy(mowgli_mutex_t *mutex)
 	mowgli_free(mutex);
 }
 
-void mowgli_mutex_set_policy(mowgli_thread_policy_t policy)
+void
+mowgli_mutex_set_policy(mowgli_thread_policy_t policy)
 {
 	switch (policy)
 	{

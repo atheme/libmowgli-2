@@ -31,7 +31,7 @@ typedef struct
 	const char *resolvconf;
 	bool dns_init;
 
-	char domain[MOWGLI_DNS_RES_HOSTLEN];	
+	char domain[MOWGLI_DNS_RES_HOSTLEN];
 } mowgli_dns_evloop_t;
 
 extern int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop);
@@ -40,7 +40,8 @@ extern void mowgli_dns_evloop_destroy(mowgli_dns_t *dns);
 extern void mowgli_dns_evloop_delete_queries(mowgli_dns_t *dns, const mowgli_dns_query_t *);
 extern void mowgli_dns_evloop_gethost_byname(mowgli_dns_t *dns, const char *, mowgli_dns_query_t *, int);
 extern void mowgli_dns_evloop_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *, mowgli_dns_query_t *);
-extern void mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *, size_t);
+
+extern void mowgli_dns_evloop_add_local_domain(mowgli_dns_t * dns, char *, size_t);
 extern int mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respath);
 
 extern const mowgli_dns_ops_t mowgli_dns_evloop_resolver;

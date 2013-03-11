@@ -25,9 +25,9 @@
 #define MOWGLI_DNS_RES_HOSTLEN 512
 
 /* Resolver types */
-#define MOWGLI_DNS_TYPE_CUSTOM	0
-#define MOWGLI_DNS_TYPE_ASYNC	1
-#define MOWGLI_DNS_TYPE_HELPER	2
+#define MOWGLI_DNS_TYPE_CUSTOM 0
+#define MOWGLI_DNS_TYPE_ASYNC 1
+#define MOWGLI_DNS_TYPE_HELPER 2
 
 /* Lookup types */
 #define MOWGLI_DNS_T_A 1
@@ -74,11 +74,11 @@ struct _mowgli_dns_t
 
 struct _mowgli_dns_query_t
 {
-	void *ptr;					/* pointer used by callback to identify request */
-	void (*callback) (mowgli_dns_reply_t * reply, int result, void *vptr);	/* callback to call */
+	void *ptr;	/* pointer used by callback to identify request */
+	void (*callback)(mowgli_dns_reply_t *reply, int result, void *vptr);	/* callback to call */
 };
 
-extern mowgli_dns_t * mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation);
+extern mowgli_dns_t *mowgli_dns_create(mowgli_eventloop_t *eventloop, int implementation);
 extern int mowgli_dns_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop, const mowgli_dns_ops_t *ops);
 extern void mowgli_dns_destroy(mowgli_dns_t *dns);
 extern int mowgli_dns_restart(mowgli_dns_t *dns);
@@ -91,4 +91,3 @@ extern void mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_s
 #include "evloop_reslib.h"
 
 #endif
-

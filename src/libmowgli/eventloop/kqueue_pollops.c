@@ -23,15 +23,17 @@
 
 #ifdef HAVE_KQUEUE
 
-#include <sys/event.h>
+# include <sys/event.h>
 
-typedef struct {
+typedef struct
+{
 	int kqueue_fd;
 	int nevents;
 	struct kevent *events;
 } mowgli_kqueue_eventloop_private_t;
 
-static void mowgli_kqueue_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_kqueue_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 
@@ -45,7 +47,8 @@ static void mowgli_kqueue_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_kqueue_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_kqueue_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 
@@ -60,7 +63,8 @@ static void mowgli_kqueue_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 	struct kevent event;
@@ -71,19 +75,20 @@ static void mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgl
 	priv = eventloop->poller;
 
 	EV_SET(&event, pollable->fd, EVFILT_READ | EVFILT_WRITE, EV_DELETE, 0, 0, pollable);
+
 	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
-			&(const struct timespec){ .tv_sec = 0, .tv_nsec = 0}
-			) != 0)
-	{
+		   &(const struct timespec) {.tv_sec = 0, .tv_nsec = 0 }
+		   ) != 0)
 		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
-	}
 }
 
-static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 	mowgli_eventloop_io_cb_t **fptr;
 	struct kevent event;
+
 	int filter;
 	bool change;
 
@@ -93,9 +98,9 @@ static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 	priv = eventloop->poller;
 	change = false;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	switch (dir)
 	{
@@ -119,21 +124,21 @@ static void mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mow
 	if (!change)
 		return;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	EV_SET(&event, pollable->fd, filter,
-			event_function ? EV_ADD : EV_DELETE, 0, 0, pollable);
+	       event_function ? EV_ADD : EV_DELETE, 0, 0, pollable);
+
 	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
-			&(const struct timespec){ .tv_sec = 0, .tv_nsec = 0}
-			) != 0)
-	{
+		   &(const struct timespec) {.tv_sec = 0, .tv_nsec = 0 }
+		   ) != 0)
 		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
-	}
 }
 
-static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 	int i, num, o_errno;
@@ -143,8 +148,8 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	priv = eventloop->poller;
 
 	num = kevent(priv->kqueue_fd, NULL, 0, priv->events, priv->nevents,
-			delay >= 0 ? &(const struct timespec){ .tv_sec = delay / 1000,
-			.tv_nsec = delay % 1000 * 1000000 } : NULL);
+		     delay >= 0 ? &(const struct timespec) {.tv_sec = delay / 1000,
+							    .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);
@@ -174,7 +179,8 @@ static void mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int de
 	}
 }
 
-mowgli_eventloop_ops_t _mowgli_kqueue_pollops = {
+mowgli_eventloop_ops_t _mowgli_kqueue_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_kqueue_eventloop_pollsetup,
