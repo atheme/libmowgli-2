@@ -107,7 +107,7 @@ mowgli_process_spawn(const char *path, char *const argv[])
 	for (i = 0; argv[i] != NULL; i++)
 		req->argv[i] = argv[i];
 
-	return mowgli_process_clone((mowgli_process_start_fn_t)mowgli_process_cloned_execv, req->argv[0], req);
+	return mowgli_process_clone((mowgli_process_start_fn_t) mowgli_process_cloned_execv, req->argv[0], req);
 }
 
 void

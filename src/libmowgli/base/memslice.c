@@ -110,9 +110,9 @@ memslice_alloc(size_t i)
 	alloc = find_or_create_allocator(adj_size);
 
 	ptr = mowgli_heap_alloc(alloc->heap);
-	((slice_tag_t *)ptr)->owner = alloc;
+	((slice_tag_t *) ptr)->owner = alloc;
 
-	return (char *)ptr + sizeof(slice_tag_t);
+	return (char *) ptr + sizeof(slice_tag_t);
 }
 
 /*
@@ -125,7 +125,7 @@ memslice_free(void *ptr)
 
 	return_if_fail(ptr != NULL);
 
-	tag = (void *)((char *)ptr - sizeof(slice_tag_t));
+	tag = (void *) ((char *) ptr - sizeof(slice_tag_t));
 	mowgli_heap_free(tag->owner->heap, tag);
 }
 

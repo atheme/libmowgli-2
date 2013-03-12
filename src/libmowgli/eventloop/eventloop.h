@@ -70,29 +70,29 @@ typedef void mowgli_eventloop_io_t;
 static inline mowgli_eventloop_pollable_t *
 mowgli_eventloop_io_pollable(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_POLLABLE, NULL);
 
-	return (mowgli_eventloop_pollable_t *)io;
+	return (mowgli_eventloop_pollable_t *) io;
 }
 
 static inline mowgli_eventloop_helper_proc_t *
 mowgli_eventloop_io_helper(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, NULL);
 	return_val_if_fail(obj->type == MOWGLI_EVENTLOOP_TYPE_HELPER, NULL);
 
-	return (mowgli_eventloop_helper_proc_t *)io;
+	return (mowgli_eventloop_helper_proc_t *) io;
 }
 
 static inline mowgli_eventloop_io_type_t
 mowgli_eventloop_io_type(mowgli_eventloop_io_t *io)
 {
-	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *)io;
+	mowgli_eventloop_io_obj_t *obj = (mowgli_eventloop_io_obj_t *) io;
 
 	return_val_if_fail(io != NULL, MOWGLI_EVENTLOOP_TYPE_ERROR);
 
@@ -206,7 +206,7 @@ mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 		winver = mowgli_alloc(sizeof(OSVERSIONINFOEX));
 		winver->dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
 
-		if (!GetVersionEx((OSVERSIONINFO *)winver))
+		if (!GetVersionEx((OSVERSIONINFO *) winver))
 		{
 			mowgli_free(winver);
 			winver = NULL;	/* FIXME */
@@ -234,7 +234,7 @@ mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 		{
 			soft_assert(GetTickCount64 != NULL);
 
-			time_ = (int)(GetTickCount64() * 1e-3);
+			time_ = (int) (GetTickCount64() * 1e-3);
 		}
 	}
 	else
@@ -248,11 +248,11 @@ mowgli_eventloop_synchronize(mowgli_eventloop_t *eventloop)
 	if (timebase.denom == 0)
 		mach_timebase_info(&timebase);
 
-	time_ = (int)(mach_absolute_time() * timebase.numer / timebase.denom * 1e-9);
+	time_ = (int) (mach_absolute_time() * timebase.numer / timebase.denom * 1e-9);
 #else
 	time_ = time(NULL);
 #endif
-	mowgli_eventloop_set_time(eventloop, (time_t)time_);
+	mowgli_eventloop_set_time(eventloop, (time_t) time_);
 }
 
 /* Sets the bias of eventloop->currtime relative to Jan 1 00:00:00 1970 */

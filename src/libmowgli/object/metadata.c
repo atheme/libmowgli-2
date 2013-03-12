@@ -34,7 +34,7 @@ mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *v
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *)n->data;
+		e = (mowgli_object_metadata_entry_t *) n->data;
 
 		if (!strcasecmp(e->name, key))
 			break;
@@ -64,7 +64,7 @@ mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *)n->data;
+		e = (mowgli_object_metadata_entry_t *) n->data;
 
 		if (!strcasecmp(e->name, key))
 		{
@@ -88,7 +88,7 @@ mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 
 	MOWGLI_LIST_FOREACH(n, self->metadata.head)
 	{
-		e = (mowgli_object_metadata_entry_t *)n->data;
+		e = (mowgli_object_metadata_entry_t *) n->data;
 
 		if (!strcasecmp(e->name, key))
 			return e->data;

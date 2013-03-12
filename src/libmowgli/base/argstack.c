@@ -33,7 +33,7 @@ static mowgli_object_class_t klass;
 static void
 mowgli_argstack_destroy(void *vptr)
 {
-	mowgli_argstack_t *self = (mowgli_argstack_t *)vptr;
+	mowgli_argstack_t *self = (mowgli_argstack_t *) vptr;
 	mowgli_node_t *n, *tn;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, self->stack.head)

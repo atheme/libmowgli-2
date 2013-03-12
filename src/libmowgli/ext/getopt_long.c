@@ -40,7 +40,7 @@ int mowgli_optreset = 0;/* reset getopt */
 char *mowgli_optarg = NULL;	/* argument associated with option */
 
 /* XXX: suppress const warnings */
-#define __UNCONST(a) ((void *)(unsigned long)(const void *)(a))
+#define __UNCONST(a) ((void *) (unsigned long) (const void *) (a))
 
 #define IGNORE_FIRST (*options == '-' || *options == '+')
 #define PRINT_ERROR ((mowgli_opterr) && ((*options != ':') \
@@ -52,10 +52,10 @@ char *mowgli_optarg = NULL;	/* argument associated with option */
 #define IN_ORDER (!IS_POSIXLY_CORRECT && *options == '-')
 
 /* return values */
-#define BADCH (int)'?'
+#define BADCH (int) '?'
 #define BADARG ((IGNORE_FIRST && options[1] == ':') \
-		|| (*options == ':') ? (int)':' : (int)'?')
-#define INORDER (int)1
+		|| (*options == ':') ? (int) ':' : (int) '?')
+#define INORDER (int) 1
 
 #define EMSG ""
 
@@ -256,7 +256,7 @@ start:
 		}
 	}
 
-	if (((optchar = (int)*place++) == (int)':') ||
+	if (((optchar = (int) *place++) == (int) ':') ||
 	    ((oli = strchr(options + (IGNORE_FIRST ? 1 : 0), optchar)) == NULL))
 	{
 		/* option letter unknown or ':' */
@@ -449,7 +449,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 				continue;
 
 			if (strlen(long_options[i].name) ==
-			    (unsigned)current_argv_len)
+			    (unsigned) current_argv_len)
 			{
 				/* exact match */
 				match = i;
@@ -467,7 +467,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 		{
 			/* ambiguous abbreviation */
 			if (PRINT_ERROR)
-				warnx(ambig, (int)current_argv_len,
+				warnx(ambig, (int) current_argv_len,
 				      current_argv);
 
 			mowgli_optopt = 0;
@@ -480,7 +480,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 			    && has_equal)
 			{
 				if (PRINT_ERROR)
-					warnx(noarg, (int)current_argv_len,
+					warnx(noarg, (int) current_argv_len,
 					      current_argv);
 
 				/*

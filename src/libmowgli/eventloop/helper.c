@@ -55,8 +55,6 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 		if (req->fd != i)
 			dup2(x, i);
 
-
-
 	if (x > 2)
 		close(x);
 
@@ -99,7 +97,7 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	mowgli_pollable_set_nonblocking(helper->pfd, true);
 
 	/* spawn helper process using mowgli_process_clone() */
-	helper->child = mowgli_process_clone((mowgli_process_start_fn_t)mowgli_helper_trampoline, helpername, &child);
+	helper->child = mowgli_process_clone((mowgli_process_start_fn_t) mowgli_helper_trampoline, helpername, &child);
 
 	if (helper->child == NULL)
 	{

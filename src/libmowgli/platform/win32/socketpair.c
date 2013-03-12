@@ -75,7 +75,7 @@ socketpair(int domain, int type, int protocol, int socks[2])
 	do
 	{
 		if (setsockopt(listener, SOL_SOCKET, SO_REUSEADDR,
-			       (char *)&reuse, (socklen_t)sizeof(reuse)) == -1)
+			       (char *) &reuse, (socklen_t) sizeof(reuse)) == -1)
 			break;
 
 		if (bind(listener, &a.addr, sizeof(a.inaddr)) == SOCKET_ERROR)
@@ -96,7 +96,7 @@ socketpair(int domain, int type, int protocol, int socks[2])
 
 		socks[0] = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, flags);
 
-		if (socks[0] == (int)INVALID_SOCKET)
+		if (socks[0] == (int) INVALID_SOCKET)
 			break;
 
 		if (connect(socks[0], &a.addr, sizeof(a.inaddr)) == SOCKET_ERROR)
@@ -104,7 +104,7 @@ socketpair(int domain, int type, int protocol, int socks[2])
 
 		socks[1] = accept(listener, NULL, NULL);
 
-		if (socks[1] == (int)INVALID_SOCKET)
+		if (socks[1] == (int) INVALID_SOCKET)
 			break;
 
 		closesocket(listener);

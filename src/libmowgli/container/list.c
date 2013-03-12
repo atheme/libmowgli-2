@@ -248,7 +248,7 @@ mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
 	for (iter = 0, tn = l->head; tn != n && tn != NULL; iter++, tn = tn->next)
 		;
 
-	return iter < (ssize_t)MOWGLI_LIST_LENGTH(l) ? iter : -1;
+	return iter < (ssize_t) MOWGLI_LIST_LENGTH(l) ? iter : -1;
 }
 
 /* deletes a link between a node and a list. */

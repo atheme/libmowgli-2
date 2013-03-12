@@ -61,19 +61,19 @@ check_all_retrievable(mowgli_patricia_t *dtree)
 	n2 = mowgli_patricia_size(dtree);
 	MOWGLI_PATRICIA_FOREACH(elem, &state, dtree)
 	{
-		elem2 = mowgli_patricia_retrieve(dtree, (const char *)elem);
+		elem2 = mowgli_patricia_retrieve(dtree, (const char *) elem);
 
 		if (elem2 == NULL)
 		{
 			errors++;
 			printf("failed to find element %s\n",
-			       (const char *)elem);
+			       (const char *) elem);
 		}
 		else if (strcmp(elem2, elem))
 		{
 			printf("element %s != %s\n",
-			       (const char *)elem,
-			       (const char *)elem2);
+			       (const char *) elem,
+			       (const char *) elem2);
 			errors++;
 		}
 		else
@@ -130,7 +130,7 @@ test_patricia(void)
 
 	MOWGLI_PATRICIA_FOREACH(elem, &state, dtree)
 	{
-		printf("element -> %s\n", (const char *)elem);
+		printf("element -> %s\n", (const char *) elem);
 	}
 	printf("End of elements\n");
 	mowgli_patricia_stats(dtree, statscb, NULL);

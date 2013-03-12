@@ -96,7 +96,7 @@ skip_ws(char **pos, mowgli_config_file_t *cf)
 		case ' ':
 		case '\t':
 		case '\r':
-		case '=':		/* XXX */
+		case '=':	/* XXX */
 			break;
 		case '\n':
 			cf->curline++;
@@ -484,14 +484,14 @@ mowgli_config_file_load_internal(mowgli_config_file_t *parent, const char *filen
 		return NULL;
 	}
 
-	buf = (char *)mowgli_alloc(sb.st_size + 1);
+	buf = (char *) mowgli_alloc(sb.st_size + 1);
 
 	if (sb.st_size)
 	{
 		errno = 0;
 		ret = fread(buf, 1, sb.st_size, fp);
 
-		if (ret != (size_t)sb.st_size)
+		if (ret != (size_t) sb.st_size)
 		{
 			mowgli_config_file_error(parent, "Error reading \"%s\": %s\n", filename, strerror(errno ? errno : EFAULT));
 			mowgli_free(buf);

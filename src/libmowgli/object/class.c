@@ -75,7 +75,7 @@ mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_clas
 
 	MOWGLI_LIST_FOREACH(n, klass1->derivitives.head)
 	{
-		mowgli_object_class_t *tklass = (mowgli_object_class_t *)n->data;
+		mowgli_object_class_t *tklass = (mowgli_object_class_t *) n->data;
 
 		if (tklass == klass2)
 			return 1;
@@ -105,7 +105,7 @@ mowgli_object_class_reinterpret_impl( /* mowgli_object_t */ void *opdata, mowgli
 	if (mowgli_object_class_check_cast(object->klass, klass))
 		return object;
 
-	mowgli_log("Invalid reinterpreted cast from %s<%p> to %s", object->klass->name, (void *)object, klass->name);
+	mowgli_log("Invalid reinterpreted cast from %s<%p> to %s", object->klass->name, (void *) object, klass->name);
 	return NULL;
 }
 

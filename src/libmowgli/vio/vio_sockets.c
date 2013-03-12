@@ -60,7 +60,7 @@ mowgli_vio_default_bind(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_BIND;
 
-	if (bind(fd, (struct sockaddr *)&addr->addr, addr->addrlen) != 0)
+	if (bind(fd, (struct sockaddr *) &addr->addr, addr->addrlen) != 0)
 		return mowgli_vio_err_errcode(vio, strerror, errno);
 
 	memcpy(&vio->addr.addr, &addr->addr, sizeof(struct sockaddr_storage));
@@ -107,7 +107,7 @@ mowgli_vio_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((afd = accept(fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((afd = accept(fd, (struct sockaddr *) &newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -151,7 +151,7 @@ mowgli_vio_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
+	if (connect(fd, (struct sockaddr *) &addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -185,7 +185,7 @@ mowgli_vio_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recv(fd, buffer, len, 0)) <= 0)
+	if ((ret = (int) recv(fd, buffer, len, 0)) <= 0)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 
@@ -227,7 +227,7 @@ mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)send(fd, buffer, len, 0)) == -1)
+	if ((ret = (int) send(fd, buffer, len, 0)) == -1)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 		MOWGLI_VIO_UNSETWRITE(vio)
@@ -240,7 +240,7 @@ mowgli_vio_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 	}
 
 	/* Set this for edge-triggered interfaces */
-	if (ret < (int)len)
+	if (ret < (int) len)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
 		MOWGLI_VIO_SETWRITE(vio)
@@ -262,7 +262,7 @@ mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len, mow
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)sendto(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, addr->addrlen)) == -1)
+	if ((ret = (int) sendto(fd, buffer, len, 0, (struct sockaddr *) &addr->addr, addr->addrlen)) == -1)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, false);
 		MOWGLI_VIO_UNSETWRITE(vio)
@@ -274,7 +274,7 @@ mowgli_vio_default_sendto(mowgli_vio_t *vio, const void *buffer, size_t len, mow
 			return 0;
 	}
 
-	if (ret < (int)len)
+	if (ret < (int) len)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDWRITE, true);
 		MOWGLI_VIO_SETWRITE(vio)
@@ -296,7 +296,7 @@ mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int)recvfrom(fd, buffer, len, 0, (struct sockaddr *)&addr->addr, &addr->addrlen)) < 0)
+	if ((ret = (int) recvfrom(fd, buffer, len, 0, (struct sockaddr *) &addr->addr, &addr->addrlen)) < 0)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 
@@ -413,7 +413,7 @@ mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *
 
 	if (proto == AF_INET)
 	{
-		struct sockaddr_in *addr_in = (struct sockaddr_in *)&saddr;
+		struct sockaddr_in *addr_in = (struct sockaddr_in *) &saddr;
 
 		addr_in->sin_family = proto;
 		addr_in->sin_port = htons(port);
@@ -427,7 +427,7 @@ mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *
 	}
 	else if (proto == AF_INET6)
 	{
-		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *)&saddr;
+		struct sockaddr_in6 *addr_in6 = (struct sockaddr_in6 *) &saddr;
 
 		addr_in6->sin6_family = proto;
 		addr_in6->sin6_port = htons(port);
@@ -472,17 +472,17 @@ mowgli_vio_sockaddr_info(const mowgli_vio_sockaddr_t *addr, mowgli_vio_sockdata_
 	return_val_if_fail(addr, -255);
 	return_val_if_fail(data, -255);
 
-	const struct sockaddr *saddr = (const struct sockaddr *)&addr->addr;
+	const struct sockaddr *saddr = (const struct sockaddr *) &addr->addr;
 
 	if (saddr->sa_family == AF_INET)
 	{
-		const struct sockaddr_in *saddr = (const struct sockaddr_in *)&addr->addr;
+		const struct sockaddr_in *saddr = (const struct sockaddr_in *) &addr->addr;
 		data->port = ntohs(saddr->sin_port);
 		sockptr = &saddr->sin_addr;
 	}
 	else if (saddr->sa_family == AF_INET6)
 	{
-		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *)&addr->addr;
+		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *) &addr->addr;
 		data->port = ntohs(saddr->sin6_port);
 		sockptr = &saddr->sin6_addr;
 	}

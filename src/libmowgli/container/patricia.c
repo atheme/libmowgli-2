@@ -138,7 +138,6 @@ first_leaf(union patricia_elem *delem)
 				delem = delem->node.down[val];
 				break;
 			}
-
 	}
 
 	return delem;
@@ -164,7 +163,7 @@ first_leaf(union patricia_elem *delem)
 mowgli_patricia_t *
 mowgli_patricia_create(void (*canonize_cb)(char *key))
 {
-	mowgli_patricia_t *dtree = (mowgli_patricia_t *)mowgli_alloc(sizeof(mowgli_patricia_t));
+	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
 
 	dtree->canonize_cb = canonize_cb;
 
@@ -201,7 +200,7 @@ mowgli_patricia_create(void (*canonize_cb)(char *key))
 mowgli_patricia_t *
 mowgli_patricia_create_named(const char *name, void (*canonize_cb)(char *key))
 {
-	mowgli_patricia_t *dtree = (mowgli_patricia_t *)mowgli_alloc(sizeof(mowgli_patricia_t));
+	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
 
 	dtree->canonize_cb = canonize_cb;
 	dtree->id = mowgli_strdup(name);
@@ -514,7 +513,7 @@ mowgli_patricia_foreach_cur(mowgli_patricia_t *dtree, mowgli_patricia_iteration_
 	return_val_if_fail(state != NULL, NULL);
 
 	return STATE_CUR(state) != NULL ?
-	       ((struct patricia_leaf *)STATE_CUR(state))->data : NULL;
+	       ((struct patricia_leaf *) STATE_CUR(state))->data : NULL;
 }
 
 /*
@@ -549,7 +548,7 @@ mowgli_patricia_foreach_next(mowgli_patricia_t *dtree, mowgli_patricia_iteration
 
 	if (STATE_CUR(state) == NULL)
 	{
-		mowgli_log("mowgli_patricia_foreach_next(): called again after iteration finished on dtree<%p>", (void *)dtree);
+		mowgli_log("mowgli_patricia_foreach_next(): called again after iteration finished on dtree<%p>", (void *) dtree);
 		return;
 	}
 
@@ -577,7 +576,7 @@ mowgli_patricia_foreach_next(mowgli_patricia_t *dtree, mowgli_patricia_iteration
 				{
 					if (strcmp(next->leaf.key, leaf->key) < 0)
 					{
-						mowgli_log("mowgli_patricia_foreach_next(): iteration went backwards (libmowgli bug) on dtree<%p>", (void *)dtree);
+						mowgli_log("mowgli_patricia_foreach_next(): iteration went backwards (libmowgli bug) on dtree<%p>", (void *) dtree);
 						STATE_NEXT(state) = NULL;
 						return;
 					}
@@ -646,7 +645,7 @@ mowgli_patricia_elem_find(mowgli_patricia_t *dict, const char *key)
 	}
 	else
 	{
-		if (keylen >= (int)sizeof(ckey_store))
+		if (keylen >= (int) sizeof(ckey_store))
 		{
 			ckey_buf = mowgli_strdup(key);
 			dict->canonize_cb(ckey_buf);
@@ -902,7 +901,7 @@ mowgli_patricia_elem_delete(mowgli_patricia_t *dict, struct patricia_leaf *leaf)
 	return_if_fail(dict != NULL);
 	return_if_fail(leaf != NULL);
 
-	delem = (union patricia_elem *)leaf;
+	delem = (union patricia_elem *) leaf;
 
 	val = delem->leaf.parent_val;
 	prev = delem->leaf.parent;
@@ -1114,7 +1113,7 @@ mowgli_patricia_stats(mowgli_patricia_t *dict, void (*cb)(const char *line, void
 			 dict->id, dict->count);
 	else
 		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
-			 (void *)dict, dict->count);
+			 (void *) dict, dict->count);
 
 	cb(str, privdata);
 	maxdepth = 0;

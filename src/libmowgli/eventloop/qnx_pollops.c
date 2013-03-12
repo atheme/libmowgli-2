@@ -173,7 +173,7 @@ mowgli_qnx_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	priv = eventloop->poller;
 
 	/* set timeout if needed */
-	dispatch_timeout(priv->dpp, delay >= 0 ? &(struct timespec) {.tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
+	dispatch_timeout(priv->dpp, delay >= 0 ? &(struct timespec) { .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	if (priv->ctp != NULL)
 		priv->ctp = dispatch_context_alloc(priv->dpp);

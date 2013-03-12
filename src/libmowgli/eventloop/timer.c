@@ -145,10 +145,11 @@ mowgli_eventloop_next_timer(mowgli_eventloop_t *eventloop)
 		}
 
 #ifdef DEBUG
-	mowgli_log("eventloop deadline:%ld", eventloop->deadline);
+		mowgli_log("eventloop deadline:%ld", eventloop->deadline);
+
 #endif
 
-	return eventloop->deadline;
+		return eventloop->deadline;
 }
 
 /* finds an event in the table */

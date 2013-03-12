@@ -42,7 +42,7 @@ mowgli_dns_get_windows_nameservers(char *ret_buf, size_t ret_size)
 	if (!(handle = LoadLibrary("iphlpapi.dll")))
 		return 0;
 
-	if (!(get_network_params = (get_net_param_func)GetProcAddress(handle, "GetNetworkParams")))
+	if (!(get_network_params = (get_net_param_func) GetProcAddress(handle, "GetNetworkParams")))
 		goto quit;
 
 	res = (*get_network_params)(&tfixedinfo, &size);

@@ -81,7 +81,7 @@ mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 	/* try to find a signal to compile the argument stack from, we start with self::klass first. */
 	MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)
 	{
-		mowgli_object_message_handler_t *sig2 = (mowgli_object_message_handler_t *)n->data;
+		mowgli_object_message_handler_t *sig2 = (mowgli_object_message_handler_t *) n->data;
 
 		if (!strcasecmp(sig2->name, name))
 		{
@@ -93,7 +93,7 @@ mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 	if (sig == NULL)
 		MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)
 		{
-			mowgli_object_message_handler_t *sig2 = (mowgli_object_message_handler_t *)n->data;
+			mowgli_object_message_handler_t *sig2 = (mowgli_object_message_handler_t *) n->data;
 
 			if (!strcasecmp(sig2->name, name))
 			{
@@ -102,9 +102,9 @@ mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 			}
 		}
 
-	/* return if no signals found, else compile the argstack */
-	if (sig == NULL)
-		return;
+		/* return if no signals found, else compile the argstack */
+		if (sig == NULL)
+			return;
 
 	va_start(va, name);
 	stack = mowgli_argstack_create_from_va_list(sig->descstr, va);
@@ -112,7 +112,7 @@ mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 
 	MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)
 	{
-		sig = (mowgli_object_message_handler_t *)n->data;
+		sig = (mowgli_object_message_handler_t *) n->data;
 
 		if (!strcasecmp(sig->name, name) && (sig->handler != NULL))
 			sig->handler(self, sig, stack);
@@ -120,7 +120,7 @@ mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 
 	MOWGLI_LIST_FOREACH(n, self->message_handlers.head)
 	{
-		sig = (mowgli_object_message_handler_t *)n->data;
+		sig = (mowgli_object_message_handler_t *) n->data;
 
 		if (!strcasecmp(sig->name, name) && (sig->handler != NULL))
 			sig->handler(self, sig, stack);

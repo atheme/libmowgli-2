@@ -40,10 +40,10 @@
 
 /* RFC 1104/1105 wasn't very helpful about what these fields should be named, so for now, we'll
    just name them this way. we probably should look at what named calls them or something. */
-#define MOWGLI_DNS_TYPE_SIZE (size_t)2
-#define MOWGLI_DNS_CLASS_SIZE (size_t)2
-#define MOWGLI_DNS_TTL_SIZE (size_t)4
-#define MOWGLI_DNS_RDLENGTH_SIZE (size_t)2
+#define MOWGLI_DNS_TYPE_SIZE (size_t) 2
+#define MOWGLI_DNS_CLASS_SIZE (size_t) 2
+#define MOWGLI_DNS_TTL_SIZE (size_t) 4
+#define MOWGLI_DNS_RDLENGTH_SIZE (size_t) 2
 #define MOWGLI_DNS_ANSWER_FIXED_SIZE (MOWGLI_DNS_TYPE_SIZE + MOWGLI_DNS_CLASS_SIZE + MOWGLI_DNS_TTL_SIZE + MOWGLI_DNS_RDLENGTH_SIZE)
 
 #define MOWGLI_DNS_MAXLINE 128
@@ -372,8 +372,8 @@ res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp)
 		{
 		case AF_INET6:
 		{
-			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)srv;
-			const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *)inp;
+			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) srv;
+			const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *) inp;
 
 			if ((srv->ss_family == inp->ss_family) && (v6->sin6_port == v6in->sin6_port))
 				if ((memcmp(&v6->sin6_addr.s6_addr, &v6in->sin6_addr.s6_addr,
@@ -389,8 +389,8 @@ res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp)
 		}
 		case AF_INET:
 		{
-			const struct sockaddr_in *v4 = (const struct sockaddr_in *)srv;
-			const struct sockaddr_in *v4in = (const struct sockaddr_in *)inp;
+			const struct sockaddr_in *v4 = (const struct sockaddr_in *) srv;
+			const struct sockaddr_in *v4in = (const struct sockaddr_in *) inp;
 
 			if ((srv->ss_family == inp->ss_family) && (v4->sin_port == v4in->sin_port))
 				if ((v4->sin_addr.s_addr == INADDR_ANY)
@@ -492,7 +492,6 @@ mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *hname, size_t size)
 				strcpy(hname + len, state->domain);
 			}
 		}
-
 }
 
 /*
@@ -548,7 +547,6 @@ mowgli_dns_evloop_delete_queries(mowgli_dns_t *dns, const mowgli_dns_query_t *qu
 		if ((request = ptr->data) != NULL)
 			if (query == request->query)
 				rem_request(dns, request);
-
 	}
 }
 
@@ -691,28 +689,28 @@ do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t *query, const struct socka
 	{
 		request = make_request(dns, query);
 		memcpy(&request->addr, addr, size);
-		request->name = (char *)mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
+		request->name = (char *) mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
 	}
 
 	if (addr->ss_family == AF_INET)
 	{
-		const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
-		cp = (const unsigned char *)&v4->sin_addr.s_addr;
+		const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr;
+		cp = (const unsigned char *) &v4->sin_addr.s_addr;
 
-		sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int)(cp[3]),
-			(unsigned int)(cp[2]), (unsigned int)(cp[1]), (unsigned int)(cp[0]));
+		sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int) (cp[3]),
+			(unsigned int) (cp[2]), (unsigned int) (cp[1]), (unsigned int) (cp[0]));
 	}
 	else if (addr->ss_family == AF_INET6)
 	{
 		int i;
 		char *rqptr = request->queryname;
-		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
-		cp = (const unsigned char *)&v6->sin6_addr.s6_addr;
+		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr;
+		cp = (const unsigned char *) &v6->sin6_addr.s6_addr;
 
 		for (i = 15; i >= 0; i--, rqptr += 4)
 			sprintf(rqptr, "%1x.%1x.",
-				(unsigned int)(cp[i] & 0xf),
-				(unsigned int)(cp[i] >> 4));
+				(unsigned int) (cp[i] & 0xf),
+				(unsigned int) (cp[i] >> 4));
 
 		strcpy(rqptr, ".ip6.arpa");
 	}
@@ -740,10 +738,10 @@ query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 	memset(buf, 0, sizeof(buf));
 
 	if ((request_len =
-		     mowgli_dns_res_mkquery(request->queryname, MOWGLI_DNS_C_IN, request->type, (unsigned char *)buf,
+		     mowgli_dns_res_mkquery(request->queryname, MOWGLI_DNS_C_IN, request->type, (unsigned char *) buf,
 					    sizeof(buf))) > 0)
 	{
-		mowgli_dns_resheader_t *header = (mowgli_dns_resheader_t *)buf;
+		mowgli_dns_resheader_t *header = (mowgli_dns_resheader_t *) buf;
 
 		/*
 		 * generate an unique id
@@ -795,12 +793,12 @@ check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, ch
 	unsigned char *current;	/* current position in buf */
 	int n;	/* temp count */
 
-	current = (unsigned char *)buf + sizeof(mowgli_dns_resheader_t);
+	current = (unsigned char *) buf + sizeof(mowgli_dns_resheader_t);
 
 	if (header->qdcount != 1)
 		return 0;
 
-	n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf, sizeof(hostbuf));
+	n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf, sizeof(hostbuf));
 
 	if (n <= 0)
 		return 0;
@@ -824,22 +822,22 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 	int n;	/* temp count */
 	int rd_length;
 
-	current = (unsigned char *)buf + sizeof(mowgli_dns_resheader_t);
+	current = (unsigned char *) buf + sizeof(mowgli_dns_resheader_t);
 
 	for (; header->qdcount > 0; --header->qdcount)
 	{
-		if ((n = mowgli_dns_dn_skipname(current, (unsigned char *)eob)) < 0)
+		if ((n = mowgli_dns_dn_skipname(current, (unsigned char *) eob)) < 0)
 			return 0;
 
-		current += (size_t)n + MOWGLI_DNS_QFIXEDSIZE;
+		current += (size_t) n + MOWGLI_DNS_QFIXEDSIZE;
 	}
 
 	/* process each answer sent to us. */
-	while (header->ancount > 0 && (char *)current < eob)
+	while (header->ancount > 0 && (char *) current < eob)
 	{
 		header->ancount--;
 
-		n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf,
+		n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf,
 					 sizeof(hostbuf));
 
 		/* Broken message (< 0) or no more answers left (== 0) */
@@ -850,9 +848,9 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 
 		/* With Address arithmetic you have to be very anal -- this code was not working on alpha due
 		 * to that (spotted by rodder/jailbird/dianora) */
-		current += (size_t)n;
+		current += (size_t) n;
 
-		if (!(((char *)current + MOWGLI_DNS_ANSWER_FIXED_SIZE) < eob))
+		if (!(((char *) current + MOWGLI_DNS_ANSWER_FIXED_SIZE) < eob))
 			break;
 
 		type = mowgli_dns_ns_get16(current);
@@ -862,7 +860,7 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 		current += MOWGLI_DNS_CLASS_SIZE;
 
 		/* We may use this later at some point so... eliminate bogus GCC warning */
-		(void)query_class;
+		(void) query_class;
 
 		request->ttl = mowgli_dns_ns_get32(current);
 		current += MOWGLI_DNS_TTL_SIZE;
@@ -884,7 +882,7 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 			if (rd_length != sizeof(struct in_addr))
 				return 0;
 
-			v4 = (struct sockaddr_in *)&request->addr;
+			v4 = (struct sockaddr_in *) &request->addr;
 			v4->sin_family = AF_INET;
 			memcpy(&v4->sin_addr, current, sizeof(struct in_addr));
 
@@ -900,7 +898,7 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 			if (rd_length != sizeof(struct in6_addr))
 				return 0;
 
-			v6 = (struct sockaddr_in6 *)&request->addr;
+			v6 = (struct sockaddr_in6 *) &request->addr;
 			v6->sin6_family = AF_INET6;
 			memcpy(&v6->sin6_addr, current, sizeof(struct in6_addr));
 
@@ -911,7 +909,7 @@ proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char 
 			if (request->type != MOWGLI_DNS_T_PTR)
 				return 0;
 
-			n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current,
+			n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current,
 						 hostbuf, sizeof(hostbuf));
 
 			/* Broken message or no more answers left */
@@ -969,13 +967,13 @@ res_read_single_reply(mowgli_dns_t *dns)
 		return 0;
 
 	/* Too small */
-	if (rc <= (int)(sizeof(mowgli_dns_resheader_t)))
+	if (rc <= (int) (sizeof(mowgli_dns_resheader_t)))
 		return 1;
 
 	/*
 	 * convert DNS reply reader from Network byte order to CPU byte order.
 	 */
-	header = (mowgli_dns_resheader_t *)buf;
+	header = (mowgli_dns_resheader_t *) buf;
 	header->ancount = ntohs(header->ancount);
 	header->qdcount = ntohs(header->qdcount);
 	header->nscount = ntohs(header->nscount);
@@ -1067,7 +1065,7 @@ make_dnsreply(mowgli_dns_reslist_t *request)
 
 	return_val_if_fail(request != 0, NULL);
 
-	cp = (mowgli_dns_reply_t *)mowgli_alloc(sizeof(mowgli_dns_reply_t));
+	cp = (mowgli_dns_reply_t *) mowgli_alloc(sizeof(mowgli_dns_reply_t));
 
 	cp->h_name = request->name;
 	memcpy(&cp->addr, &request->addr, sizeof(cp->addr));

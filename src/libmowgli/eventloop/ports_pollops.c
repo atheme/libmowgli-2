@@ -73,7 +73,7 @@ mowgli_ports_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_p
 	priv = eventloop->poller;
 	pollable->slot = 0;
 
-	if (port_dissociate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t)pollable->fd) < 0)
+	if (port_dissociate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t) pollable->fd) < 0)
 	{
 		if (mowgli_eventloop_ignore_errno(errno))
 			return;
@@ -129,11 +129,11 @@ mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop
 	}
 	else if (pollable->slot == 0)
 	{
-		port_dissociate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t)pollable->fd);
+		port_dissociate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t) pollable->fd);
 		return;
 	}
 
-	if (port_associate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t)pollable->fd, pollable->slot, pollable) < 0)
+	if (port_associate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t) pollable->fd, pollable->slot, pollable) < 0)
 	{
 		if (mowgli_eventloop_ignore_errno(errno))
 			return;
@@ -155,7 +155,7 @@ mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	priv = eventloop->poller;
 
 	num = port_getn(priv->port_fd, priv->pfd, priv->pfd_size, &nget,
-			delay >= 0 ? &(struct timespec) {.tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
+			delay >= 0 ? &(struct timespec) { .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);

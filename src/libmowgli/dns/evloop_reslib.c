@@ -123,7 +123,7 @@ static int mowgli_dns_mklower(int ch);
 int
 mowgli_dns_dn_expand(const unsigned char *rmsg, const unsigned char *eom, const unsigned char *src, char *dst, int dstsiz)
 {
-	int n = mowgli_dns_ns_name_uncompress(rmsg, eom, src, dst, (size_t)dstsiz);
+	int n = mowgli_dns_ns_name_uncompress(rmsg, eom, src, dst, (size_t) dstsiz);
 
 	if ((n > 0) && (dst[0] == '.'))
 		dst[0] = '\0';
@@ -148,7 +148,7 @@ mowgli_dns_ns_name_uncompress(const unsigned char *rmsg, const unsigned char *eo
 	if ((n = mowgli_dns_ns_name_unpack(rmsg, eom, src, tmp, sizeof tmp)) == -1)
 		return -1;
 
-	if (mowgli_dns_ns_name_ntop((char *)tmp, dst, dstsiz) == -1)
+	if (mowgli_dns_ns_name_ntop((char *) tmp, dst, dstsiz) == -1)
 		return -1;
 
 	return n;
@@ -298,7 +298,7 @@ mowgli_dns_ns_name_ntop(const char *src, char *dst, size_t dstsiz)
 			*dn++ = '.';
 		}
 
-		if ((l = labellen((const unsigned char *)(cp - 1))) < 0)
+		if ((l = labellen((const unsigned char *) (cp - 1))) < 0)
 		{
 			errno = EMSGSIZE;	/* XXX */
 			return -1;
@@ -331,7 +331,7 @@ mowgli_dns_ns_name_ntop(const char *src, char *dst, size_t dstsiz)
 			continue;
 		}
 
-		for ((void)NULL; l > 0; l--)
+		for ((void) NULL; l > 0; l--)
 		{
 			c = *cp++;
 
@@ -344,7 +344,7 @@ mowgli_dns_ns_name_ntop(const char *src, char *dst, size_t dstsiz)
 				}
 
 				*dn++ = '\\';
-				*dn++ = (char)c;
+				*dn++ = (char) c;
 			}
 			else if (!mowgli_dns_is_printable(c))
 			{
@@ -367,7 +367,7 @@ mowgli_dns_ns_name_ntop(const char *src, char *dst, size_t dstsiz)
 					return -1;
 				}
 
-				*dn++ = (char)c;
+				*dn++ = (char) c;
 			}
 		}
 	}
@@ -401,7 +401,7 @@ mowgli_dns_ns_name_ntop(const char *src, char *dst, size_t dstsiz)
 static int
 mowgli_dns_dn_comp(const char *src, unsigned char *dst, int dstsiz, unsigned char **dnptrs, unsigned char **lastdnptr)
 {
-	return mowgli_dns_ns_name_compress(src, dst, (size_t)dstsiz, dnptrs, lastdnptr);
+	return mowgli_dns_ns_name_compress(src, dst, (size_t) dstsiz, dnptrs, lastdnptr);
 }
 
 /*
@@ -643,7 +643,7 @@ mowgli_dns_ns_name_pton(const char *src, unsigned char *dst, size_t dstsiz)
 					return -1;
 				}
 
-				if ((e = mowgli_dns_encode_bitsring(&src, cp + 2, &label, &bp, (const char *)eom)) != 0)
+				if ((e = mowgli_dns_encode_bitsring(&src, cp + 2, &label, &bp, (const char *) eom)) != 0)
 				{
 					errno = e;
 					return -1;
@@ -757,7 +757,7 @@ mowgli_dns_ns_name_pton(const char *src, unsigned char *dst, size_t dstsiz)
 			return -1;
 		}
 
-		*bp++ = (unsigned char)c;
+		*bp++ = (unsigned char) c;
 	}
 
 	c = (bp - label - 1);
@@ -834,7 +834,7 @@ mowgli_dns_ns_name_pack(const unsigned char *src, unsigned char *dst, int dstsiz
 		if ((rmsg = *dnptrs++) != NULL)
 		{
 			for (cpp = dnptrs; *cpp != NULL; cpp++)
-				(void)NULL;
+				(void) NULL;
 
 			lpp = cpp;	/* end of list to search */
 		}
@@ -886,8 +886,8 @@ mowgli_dns_ns_name_pack(const unsigned char *src, unsigned char *dst, int dstsiz
 
 		if ((n != 0) && (rmsg != NULL))
 		{
-			l = mowgli_dns_dn_find(srcp, rmsg, (const unsigned char *const *)dnptrs,
-					       (const unsigned char *const *)lpp);
+			l = mowgli_dns_dn_find(srcp, rmsg, (const unsigned char *const *) dnptrs,
+					       (const unsigned char *const *) lpp);
 
 			if (l >= 0)
 			{
@@ -971,7 +971,7 @@ mowgli_dns_encode_bitsring(const char **bp, const char *end, unsigned char **lab
 	if (!isxdigit((*cp) & 0xff))	/* reject '\[x/BLEN]' */
 		return EINVAL;
 
-	for (tp = (char *)(dst + 1); cp < end && tp < eom; cp++)
+	for (tp = (char *) (dst + 1); cp < end && tp < eom; cp++)
 	{
 		switch ((c = *cp))
 		{
@@ -982,7 +982,7 @@ mowgli_dns_encode_bitsring(const char **bp, const char *end, unsigned char **lab
 				if (beg_blen == NULL)
 					return EINVAL;
 
-				blen = (int)strtol(beg_blen, &end_blen, 10);
+				blen = (int) strtol(beg_blen, &end_blen, 10);
 
 				if (*end_blen != ']')
 					return EINVAL;
@@ -1018,7 +1018,7 @@ mowgli_dns_encode_bitsring(const char **bp, const char *end, unsigned char **lab
 					return EINVAL;
 
 				value <<= 4;
-				value += digitvalue[(int)c];
+				value += digitvalue[(int) c];
 				count += 4;
 				tbcount += 4;
 
@@ -1074,7 +1074,7 @@ done:
 	**dst = blen;
 
 	*bp = cp;
-	*dst = (unsigned char *)tp;
+	*dst = (unsigned char *) tp;
 
 	return 0;
 }
@@ -1175,9 +1175,9 @@ mowgli_dns_mklower(int ch)
  */
 int
 mowgli_dns_res_mkquery(const char *dname,	/* domain name */
-		       int query_class, int type,			/* class and type of query */
-		       unsigned char *buf,			/* buffer to put query */
-		       int buflen)			/* size of buffer */
+		       int query_class, int type,	/* class and type of query */
+		       unsigned char *buf,	/* buffer to put query */
+		       int buflen)	/* size of buffer */
 {
 	mowgli_dns_resheader_t *hp;
 	unsigned char *cp;
@@ -1191,7 +1191,7 @@ mowgli_dns_res_mkquery(const char *dname,	/* domain name */
 		return -1;
 
 	memset(buf, 0, MOWGLI_DNS_HFIXEDSIZE);
-	hp = (mowgli_dns_resheader_t *)buf;
+	hp = (mowgli_dns_resheader_t *) buf;
 
 	hp->id = 0;
 	hp->opcode = MOWGLI_DNS_QUERY;

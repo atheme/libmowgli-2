@@ -120,7 +120,7 @@ mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mo
 	/* Check for previous attachment */
 	if (vio->eventloop)
 	{
-		mowgli_log("VIO object [%p] is already attached to eventloop [%p]; attempted to attach new eventloop [%p]", (void *)vio, (void *)vio->eventloop, (void *)eventloop);
+		mowgli_log("VIO object [%p] is already attached to eventloop [%p]; attempted to attach new eventloop [%p]", (void *) vio, (void *) vio->eventloop, (void *) eventloop);
 		return;
 	}
 
@@ -139,7 +139,7 @@ mowgli_vio_eventloop_attach(mowgli_vio_t *vio, mowgli_eventloop_t *eventloop, mo
 	}
 	else
 	{
-		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", (void *)vio);
+		mowgli_log("Unable to create pollable with VIO object [%p], expect problems.", (void *) vio);
 		vio->io.fd = fd;/* May have been clobbered */
 	}
 }

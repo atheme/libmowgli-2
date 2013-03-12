@@ -32,15 +32,15 @@ inet_pton(int af, const char *src, void *dst)
 
 	mowgli_strlcpy(src_copy, src, sizeof src_copy);
 
-	if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *)&ss, &size) != SOCKET_ERROR)
+	if (WSAStringToAddress(src_copy, af, NULL, (struct sockaddr *) &ss, &size) != SOCKET_ERROR)
 		switch (af)
 		{
 		case AF_INET:
-			*(struct in_addr *)dst = ((struct sockaddr_in *)&ss)->sin_addr;
+			*(struct in_addr *) dst = ((struct sockaddr_in *) &ss)->sin_addr;
 			return 1;
 
 		case AF_INET6:
-			*(struct in6_addr *)dst = ((struct sockaddr_in6 *)&ss)->sin6_addr;
+			*(struct in6_addr *) dst = ((struct sockaddr_in6 *) &ss)->sin6_addr;
 			return 1;
 
 		default:
@@ -62,18 +62,18 @@ inet_ntop(int af, const void *addr, char *host, size_t hostlen)
 	switch (af)
 	{
 	case AF_INET:
-		memcpy(&(((struct sockaddr_in *)&ss)->sin_addr), (struct in_addr *)addr, sizeof(struct in_addr));
+		memcpy(&(((struct sockaddr_in *) &ss)->sin_addr), (struct in_addr *) addr, sizeof(struct in_addr));
 		break;
 
 	case AF_INET6:
-		memcpy(&(((struct sockaddr_in6 *)&ss)->sin6_addr), (struct in6_addr *)addr, sizeof(struct in6_addr));
+		memcpy(&(((struct sockaddr_in6 *) &ss)->sin6_addr), (struct in6_addr *) addr, sizeof(struct in6_addr));
 		break;
 
 	default:
 		return NULL;
 	}
 
-	if (WSAAddressToString((struct sockaddr *)&ss, size, 0, host, (LPDWORD)&hostlen) != SOCKET_ERROR)
+	if (WSAAddressToString((struct sockaddr *) &ss, size, 0, host, (LPDWORD) &hostlen) != SOCKET_ERROR)
 		return host;
 
 	return NULL;

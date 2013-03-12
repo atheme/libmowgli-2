@@ -160,7 +160,7 @@ mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *e
 static void
 mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
-	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *)userdata;
+	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *) userdata;
 	mowgli_linebuf_buf_t *buffer = &(linebuf->readbuf);
 	void *bufpos;
 	size_t offset;
@@ -202,7 +202,7 @@ mowgli_linebuf_read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *i
 static void
 mowgli_linebuf_write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
-	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *)userdata;
+	mowgli_linebuf_t *linebuf = (mowgli_linebuf_t *) userdata;
 	mowgli_linebuf_buf_t *buffer = &(linebuf->writebuf);
 	int ret;
 
@@ -266,8 +266,8 @@ mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len)
 		return;
 	}
 
-	memcpy((void *)ptr, data, len);
-	memcpy((void *)(ptr + len), linebuf->endl, linebuf->endl_len);
+	memcpy((void *) ptr, data, len);
+	memcpy((void *) (ptr + len), linebuf->endl, linebuf->endl_len);
 
 	linebuf->writebuf.buflen += len + linebuf->endl_len;
 

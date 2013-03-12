@@ -53,7 +53,7 @@ struct mowgli_dictionary_
 mowgli_dictionary_t *
 mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *)mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	dtree->compare_cb = compare_cb;
 
@@ -83,7 +83,7 @@ mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 mowgli_dictionary_t *
 mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *)mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	dtree->compare_cb = compare_cb;
 	dtree->id = strdup(name);
@@ -548,7 +548,7 @@ mowgli_dictionary_foreach(mowgli_dictionary_t *dtree, int (*foreach_cb)(mowgli_d
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, dtree->head)
 	{
 		/* delem_t is a subclass of node_t. */
-		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *)n;
+		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *) n;
 
 		if (foreach_cb != NULL)
 			(*foreach_cb)(delem, privdata);
@@ -585,7 +585,7 @@ mowgli_dictionary_search(mowgli_dictionary_t *dtree, void *(*foreach_cb)(mowgli_
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, dtree->head)
 	{
 		/* delem_t is a subclass of node_t. */
-		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *)n;
+		mowgli_dictionary_elem_t *delem = (mowgli_dictionary_elem_t *) n;
 
 		if (foreach_cb != NULL)
 			ret = (*foreach_cb)(delem, privdata);
@@ -684,7 +684,7 @@ mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree, mowgli_dictionary_ite
 
 	if (state->cur == NULL)
 	{
-		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", (void *)dtree);
+		mowgli_log("mowgli_dictionary_foreach_next(): called again after iteration finished on dtree<%p>", (void *) dtree);
 		return;
 	}
 
@@ -760,7 +760,7 @@ mowgli_dictionary_add(mowgli_dictionary_t *dict, const void *key, void *data)
 
 	if (delem->key == NULL)
 	{
-		mowgli_log("major WTF: delem->key<%p> is NULL, not adding node.", (void *)key);
+		mowgli_log("major WTF: delem->key<%p> is NULL, not adding node.", (void *) key);
 		mowgli_heap_free(elem_heap, delem);
 		return NULL;
 	}
@@ -904,7 +904,7 @@ mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, 
 			 dict->id, dict->count);
 	else
 		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
-			 (void *)dict, dict->count);
+			 (void *) dict, dict->count);
 
 	cb(str, privdata);
 	maxdepth = 0;

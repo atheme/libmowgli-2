@@ -189,7 +189,7 @@ mowgli_index_compare_with_data(const void *a, const void *b, void *_index)
 {
 	mowgli_index_t *index = _index;
 
-	return index->compare(*(const void **)a, *(const void **)b,
+	return index->compare(*(const void **) a, *(const void **) b,
 			      index->compare_data);
 }
 

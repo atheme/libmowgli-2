@@ -52,10 +52,10 @@ setup_listener(void)
 	in.sin_family = AF_INET;
 	in.sin_port = htons(1337);
 
-	if (bind(fd, (struct sockaddr *)&in, sizeof(struct sockaddr_in)) < 0)
+	if (bind(fd, (struct sockaddr *) &in, sizeof(struct sockaddr_in)) < 0)
 	{
 		in.sin_port = htons(31337);
-		bind(fd, (struct sockaddr *)&in, sizeof(struct sockaddr_in));
+		bind(fd, (struct sockaddr *) &in, sizeof(struct sockaddr_in));
 	}
 
 	listen(fd, 5);

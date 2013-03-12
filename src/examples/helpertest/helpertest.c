@@ -49,8 +49,8 @@ helper_start(mowgli_eventloop_helper_proc_t *helper, void *userdata)
 
 	mowgli_writef(helper->fd, "hi from pid %d\n", getpid());
 
-	mowgli_timer_add(eventloop, "timer_tick", (mowgli_event_dispatch_func_t *)timer_tick, helper, 1);
-	mowgli_timer_add_once(eventloop, "timer_oneshot", (mowgli_event_dispatch_func_t *)timer_oneshot, helper, 5);
+	mowgli_timer_add(eventloop, "timer_tick", (mowgli_event_dispatch_func_t *) timer_tick, helper, 1);
+	mowgli_timer_add_once(eventloop, "timer_oneshot", (mowgli_event_dispatch_func_t *) timer_oneshot, helper, 5);
 
 	mowgli_eventloop_run(eventloop);
 

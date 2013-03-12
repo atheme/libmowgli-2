@@ -36,7 +36,7 @@ mowgli_module_open(const char *path)
 	 */
 	return_val_if_fail(handle != NULL, NULL);
 
-	return (mowgli_module_t)handle;
+	return (mowgli_module_t) handle;
 }
 
 void *
@@ -46,7 +46,7 @@ mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 
 	return_val_if_fail(module != NULL, NULL);
 
-	handle = GetProcAddress((HANDLE)module, symbol);
+	handle = GetProcAddress((HANDLE) module, symbol);
 
 	/* make sure we have something. make this an assertion so that
 	 * there is feedback if something happens. (poor programming practice).
@@ -61,5 +61,5 @@ mowgli_module_close(mowgli_module_t module)
 {
 	return_if_fail(module != NULL);
 
-	FreeLibrary((HANDLE)module);
+	FreeLibrary((HANDLE) module);
 }

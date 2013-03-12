@@ -218,7 +218,7 @@ destroy_extra_array(mowgli_json_t *n)
 
 	MOWGLI_LIST_FOREACH_SAFE(cur, next, n->v.v_array->head)
 	{
-		mowgli_json_decref((mowgli_json_t *)cur->data);
+		mowgli_json_decref((mowgli_json_t *) cur->data);
 		mowgli_node_delete(cur, n->v.v_array);
 	}
 
@@ -237,7 +237,7 @@ mowgli_json_create_object(void)
 static void
 destroy_extra_object_cb(const char *key, void *data, void *privdata)
 {
-	mowgli_json_decref((mowgli_json_t *)data);
+	mowgli_json_decref((mowgli_json_t *) data);
 }
 
 static void
@@ -1144,7 +1144,7 @@ lex_tokenize(mowgli_json_parse_t *parse)
 		else
 			val = mowgli_json_null;
 
-			/* error condition! */
+		/* error condition! */
 
 		break;
 

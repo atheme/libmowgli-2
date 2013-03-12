@@ -75,12 +75,12 @@ inherit_handles(void)
 		p = mowgli_alloc_array(sizeof(uint32_t), n);
 	}
 
-	info = (SYSTEM_HANDLE_INFORMATION *)(p + 1);
+	info = (SYSTEM_HANDLE_INFORMATION *) (p + 1);
 	pid = GetCurrentProcessId();
 
 	for (i = 0; i < *p; i++)
 		if (info[i].ProcessId == pid)
-			SetHandleInformation((HANDLE)h[i].Handle, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+			SetHandleInformation((HANDLE) h[i].Handle, HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
 
 	mowgli_free(p);
 }
@@ -134,14 +134,14 @@ fork(void)
 
 	/* now set up a thread for that process using a context, cloning the current thread ... */
 	ZwGetContextThread(NtCurrentThread(), &context);
-	context.Eip = (unsigned long)child;
+	context.Eip = (unsigned long) child;
 
 	/* set up a stack for the thread now that the child sentinel is set up ... */
-	ZwQueryVirtualMemory(NtCurrentProcess(), (void *)context.Esp, MemoryBasicInformation,
+	ZwQueryVirtualMemory(NtCurrentProcess(), (void *) context.Esp, MemoryBasicInformation,
 			     &mbi, sizeof mbi, 0);
 
-	stack = (USER_STACK) {0, 0, ((char *)mbi.BaseAddress) + mbi.RegionSize,
-			      mbi.BaseAddress, mbi.AllocationBase };
+	stack = (USER_STACK) { 0, 0, ((char *) mbi.BaseAddress) + mbi.RegionSize,
+			       mbi.BaseAddress, mbi.AllocationBase };
 
 	/* now spawn the thread! */
 	ZwCreateThread(&thread_handle, THREAD_ALL_ACCESS, &oa, proc_handle, &cid, &context, &stack, TRUE);
@@ -154,7 +154,7 @@ fork(void)
 	ZwWriteVirtualMemory(process_handle, tbi.TebBaseAddress, &tib->ExceptionList, sizeof(tib->ExceptionList), 0);
 
 	/* ready to go, now request a CSRSS session */
-	request_csrss_session(process_handle, thread_handle, (uint32_t)cid.UniqueProcess, (uint32_t)cid.UniqueThread);
+	request_csrss_session(process_handle, thread_handle, (uint32_t) cid.UniqueProcess, (uint32_t) cid.UniqueThread);
 
 	/* CSRSS session set up or we segfaulted by now, so unfreeze the child... */
 	ZwResumeThread(thread_handle, 0);
@@ -163,7 +163,7 @@ fork(void)
 	ZwClose(thread_handle);
 	ZwClose(process_handle);
 
-	return (int)cid.UniqueProcess;
+	return (int) cid.UniqueProcess;
 }
 
 #  endif

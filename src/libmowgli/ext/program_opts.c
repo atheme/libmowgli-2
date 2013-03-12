@@ -31,7 +31,7 @@ mowgli_program_opts_consumer_str(const char *arg, void *userdata)
 	return_if_fail(arg != NULL);
 	return_if_fail(userdata != NULL);
 
-	*(char **)userdata = mowgli_strdup(arg);
+	*(char **) userdata = mowgli_strdup(arg);
 }
 
 void
@@ -40,7 +40,7 @@ mowgli_program_opts_consumer_int(const char *arg, void *userdata)
 	return_if_fail(arg != NULL);
 	return_if_fail(userdata != NULL);
 
-	*(int *)userdata = atoi(arg);
+	*(int *) userdata = atoi(arg);
 }
 
 void
@@ -49,7 +49,7 @@ mowgli_program_opts_consumer_bool(const char *arg, void *userdata)
 	return_if_fail(arg != NULL);
 	return_if_fail(userdata != NULL);
 
-	*(bool *)userdata = true;
+	*(bool *) userdata = true;
 }
 
 static inline mowgli_program_opts_t *
@@ -62,10 +62,10 @@ mowgli_program_opts_lookup_name(mowgli_program_opts_t *opts, size_t opts_size, c
 			if (!strcasecmp(name, opts[i].longopt))
 				return &opts[i];
 
-	else
-		for (i = 0; i < opts_size; i++)
-			if (*name == opts[i].smallopt)
-				return &opts[i];
+			else
+				for (i = 0; i < opts_size; i++)
+					if (*name == opts[i].smallopt)
+						return &opts[i];
 
 	return NULL;
 }

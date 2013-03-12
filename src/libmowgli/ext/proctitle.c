@@ -18,7 +18,7 @@
  *
  * Copyright (c) 2000-2011, PostgreSQL Global Development Group
  * various details abducted from various places
- **--------------------------------------------------------------------
+ ***--------------------------------------------------------------------
  */
 
 #include "mowgli.h"
@@ -144,8 +144,6 @@ mowgli_proctitle_init(int argc, char **argv)
 		if ((i == 0) || (end_of_area + 1 == argv[i]))
 			end_of_area = argv[i] + strlen(argv[i]);
 
-
-
 	if (end_of_area == NULL)/* probably can't happen? */
 	{
 		ps_buffer = NULL;
@@ -166,7 +164,7 @@ mowgli_proctitle_init(int argc, char **argv)
 	/*
 	 * move the environment out of the way
 	 */
-	new_environ = (char **)mowgli_alloc((i + 1) * sizeof(char *));
+	new_environ = (char **) mowgli_alloc((i + 1) * sizeof(char *));
 
 	for (i = 0; environ[i] != NULL; i++)
 		new_environ[i] = mowgli_strdup(environ[i]);
@@ -191,7 +189,7 @@ mowgli_proctitle_init(int argc, char **argv)
 
 	char **new_argv;
 
-	new_argv = (char **)mowgli_alloc((argc + 1) * sizeof(char *));
+	new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
 
 	for (i = 0; i < argc; i++)
 		new_argv[i] = mowgli_strdup(argv[i]);
@@ -316,7 +314,7 @@ mowgli_proctitle_get(int *displen)
 
 #endif
 
-	*displen = (int)(ps_buffer_cur_len - ps_buffer_fixed_size);
+	*displen = (int) (ps_buffer_cur_len - ps_buffer_fixed_size);
 
 	return ps_buffer + ps_buffer_fixed_size;
 }

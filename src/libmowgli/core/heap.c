@@ -121,9 +121,9 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 			blp = mowgli_alloc(blp_size);
 	}
 
-	block = (mowgli_block_t *)blp;
+	block = (mowgli_block_t *) blp;
 
-	offset = (char *)blp + sizeof(mowgli_block_t);
+	offset = (char *) blp + sizeof(mowgli_block_t);
 	block->data = offset;
 	block->heap = bh;
 
@@ -131,7 +131,7 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 
 	for (a = 0; a < bh->mowgli_heap_elems; a++)
 	{
-		node = (mowgli_heap_elem_header_t *)offset;
+		node = (mowgli_heap_elem_header_t *) offset;
 		node->un.next = prev;
 		offset += bh->alloc_size;
 		prev = node;
@@ -320,7 +320,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	mowgli_mutex_unlock(&heap->mutex);
 
 	/* return pointer to it */
-	return (char *)h + sizeof(mowgli_heap_elem_header_t);
+	return (char *) h + sizeof(mowgli_heap_elem_header_t);
 }
 
 /* frees an item back to the mowgli_heap_t */
@@ -333,7 +333,7 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	if (mowgli_mutex_lock(&heap->mutex) != 0)
 		mowgli_log_fatal("heap mutex can't be locked");
 
-	h = (mowgli_heap_elem_header_t *)((char *)data - sizeof(mowgli_heap_elem_header_t));
+	h = (mowgli_heap_elem_header_t *) ((char *) data - sizeof(mowgli_heap_elem_header_t));
 	b = h->un.block;
 
 	return_if_fail(b->heap == heap);

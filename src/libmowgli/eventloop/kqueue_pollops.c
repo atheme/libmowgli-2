@@ -77,7 +77,7 @@ mowgli_kqueue_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_
 	EV_SET(&event, pollable->fd, EVFILT_READ | EVFILT_WRITE, EV_DELETE, 0, 0, pollable);
 
 	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
-		   &(const struct timespec) {.tv_sec = 0, .tv_nsec = 0 }
+		   &(const struct timespec) { .tv_sec = 0, .tv_nsec = 0 }
 		   ) != 0)
 		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
 }
@@ -132,7 +132,7 @@ mowgli_kqueue_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloo
 	       event_function ? EV_ADD : EV_DELETE, 0, 0, pollable);
 
 	if (kevent(priv->kqueue_fd, &event, 1, NULL, 0,
-		   &(const struct timespec) {.tv_sec = 0, .tv_nsec = 0 }
+		   &(const struct timespec) { .tv_sec = 0, .tv_nsec = 0 }
 		   ) != 0)
 		mowgli_log("mowgli_kqueue_eventloop_setselect(): kevent failed: %d (%s)", errno, strerror(errno));
 }
@@ -148,8 +148,8 @@ mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	priv = eventloop->poller;
 
 	num = kevent(priv->kqueue_fd, NULL, 0, priv->events, priv->nevents,
-		     delay >= 0 ? &(const struct timespec) {.tv_sec = delay / 1000,
-							    .tv_nsec = delay % 1000 * 1000000 } : NULL);
+		     delay >= 0 ? &(const struct timespec) { .tv_sec = delay / 1000,
+							     .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);

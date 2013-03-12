@@ -40,12 +40,12 @@ resolve_cb(mowgli_dns_reply_t *reply, int reason, void *vptr)
 
 	if (reply->addr.addr.ss_family == AF_INET)
 	{
-		const struct sockaddr_in *saddr = (const struct sockaddr_in *)&reply->addr.addr;
+		const struct sockaddr_in *saddr = (const struct sockaddr_in *) &reply->addr.addr;
 		sockptr = &saddr->sin_addr;
 	}
 	else if (reply->addr.addr.ss_family == AF_INET6)
 	{
-		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *)&reply->addr.addr;
+		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *) &reply->addr.addr;
 		sockptr = &saddr->sin6_addr;
 	}
 	else
@@ -108,13 +108,13 @@ read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_event
 
 			if (strchr(++ch, ':') != NULL)
 			{
-				struct sockaddr_in6 *saddr = (struct sockaddr_in6 *)&addr;
+				struct sockaddr_in6 *saddr = (struct sockaddr_in6 *) &addr;
 				type = AF_INET6;
 				addrptr = &saddr->sin6_addr;
 			}
 			else
 			{
-				struct sockaddr_in *saddr = (struct sockaddr_in *)&addr;
+				struct sockaddr_in *saddr = (struct sockaddr_in *) &addr;
 				type = AF_INET;
 				addrptr = &saddr->sin_addr;
 			}

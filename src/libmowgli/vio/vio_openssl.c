@@ -129,7 +129,7 @@ mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *add
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
+	if (connect(fd, (struct sockaddr *) &addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 		{
@@ -185,7 +185,7 @@ mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 		method = SSLv23_server_method();
 	}
 
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
+	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
 
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
@@ -244,7 +244,7 @@ mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((afd = accept(fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((afd = accept(fd, (struct sockaddr *) &newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -330,7 +330,7 @@ mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *
 	}
 
 	/* Cast is to eliminate an excessively bogus warning on old OpenSSL --Elizacat */
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
+	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
 
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
@@ -417,11 +417,11 @@ mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const 
 
 	if (read)
 	{
-		ret = (int)SSL_read(connection->ssl_handle, readbuf, len);
+		ret = (int) SSL_read(connection->ssl_handle, readbuf, len);
 	}
 	else
 	{
-		ret = (int)SSL_write(connection->ssl_handle, writebuf, len);
+		ret = (int) SSL_write(connection->ssl_handle, writebuf, len);
 		MOWGLI_VIO_UNSETWRITE(vio)
 	}
 

@@ -75,9 +75,9 @@ mowgli_alloc_array_using_policy(mowgli_allocation_policy_t *policy, size_t size,
 	adj_size = (size * count) + sizeof(alloc_tag_t);
 
 	r = policy->allocate(adj_size);
-	((alloc_tag_t *)r)->allocator = policy;
+	((alloc_tag_t *) r)->allocator = policy;
 
-	return (char *)r + sizeof(alloc_tag_t);
+	return (char *) r + sizeof(alloc_tag_t);
 }
 
 /*
@@ -199,7 +199,7 @@ mowgli_free(void *ptr)
 
 	return_if_fail(ptr != NULL);
 
-	tag = (alloc_tag_t *)((char *)ptr - sizeof(alloc_tag_t));
+	tag = (alloc_tag_t *) ((char *) ptr - sizeof(alloc_tag_t));
 	tag->allocator->deallocate(tag);
 }
 

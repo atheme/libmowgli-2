@@ -39,7 +39,7 @@ mowgli_winsock_bootstrap(void)
 {
 	int r;
 
-	r = WSAStartup((short)0x202, &wsock_env);
+	r = WSAStartup((short) 0x202, &wsock_env);
 
 	if (r != 0)
 	{

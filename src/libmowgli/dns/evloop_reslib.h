@@ -69,34 +69,34 @@ typedef struct
  * Inline versions of get/put short/long.  Pointer is advanced.
  */
 #define MOWGLI_DNS_NS_GET16(s, cp) { \
-		const unsigned char *t_cp = (const unsigned char *)(cp); \
-		(s) = ((uint16_t)t_cp[0] << 8) \
-		      | ((uint16_t)t_cp[1]) \
+		const unsigned char *t_cp = (const unsigned char *) (cp); \
+		(s) = ((uint16_t) t_cp[0] << 8)	\
+		      | ((uint16_t) t_cp[1]) \
 		; \
 		(cp) += MOWGLI_DNS_NS_INT16SIZE; \
 }
 
 #define MOWGLI_DNS_NS_GET32(l, cp) { \
-		const unsigned char *t_cp = (const unsigned char *)(cp); \
-		(l) = ((uint32_t)t_cp[0] << 24)	\
-		      | ((uint32_t)t_cp[1] << 16) \
-		      | ((uint32_t)t_cp[2] << 8) \
-		      | ((uint32_t)t_cp[3]) \
+		const unsigned char *t_cp = (const unsigned char *) (cp); \
+		(l) = ((uint32_t) t_cp[0] << 24) \
+		      | ((uint32_t) t_cp[1] << 16) \
+		      | ((uint32_t) t_cp[2] << 8) \
+		      | ((uint32_t) t_cp[3]) \
 		; \
 		(cp) += MOWGLI_DNS_NS_INT32SIZE; \
 }
 
 #define MOWGLI_DNS_NS_PUT16(s, cp) { \
-		uint16_t t_s = (uint16_t)(s); \
-		unsigned char *t_cp = (unsigned char *)(cp); \
+		uint16_t t_s = (uint16_t) (s); \
+		unsigned char *t_cp = (unsigned char *) (cp); \
 		*t_cp++ = t_s >> 8; \
 		*t_cp = t_s; \
 		(cp) += MOWGLI_DNS_NS_INT16SIZE; \
 }
 
 #define MOWGLI_DNS_NS_PUT32(l, cp) { \
-		uint32_t t_l = (uint32_t)(l); \
-		unsigned char *t_cp = (unsigned char *)(cp); \
+		uint32_t t_l = (uint32_t) (l); \
+		unsigned char *t_cp = (unsigned char *) (cp); \
 		*t_cp++ = t_l >> 24; \
 		*t_cp++ = t_l >> 16; \
 		*t_cp++ = t_l >> 8; \
