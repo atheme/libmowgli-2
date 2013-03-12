@@ -40,10 +40,10 @@
 
 /* RFC 1104/1105 wasn't very helpful about what these fields should be named, so for now, we'll
    just name them this way. we probably should look at what named calls them or something. */
-#define MOWGLI_DNS_TYPE_SIZE (size_t) 2
-#define MOWGLI_DNS_CLASS_SIZE (size_t) 2
-#define MOWGLI_DNS_TTL_SIZE (size_t) 4
-#define MOWGLI_DNS_RDLENGTH_SIZE (size_t) 2
+#define MOWGLI_DNS_TYPE_SIZE ((size_t) 2)
+#define MOWGLI_DNS_CLASS_SIZE ((size_t) 2)
+#define MOWGLI_DNS_TTL_SIZE ((size_t) 4)
+#define MOWGLI_DNS_RDLENGTH_SIZE ((size_t) 2)
 #define MOWGLI_DNS_ANSWER_FIXED_SIZE (MOWGLI_DNS_TYPE_SIZE + MOWGLI_DNS_CLASS_SIZE + MOWGLI_DNS_TTL_SIZE + MOWGLI_DNS_RDLENGTH_SIZE)
 
 #define MOWGLI_DNS_MAXLINE 128
