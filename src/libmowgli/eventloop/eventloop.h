@@ -253,6 +253,9 @@ static inline bool mowgli_eventloop_ignore_errno(int error)
 #if defined(EAGAIN) && (EWOULDBLOCK != EAGAIN)
 	case EAGAIN:
 #endif
+#ifdef ETIME
+	case ETIME:
+#endif
 #ifdef EINTR
 	case EINTR:
 #endif
