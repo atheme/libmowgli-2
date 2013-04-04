@@ -32,7 +32,6 @@
 
 #define strcasecmp			_stricmp
 #define strdup				_strdup
-#define usleep(_usecs)		Sleep((_usecs)/1000L)
 #ifdef _MSC_VER
 # define snprintf			_snprintf
 #endif
