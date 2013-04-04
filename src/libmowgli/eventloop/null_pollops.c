@@ -105,6 +105,8 @@ static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 
 static void mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 {
+	for (; time > 999999; time -= 999999)
+		usleep(999999);
 	usleep(time);
 }
 
