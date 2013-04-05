@@ -22,9 +22,10 @@
 
 #ifdef _WIN32
 
-#define DEFAULT_SOCKETMAX	(2048)
+# define DEFAULT_SOCKETMAX (2048)
 
-typedef struct {
+typedef struct
+{
 	WSAEVENT *pfd;
 	unsigned short pfd_size;
 	unsigned short last_slot;
@@ -33,11 +34,13 @@ typedef struct {
 
 static WSADATA wsock_env;
 
-void mowgli_winsock_bootstrap(void)
+void
+mowgli_winsock_bootstrap(void)
 {
 	int r;
 
 	r = WSAStartup((short) 0x202, &wsock_env);
+
 	if (r != 0)
 	{
 		printf("mowgli bootstrap failure (win32): %d\n", r);
@@ -50,7 +53,8 @@ void mowgli_winsock_bootstrap(void)
 		wsock_env.iMaxSockets -= (wsock_env.iMaxSockets % MAXIMUM_WAIT_OBJECTS);
 }
 
-static void mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	unsigned short i;
 	mowgli_winsock_eventloop_private_t *priv;
@@ -74,7 +78,8 @@ static void mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static unsigned short mowgli_winsock_eventloop_find_slot(mowgli_winsock_eventloop_private_t *priv)
+static unsigned short
+mowgli_winsock_eventloop_find_slot(mowgli_winsock_eventloop_private_t *priv)
 {
 	unsigned short i = 1;
 
@@ -84,23 +89,20 @@ static unsigned short mowgli_winsock_eventloop_find_slot(mowgli_winsock_eventloo
 		i = priv->last_slot;
 
 	for (; i < priv->pfd_size; i++)
-	{
 		if (priv->pfd[i] == INVALID_HANDLE_VALUE)
 		{
 			priv->last_slot = i;
 			return i;
 		}
-	}
 
 	/* miss, try from beginning. */
+
 	for (i = 1; i < priv->pfd_size; i++)
-	{
 		if (priv->pfd[i] == INVALID_HANDLE_VALUE)
 		{
 			priv->last_slot = i;
 			return i;
 		}
-	}
 
 	/* if this happens, we're boned... */
 	mowgli_log("out of handles for eventloop %p, aborting\n", priv);
@@ -109,7 +111,8 @@ static unsigned short mowgli_winsock_eventloop_find_slot(mowgli_winsock_eventloo
 	return 0;
 }
 
-static void mowgli_winsock_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_winsock_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	unsigned short i;
 	mowgli_winsock_eventloop_private_t *priv;
@@ -130,7 +133,8 @@ static void mowgli_winsock_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_winsock_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_winsock_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_winsock_eventloop_private_t *priv;
 
@@ -152,7 +156,8 @@ static void mowgli_winsock_eventloop_destroy(mowgli_eventloop_t *eventloop, mowg
 	pollable->events = 0;
 }
 
-static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_winsock_eventloop_private_t *priv;
 	unsigned int old_flags;
@@ -163,9 +168,9 @@ static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mo
 	priv = eventloop->poller;
 	old_flags = pollable->events;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	switch (dir)
 	{
@@ -182,9 +187,9 @@ static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mo
 		break;
 	}
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	if (pollable->read_function == NULL)
 		pollable->events &= ~(FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB);
@@ -192,8 +197,10 @@ static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mo
 	if (pollable->write_function == NULL)
 		pollable->events &= ~(FD_WRITE | FD_CONNECT | FD_CLOSE);
 
-	if (old_flags == 0 && pollable->events == 0)
+	if ((old_flags == 0) && (pollable->events == 0))
+	{
 		return;
+	}
 	else if (pollable->events <= 0)
 	{
 		mowgli_winsock_eventloop_destroy(eventloop, pollable);
@@ -220,7 +227,8 @@ static void mowgli_winsock_eventloop_setselect(mowgli_eventloop_t *eventloop, mo
 	return;
 }
 
-static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_winsock_eventloop_private_t *priv;
 	int i, j;
@@ -263,7 +271,8 @@ static void mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int d
 	mowgli_eventloop_synchronize(eventloop);
 }
 
-mowgli_eventloop_ops_t _mowgli_winsock_pollops = {
+mowgli_eventloop_ops_t _mowgli_winsock_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_winsock_eventloop_pollsetup,

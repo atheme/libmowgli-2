@@ -28,24 +28,31 @@
 char _mowgli_log_buf[MOWGLI_LOG_BUF_SIZE];
 mowgli_log_cb_t _mowgli_log_cb;
 
-void mowgli_log_cb_default(const char *buf) {
+void
+mowgli_log_cb_default(const char *buf)
+{
 	fprintf(stderr, "%s\n", buf);
 }
 
-void mowgli_log_bootstrap() {
+void
+mowgli_log_bootstrap()
+{
 	_mowgli_log_cb = mowgli_log_cb_default;
 }
 
-void mowgli_log_set_cb(mowgli_log_cb_t callback) {
+void
+mowgli_log_set_cb(mowgli_log_cb_t callback)
+{
 	return_if_fail(callback != NULL);
 
 	_mowgli_log_cb = callback;
 }
 
-void mowgli_log_prefix_real(const char *file, int line, const char *func,
-		const char *prefix, const char *fmt, ...) {
+void
+mowgli_log_prefix_real(const char *file, int line, const char *func, const char *prefix, const char *fmt, ...)
+{
 	int len = snprintf(_mowgli_log_buf, MOWGLI_LOG_BUF_SIZE, "(%s:%d %s): %s",
-			file, line, func, prefix);
+			   file, line, func, prefix);
 
 	char *buf = &_mowgli_log_buf[len];
 
@@ -59,10 +66,11 @@ void mowgli_log_prefix_real(const char *file, int line, const char *func,
 }
 
 /* TODO: remove next time there is a LIB_MAJOR bump */
-void mowgli_log_real(const char *file, int line, const char *func,
-		const char *fmt, ...) {
+void
+mowgli_log_real(const char *file, int line, const char *func, const char *fmt, ...)
+{
 	int len = snprintf(_mowgli_log_buf, 4095, "(%s:%d %s): ", file, line,
-			func);
+			   func);
 
 	char *buf = &_mowgli_log_buf[len];
 
@@ -76,11 +84,12 @@ void mowgli_log_real(const char *file, int line, const char *func,
 }
 
 /* TODO: remove next time there is a LIB_MAJOR bump */
-void mowgli_soft_assert_log(const char *asrt, const char *file, int line,
-		const char *function) {
+void
+mowgli_soft_assert_log(const char *asrt, const char *file, int line, const char *function)
+{
 	snprintf(_mowgli_log_buf, 4095,
-			"(%s:%d %s): critical: Assertion '%s' failed.", file, line,
-			function, asrt);
+		 "(%s:%d %s): critical: Assertion '%s' failed.", file, line,
+		 function, asrt);
 
 	_mowgli_log_cb(_mowgli_log_buf);
 }

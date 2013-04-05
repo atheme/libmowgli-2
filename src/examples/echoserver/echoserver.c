@@ -26,23 +26,27 @@
 mowgli_eventloop_t *base_eventloop;
 mowgli_eventloop_pollable_t *listener;
 
-typedef struct {
+typedef struct
+{
 	mowgli_eventloop_io_t *io;
 	char buf[1024];
 } client_t;
 
 #ifdef DEBUG
-static void timer_tick(void *unused)
+static void
+timer_tick(void *unused)
 {
 	static int ticks = 0;
 
 	printf("tick: %d\n", ++ticks);
 }
+
 #endif
 
-static int setup_listener(void)
+static int
+setup_listener(void)
 {
-	struct sockaddr_in in = {};
+	struct sockaddr_in in = { };
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	in.sin_family = AF_INET;
@@ -59,7 +63,8 @@ static int setup_listener(void)
 	return fd;
 }
 
-static void write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	client_t *client = userdata;
@@ -72,7 +77,8 @@ static void write_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io,
 	mowgli_pollable_setselect(base_eventloop, client->io, MOWGLI_EVENTLOOP_IO_WRITE, NULL);
 }
 
-static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	int ret;
@@ -90,13 +96,15 @@ static void read_data(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, 
 	mowgli_pollable_setselect(base_eventloop, client->io, MOWGLI_EVENTLOOP_IO_WRITE, write_data);
 }
 
-static void client_error(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+client_error(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_free(userdata);
 	mowgli_pollable_destroy(eventloop, io);
 }
 
-static void accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 	client_t *client;
@@ -115,7 +123,8 @@ static void accept_client(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *
 	mowgli_pollable_setselect(base_eventloop, client->io, MOWGLI_EVENTLOOP_IO_ERROR, client_error);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	int fd;
 

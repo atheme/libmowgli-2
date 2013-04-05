@@ -7,17 +7,18 @@
 
 #define BUFSIZE 2048
 
-#define PROTO	AF_INET6
-#define LISTEN	"::ffff:127.0.0.1"	/* 6to4 mapping */
-#define PORT	31337
+#define PROTO AF_INET6
+#define LISTEN "::ffff:127.0.0.1"	/* 6to4 mapping */
+#define PORT 31337
 
 #define ECHOBACK "Echo: "
 
-int main (void)
+int
+main(void)
 {
 	mowgli_vio_t *vio = mowgli_vio_create(NULL);
 	mowgli_vio_sockaddr_t addr;
-	
+
 	mowgli_vio_sockaddr_create(&addr, PROTO, LISTEN, PORT);
 
 	if (mowgli_vio_socket(vio, PROTO, SOCK_DGRAM, 0))
@@ -41,5 +42,5 @@ int main (void)
 		mowgli_vio_sendto(vio, buf, strlen(buf), &addr);
 	}
 
-	return EXIT_SUCCESS; /* Not reached */
+	return EXIT_SUCCESS;	/* Not reached */
 }

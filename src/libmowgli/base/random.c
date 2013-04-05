@@ -27,9 +27,9 @@
 /* period parameters */
 #define N 624
 #define M 397
-#define MATRIX_A 0x9908b0dfUL   /* constant vector a */
-#define UPPER_MASK 0x80000000UL /* most significant w-r bits */
-#define LOWER_MASK 0x7fffffffUL /* least significant r bits */
+#define MATRIX_A 0x9908b0dfUL	/* constant vector a */
+#define UPPER_MASK 0x80000000UL	/* most significant w-r bits */
+#define LOWER_MASK 0x7fffffffUL	/* least significant r bits */
 
 /* mowgli_random_t contains state data which is private */
 struct mowgli_random_
@@ -42,20 +42,24 @@ struct mowgli_random_
 static mowgli_object_class_t klass;
 
 /* initialization */
-void mowgli_random_bootstrap(void)
+void
+mowgli_random_bootstrap(void)
 {
 	mowgli_object_class_init(&klass, "mowgli_random_t", NULL, FALSE);
 }
 
 /* construction and destruction. */
-mowgli_random_t *mowgli_random_create(void)
+mowgli_random_t *
+mowgli_random_create(void)
 {
 	return mowgli_random_create_with_seed(time(NULL));
 }
 
-mowgli_random_t *mowgli_random_create_with_seed(unsigned int seed)
+mowgli_random_t *
+mowgli_random_create_with_seed(unsigned int seed)
 {
 	mowgli_random_t *out = mowgli_alloc(sizeof(mowgli_random_t));
+
 	mowgli_object_init(mowgli_object(out), NULL, &klass, NULL);
 
 	mowgli_random_reseed(out, seed);
@@ -64,11 +68,13 @@ mowgli_random_t *mowgli_random_create_with_seed(unsigned int seed)
 }
 
 /* reset seed */
-void mowgli_random_reseed(mowgli_random_t *self, unsigned int seed)
+void
+mowgli_random_reseed(mowgli_random_t *self, unsigned int seed)
 {
 	return_if_fail(self != NULL);
 
 	self->mt[0] = seed & 0xffffffffUL;
+
 	for (self->mti = 1; self->mti < N; self->mti++)
 	{
 		self->mt[self->mti] = (1812433253UL * (self->mt[self->mti - 1] ^ (self->mt[self->mti - 1] >> 30)) + self->mti);
@@ -77,7 +83,8 @@ void mowgli_random_reseed(mowgli_random_t *self, unsigned int seed)
 }
 
 /* number retrieval */
-unsigned int mowgli_random_int(mowgli_random_t *self)
+unsigned int
+mowgli_random_int(mowgli_random_t *self)
 {
 	unsigned int y;
 	static unsigned int mag01[2] = { 0x0UL, MATRIX_A };
@@ -97,7 +104,7 @@ unsigned int mowgli_random_int(mowgli_random_t *self)
 		for (; t < N - 1; t++)
 		{
 			y = (self->mt[t] & UPPER_MASK) | (self->mt[t + 1] & LOWER_MASK);
-			self->mt[t] = self->mt[t + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1U];			
+			self->mt[t] = self->mt[t + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1U];
 		}
 
 		y = (self->mt[N - 1] & UPPER_MASK) | (self->mt[0] & LOWER_MASK);
@@ -116,7 +123,8 @@ unsigned int mowgli_random_int(mowgli_random_t *self)
 	return y;
 }
 
-int mowgli_random_int_ranged(mowgli_random_t *self, int begin, int end)
+int
+mowgli_random_int_ranged(mowgli_random_t *self, int begin, int end)
 {
 	unsigned int dist = end - begin;
 	unsigned int max, ret;
@@ -129,13 +137,16 @@ int mowgli_random_int_ranged(mowgli_random_t *self, int begin, int end)
 			remain -= dist;
 
 		max = 0xFFFFFFFFU - remain;
-	} else
+	}
+	else
+	{
 		max = dist - 1;
+	}
 
 	do
-	{
 		ret = mowgli_random_int(self);
-	} while (ret > max);
+
+	while (ret > max);
 
 	ret %= dist;
 

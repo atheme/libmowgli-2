@@ -23,7 +23,8 @@
 
 #include "mowgli.h"
 
-void mowgli_object_class_message_handler_attach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
+void
+mowgli_object_class_message_handler_attach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(sig != NULL);
@@ -31,7 +32,8 @@ void mowgli_object_class_message_handler_attach(mowgli_object_class_t *klass, mo
 	mowgli_node_add(sig, mowgli_node_create(), &klass->message_handlers);
 }
 
-void mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
+void
+mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mowgli_object_message_handler_t *sig)
 {
 	return_if_fail(klass != NULL);
 	return_if_fail(sig != NULL);
@@ -43,7 +45,8 @@ void mowgli_object_class_message_handler_detach(mowgli_object_class_t *klass, mo
 	mowgli_node_free(n);
 }
 
-void mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
+void
+mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(sig != NULL);
@@ -51,7 +54,8 @@ void mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_object_m
 	mowgli_node_add(sig, mowgli_node_create(), &self->message_handlers);
 }
 
-void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
+void
+mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_message_handler_t *sig)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(sig != NULL);
@@ -63,7 +67,8 @@ void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_m
 	mowgli_node_free(n);
 }
 
-void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
+void
+mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(name != NULL);
@@ -86,7 +91,6 @@ void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ..
 	}
 
 	if (sig == NULL)
-	{
 		MOWGLI_LIST_FOREACH(n, self->klass->message_handlers.head)
 		{
 			mowgli_object_message_handler_t *sig2 = (mowgli_object_message_handler_t *) n->data;
@@ -97,11 +101,10 @@ void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ..
 				break;
 			}
 		}
-	}
 
-	/* return if no signals found, else compile the argstack */
-	if (sig == NULL)
-		return;
+		/* return if no signals found, else compile the argstack */
+		if (sig == NULL)
+			return;
 
 	va_start(va, name);
 	stack = mowgli_argstack_create_from_va_list(sig->descstr, va);
@@ -111,7 +114,7 @@ void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ..
 	{
 		sig = (mowgli_object_message_handler_t *) n->data;
 
-		if (!strcasecmp(sig->name, name) && sig->handler != NULL)
+		if (!strcasecmp(sig->name, name) && (sig->handler != NULL))
 			sig->handler(self, sig, stack);
 	}
 
@@ -119,7 +122,7 @@ void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ..
 	{
 		sig = (mowgli_object_message_handler_t *) n->data;
 
-		if (!strcasecmp(sig->name, name) && sig->handler != NULL)
+		if (!strcasecmp(sig->name, name) && (sig->handler != NULL))
 			sig->handler(self, sig, stack);
 	}
 

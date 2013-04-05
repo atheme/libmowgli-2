@@ -26,12 +26,13 @@
 static mowgli_heap_t *mowgli_node_heap;
 static mowgli_heap_t *mowgli_list_heap;
 
-void mowgli_node_bootstrap(void)
+void
+mowgli_node_bootstrap(void)
 {
-        mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 1024, BH_NOW);
-        mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 64, BH_NOW);
+	mowgli_node_heap = mowgli_heap_create(sizeof(mowgli_node_t), 1024, BH_NOW);
+	mowgli_list_heap = mowgli_heap_create(sizeof(mowgli_list_t), 64, BH_NOW);
 
-	if (mowgli_node_heap == NULL || mowgli_list_heap == NULL)
+	if ((mowgli_node_heap == NULL) || (mowgli_list_heap == NULL))
 	{
 		mowgli_log("heap allocator failure.");
 		abort();
@@ -39,31 +40,34 @@ void mowgli_node_bootstrap(void)
 }
 
 /* creates a new node */
-mowgli_node_t *mowgli_node_create(void)
+mowgli_node_t *
+mowgli_node_create(void)
 {
-        mowgli_node_t *n;
+	mowgli_node_t *n;
 
-        /* allocate it */
-        n = mowgli_heap_alloc(mowgli_node_heap);
+	/* allocate it */
+	n = mowgli_heap_alloc(mowgli_node_heap);
 
-        /* initialize */
-        n->next = n->prev = n->data = NULL;
+	/* initialize */
+	n->next = n->prev = n->data = NULL;
 
-        /* return a pointer to the new node */
-        return n;
+	/* return a pointer to the new node */
+	return n;
 }
 
 /* frees a node */
-void mowgli_node_free(mowgli_node_t *n)
+void
+mowgli_node_free(mowgli_node_t *n)
 {
 	return_if_fail(n != NULL);
 
-        /* free it */
-        mowgli_heap_free(mowgli_node_heap, n);
+	/* free it */
+	mowgli_heap_free(mowgli_node_heap, n);
 }
 
 /* adds a node to the end of a list */
-void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l)
+void
+mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l)
 {
 	mowgli_node_t *tn;
 
@@ -99,7 +103,8 @@ void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l)
 }
 
 /* adds a node to the head of a list */
-void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l)
+void
+mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l)
 {
 	mowgli_node_t *tn;
 
@@ -126,15 +131,20 @@ void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l)
 }
 
 /* adds a node to a list before another node, or to the end */
-void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before)
+void
+mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before)
 {
 	return_if_fail(n != NULL);
 	return_if_fail(l != NULL);
 
 	if (before == NULL)
+	{
 		mowgli_node_add(data, n, l);
+	}
 	else if (before == l->head)
+	{
 		mowgli_node_add_head(data, n, l);
+	}
 	else
 	{
 		n->data = data;
@@ -150,13 +160,16 @@ void mowgli_node_add_before(void *data, mowgli_node_t *n, mowgli_list_t *l, mowg
 }
 
 /* adds a node to a list after another node, or to the end */
-void mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before)
+void
+mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgli_node_t *before)
 {
 	return_if_fail(n != NULL);
 	return_if_fail(l != NULL);
 
-	if (before == NULL || before->next == NULL)
+	if ((before == NULL) || (before->next == NULL))
+	{
 		mowgli_node_add(data, n, l);
+	}
 	else
 	{
 		n->data = data;
@@ -169,7 +182,8 @@ void mowgli_node_add_after(void *data, mowgli_node_t *n, mowgli_list_t *l, mowgl
 }
 
 /* retrieves a node at `position` position. */
-mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, size_t pos)
+mowgli_node_t *
+mowgli_node_nth(mowgli_list_t *l, size_t pos)
 {
 	size_t iter;
 	mowgli_node_t *n;
@@ -178,16 +192,20 @@ mowgli_node_t *mowgli_node_nth(mowgli_list_t *l, size_t pos)
 
 	/* locate the proper position. */
 	if (pos < MOWGLI_LIST_LENGTH(l) / 2)
-		for (iter = 0, n = l->head; iter != pos && n != NULL; iter++, n = n->next);
+		for (iter = 0, n = l->head; iter != pos && n != NULL; iter++, n = n->next)
+			;
+
 	else
 		for (iter = MOWGLI_LIST_LENGTH(l) - 1, n = l->tail;
-			iter != pos && n != NULL; iter--, n = n->prev);
+		     iter != pos && n != NULL; iter--, n = n->prev)
+			;
 
 	return n;
 }
 
 /* returns the data from node at `position` position, or NULL. */
-void *mowgli_node_nth_data(mowgli_list_t *l, size_t pos)
+void *
+mowgli_node_nth_data(mowgli_list_t *l, size_t pos)
 {
 	mowgli_node_t *n;
 
@@ -202,7 +220,8 @@ void *mowgli_node_nth_data(mowgli_list_t *l, size_t pos)
 }
 
 /* inserts a node at `position` position. */
-void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, size_t pos)
+void
+mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, size_t pos)
 {
 	mowgli_node_t *tn;
 
@@ -216,7 +235,8 @@ void mowgli_node_insert(void *data, mowgli_node_t *n, mowgli_list_t *l, size_t p
 }
 
 /* retrieves the index position of a node in a list. */
-ssize_t mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
+ssize_t
+mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
 {
 	ssize_t iter;
 	mowgli_node_t *tn;
@@ -225,82 +245,89 @@ ssize_t mowgli_node_index(mowgli_node_t *n, mowgli_list_t *l)
 	return_val_if_fail(l != NULL, -1);
 
 	/* locate the proper position. */
-	for (iter = 0, tn = l->head; tn != n && tn != NULL; iter++, tn = tn->next);
+	for (iter = 0, tn = l->head; tn != n && tn != NULL; iter++, tn = tn->next)
+		;
 
 	return iter < (ssize_t) MOWGLI_LIST_LENGTH(l) ? iter : -1;
 }
 
 /* deletes a link between a node and a list. */
-void mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l)
+void
+mowgli_node_delete(mowgli_node_t *n, mowgli_list_t *l)
 {
 	return_if_fail(n != NULL);
 	return_if_fail(l != NULL);
 
-        /* are we the head? */
-        if (!n->prev)
-                l->head = n->next;
-        else
-                n->prev->next = n->next;
+	/* are we the head? */
+	if (!n->prev)
+		l->head = n->next;
+	else
+		n->prev->next = n->next;
 
-        /* are we the tail? */
-        if (!n->next)
-                l->tail = n->prev;
-        else
-                n->next->prev = n->prev;
+	/* are we the tail? */
+	if (!n->next)
+		l->tail = n->prev;
+	else
+		n->next->prev = n->prev;
 
-        /* down the count */
-        l->count--;
+	/* down the count */
+	l->count--;
 }
 
 /* finds a node by `data' */
-mowgli_node_t *mowgli_node_find(void *data, mowgli_list_t *l)
+mowgli_node_t *
+mowgli_node_find(void *data, mowgli_list_t *l)
 {
 	mowgli_node_t *n;
 
 	return_val_if_fail(l != NULL, NULL);
 
-	MOWGLI_LIST_FOREACH(n, l->head) if (n->data == data)
+	MOWGLI_LIST_FOREACH(n, l->head)
+
+	if (n->data == data)
 		return n;
 
 	return NULL;
 }
 
 /* moves a node from one list to another. */
-void mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist)
+void
+mowgli_node_move(mowgli_node_t *m, mowgli_list_t *oldlist, mowgli_list_t *newlist)
 {
 	return_if_fail(m != NULL);
 	return_if_fail(oldlist != NULL);
 	return_if_fail(newlist != NULL);
 
-        /* Assumption: If m->next == NULL, then list->tail == m
-         *        and: If m->prev == NULL, then list->head == m
-         */
-        if (m->next != NULL)
-                m->next->prev = m->prev;
-        else
-                oldlist->tail = m->prev;
+	/* Assumption: If m->next == NULL, then list->tail == m
+	 *        and: If m->prev == NULL, then list->head == m
+	 */
+	if (m->next != NULL)
+		m->next->prev = m->prev;
+	else
+		oldlist->tail = m->prev;
 
-        if (m->prev != NULL)
-                m->prev->next = m->next;
-        else
-                oldlist->head = m->next;
+	if (m->prev != NULL)
+		m->prev->next = m->next;
+	else
+		oldlist->head = m->next;
 
-        m->prev = NULL;
-        m->next = newlist->head;
+	m->prev = NULL;
+	m->next = newlist->head;
 
-        if (newlist->head != NULL)
-                newlist->head->prev = m;
-        else if (newlist->tail == NULL)
-                newlist->tail = m;
+	if (newlist->head != NULL)
+		newlist->head->prev = m;
+	else if (newlist->tail == NULL)
+		newlist->tail = m;
 
-        newlist->head = m;
+	newlist->head = m;
 
-        oldlist->count--;
-        newlist->count++;
+	oldlist->count--;
+	newlist->count++;
 }
 
 /* creates a new list. */
-mowgli_list_t *mowgli_list_create(void)
+mowgli_list_t *
+mowgli_list_create(void)
 {
 	mowgli_list_t *out = mowgli_heap_alloc(mowgli_list_heap);
 
@@ -308,13 +335,15 @@ mowgli_list_t *mowgli_list_create(void)
 }
 
 /* frees a created list. */
-void mowgli_list_free(mowgli_list_t *l)
+void
+mowgli_list_free(mowgli_list_t *l)
 {
 	mowgli_heap_free(mowgli_list_heap, l);
 }
 
 /* concatenates two lists together. */
-void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
+void
+mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
 {
 	return_if_fail(l != NULL);
 	return_if_fail(l2 != NULL);
@@ -334,7 +363,8 @@ void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
 }
 
 /* reverse a list -- O(n)! */
-void mowgli_list_reverse(mowgli_list_t *l)
+void
+mowgli_list_reverse(mowgli_list_t *l)
 {
 	mowgli_node_t *n, *tn;
 
@@ -343,6 +373,7 @@ void mowgli_list_reverse(mowgli_list_t *l)
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, l->head)
 	{
 		mowgli_node_t *tn2 = n->next;
+
 		n->next = n->prev;
 		n->prev = tn2;
 	}
@@ -353,7 +384,8 @@ void mowgli_list_reverse(mowgli_list_t *l)
 }
 
 /* sorts a list -- O(n ^ 2) most likely, i don't want to think about it. --nenolod */
-void mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opaque)
+void
+mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opaque)
 {
 	mowgli_node_t *n, *tn, *n2, *tn2;
 
@@ -374,13 +406,15 @@ void mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opa
 			i2 = mowgli_node_index(n2, l);
 
 			if ((result = comp(n, n2, opaque)) == 0)
+			{
 				continue;
-			else if (result < 0 && i > i2)
+			}
+			else if ((result < 0) && (i > i2))
 			{
 				mowgli_node_delete(n, l);
 				mowgli_node_add_before(n->data, n, l, n2);
 			}
-			else if (result > 0 && i < i2)
+			else if ((result > 0) && (i < i2))
 			{
 				mowgli_node_delete(n, l);
 				mowgli_node_add_after(n->data, n, l, n2);

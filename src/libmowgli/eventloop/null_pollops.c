@@ -20,7 +20,8 @@
 
 #include "mowgli.h"
 
-void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
+void
+mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 {
 	time_t delay, currtime;
 	int t;
@@ -52,15 +53,16 @@ void mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int tim
 #endif
 
 	eventloop->eventloop_ops->select(eventloop, t);
-
 }
 
-void mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
+void
+mowgli_simple_eventloop_run_once(mowgli_eventloop_t *eventloop)
 {
 	eventloop->eventloop_ops->timeout_once(eventloop, 0);
 }
 
-void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+void
+mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
 
@@ -68,24 +70,28 @@ void mowgli_simple_eventloop_error_handler(mowgli_eventloop_t *eventloop, mowgli
 		mowgli_pollable_destroy(eventloop, pollable);
 }
 
-static void mowgli_null_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_null_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	return;
 }
 
-static void mowgli_null_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_null_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	return;
 }
 
-static void mowgli_null_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_null_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	return;
 }
 
-static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
-	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", (void *)pollable);
+	mowgli_log("null eventloop does not really do polling, events for pollable<%p> will be ignored", (void *) pollable);
 
 	switch (dir)
 	{
@@ -103,12 +109,14 @@ static void mowgli_null_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgl
 	return;
 }
 
-static void mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop, int time)
+static void
+mowgli_null_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 {
 	usleep(time);
 }
 
-mowgli_eventloop_ops_t _mowgli_null_pollops = {
+mowgli_eventloop_ops_t _mowgli_null_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_null_eventloop_pollsetup,

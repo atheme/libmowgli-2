@@ -23,47 +23,53 @@
 
 #include "mowgli.h"
 
-
 /*************
- * This Windows implementation is guaranteed to work on Windows 95,
- * Windows NT 4, and anything later.
- *************/
+* This Windows implementation is guaranteed to work on Windows 95,
+* Windows NT 4, and anything later.
+*************/
 #if defined(_WIN32)
 
-static int mowgli_win32_mutex_create(mowgli_mutex_t *mutex)
+static int
+mowgli_win32_mutex_create(mowgli_mutex_t *mutex)
 {
 	mutex->mutex = CreateMutex(NULL, FALSE, NULL);
-	if(mutex->mutex == NULL)
+
+	if (mutex->mutex == NULL)
 		return GetLastError();
 
 	return 0;
 }
 
-static int mowgli_win32_mutex_lock(mowgli_mutex_t *mutex)
+static int
+mowgli_win32_mutex_lock(mowgli_mutex_t *mutex)
 {
 	return WaitForSingleObject(mutex->mutex, INFINITE);
 }
 
-static int mowgli_win32_mutex_trylock(mowgli_mutex_t *mutex)
+static int
+mowgli_win32_mutex_trylock(mowgli_mutex_t *mutex)
 {
 	return WaitForSingleObject(mutex->mutex, 0);
 }
 
-static int mowgli_win32_mutex_unlock(mowgli_mutex_t *mutex)
+static int
+mowgli_win32_mutex_unlock(mowgli_mutex_t *mutex)
 {
-	if(ReleaseMutex(mutex->mutex) != 0)
+	if (ReleaseMutex(mutex->mutex) != 0)
 		return 0;
 
 	return GetLastError();
 }
 
-static int mowgli_win32_mutex_destroy(mowgli_mutex_t *mutex)
+static int
+mowgli_win32_mutex_destroy(mowgli_mutex_t *mutex)
 {
 	CloseHandle(mutex->mutex);
 	return 0;
 }
 
-const mowgli_mutex_ops_t _mowgli_win32_mutex_ops = {
+const mowgli_mutex_ops_t _mowgli_win32_mutex_ops =
+{
 	.mutex_create = mowgli_win32_mutex_create,
 	.mutex_lock = mowgli_win32_mutex_lock,
 	.mutex_trylock = mowgli_win32_mutex_trylock,

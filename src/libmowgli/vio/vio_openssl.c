@@ -30,7 +30,8 @@
 
 #ifdef HAVE_OPENSSL
 
-typedef struct {
+typedef struct
+{
 	SSL *ssl_handle;
 	SSL_CTX *ssl_context;
 	mowgli_vio_ssl_settings_t settings;
@@ -45,7 +46,8 @@ static bool openssl_init = false;
 
 static mowgli_vio_ops_t *openssl_ops = NULL;
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
+int
+mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
 {
 	mowgli_ssl_connection_t *connection;
 
@@ -74,7 +76,9 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 		vio->ops = openssl_ops;
 	}
 	else
+	{
 		vio->ops = ops;
+	}
 
 	/* Change ops */
 	mowgli_vio_ops_set_op(vio->ops, connect, mowgli_vio_openssl_default_connect);
@@ -98,21 +102,24 @@ int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *sett
 }
 
 /* Returns void so they can be stubs */
-void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
+void *
+mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
 {
 	return_val_if_fail(vio, NULL);
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	return connection->ssl_handle;
 }
 
-void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
+void *
+mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 {
 	return_val_if_fail(vio, NULL);
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	return connection->ssl_context;
 }
 
-int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
+int
+mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr)
 {
 	const int fd = mowgli_vio_getfd(vio);
 
@@ -122,10 +129,12 @@ int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t 
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	if (connect(fd, (struct sockaddr *)&addr->addr, addr->addrlen) < 0)
+	if (connect(fd, (struct sockaddr *) &addr->addr, addr->addrlen) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
+		{
 			return mowgli_vio_err_errcode(vio, strerror, errno);
+		}
 		else
 		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, true);
@@ -146,7 +155,8 @@ int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t 
 	return mowgli_vio_openssl_client_handshake(vio, connection);
 }
 
-int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
+int
+mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 {
 	return_val_if_fail(vio, -255);
 
@@ -170,15 +180,18 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 		method = TLSv1_server_method();
 		break;
 	default:
+
 		/* Compat method */
 		method = SSLv23_server_method();
 	}
 
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
+	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
+
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
 	connection->ssl_handle = SSL_new(connection->ssl_context);
+
 	if (connection->ssl_handle == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
@@ -209,7 +222,8 @@ int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 	return 0;
 }
 
-int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
+int
+mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int afd;
@@ -230,7 +244,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 		return mowgli_vio_error(vio);
 	}
 
-	if ((afd = accept(fd, (struct sockaddr *)&newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
+	if ((afd = accept(fd, (struct sockaddr *) &newvio->addr.addr, &(newvio->addr.addrlen))) < 0)
 	{
 		if (!mowgli_eventloop_ignore_errno(errno))
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -271,7 +285,7 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 			break;
 		}
 
-		if(err > 0)
+		if (err > 0)
 		{
 			errno = EIO;
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -287,7 +301,8 @@ int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio)
 	return 0;
 }
 
-static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
+static int
+mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *connection)
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
@@ -309,16 +324,19 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 		method = TLSv1_client_method();
 		break;
 	default:
+
 		/* Compat method */
 		method = SSLv23_client_method();
 	}
 
 	/* Cast is to eliminate an excessively bogus warning on old OpenSSL --Elizacat */
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *)method);
+	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
+
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
 	connection->ssl_handle = SSL_new(connection->ssl_context);
+
 	if (connection->ssl_handle == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
 
@@ -333,6 +351,7 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	if ((ret = SSL_connect(connection->ssl_handle)) != 1)
 	{
 		unsigned long err = SSL_get_error(connection->ssl_handle, ret);
+
 		if (err == SSL_ERROR_WANT_READ)
 		{
 			mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, true);
@@ -349,7 +368,9 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 			return 0;
 		}
 		else
+		{
 			return mowgli_vio_err_sslerrcode(vio, err);
+		}
 
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISSSLCONNECTING, false);
 		return 0;
@@ -362,22 +383,25 @@ static int mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_con
 	return 0;
 }
 
-#define MOWGLI_VIO_SSL_DOREAD true
-#define MOWGLI_VIO_SSL_DOWRITE false
+# define MOWGLI_VIO_SSL_DOREAD true
+# define MOWGLI_VIO_SSL_DOWRITE false
 
-int mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
+int
+mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_READ;
 	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOREAD, vio, buffer, NULL, len);
 }
 
-int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
+int
+mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len)
 {
 	vio->error.op = MOWGLI_VIO_ERR_OP_WRITE;
 	return mowgli_openssl_read_or_write(MOWGLI_VIO_SSL_DOWRITE, vio, NULL, buffer, len);
 }
 
-static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const void *writebuf, size_t len)
+static int
+mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *readbuf, const void *writebuf, size_t len)
 {
 	mowgli_ssl_connection_t *connection = vio->privdata;
 	int ret;
@@ -391,11 +415,13 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 
 	return_val_if_fail(connection->ssl_handle != NULL, -1);
 
-	if(read)
-		ret = (int)SSL_read(connection->ssl_handle, readbuf, len);
+	if (read)
+	{
+		ret = (int) SSL_read(connection->ssl_handle, readbuf, len);
+	}
 	else
 	{
-		ret = (int)SSL_write(connection->ssl_handle, writebuf, len);
+		ret = (int) SSL_write(connection->ssl_handle, writebuf, len);
 		MOWGLI_VIO_UNSETWRITE(vio)
 	}
 
@@ -414,7 +440,8 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 		case SSL_ERROR_ZERO_RETURN:
 			return 0;
 		case SSL_ERROR_SYSCALL:
-			if((err = ERR_get_error()) == 0)
+
+			if ((err = ERR_get_error()) == 0)
 			{
 				vio->error.type = MOWGLI_VIO_ERR_REMOTE_HANGUP;
 				mowgli_strlcpy(vio->error.string, "Remote host closed the socket", sizeof(vio->error.string));
@@ -431,7 +458,7 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 			break;
 		}
 
-		if(err > 0)
+		if (err > 0)
 		{
 			errno = EIO;
 			return mowgli_vio_err_errcode(vio, strerror, errno);
@@ -447,7 +474,8 @@ static int mowgli_openssl_read_or_write(bool read, mowgli_vio_t *vio, void *read
 	return ret;
 }
 
-int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
+int
+mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 {
 	const int fd = mowgli_vio_getfd(vio);
 	mowgli_ssl_connection_t *connection = vio->privdata;
@@ -469,23 +497,25 @@ int mowgli_vio_openssl_default_close(mowgli_vio_t *vio)
 
 #else
 
-int mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
+int
+mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings, mowgli_vio_ops_t *ops)
 {
 	mowgli_log("OpenSSL requested on a VIO object, but mowgli was built without OpenSSL support...");
 	return -1;
 }
 
-void * mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
+void *
+mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio)
 {
 	mowgli_log("Cannot get VIO SSL handle as libmowgli was built without OpenSSL support");
 	return NULL;
 }
 
-void * mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
+void *
+mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio)
 {
 	mowgli_log("Cannot get VIO SSL context as libmowgli was built without OpenSSL support");
 	return NULL;
 }
 
 #endif
-

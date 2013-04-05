@@ -35,8 +35,9 @@
 #ifndef __MOWGLI_PATRICIA_H__
 #define __MOWGLI_PATRICIA_H__
 
-struct mowgli_patricia_; /* defined in src/patricia.c */
-struct mowgli_patricia_elem_; /* defined in src/patricia.c */
+struct mowgli_patricia_;/* defined in src/patricia.c */
+
+struct mowgli_patricia_elem_;	/* defined in src/patricia.c */
 
 typedef struct mowgli_patricia_ mowgli_patricia_t;
 typedef struct mowgli_patricia_elem_ mowgli_patricia_elem_t;
@@ -56,7 +57,8 @@ typedef struct mowgli_patricia_iteration_state_ mowgli_patricia_iteration_state_
 /*
  * this is a convenience macro for inlining iteration of dictionaries.
  */
-#define MOWGLI_PATRICIA_FOREACH(element, state, dict) for (mowgli_patricia_foreach_start((dict), (state)); (element = mowgli_patricia_foreach_cur((dict), (state))); mowgli_patricia_foreach_next((dict), (state)))
+#define MOWGLI_PATRICIA_FOREACH(element, state, dict) \
+	for (mowgli_patricia_foreach_start((dict), (state)); (element = mowgli_patricia_foreach_cur((dict), (state))); mowgli_patricia_foreach_next((dict), (state)))
 
 /*
  * mowgli_patricia_create() creates a new patricia tree of the defined resolution.
@@ -79,9 +81,7 @@ extern void mowgli_patricia_shutdown(void);
  * mowgli_patricia_destroy() destroys all entries in a dtree, and also optionally calls
  * a defined callback function to destroy any data attached to it.
  */
-extern void mowgli_patricia_destroy(mowgli_patricia_t *dtree,
-	void (*destroy_cb)(const char *key, void *data, void *privdata),
-	void *privdata);
+extern void mowgli_patricia_destroy(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata);
 
 /*
  * mowgli_patricia_foreach() iterates all entries in a dtree, and also optionally calls
@@ -89,9 +89,7 @@ extern void mowgli_patricia_destroy(mowgli_patricia_t *dtree,
  *
  * To shortcircuit iteration, return non-zero from the callback function.
  */
-extern void mowgli_patricia_foreach(mowgli_patricia_t *dtree,
-	int (*foreach_cb)(const char *key, void *data, void *privdata),
-	void *privdata);
+extern void mowgli_patricia_foreach(mowgli_patricia_t *dtree, int (*foreach_cb)(const char *key, void *data, void *privdata), void *privdata);
 
 /*
  * mowgli_patricia_search() iterates all entries in a dtree, and also optionally calls
@@ -100,9 +98,7 @@ extern void mowgli_patricia_foreach(mowgli_patricia_t *dtree,
  * When the object is found, a non-NULL is returned from the callback, which results
  * in that object being returned to the user.
  */
-extern void *mowgli_patricia_search(mowgli_patricia_t *dtree,
-	void *(*foreach_cb)(const char *key, void *data, void *privdata),
-	void *privdata);
+extern void *mowgli_patricia_search(mowgli_patricia_t *dtree, void *(*foreach_cb)(const char *key, void *data, void *privdata), void *privdata);
 
 /*
  * mowgli_patricia_foreach_start() begins an iteration over all items
@@ -110,21 +106,18 @@ extern void *mowgli_patricia_search(mowgli_patricia_t *dtree,
  * in progress at a time, it is permitted to remove the current element
  * of the iteration (but not any other element).
  */
-extern void mowgli_patricia_foreach_start(mowgli_patricia_t *dtree,
-	mowgli_patricia_iteration_state_t *state);
+extern void mowgli_patricia_foreach_start(mowgli_patricia_t *dtree, mowgli_patricia_iteration_state_t *state);
 
 /*
  * mowgli_patricia_foreach_cur() returns the current element of the iteration,
  * or NULL if there are no more elements.
  */
-extern void *mowgli_patricia_foreach_cur(mowgli_patricia_t *dtree,
-	mowgli_patricia_iteration_state_t *state);
+extern void *mowgli_patricia_foreach_cur(mowgli_patricia_t *dtree, mowgli_patricia_iteration_state_t *state);
 
 /*
  * mowgli_patricia_foreach_next() moves to the next element.
  */
-extern void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree,
-	mowgli_patricia_iteration_state_t *state);
+extern void mowgli_patricia_foreach_next(mowgli_patricia_t *dtree, mowgli_patricia_iteration_state_t *state);
 
 /*
  * mowgli_patricia_add() adds a key->value entry to the patricia tree.

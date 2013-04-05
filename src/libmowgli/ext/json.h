@@ -42,9 +42,11 @@
 #define MOWGLI_JSON_H
 
 /* Types with public definitons */
-typedef enum {
+typedef enum
+{
 	MOWGLI_JSON_TAG_NULL,
 	MOWGLI_JSON_TAG_BOOLEAN,
+
 	/* JSON does not distinguish between integers or floating points
 	   (they are both just number types), but in C we are forced to
 	   make the distinction */
@@ -55,14 +57,17 @@ typedef enum {
 	MOWGLI_JSON_TAG_OBJECT,
 } mowgli_json_tag_t;
 typedef struct _mowgli_json_t mowgli_json_t;
+
 /* Types whose definitons are kept private */
 typedef struct _mowgli_json_parse_t mowgli_json_parse_t;
 
-struct _mowgli_json_t {
+struct _mowgli_json_t
+{
 	mowgli_json_tag_t tag;
 	int refcount;
 
-	union {
+	union
+	{
 		bool v_bool;
 		int v_int;
 		double v_float;
@@ -76,17 +81,17 @@ struct _mowgli_json_t {
    structs. These are just helpers and are not intended to provide a
    consistent interface. They are as likely to change as the mowgli_json_t
    struct itself. */
-#define MOWGLI_JSON_TAG(n)		((n)->tag)
-#define MOWGLI_JSON_BOOLEAN(n)		((n)->v.v_bool)
-#define MOWGLI_JSON_INTEGER(n)		((n)->v.v_int)
-#define MOWGLI_JSON_FLOAT(n)		((n)->v.v_float)
-#define MOWGLI_JSON_NUMBER(n)		((n)->tag == MOWGLI_JSON_TAG_FLOAT ? \
-					   (n)->v.v_float : (n)->v.v_int)
-#define MOWGLI_JSON_STRING(n)		((n)->v.v_string)
-#define MOWGLI_JSON_STRING_STR(n)	((n)->v.v_string->str)
-#define MOWGLI_JSON_STRING_LEN(n)	((n)->v.v_string->pos)
-#define MOWGLI_JSON_ARRAY(n)		((n)->v.v_array)
-#define MOWGLI_JSON_OBJECT(n)		((n)->v.v_object)
+#define MOWGLI_JSON_TAG(n) ((n)->tag)
+#define MOWGLI_JSON_BOOLEAN(n) ((n)->v.v_bool)
+#define MOWGLI_JSON_INTEGER(n) ((n)->v.v_int)
+#define MOWGLI_JSON_FLOAT(n) ((n)->v.v_float)
+#define MOWGLI_JSON_NUMBER(n) ((n)->tag == MOWGLI_JSON_TAG_FLOAT ? \
+			       (n)->v.v_float : (n)->v.v_int)
+#define MOWGLI_JSON_STRING(n) ((n)->v.v_string)
+#define MOWGLI_JSON_STRING_STR(n) ((n)->v.v_string->str)
+#define MOWGLI_JSON_STRING_LEN(n) ((n)->v.v_string->pos)
+#define MOWGLI_JSON_ARRAY(n) ((n)->v.v_array)
+#define MOWGLI_JSON_OBJECT(n) ((n)->v.v_object)
 
 /* Users of the JSON parser/formatter are not required to use these
    constants, but the parser will ALWAYS parse the symbols "null",
@@ -103,9 +108,10 @@ extern mowgli_json_t *mowgli_json_decref(mowgli_json_t *n);
 
 extern mowgli_json_t *mowgli_json_create_integer(int v_int);
 extern mowgli_json_t *mowgli_json_create_float(double v_float);
+
 /* #define mowgli_json_create_number(V) _Generic((V), \
-	int: mowgli_json_create_integer, \
-	double: mowgli_json_create_float)(V) */
+        int: mowgli_json_create_integer, \
+        double: mowgli_json_create_float)(V) */
 extern mowgli_json_t *mowgli_json_create_string_n(const char *str, size_t len);
 extern mowgli_json_t *mowgli_json_create_string(const char *str);
 extern mowgli_json_t *mowgli_json_create_array(void);
@@ -115,7 +121,8 @@ extern mowgli_json_t *mowgli_json_create_object(void);
 
 typedef struct _mowgli_json_output_t mowgli_json_output_t;
 
-struct _mowgli_json_output_t {
+struct _mowgli_json_output_t
+{
 	void (*append)(mowgli_json_output_t *out, const char *str, size_t len);
 	void (*append_char)(mowgli_json_output_t *out, const char c);
 	void *priv;

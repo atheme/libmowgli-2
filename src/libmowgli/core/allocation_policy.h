@@ -27,14 +27,14 @@
 typedef void *(*mowgli_allocation_func_t)(size_t size);
 typedef void (*mowgli_deallocation_func_t)(void *ptr);
 
-typedef struct {
+typedef struct
+{
 	mowgli_object_t parent;
 	mowgli_allocation_func_t allocate;
 	mowgli_deallocation_func_t deallocate;
 } mowgli_allocation_policy_t;
 
-mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name,
-	mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
+mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
 mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);
 
 /* for mowgli_alloc, et. al */

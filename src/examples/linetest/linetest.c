@@ -27,22 +27,26 @@
 mowgli_eventloop_t *base_eventloop;
 char buf[512];
 
-typedef struct {
+typedef struct
+{
 	mowgli_linebuf_t *linebuf;
 } client_t;
 
 void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata);
 
-void write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
+void
+write_line(mowgli_linebuf_t *linebuf, char *buf, size_t len)
 {
 	printf("-> %s\n", buf);
 	mowgli_linebuf_write(linebuf, buf, len);
 }
 
-client_t * create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
+client_t *
+create_client(const char *server, const char *port, const char *nick, const char *user, const char *realname)
 {
 	client_t *client;
 	struct addrinfo hints, *res;
+
 	bool use_ssl = false;
 	mowgli_vio_sockaddr_t addr;
 	int ret;
@@ -77,12 +81,11 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 
 	/* Wrap the VIO object */
 	if (use_ssl)
-	{
 		if (mowgli_vio_openssl_setssl(linebuf->vio, NULL, NULL) != 0)
 			return NULL;
-	}
 
 	/* We have to have a socket before starting the linebuf */
+
 	if (mowgli_vio_socket(linebuf->vio, res->ai_family, res->ai_socktype, res->ai_protocol) != 0)
 		return NULL;
 
@@ -103,7 +106,8 @@ client_t * create_client(const char *server, const char *port, const char *nick,
 	return client;
 }
 
-void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
+void
+eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 {
 	char str[512];
 
@@ -120,6 +124,7 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 	if (strstr(str, "PING"))
 	{
 		char *pos = strpbrk(str, ":");
+
 		if (pos)
 		{
 			char buf[512];
@@ -131,7 +136,8 @@ void eat_line(mowgli_linebuf_t *linebuf, char *line, size_t len, void *userdata)
 	return;
 }
 
-int main(int argc, const char *argv[])
+int
+main(int argc, const char *argv[])
 {
 	client_t *client;
 	const char *serv, *port;
@@ -150,6 +156,7 @@ int main(int argc, const char *argv[])
 	port = argv[2];
 
 	client = create_client(serv, port, "Mowglibot", "Mowglibot", "The libmowgli example bot that does nothing useful");
+
 	if (client == NULL)
 		return EXIT_FAILURE;
 

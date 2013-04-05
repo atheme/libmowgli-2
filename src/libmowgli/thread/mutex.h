@@ -28,17 +28,18 @@
 # include <thread.h>
 # include <synch.h>
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) 	mutex_t (name)
+# define MOWGLI_NATIVE_MUTEX_DECL(name) mutex_t(name)
 #elif defined MOWGLI_OS_WIN
 # define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) 	HANDLE (name)
+# define MOWGLI_NATIVE_MUTEX_DECL(name) HANDLE(name)
 #else
 # include <pthread.h>
 #endif
 
 typedef struct mowgli_mutex_ mowgli_mutex_t;
 
-typedef struct {
+typedef struct
+{
 	int (*mutex_create)(mowgli_mutex_t *mutex);
 	int (*mutex_lock)(mowgli_mutex_t *mutex);
 	int (*mutex_trylock)(mowgli_mutex_t *mutex);
@@ -46,7 +47,8 @@ typedef struct {
 	int (*mutex_destroy)(mowgli_mutex_t *mutex);
 } mowgli_mutex_ops_t;
 
-struct mowgli_mutex_ {
+struct mowgli_mutex_
+{
 #ifdef MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
 	MOWGLI_NATIVE_MUTEX_DECL(mutex);
 #else
@@ -60,7 +62,7 @@ struct mowgli_mutex_ {
 #endif
 
 mowgli_mutex_t *mowgli_mutex_create(void);
-int mowgli_mutex_init(mowgli_mutex_t* mutex);
+int mowgli_mutex_init(mowgli_mutex_t *mutex);
 int mowgli_mutex_lock(mowgli_mutex_t *mutex);
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex);
 int mowgli_mutex_unlock(mowgli_mutex_t *mutex);
@@ -70,10 +72,10 @@ void mowgli_mutex_destroy(mowgli_mutex_t *mutex);
 void mowgli_mutex_set_policy(mowgli_thread_policy_t policy);
 
 /* simple dispatch function to set the ops up for the various subsystems. */
-static inline void mowgli_thread_set_policy(mowgli_thread_policy_t policy)
+static inline void
+mowgli_thread_set_policy(mowgli_thread_policy_t policy)
 {
 	mowgli_mutex_set_policy(policy);
 }
 
 #endif
-

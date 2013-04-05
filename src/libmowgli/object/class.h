@@ -26,7 +26,8 @@
 
 typedef void (*mowgli_destructor_t)(void *);
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	mowgli_list_t derivitives;
 	mowgli_destructor_t destructor;
@@ -37,24 +38,25 @@ typedef struct {
 extern void mowgli_object_class_init(mowgli_object_class_t *klass, const char *name, mowgli_destructor_t des, mowgli_boolean_t dynamic);
 extern int mowgli_object_class_check_cast(mowgli_object_class_t *klass1, mowgli_object_class_t *klass2);
 extern void mowgli_object_class_set_derivitive(mowgli_object_class_t *klass, mowgli_object_class_t *parent);
-extern void *mowgli_object_class_reinterpret_impl(/* mowgli_object_t */ void *object, mowgli_object_class_t *klass);
+extern void *mowgli_object_class_reinterpret_impl( /* mowgli_object_t */ void *object, mowgli_object_class_t *klass);
 extern mowgli_object_class_t *mowgli_object_class_find_by_name(const char *name);
 extern void mowgli_object_class_destroy(mowgli_object_class_t *klass);
 
-#define MOWGLI_REINTERPRET_CAST(object, klass) (klass *) mowgli_object_class_reinterpret_impl(object, mowgli_object_class_find_by_name( # klass ))
+#define MOWGLI_REINTERPRET_CAST(object, klass) (klass *) mowgli_object_class_reinterpret_impl(object, mowgli_object_class_find_by_name(#klass))
 
-#define mowgli_forced_cast(from_type, to_type, from, to)\
-do {                                                    \
-  union cast_union                                      \
-  {                                                     \
-    to_type   out;                                      \
-    from_type in;                                       \
-  } u;                                                  \
-  typedef int cant_use_union_cast[                      \
-    sizeof (from_type) == sizeof (u)                    \
-    && sizeof (from_type) == sizeof (to_type) ? 1 : -1];\
-  u.in = from;                                          \
-  to = u.out;                                           \
-} while (0)
+#define mowgli_forced_cast(from_type, to_type, from, to) \
+	do \
+	{ \
+		union cast_union \
+		{ \
+			to_type out; \
+			from_type in; \
+		} u; \
+		typedef int cant_use_union_cast[ \
+			sizeof(from_type) == sizeof(u) \
+			&& sizeof(from_type) == sizeof(to_type) ? 1 : -1]; \
+		u.in = from; \
+		to = u.out; \
+	} while (0)
 
 #endif

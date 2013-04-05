@@ -23,7 +23,8 @@
 
 #include "mowgli.h"
 
-void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
+void
+mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *value)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(key != NULL);
@@ -52,7 +53,8 @@ void mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, vo
 	mowgli_node_add(e, mowgli_node_create(), &self->metadata);
 }
 
-void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
+void
+mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 {
 	return_if_fail(self != NULL);
 	return_if_fail(key != NULL);
@@ -75,7 +77,8 @@ void mowgli_object_metadata_dissociate(mowgli_object_t *self, const char *key)
 	}
 }
 
-void *mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
+void *
+mowgli_object_metadata_retrieve(mowgli_object_t *self, const char *key)
 {
 	return_null_if_fail(self != NULL);
 	return_null_if_fail(key != NULL);

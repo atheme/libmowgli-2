@@ -25,14 +25,18 @@
 #ifndef __MOWGLI_STRING_H__
 #define __MOWGLI_STRING_H__
 
-typedef struct mowgli_string_ {
+typedef struct mowgli_string_
+{
 	char *str;
 	size_t pos;
 	size_t size;
 
 	void (*reset)(struct mowgli_string_ *self);
+
 	void (*append)(struct mowgli_string_ *self, const char *src, size_t n);
+
 	void (*append_char)(struct mowgli_string_ *self, const char c);
+
 	void (*destroy)(struct mowgli_string_ *self);
 } mowgli_string_t;
 

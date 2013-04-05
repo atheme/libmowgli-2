@@ -20,7 +20,8 @@
 
 #include "mowgli.h"
 
-typedef struct {
+typedef struct
+{
 	mowgli_eventloop_helper_start_fn_t *start_fn;
 	void *userdata;
 	mowgli_descriptor_t fd;
@@ -30,6 +31,7 @@ static void
 mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 {
 	mowgli_eventloop_helper_proc_t *helper;
+
 #ifndef _WIN32
 	int i, x;
 #endif
@@ -42,22 +44,20 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 	helper->fd = req->fd;
 
 #ifndef _WIN32
+
 	for (i = 0; i < 1024; i++)
-	{
 		if (i != req->fd)
 			close(i);
-	}
 
 	x = open("/dev/null", O_RDWR);
 
 	for (i = 0; i < 2; i++)
-	{
 		if (req->fd != i)
 			dup2(x, i);
-	}
 
 	if (x > 2)
 		close(x);
+
 #endif
 
 	helper->eventloop = mowgli_eventloop_create();
@@ -194,13 +194,16 @@ mowgli_helper_io_trampoline(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t
 {
 	mowgli_eventloop_helper_proc_t *helper = userdata;
 
-	switch (dir) {
+	switch (dir)
+	{
 	case MOWGLI_EVENTLOOP_IO_READ:
+
 		if (helper->read_function != NULL)
-        {
+		{
 			helper->read_function(eventloop, helper, MOWGLI_EVENTLOOP_IO_READ, helper->userdata);
-            return;
-        }
+			return;
+		}
+
 	default:
 		break;
 	}

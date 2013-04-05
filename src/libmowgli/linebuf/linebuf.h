@@ -23,10 +23,11 @@
 
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
-typedef void mowgli_linebuf_readline_cb_t(mowgli_linebuf_t *, char *, size_t, void *);
-typedef void mowgli_linebuf_shutdown_cb_t(mowgli_linebuf_t *, void *);
+typedef void mowgli_linebuf_readline_cb_t (mowgli_linebuf_t *, char *, size_t, void *);
+typedef void mowgli_linebuf_shutdown_cb_t (mowgli_linebuf_t *, void *);
 
-extern mowgli_linebuf_t * mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata);
+extern mowgli_linebuf_t *mowgli_linebuf_create(mowgli_linebuf_readline_cb_t *cb, void *userdata);
+
 /* XXX these are unfortunately named and will change */
 extern void mowgli_linebuf_attach_to_eventloop(mowgli_linebuf_t *linebuf, mowgli_eventloop_t *eventloop);
 extern void mowgli_linebuf_detach_from_eventloop(mowgli_linebuf_t *linebuf);
@@ -38,24 +39,26 @@ extern void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, in
 extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...);
 extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf);
 
-struct _mowgli_linebuf_buf {
+struct _mowgli_linebuf_buf
+{
 	char *buffer;
 	size_t buflen;
 	size_t maxbuflen;
 };
 
 /* Errors */
-#define MOWGLI_LINEBUF_ERR_NONE			0x0000
-#define MOWGLI_LINEBUF_ERR_READBUF_FULL		0x0001
-#define MOWGLI_LINEBUF_ERR_WRITEBUF_FULL	0x0002
+#define MOWGLI_LINEBUF_ERR_NONE 0x0000
+#define MOWGLI_LINEBUF_ERR_READBUF_FULL 0x0001
+#define MOWGLI_LINEBUF_ERR_WRITEBUF_FULL 0x0002
 
 /* Informative */
-#define MOWGLI_LINEBUF_LINE_HASNULLCHAR		0x0004
+#define MOWGLI_LINEBUF_LINE_HASNULLCHAR 0x0004
 
 /* State */
-#define MOWGLI_LINEBUF_SHUTTING_DOWN		0x0100
+#define MOWGLI_LINEBUF_SHUTTING_DOWN 0x0100
 
-struct _mowgli_linebuf {
+struct _mowgli_linebuf
+{
 	mowgli_linebuf_readline_cb_t *readline_cb;
 	mowgli_linebuf_shutdown_cb_t *shutdown_cb;
 
@@ -77,11 +80,11 @@ struct _mowgli_linebuf {
 	void *userdata;
 };
 
-static inline mowgli_vio_t * mowgli_linebuf_get_vio(mowgli_linebuf_t *linebuf)
+static inline mowgli_vio_t *
+mowgli_linebuf_get_vio(mowgli_linebuf_t *linebuf)
 {
 	return_val_if_fail(linebuf != NULL, NULL);
 	return linebuf->vio;
 }
 
 #endif
-

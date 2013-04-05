@@ -26,6 +26,7 @@
 
 /* mowgli_random_t contains state data which is private */
 struct mowgli_random_;
+
 typedef struct mowgli_random_ mowgli_random_t;
 
 /* construction and destruction. */

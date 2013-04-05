@@ -25,27 +25,23 @@ struct mowgli_index_;
 
 typedef struct mowgli_index_ mowgli_index_t;
 
-mowgli_index_t * mowgli_index_create (void);
-void mowgli_index_destroy (mowgli_index_t * index);
-int mowgli_index_count (mowgli_index_t * index);
-void mowgli_index_allocate (mowgli_index_t * index, int size);
-void mowgli_index_set (mowgli_index_t * index, int at, void * value);
-void * mowgli_index_get (mowgli_index_t * index, int at);
-void mowgli_index_insert (mowgli_index_t * index, int at, void * value);
-void mowgli_index_append (mowgli_index_t * index, void * value);
-void mowgli_index_copy_set (mowgli_index_t * source, int from, mowgli_index_t * target,
- int to, int count);
-void mowgli_index_copy_insert (mowgli_index_t * source, int from, mowgli_index_t * target,
- int to, int count);
-void mowgli_index_copy_append (mowgli_index_t * source, int from, mowgli_index_t * target,
- int count);
-void mowgli_index_merge_insert (mowgli_index_t * first, int at, mowgli_index_t * second);
-void mowgli_index_merge_append (mowgli_index_t * first, mowgli_index_t * second);
-void mowgli_index_move (mowgli_index_t * index, int from, int to, int count);
-void mowgli_index_delete (mowgli_index_t * index, int at, int count);
-void mowgli_index_sort (mowgli_index_t * index, int (* compare) (const void * a,
- const void * b));
-void mowgli_index_sort_with_data (mowgli_index_t * index, int (* compare)
- (const void * a, const void * b, void * data), void * data);
+mowgli_index_t *mowgli_index_create(void);
+void mowgli_index_destroy(mowgli_index_t *index);
+int mowgli_index_count(mowgli_index_t *index);
+void mowgli_index_allocate(mowgli_index_t *index, int size);
+void mowgli_index_set(mowgli_index_t *index, int at, void *value);
+void *mowgli_index_get(mowgli_index_t *index, int at);
+void mowgli_index_insert(mowgli_index_t *index, int at, void *value);
+void mowgli_index_append(mowgli_index_t *index, void *value);
+void mowgli_index_copy_set(mowgli_index_t *source, int from, mowgli_index_t *target, int to, int count);
+void mowgli_index_copy_insert(mowgli_index_t *source, int from, mowgli_index_t *target, int to, int count);
+void mowgli_index_copy_append(mowgli_index_t *source, int from, mowgli_index_t *target, int count);
+void mowgli_index_merge_insert(mowgli_index_t *first, int at, mowgli_index_t *second);
+void mowgli_index_merge_append(mowgli_index_t *first, mowgli_index_t *second);
+void mowgli_index_move(mowgli_index_t *index, int from, int to, int count);
+void mowgli_index_delete(mowgli_index_t *index, int at, int count);
+void mowgli_index_sort(mowgli_index_t *index, int (*compare)(const void *a, const void *b));
+void mowgli_index_sort_with_data(mowgli_index_t *index, int(*compare)
+				 (const void *a, const void *b, void *data), void *data);
 
 #endif

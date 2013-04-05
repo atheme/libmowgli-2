@@ -34,18 +34,21 @@
 #include <mowgli.h>
 
 #ifdef _WIN32
-#define strcasecmp			_stricmp
+# define strcasecmp _stricmp
 #endif
 
-int str_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
+int
+str_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
 {
-	int ret; 
+	int ret;
+
 	ret = strcasecmp(n->data, n2->data);
 
 	return ret;
 }
 
-void test_strings(void)
+void
+test_strings(void)
 {
 	mowgli_list_t l = { NULL, NULL, 0 };
 	mowgli_node_t *n, *tn;
@@ -73,12 +76,13 @@ void test_strings(void)
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, l.head)
 	{
-		printf("  %s\n", (char*) n->data);
+		printf("  %s\n", (char *) n->data);
 		mowgli_node_delete(n, &l);
 	}
 }
 
-int int_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
+int
+int_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
 {
 	long a = (long) n->data;
 	long b = (long) n2->data;
@@ -86,11 +90,12 @@ int int_comparator(mowgli_node_t *n, mowgli_node_t *n2, void *opaque)
 	return a - b;
 }
 
-void test_integers(void)
+void
+test_integers(void)
 {
 	mowgli_list_t l = { NULL, NULL, 0 };
 	mowgli_node_t *n, *tn;
-	
+
 	mowgli_node_add((void *) 3, mowgli_node_create(), &l);
 	mowgli_node_add((void *) 2, mowgli_node_create(), &l);
 	mowgli_node_add((void *) 4, mowgli_node_create(), &l);
@@ -107,7 +112,8 @@ void test_integers(void)
 	}
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
 	test_strings();
 	test_integers();

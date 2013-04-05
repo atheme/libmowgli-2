@@ -22,15 +22,17 @@
 
 #ifdef HAVE_PORT_CREATE
 
-#include <port.h>
+# include <port.h>
 
-typedef struct {
+typedef struct
+{
 	int port_fd;
 	int pfd_size;
 	port_event_t *pfd;
 } mowgli_ports_eventloop_private_t;
 
-static void mowgli_ports_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
+static void
+mowgli_ports_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_ports_eventloop_private_t *priv;
 
@@ -44,7 +46,8 @@ static void mowgli_ports_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_ports_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
+static void
+mowgli_ports_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 {
 	mowgli_ports_eventloop_private_t *priv;
 
@@ -59,7 +62,8 @@ static void mowgli_ports_eventloop_pollshutdown(mowgli_eventloop_t *eventloop)
 	return;
 }
 
-static void mowgli_ports_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
+static void
+mowgli_ports_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	mowgli_ports_eventloop_private_t *priv;
 
@@ -78,7 +82,8 @@ static void mowgli_ports_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli
 	}
 }
 
-static void mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
+static void
+mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function)
 {
 	mowgli_ports_eventloop_private_t *priv;
 	unsigned int old_flags;
@@ -89,9 +94,9 @@ static void mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	priv = eventloop->poller;
 	old_flags = pollable->slot;
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("setselect %p fd %d func %p", pollable, pollable->fd, event_function);
-#endif
+# endif
 
 	switch (dir)
 	{
@@ -108,9 +113,9 @@ static void mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 		break;
 	}
 
-#ifdef DEBUG
+# ifdef DEBUG
 	mowgli_log("%p -> read %p : write %p", pollable, pollable->read_function, pollable->write_function);
-#endif
+# endif
 
 	if (pollable->read_function == NULL)
 		pollable->slot &= ~POLLIN;
@@ -118,8 +123,10 @@ static void mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	if (pollable->write_function == NULL)
 		pollable->slot &= ~POLLOUT;
 
-	if (old_flags == 0 && pollable->slot == 0)
+	if ((old_flags == 0) && (pollable->slot == 0))
+	{
 		return;
+	}
 	else if (pollable->slot == 0)
 	{
 		port_dissociate(priv->port_fd, PORT_SOURCE_FD, (uintptr_t) pollable->fd);
@@ -137,7 +144,8 @@ static void mowgli_ports_eventloop_setselect(mowgli_eventloop_t *eventloop, mowg
 	return;
 }
 
-static void mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
+static void
+mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_ports_eventloop_private_t *priv;
 	int i, ret, o_errno, nget = 1;
@@ -147,7 +155,7 @@ static void mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	priv = eventloop->poller;
 
 	ret = port_getn(priv->port_fd, priv->pfd, priv->pfd_size, &nget,
-			delay >= 0 ? &(struct timespec){ .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
+			delay >= 0 ? &(struct timespec) { .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);
@@ -176,7 +184,8 @@ static void mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int del
 	}
 }
 
-mowgli_eventloop_ops_t _mowgli_ports_pollops = {
+mowgli_eventloop_ops_t _mowgli_ports_pollops =
+{
 	.timeout_once = mowgli_simple_eventloop_timeout_once,
 	.run_once = mowgli_simple_eventloop_run_once,
 	.pollsetup = mowgli_ports_eventloop_pollsetup,

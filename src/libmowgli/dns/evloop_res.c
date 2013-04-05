@@ -1,4 +1,4 @@
-/* 
+/*
  * A rewrite of Darren Reeds original res.c As there is nothing
  * left of Darrens original code, this is now licensed by the hybrid group.
  * (Well, some of the function names are the same, and bits of the structs..)
@@ -12,7 +12,7 @@
  *     --Bleep (Thomas Helvey <tomh@inxpress.net>)
  *
  * This was all needlessly complicated for irc. Simplified. No more hostent
- * All we really care about is the IP -> hostname mappings. Thats all. 
+ * All we really care about is the IP -> hostname mappings. Thats all.
  *
  * Apr 28, 2003 --cryogen and Dianora
  *
@@ -27,23 +27,23 @@
  * its own namespace. Also gutted a lot of needless/one-use/few-line functions.
  * Jesus, what were they thinking...
  *
- * 2012 --Elizacat 
+ * 2012 --Elizacat
  */
 
 #include "mowgli.h"
 #include "dns.h"
 
-#define MOWGLI_DNS_MAXPACKET      1024		/* rfc sez 512 but we expand names so ... */
-#define MOWGLI_DNS_RES_MAXALIASES 35		/* maximum aliases allowed */
-#define MOWGLI_DNS_RES_MAXADDRS   35		/* maximum addresses allowed */
-#define MOWGLI_DNS_AR_TTL         600		/* TTL in seconds for dns cache entries */
+#define MOWGLI_DNS_MAXPACKET 1024	/* rfc sez 512 but we expand names so ... */
+#define MOWGLI_DNS_RES_MAXALIASES 35	/* maximum aliases allowed */
+#define MOWGLI_DNS_RES_MAXADDRS 35	/* maximum addresses allowed */
+#define MOWGLI_DNS_AR_TTL 600	/* TTL in seconds for dns cache entries */
 
 /* RFC 1104/1105 wasn't very helpful about what these fields should be named, so for now, we'll
    just name them this way. we probably should look at what named calls them or something. */
-#define MOWGLI_DNS_TYPE_SIZE         (size_t)2
-#define MOWGLI_DNS_CLASS_SIZE        (size_t)2
-#define MOWGLI_DNS_TTL_SIZE          (size_t)4
-#define MOWGLI_DNS_RDLENGTH_SIZE     (size_t)2
+#define MOWGLI_DNS_TYPE_SIZE (size_t) 2
+#define MOWGLI_DNS_CLASS_SIZE (size_t) 2
+#define MOWGLI_DNS_TTL_SIZE (size_t) 4
+#define MOWGLI_DNS_RDLENGTH_SIZE (size_t) 2
 #define MOWGLI_DNS_ANSWER_FIXED_SIZE (MOWGLI_DNS_TYPE_SIZE + MOWGLI_DNS_CLASS_SIZE + MOWGLI_DNS_TTL_SIZE + MOWGLI_DNS_RDLENGTH_SIZE)
 
 #define MOWGLI_DNS_MAXLINE 128
@@ -55,52 +55,56 @@ typedef struct
 	time_t ttl;
 	char type;
 	char queryname[MOWGLI_DNS_RES_HOSTLEN + 1];	/* name currently being queried */
-	char retries;				/* retry counter */
-	char sends;					/* number of sends (>1 means resent) */
+	char retries;	/* retry counter */
+	char sends;	/* number of sends (>1 means resent) */
 	time_t sentat;
 	time_t timeout;
-	unsigned int lastns;		/* index of last server sent to */
+	unsigned int lastns;	/* index of last server sent to */
 	struct sockaddr_storage addr;
+
 	char *name;
-	mowgli_dns_query_t *query;			/* query callback for this request */
+	mowgli_dns_query_t *query;	/* query callback for this request */
 } mowgli_dns_reslist_t;
 
 static mowgli_heap_t *reslist_heap = NULL;
 
 #ifndef _WIN32
 static int parse_resvconf(mowgli_dns_t *dns);
+
 #else
 static void parse_windows_resolvers(mowgli_dns_t *dns);
+
 #endif
 
 static void timeout_resolver(void *arg);
 static void add_nameserver(mowgli_dns_t *dns, const char *arg);
 static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp);
 static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
-static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t * query);
-static void do_query_name(mowgli_dns_t *dns, mowgli_dns_query_t * query, const char *name, mowgli_dns_reslist_t *request, int);
-static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const struct sockaddr_storage *, mowgli_dns_reslist_t *request);
+static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t *query);
+static void do_query_name(mowgli_dns_t *dns, mowgli_dns_query_t *query, const char *name, mowgli_dns_reslist_t *request, int);
+static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t *query, const struct sockaddr_storage *, mowgli_dns_reslist_t *request);
 static void query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
 static int send_res_msg(mowgli_dns_t *dns, const char *buf, int len, int count);
 static void resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request);
-static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob);
-static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *, char *);
+static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char *buf, char *eob);
+static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char *, char *);
 static mowgli_dns_reslist_t *find_id(mowgli_dns_t *dns, int id);
 static mowgli_dns_reply_t *make_dnsreply(mowgli_dns_reslist_t *request);
 static void res_readreply(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata);
 
-/* 
+/*
  * mowgli_dns_evloop_init - do everything we need to read the resolv.conf file
  * and initialize the resolver file descriptor if needed
  */
-int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
+int
+mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 {
 	int i;
 	mowgli_dns_evloop_t *state;
 
 	if (dns->dns_state == NULL)
 		dns->dns_state = mowgli_alloc(sizeof(mowgli_dns_evloop_t));
-	
+
 	dns->dns_type = MOWGLI_DNS_TYPE_ASYNC;
 
 	if (!reslist_heap)
@@ -130,10 +134,11 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 	if (state->vio == NULL)
 	{
 		state->vio = mowgli_vio_create(dns);
+
 		if (mowgli_vio_socket(state->vio, state->nsaddr_list[0].addr.ss_family, SOCK_DGRAM, 0) != 0)
 		{
 			mowgli_log("start_resolver(): unable to open UDP resolver socket: %s",
-				 state->vio->error.string);
+				   state->vio->error.string);
 			return -1;
 		}
 
@@ -146,7 +151,8 @@ int mowgli_dns_evloop_init(mowgli_dns_t *dns, mowgli_eventloop_t *eventloop)
 	return 0;
 }
 
-int mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respath)
+int
+mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respath)
 {
 #ifndef _WIN32
 	mowgli_dns_evloop_t *state = dns->dns_state;
@@ -157,17 +163,18 @@ int mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respath)
 
 	if (!state->dns_init)
 		return mowgli_dns_evloop_restart(dns);
-	
+
 	return 0;
 #else
 	mowgli_log("Unimplemented on Windows. :(");
 #endif
 }
 
-/* 
+/*
  * mowgli_dns_evloop_restart - reread resolv.conf, reopen socket
  */
-int mowgli_dns_evloop_restart(mowgli_dns_t *dns)
+int
+mowgli_dns_evloop_restart(mowgli_dns_t *dns)
 {
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
@@ -176,7 +183,8 @@ int mowgli_dns_evloop_restart(mowgli_dns_t *dns)
 }
 
 /* mowgli_dns_evloop_destroy - finish us off */
-void mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
+void
+mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
 {
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
@@ -196,7 +204,8 @@ void mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
  * output - -1 if failure, 0 if success
  * side effects - fills in state->nsaddr_list
  */
-static int parse_resvconf(mowgli_dns_t *dns)
+static int
+parse_resvconf(mowgli_dns_t *dns)
 {
 	char *p;
 	char *opt;
@@ -210,7 +219,7 @@ static int parse_resvconf(mowgli_dns_t *dns)
 		respath = state->resolvconf;
 	else
 		respath = "/etc/resolv.conf";
-	
+
 	if ((file = fopen(respath, "r")) == NULL)
 	{
 		mowgli_log("Failed to open %s: %s", respath, strerror(errno));
@@ -224,31 +233,44 @@ static int parse_resvconf(mowgli_dns_t *dns)
 			*p = '\0';
 
 		p = input;
+
 		/* skip until something thats not a space is seen */
 		while (isspace(*p))
+		{
 			p++;
+		}
+
 		/* if at this point, have a '\0' then continue */
 		if (*p == '\0')
 			continue;
 
 		/* Ignore comment lines immediately */
-		if (*p == '#' || *p == ';')
+		if ((*p == '#') || (*p == ';'))
 			continue;
 
 		/* skip until a space is found */
 		opt = p;
+
 		while (!isspace(*p) && *p != '\0')
+		{
 			p++;
+		}
+
 		if (*p == '\0')
 			continue;			/* no arguments?.. ignore this line */
+
 		/* blow away the space character */
 		*p++ = '\0';
 
 		/* skip these spaces that are before the argument */
 		while (isspace(*p))
+		{
 			p++;
+		}
+
 		/* Now arg should be right where p is pointing */
 		arg = p;
+
 		if ((p = strpbrk(arg, " \t")) != NULL)
 			*p = '\0';			/* take the first word */
 
@@ -277,20 +299,21 @@ parse_windows_resolvers(mowgli_dns_t *dns)
 
 	mowgli_dns_get_windows_nameservers(ns_buf, sizeof ns_buf);
 
-	for(server = strtok(ns_buf, ","); server != NULL; server = strtok(NULL, ","))
+	for (server = strtok(ns_buf, ","); server != NULL; server = strtok(NULL, ","))
 		add_nameserver(dns, server);
 }
 
 #endif
 
-
 /* add_nameserver()
  * input - either an IPV4 address in dotted quad or an IPV6 address in : format
  * output - NONE
  * side effects - entry in state->nsaddr_list is filled in as needed */
-static void add_nameserver(mowgli_dns_t *dns, const char *arg)
+static void
+add_nameserver(mowgli_dns_t *dns, const char *arg)
 {
 	struct addrinfo hints, *res;
+
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 #ifdef DEBUG
@@ -321,7 +344,7 @@ static void add_nameserver(mowgli_dns_t *dns, const char *arg)
 	freeaddrinfo(res);
 }
 
-/* 
+/*
  * int
  * res_ourserver(dns, inp)
  *      looks up "inp" in state->nsaddr_list[]
@@ -333,7 +356,8 @@ static void add_nameserver(mowgli_dns_t *dns, const char *arg)
  *      revised for ircd, cryogen(stu) may03
  *      rewritten by Elizacat 25mar12
  */
-static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage * inp)
+static int
+res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage *inp)
 {
 	int ns;
 	mowgli_dns_evloop_t *state = dns->dns_state;
@@ -348,36 +372,34 @@ static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage * inp)
 		{
 		case AF_INET6:
 		{
-			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)srv;
-			const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *)inp;
+			const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) srv;
+			const struct sockaddr_in6 *v6in = (const struct sockaddr_in6 *) inp;
 
-			if (srv->ss_family == inp->ss_family && v6->sin6_port == v6in->sin6_port)
-			{
+			if ((srv->ss_family == inp->ss_family) && (v6->sin6_port == v6in->sin6_port))
 				if ((memcmp(&v6->sin6_addr.s6_addr, &v6in->sin6_addr.s6_addr,
-							sizeof(struct in6_addr)) == 0) ||
-					(memcmp(&v6->sin6_addr.s6_addr, &in6addr_any,
-							sizeof(struct in6_addr)) == 0))
+					    sizeof(struct in6_addr)) == 0) ||
+				    (memcmp(&v6->sin6_addr.s6_addr, &in6addr_any,
+					    sizeof(struct in6_addr)) == 0))
 				{
 					state->timeout_count[ns] = 0;
 					return 1;
 				}
-			}
+
 			break;
 		}
 		case AF_INET:
 		{
-			const struct sockaddr_in *v4 = (const struct sockaddr_in *)srv;
-			const struct sockaddr_in *v4in = (const struct sockaddr_in *)inp;
+			const struct sockaddr_in *v4 = (const struct sockaddr_in *) srv;
+			const struct sockaddr_in *v4in = (const struct sockaddr_in *) inp;
 
-			if (srv->ss_family == inp->ss_family && v4->sin_port == v4in->sin_port)
-			{
+			if ((srv->ss_family == inp->ss_family) && (v4->sin_port == v4in->sin_port))
 				if ((v4->sin_addr.s_addr == INADDR_ANY)
-					|| (v4->sin_addr.s_addr == v4in->sin_addr.s_addr))
+				    || (v4->sin_addr.s_addr == v4in->sin_addr.s_addr))
 				{
 					state->timeout_count[ns] = 0;
 					return 1;
 				}
-			}
+
 			break;
 		}
 		default:
@@ -388,11 +410,12 @@ static int res_ourserver(mowgli_dns_t *dns, const struct sockaddr_storage * inp)
 	return 0;
 }
 
-/* 
- * timeout_query_list - Remove queries from the list which have been 
+/*
+ * timeout_query_list - Remove queries from the list which have been
  * there too long without being resolved.
  */
-static time_t timeout_query_list(mowgli_dns_t *dns, time_t now)
+static time_t
+timeout_query_list(mowgli_dns_t *dns, time_t now)
 {
 	mowgli_node_t *ptr;
 	mowgli_node_t *next_ptr;
@@ -410,7 +433,7 @@ static time_t timeout_query_list(mowgli_dns_t *dns, time_t now)
 		{
 			if (--request->retries <= 0)
 			{
-				(*request->query->callback) (NULL, MOWGLI_DNS_RES_TIMEOUT, request->query->ptr);
+				(*request->query->callback)(NULL, MOWGLI_DNS_RES_TIMEOUT, request->query->ptr);
 				rem_request(dns, request);
 				continue;
 			}
@@ -423,17 +446,18 @@ static time_t timeout_query_list(mowgli_dns_t *dns, time_t now)
 			}
 		}
 
-		if ((next_time == 0) || timeout < next_time)
+		if ((next_time == 0) || (timeout < next_time))
 			next_time = timeout;
 	}
 
 	return (next_time > now) ? next_time : (now + MOWGLI_DNS_AR_TTL);
 }
 
-/* 
+/*
  * timeout_resolver - check request list
  */
-static void timeout_resolver(void *arg)
+static void
+timeout_resolver(void *arg)
 {
 	mowgli_dns_t *dns = arg;
 	mowgli_dns_evloop_t *state = dns->dns_state;
@@ -447,18 +471,17 @@ static void timeout_resolver(void *arg)
 	mowgli_timer_add(state->eventloop, "timeout_resolver", timeout_resolver, dns, next - now);
 }
 
-
-/* 
+/*
  * mowgli_dns_evloop_add_local_domain - Add the domain to hostname, if it is missing
  * (as suggested by eps@TOASTER.SFSU.EDU)
  */
-void mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *hname, size_t size)
+void
+mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *hname, size_t size)
 {
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	/* try to fix up unqualified names */
 	if (strchr(hname, '.') == NULL)
-	{
 		if (state->domain[0])
 		{
 			size_t len = strlen(hname);
@@ -469,15 +492,15 @@ void mowgli_dns_evloop_add_local_domain(mowgli_dns_t *dns, char *hname, size_t s
 				strcpy(hname + len, state->domain);
 			}
 		}
-	}
 }
 
-/* 
- * rem_request - remove a request from the list. 
- * This must also free any memory that has been allocated for 
+/*
+ * rem_request - remove a request from the list.
+ * This must also free any memory that has been allocated for
  * temporary storage of DNS results.
  */
-static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
+static void
+rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 {
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
@@ -488,17 +511,18 @@ static void rem_request(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 	mowgli_heap_free(reslist_heap, request);
 }
 
-/* 
+/*
  * make_request - Create a DNS request record for the server.
  */
-static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t * query)
+static mowgli_dns_reslist_t *
+make_request(mowgli_dns_t *dns, mowgli_dns_query_t *query)
 {
 	mowgli_dns_reslist_t *request = mowgli_heap_alloc(reslist_heap);
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	request->sentat = mowgli_eventloop_get_time(state->eventloop);
 	request->retries = 3;
-	request->timeout = 4;		/* start at 4 and exponential inc. */
+	request->timeout = 4;	/* start at 4 and exponential inc. */
 	request->query = query;
 
 	mowgli_node_add(request, &request->node, &state->request_list);
@@ -506,11 +530,12 @@ static mowgli_dns_reslist_t *make_request(mowgli_dns_t *dns, mowgli_dns_query_t 
 	return request;
 }
 
-/* 
- * mowgli_dns_evloop_delete_queries - cleanup outstanding queries 
+/*
+ * mowgli_dns_evloop_delete_queries - cleanup outstanding queries
  * for which there no longer exist clients or conf lines.
  */
-void mowgli_dns_evloop_delete_queries(mowgli_dns_t *dns, const mowgli_dns_query_t * query)
+void
+mowgli_dns_evloop_delete_queries(mowgli_dns_t *dns, const mowgli_dns_query_t *query)
 {
 	mowgli_node_t *ptr;
 	mowgli_node_t *next_ptr;
@@ -520,18 +545,17 @@ void mowgli_dns_evloop_delete_queries(mowgli_dns_t *dns, const mowgli_dns_query_
 	MOWGLI_ITER_FOREACH_SAFE(ptr, next_ptr, state->request_list.head)
 	{
 		if ((request = ptr->data) != NULL)
-		{
 			if (query == request->query)
 				rem_request(dns, request);
-		}
 	}
 }
 
-/* 
+/*
  * retryfreq - determine how many queries to wait before resending
  * if there have been that many consecutive timeouts
  */
-static inline int retryfreq(int timeouts)
+static inline int
+retryfreq(int timeouts)
 {
 	int i;
 	int counter = 1;
@@ -543,19 +567,21 @@ static inline int retryfreq(int timeouts)
 	return counter;
 }
 
-/* 
+/*
  * send_res_msg - sends msg to a nameserver.
  * This should reflect /etc/resolv.conf.
- * Returns number of nameserver successfully sent to 
+ * Returns number of nameserver successfully sent to
  * or -1 if no successful sends.
  */
-static int send_res_msg(mowgli_dns_t *dns, const char *rmsg, int len, int rcount)
+static int
+send_res_msg(mowgli_dns_t *dns, const char *rmsg, int len, int rcount)
 {
 	int i;
 	int ns;
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	state->retrycnt++;
+
 	/* First try a nameserver that seems to work. Every once in a while, try a possibly broken one
 	 * to check if it is working again. */
 	for (i = 0; i < state->nscount; i++)
@@ -573,6 +599,7 @@ static int send_res_msg(mowgli_dns_t *dns, const char *rmsg, int len, int rcount
 	for (i = 0; i < state->nscount; i++)
 	{
 		ns = (i + rcount - 1) % state->nscount;
+
 		if (!state->timeout_count[ns])
 			continue;
 
@@ -583,10 +610,11 @@ static int send_res_msg(mowgli_dns_t *dns, const char *rmsg, int len, int rcount
 	return -1;
 }
 
-/* 
+/*
  * find_id - find a dns request id (id is determined by dn_mkquery)
  */
-static mowgli_dns_reslist_t *find_id(mowgli_dns_t *dns, int id)
+static mowgli_dns_reslist_t *
+find_id(mowgli_dns_t *dns, int id)
 {
 	mowgli_node_t *ptr;
 	mowgli_dns_reslist_t *request;
@@ -603,31 +631,34 @@ static mowgli_dns_reslist_t *find_id(mowgli_dns_t *dns, int id)
 	return NULL;
 }
 
-/* 
+/*
  * mowgli_dns_evloop_gethost_byname - get host address from name
  *
  */
-void mowgli_dns_evloop_gethost_byname(mowgli_dns_t *dns, const char *name, mowgli_dns_query_t * query, int type)
+void
+mowgli_dns_evloop_gethost_byname(mowgli_dns_t *dns, const char *name, mowgli_dns_query_t *query, int type)
 {
 	return_if_fail(name != NULL);
 
 	do_query_name(dns, query, name, NULL, type);
 }
 
-/* 
+/*
  * mowgli_dns_evloop_gethost_byaddr - get host name from address
  */
-void mowgli_dns_evloop_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage * addr, mowgli_dns_query_t * query)
+void
+mowgli_dns_evloop_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *addr, mowgli_dns_query_t *query)
 {
 	return_if_fail(addr != NULL);
 
 	do_query_number(dns, query, addr, NULL);
 }
 
-/* 
+/*
  * do_query_name - nameserver lookup name
  */
-static void do_query_name(mowgli_dns_t *dns, mowgli_dns_query_t * query, const char *name, mowgli_dns_reslist_t *request, int type)
+static void
+do_query_name(mowgli_dns_t *dns, mowgli_dns_query_t *query, const char *name, mowgli_dns_reslist_t *request, int type)
 {
 	char host_name[MOWGLI_DNS_RES_HOSTLEN + 1];
 
@@ -645,11 +676,11 @@ static void do_query_name(mowgli_dns_t *dns, mowgli_dns_query_t * query, const c
 	query_name(dns, request);
 }
 
-/* 
+/*
  * do_query_number - Use this to do reverse IP# lookups.
  */
-static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const struct sockaddr_storage * addr,
-							mowgli_dns_reslist_t *request)
+static void
+do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t *query, const struct sockaddr_storage *addr, mowgli_dns_reslist_t *request)
 {
 	const unsigned char *cp;
 	const size_t size = addr->ss_family == AF_INET ? sizeof(struct sockaddr_in) : sizeof(struct sockaddr_in6);
@@ -658,30 +689,28 @@ static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const
 	{
 		request = make_request(dns, query);
 		memcpy(&request->addr, addr, size);
-		request->name = (char *)mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
+		request->name = (char *) mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
 	}
 
 	if (addr->ss_family == AF_INET)
 	{
-		const struct sockaddr_in *v4 = (const struct sockaddr_in *)addr;
-		cp = (const unsigned char *)&v4->sin_addr.s_addr;
+		const struct sockaddr_in *v4 = (const struct sockaddr_in *) addr;
+		cp = (const unsigned char *) &v4->sin_addr.s_addr;
 
-		sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int)(cp[3]),
-				(unsigned int)(cp[2]), (unsigned int)(cp[1]), (unsigned int)(cp[0]));
+		sprintf(request->queryname, "%u.%u.%u.%u.in-addr.arpa", (unsigned int) (cp[3]),
+			(unsigned int) (cp[2]), (unsigned int) (cp[1]), (unsigned int) (cp[0]));
 	}
 	else if (addr->ss_family == AF_INET6)
 	{
 		int i;
 		char *rqptr = request->queryname;
-		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *)addr;
-		cp = (const unsigned char *)&v6->sin6_addr.s6_addr;
+		const struct sockaddr_in6 *v6 = (const struct sockaddr_in6 *) addr;
+		cp = (const unsigned char *) &v6->sin6_addr.s6_addr;
 
-		for(i = 15; i >= 0; i--, rqptr += 4)
-		{
+		for (i = 15; i >= 0; i--, rqptr += 4)
 			sprintf(rqptr, "%1x.%1x.",
-					(unsigned int)(cp[i] & 0xf),
-					(unsigned int)(cp[i] >> 4));
-		}
+				(unsigned int) (cp[i] & 0xf),
+				(unsigned int) (cp[i] >> 4));
 
 		strcpy(rqptr, ".ip6.arpa");
 	}
@@ -691,15 +720,15 @@ static void do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t * query, const
 		return;
 	}
 
-
 	request->type = MOWGLI_DNS_T_PTR;
 	query_name(dns, request);
 }
 
-/* 
+/*
  * query_name - generate a query based on class, type and name.
  */
-static void query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
+static void
+query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 {
 	char buf[MOWGLI_DNS_MAXPACKET];
 	int request_len = 0;
@@ -709,32 +738,34 @@ static void query_name(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 	memset(buf, 0, sizeof(buf));
 
 	if ((request_len =
-		 mowgli_dns_res_mkquery(request->queryname, MOWGLI_DNS_C_IN, request->type, (unsigned char *)buf,
-						 sizeof(buf))) > 0)
+		     mowgli_dns_res_mkquery(request->queryname, MOWGLI_DNS_C_IN, request->type, (unsigned char *) buf,
+					    sizeof(buf))) > 0)
 	{
 		mowgli_dns_resheader_t *header = (mowgli_dns_resheader_t *) buf;
-		/* 
+
+		/*
 		 * generate an unique id
 		 * NOTE: we don't have to worry about converting this to and from
 		 * network byte order, the nameserver does not interpret this value
 		 * and returns it unchanged
 		 */
 		do
-		{
 			header->id = (header->id + mowgli_random_int(state->rand)) & 0xffff;
-		}
+
 		while (find_id(dns, header->id));
 
 		request->id = header->id;
 		++request->sends;
 
 		ns = send_res_msg(dns, buf, request_len, request->sends);
+
 		if (ns != -1)
 			request->lastns = ns;
 	}
 }
 
-static void resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
+static void
+resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 {
 	switch (request->type)
 	{
@@ -750,23 +781,24 @@ static void resend_query(mowgli_dns_t *dns, mowgli_dns_reslist_t *request)
 	}
 }
 
-/* 
+/*
  * check_question - check if the reply really belongs to the
  * name we queried (to guard against late replies from previous
  * queries with the same id).
  */
-static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
+static int
+check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char *buf, char *eob)
 {
 	char hostbuf[MOWGLI_DNS_RES_HOSTLEN + 1];	/* working buffer */
-	unsigned char *current;				/* current position in buf */
-	int n;						/* temp count */
+	unsigned char *current;	/* current position in buf */
+	int n;	/* temp count */
 
-	current = (unsigned char *)buf + sizeof(mowgli_dns_resheader_t);
+	current = (unsigned char *) buf + sizeof(mowgli_dns_resheader_t);
 
 	if (header->qdcount != 1)
 		return 0;
 
-	n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf, sizeof(hostbuf));
+	n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf, sizeof(hostbuf));
 
 	if (n <= 0)
 		return 0;
@@ -777,35 +809,36 @@ static int check_question(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t 
 	return 1;
 }
 
-/* 
+/*
  * proc_answer - process name server reply
  */
-static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * header, char *buf, char *eob)
+static int
+proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t *header, char *buf, char *eob)
 {
 	char hostbuf[MOWGLI_DNS_RES_HOSTLEN + 100];	/* working buffer */
-	unsigned char *current;				/* current position in buf */
-	int query_class;				/* answer class */
-	int type;					/* answer type */
-	int n;						/* temp count */
+	unsigned char *current;	/* current position in buf */
+	int query_class;/* answer class */
+	int type;	/* answer type */
+	int n;	/* temp count */
 	int rd_length;
 
-	current = (unsigned char *)buf + sizeof(mowgli_dns_resheader_t);
+	current = (unsigned char *) buf + sizeof(mowgli_dns_resheader_t);
 
 	for (; header->qdcount > 0; --header->qdcount)
 	{
-		if ((n = mowgli_dns_dn_skipname(current, (unsigned char *)eob)) < 0)
+		if ((n = mowgli_dns_dn_skipname(current, (unsigned char *) eob)) < 0)
 			return 0;
 
 		current += (size_t) n + MOWGLI_DNS_QFIXEDSIZE;
 	}
 
 	/* process each answer sent to us. */
-	while (header->ancount > 0 && (char *)current < eob)
+	while (header->ancount > 0 && (char *) current < eob)
 	{
 		header->ancount--;
 
-		n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current, hostbuf,
-						  sizeof(hostbuf));
+		n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current, hostbuf,
+					 sizeof(hostbuf));
 
 		/* Broken message (< 0) or no more answers left (== 0) */
 		if (n <= 0)
@@ -817,7 +850,7 @@ static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * h
 		 * to that (spotted by rodder/jailbird/dianora) */
 		current += (size_t) n;
 
-		if (!(((char *)current + MOWGLI_DNS_ANSWER_FIXED_SIZE) < eob))
+		if (!(((char *) current + MOWGLI_DNS_ANSWER_FIXED_SIZE) < eob))
 			break;
 
 		type = mowgli_dns_ns_get16(current);
@@ -827,7 +860,7 @@ static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * h
 		current += MOWGLI_DNS_CLASS_SIZE;
 
 		/* We may use this later at some point so... eliminate bogus GCC warning */
-		(void)query_class;
+		(void) query_class;
 
 		request->ttl = mowgli_dns_ns_get32(current);
 		current += MOWGLI_DNS_TTL_SIZE;
@@ -849,7 +882,7 @@ static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * h
 			if (rd_length != sizeof(struct in_addr))
 				return 0;
 
-			v4 = (struct sockaddr_in *)&request->addr;
+			v4 = (struct sockaddr_in *) &request->addr;
 			v4->sin_family = AF_INET;
 			memcpy(&v4->sin_addr, current, sizeof(struct in_addr));
 
@@ -861,37 +894,40 @@ static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * h
 
 			if (request->type != MOWGLI_DNS_T_AAAA)
 				return 0;
-			
+
 			if (rd_length != sizeof(struct in6_addr))
 				return 0;
-			
-			v6 = (struct sockaddr_in6 *)&request->addr;
+
+			v6 = (struct sockaddr_in6 *) &request->addr;
 			v6->sin6_family = AF_INET6;
 			memcpy(&v6->sin6_addr, current, sizeof(struct in6_addr));
-			
+
 			return 1;
 		}
 		case MOWGLI_DNS_T_PTR:
+
 			if (request->type != MOWGLI_DNS_T_PTR)
 				return 0;
-			
-			n = mowgli_dns_dn_expand((unsigned char *)buf, (unsigned char *)eob, current,
-							  hostbuf, sizeof(hostbuf));
-			
+
+			n = mowgli_dns_dn_expand((unsigned char *) buf, (unsigned char *) eob, current,
+						 hostbuf, sizeof(hostbuf));
+
 			/* Broken message or no more answers left */
 			if (n <= 0)
 				return 0;
-			
+
 			mowgli_strlcpy(request->name, hostbuf, MOWGLI_DNS_RES_HOSTLEN + 1);
 
 			return 1;
 		case MOWGLI_DNS_T_CNAME:
+
 			/* real answer will follow */
 			current += rd_length;
 			break;
 		default:
+
 			/* XXX I'd rather just throw away the entire bogus thing but its possible its just a
-			 * broken nameserver with still valid answers. But lets do some rudimentary logging for 
+			 * broken nameserver with still valid answers. But lets do some rudimentary logging for
 			 * now... */
 			mowgli_log("proc_answer(): bogus type %d", type);
 			break;
@@ -901,19 +937,21 @@ static int proc_answer(mowgli_dns_reslist_t *request, mowgli_dns_resheader_t * h
 	return 1;
 }
 
-/* 
+/*
  * res_read_single_reply - read a dns reply from the nameserver and process it.
  * Return value: 1 if a packet was read, 0 otherwise
  */
-static int res_read_single_reply(mowgli_dns_t *dns)
+static int
+res_read_single_reply(mowgli_dns_t *dns)
 {
 	char buf[sizeof(mowgli_dns_resheader_t) + MOWGLI_DNS_MAXPACKET]
-		/* Sparc and alpha need 16bit-alignment for accessing header->id (which is uint16_t).
-		   Because of the header = (mowgli_dns_resheader_t*) buf; later on, this is neeeded. --FaUl */
+
+	/* Sparc and alpha need 16bit-alignment for accessing header->id (which is uint16_t).
+	   Because of the header = (mowgli_dns_resheader_t*) buf; later on, this is neeeded. --FaUl */
 #if defined(__sparc__) || defined(__alpha__)
-		__attribute__ ((aligned(16)))
+	__attribute__((aligned(16)))
 #endif
-		;
+	;
 	mowgli_dns_resheader_t *header;
 	mowgli_dns_reslist_t *request = NULL;
 	mowgli_dns_reply_t *reply = NULL;
@@ -925,14 +963,14 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	rc = mowgli_vio_recvfrom(state->vio, buf, sizeof(buf), &lsin);
 
 	/* No packet */
-	if (rc == 0 || rc == -1)
+	if ((rc == 0) || (rc == -1))
 		return 0;
 
 	/* Too small */
-	if (rc <= (int)(sizeof(mowgli_dns_resheader_t)))
+	if (rc <= (int) (sizeof(mowgli_dns_resheader_t)))
 		return 1;
 
-	/* 
+	/*
 	 * convert DNS reply reader from Network byte order to CPU byte order.
 	 */
 	header = (mowgli_dns_resheader_t *) buf;
@@ -957,22 +995,23 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	{
 		if (header->rcode == MOWGLI_DNS_NXDOMAIN)
 		{
-			(*request->query->callback) (NULL, MOWGLI_DNS_RES_NXDOMAIN, request->query->ptr);
+			(*request->query->callback)(NULL, MOWGLI_DNS_RES_NXDOMAIN, request->query->ptr);
 			rem_request(dns, request);
 		}
 		else
 		{
-			/* 
+			/*
 			 * If a bad error was returned, we stop here and dont send
 			 * send any more (no retries granted).
 			 */
-			(*request->query->callback) (NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
+			(*request->query->callback)(NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 			rem_request(dns, request);
 		}
+
 		return 1;
 	}
 
-	/* If this fails there was an error decoding the received packet, 
+	/* If this fails there was an error decoding the received packet,
 	 * give up. -- jilles
 	 */
 	answer_count = proc_answer(request, header, buf, buf + rc);
@@ -986,7 +1025,7 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 				/* got a PTR response with no name, something bogus is happening
 				 * don't bother trying again, the client address doesn't resolve
 				 */
-				(*request->query->callback) (reply, MOWGLI_DNS_RES_INVALID, request->query->ptr);
+				(*request->query->callback)(reply, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 				rem_request(dns, request);
 				return 1;
 			}
@@ -997,13 +1036,14 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 				mowgli_dns_evloop_gethost_byname(dns, request->name, request->query, MOWGLI_DNS_T_AAAA);
 			else
 				mowgli_dns_evloop_gethost_byname(dns, request->name, request->query, MOWGLI_DNS_T_A);
+
 			rem_request(dns, request);
 		}
 		else
 		{
 			/* got a name and address response, client resolved */
 			reply = make_dnsreply(request);
-			(*request->query->callback) (reply, MOWGLI_DNS_RES_SUCCESS, request->query->ptr);
+			(*request->query->callback)(reply, MOWGLI_DNS_RES_SUCCESS, request->query->ptr);
 			mowgli_free(reply);
 			rem_request(dns, request);
 		}
@@ -1011,16 +1051,18 @@ static int res_read_single_reply(mowgli_dns_t *dns)
 	else
 	{
 		/* couldn't decode, give up -- jilles */
-		(*request->query->callback) (NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
+		(*request->query->callback)(NULL, MOWGLI_DNS_RES_INVALID, request->query->ptr);
 		rem_request(dns, request);
 	}
 
 	return 1;
 }
 
-static mowgli_dns_reply_t *make_dnsreply(mowgli_dns_reslist_t *request)
+static mowgli_dns_reply_t *
+make_dnsreply(mowgli_dns_reslist_t *request)
 {
 	mowgli_dns_reply_t *cp;
+
 	return_val_if_fail(request != 0, NULL);
 
 	cp = (mowgli_dns_reply_t *) mowgli_alloc(sizeof(mowgli_dns_reply_t));
@@ -1030,14 +1072,18 @@ static mowgli_dns_reply_t *make_dnsreply(mowgli_dns_reslist_t *request)
 	return cp;
 }
 
-static void res_readreply(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
+static void
+res_readreply(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *userdata)
 {
 	mowgli_dns_t *dns = userdata;
-	while (res_read_single_reply(dns));
+
+	while (res_read_single_reply(dns))
+	{ }
 }
 
 /* DNS ops for this resolver */
-const mowgli_dns_ops_t mowgli_dns_evloop_resolver = {
+const mowgli_dns_ops_t mowgli_dns_evloop_resolver =
+{
 	.mowgli_dns_init_func_t = mowgli_dns_evloop_init,
 	.mowgli_dns_fini_func_t = mowgli_dns_evloop_destroy,
 	.mowgli_dns_restart_func_t = mowgli_dns_evloop_restart,
@@ -1045,4 +1091,3 @@ const mowgli_dns_ops_t mowgli_dns_evloop_resolver = {
 	.mowgli_dns_gethost_byname_func_t = mowgli_dns_evloop_gethost_byname,
 	.mowgli_dns_gethost_byaddr_func_t = mowgli_dns_evloop_gethost_byaddr,
 };
-

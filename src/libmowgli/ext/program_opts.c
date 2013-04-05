@@ -58,21 +58,14 @@ mowgli_program_opts_lookup_name(mowgli_program_opts_t *opts, size_t opts_size, c
 	size_t i;
 
 	if (strlen(name) > 1)
-	{
 		for (i = 0; i < opts_size; i++)
-		{
 			if (!strcasecmp(name, opts[i].longopt))
 				return &opts[i];
-		}
-	}
-	else
-	{
-		for (i = 0; i < opts_size; i++)
-		{
-			if (*name == opts[i].smallopt)
-				return &opts[i];
-		}
-	}
+
+			else
+				for (i = 0; i < opts_size; i++)
+					if (*name == opts[i].smallopt)
+						return &opts[i];
 
 	return NULL;
 }
@@ -94,6 +87,7 @@ mowgli_program_opts_convert(const mowgli_program_opts_t *opts, size_t opts_size)
 
 		g_opts[i].name = opts[i].longopt;
 		g_opts[i].iflag = i;
+
 		if (opts[i].has_param)
 			g_opts[i].has_arg = 1;
 	}
@@ -118,6 +112,7 @@ mowgli_program_opts_compute_optstr(const mowgli_program_opts_t *opts, size_t opt
 			continue;
 
 		*p++ = opts[i].smallopt;
+
 		if (opts[i].has_param)
 			*p++ = ':';
 	}
@@ -132,7 +127,7 @@ mowgli_program_opts_dispatch(const mowgli_program_opts_t *opt, const char *optar
 {
 	return_if_fail(opt != NULL);
 
-	if (opt->has_param && optarg == NULL)
+	if (opt->has_param && (optarg == NULL))
 	{
 		fprintf(stderr, "no optarg for option %s", opt->longopt);
 		return;
@@ -163,24 +158,26 @@ mowgli_program_opts_parse(const mowgli_program_opts_t *opts, size_t opts_size, i
 		const mowgli_program_opts_t *opt = NULL;
 
 		c = mowgli_getopt_long(*argc, *argv, shortops, g_opts, &opt_index);
+
 		if (c == -1)
 			break;
 
 		switch (c)
 		{
 		case 0:
+
 			/* long-option was provided, resolve it. */
 			opt = &opts[g_opts[opt_index].iflag];
 			break;
 		default:
+
 			for (i = 0; i < opts_size; i++)
-			{
 				if (opts[i].smallopt == c)
 				{
 					opt = &opts[i];
 					break;
 				}
-			}
+
 			break;
 		}
 

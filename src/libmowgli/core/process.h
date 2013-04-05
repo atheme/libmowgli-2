@@ -25,7 +25,8 @@ typedef void (*mowgli_process_start_fn_t)(void *data);
 
 typedef pid_t mowgli_process_id_t;
 
-typedef struct {
+typedef struct
+{
 	mowgli_process_id_t pid;
 	void *userdata;
 } mowgli_process_t;

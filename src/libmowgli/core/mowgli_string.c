@@ -24,7 +24,8 @@
 
 #include "mowgli.h"
 
-mowgli_string_t *mowgli_string_create(void)
+mowgli_string_t *
+mowgli_string_create(void)
 {
 	mowgli_string_t *self = mowgli_alloc(sizeof(mowgli_string_t));
 
@@ -40,14 +41,16 @@ mowgli_string_t *mowgli_string_create(void)
 	return self;
 }
 
-void mowgli_string_reset(mowgli_string_t *self)
+void
+mowgli_string_reset(mowgli_string_t *self)
 {
 	return_if_fail(self != NULL);
 
 	self->str[0] = self->pos = 0;
 }
 
-void mowgli_string_destroy(mowgli_string_t *self)
+void
+mowgli_string_destroy(mowgli_string_t *self)
 {
 	return_if_fail(self != NULL);
 
@@ -55,7 +58,8 @@ void mowgli_string_destroy(mowgli_string_t *self)
 	mowgli_free(self);
 }
 
-void mowgli_string_append(mowgli_string_t *self, const char *src, size_t n)
+void
+mowgli_string_append(mowgli_string_t *self, const char *src, size_t n)
 {
 	if (self->size - self->pos <= n)
 	{
@@ -75,7 +79,8 @@ void mowgli_string_append(mowgli_string_t *self, const char *src, size_t n)
 	self->str[self->pos] = 0;
 }
 
-void mowgli_string_append_char(mowgli_string_t *self, const char c)
+void
+mowgli_string_append_char(mowgli_string_t *self, const char c)
 {
 	if (self->size - self->pos <= 1)
 	{
@@ -94,7 +99,6 @@ void mowgli_string_append_char(mowgli_string_t *self, const char c)
 	self->str[self->pos] = 0;
 }
 
-
 /*
  * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
  *
@@ -111,7 +115,8 @@ void mowgli_string_append_char(mowgli_string_t *self, const char c)
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-size_t mowgli_strlcat(char *dst, const char *src, size_t siz)
+size_t
+mowgli_strlcat(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
@@ -120,50 +125,63 @@ size_t mowgli_strlcat(char *dst, const char *src, size_t siz)
 
 	/* Find the end of dst and adjust bytes left but don't go past end */
 	while (n-- != 0 && *d != '\0')
+	{
 		d++;
+	}
+
 	dlen = d - dst;
 	n = siz - dlen;
 
 	if (n == 0)
-		return (dlen + strlen(s));
-	while (*s != '\0') {
-		if (n != 1) {
+		return dlen + strlen(s);
+
+	while (*s != '\0')
+	{
+		if (n != 1)
+		{
 			*d++ = *s;
 			n--;
 		}
+
 		s++;
 	}
+
 	*d = '\0';
 
-	return (dlen + (s - src));	/* count does not include NUL */
+	return dlen + (s - src);/* count does not include NUL */
 }
 
-size_t mowgli_strlcpy(char *dst, const char *src, size_t siz)
+size_t
+mowgli_strlcpy(char *dst, const char *src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;
 	size_t n = siz;
 
 	/* Copy as many bytes as will fit */
-	if (n != 0) {
-		while (--n != 0) {
+	if (n != 0)
+		while (--n != 0)
+		{
 			if ((*d++ = *s++) == '\0')
 				break;
 		}
-	}
 
 	/* Not enough room in dst, add NUL and traverse rest of src */
-	if (n == 0) {
+
+	if (n == 0)
+	{
 		if (siz != 0)
 			*d = '\0';		/* NUL-terminate dst */
+
 		while (*s++)
-			;
+		{ }
 	}
 
-	return (s - src - 1);	/* count does not include NUL */
+	return s - src - 1;	/* count does not include NUL */
 }
 
-ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
+ssize_t
+mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
 {
 	size_t len;
 	va_list va;

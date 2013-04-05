@@ -20,7 +20,8 @@
 
 #include "mowgli.h"
 
-typedef struct {
+typedef struct
+{
 	char *path;
 	char **argv;
 } mowgli_process_execv_req_t;
@@ -57,12 +58,14 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, const char *procname, v
 	out->userdata = userdata;
 
 	out->pid = fork();
+
 	switch (out->pid)
 	{
 	default:
 		break;
 
 	case 0:
+
 		/* Do our best to set this... */
 		mowgli_proctitle_set("%s", procname);
 		start_fn(out->userdata);

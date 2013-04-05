@@ -26,7 +26,8 @@
 
 #ifdef __cplusplus
 # define MOWGLI_DECLS_START extern "C" {
-# define MOWGLI_DECLS_END   }
+# define MOWGLI_DECLS_END \
+	}
 #else
 # define MOWGLI_DECLS_START
 # define MOWGLI_DECLS_END
@@ -97,4 +98,3 @@ MOWGLI_DECLS_START
 MOWGLI_DECLS_END
 
 #endif
-

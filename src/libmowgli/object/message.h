@@ -27,7 +27,8 @@
 typedef struct mowgli_object_message_handler_ mowgli_object_message_handler_t;
 typedef void (*mowgli_object_messaging_func_t)(mowgli_object_t *self, mowgli_object_message_handler_t *sig, mowgli_argstack_t *argstack);
 
-struct mowgli_object_message_handler_ {
+struct mowgli_object_message_handler_
+{
 	char *name;
 	char *descstr;
 	mowgli_object_messaging_func_t handler;

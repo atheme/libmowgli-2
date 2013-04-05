@@ -26,10 +26,9 @@
 static mowgli_patricia_t *mowgli_global_storage_dict = NULL;
 static mowgli_mutex_t mowgli_global_storage_lock;
 
-static void _storage_key_canon(char *key)
-{
-
-}
+static void
+_storage_key_canon(char *key)
+{ }
 
 void
 mowgli_global_storage_bootstrap(void)
@@ -66,4 +65,3 @@ mowgli_global_storage_free(char *name)
 	mowgli_patricia_delete(mowgli_global_storage_dict, name);
 	mowgli_mutex_unlock(&mowgli_global_storage_lock);
 }
-

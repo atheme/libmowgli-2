@@ -40,7 +40,8 @@
  * Side Effects:
  *      - none
  */
-void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t des)
+void
+mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_class_t *klass, mowgli_destructor_t des)
 {
 	return_if_fail(obj != NULL);
 
@@ -48,7 +49,9 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
 		obj->name = mowgli_strdup(name);
 
 	if (klass != NULL)
+	{
 		obj->klass = klass;
+	}
 	else
 	{
 		mowgli_object_class_t *tmp = mowgli_alloc(sizeof(mowgli_object_class_t));
@@ -85,8 +88,7 @@ void mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_cl
  *      - none
  */
 void
-mowgli_object_init_from_class(mowgli_object_t *obj, const char *name,
-	mowgli_object_class_t *klass)
+mowgli_object_init_from_class(mowgli_object_t *obj, const char *name, mowgli_object_class_t *klass)
 {
 	return_if_fail(obj != NULL);
 	return_if_fail(klass != NULL);
@@ -108,7 +110,8 @@ mowgli_object_init_from_class(mowgli_object_t *obj, const char *name,
  * Side Effects:
  *      - none
  */
-void * mowgli_object_ref(void *object)
+void *
+mowgli_object_ref(void *object)
 {
 	return_val_if_fail(object != NULL, NULL);
 
@@ -131,7 +134,8 @@ void * mowgli_object_ref(void *object)
  * Side Effects:
  *      - if the refcount is 0, the object is destroyed.
  */
-void mowgli_object_unref(void *object)
+void
+mowgli_object_unref(void *object)
 {
 	mowgli_object_t *obj = mowgli_object(object);
 
@@ -159,6 +163,8 @@ void mowgli_object_unref(void *object)
 				free(obj);
 		}
 		else
+		{
 			mowgli_log_warning("invalid object class");
+		}
 	}
 }

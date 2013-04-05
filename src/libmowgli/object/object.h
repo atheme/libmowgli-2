@@ -24,7 +24,8 @@
 #ifndef __MOWGLI_OBJECT_H__
 #define __MOWGLI_OBJECT_H__
 
-typedef struct {
+typedef struct
+{
 	char *name;
 	int refcount;
 	mowgli_object_class_t *klass;

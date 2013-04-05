@@ -26,27 +26,29 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-mowgli_module_t mowgli_module_open(const char *path)
+mowgli_module_t
+mowgli_module_open(const char *path)
 {
 	HANDLE handle = LoadLibraryA(path);
 
-	/* make sure we have something. make this an assertion so that 
+	/* make sure we have something. make this an assertion so that
 	 * there is feedback if something happens. (poor programming practice).
 	 */
 	return_val_if_fail(handle != NULL, NULL);
 
-	return (mowgli_module_t)handle;
+	return (mowgli_module_t) handle;
 }
 
-void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
+void *
+mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 {
 	void *handle;
 
 	return_val_if_fail(module != NULL, NULL);
 
-	handle = GetProcAddress((HANDLE)module, symbol);
+	handle = GetProcAddress((HANDLE) module, symbol);
 
-	/* make sure we have something. make this an assertion so that 
+	/* make sure we have something. make this an assertion so that
 	 * there is feedback if something happens. (poor programming practice).
 	 */
 	return_val_if_fail(handle != NULL, NULL);
@@ -54,9 +56,10 @@ void * mowgli_module_symbol(mowgli_module_t module, const char *symbol)
 	return handle;
 }
 
-void mowgli_module_close(mowgli_module_t module)
+void
+mowgli_module_close(mowgli_module_t module)
 {
 	return_if_fail(module != NULL);
 
-	FreeLibrary((HANDLE)module);
+	FreeLibrary((HANDLE) module);
 }

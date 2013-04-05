@@ -1,4 +1,4 @@
-/* 
+/*
  * Code has been calqued from PostgreSQL 9.1 by Elizabeth J. Myers.
  * Below is their copyright header.
  *
@@ -18,23 +18,23 @@
  *
  * Copyright (c) 2000-2011, PostgreSQL Global Development Group
  * various details abducted from various places
- *--------------------------------------------------------------------
+ ***--------------------------------------------------------------------
  */
 
 #include "mowgli.h"
 
 #ifdef HAVE_SYS_PSTAT_H
-#include <sys/pstat.h>		/* for HP-UX */
+# include <sys/pstat.h>		/* for HP-UX */
 #endif
 #ifdef HAVE_PS_STRINGS
-#include <machine/vmparam.h>	/* for old BSD */
-#include <sys/exec.h>
+# include <machine/vmparam.h>	/* for old BSD */
+# include <sys/exec.h>
 #endif
 #ifdef MOWGLI_OS_OSX
-#include <crt_externs.h>
+# include <crt_externs.h>
 #endif
 #ifdef HAVE_SYS_PRCTL_H
-#include <sys/prctl.h>
+# include <sys/prctl.h>
 #endif
 
 #if !defined(MOWGLI_OS_WIN) && !defined(MOWGLI_OS_OSX)
@@ -69,44 +69,43 @@ extern char **environ;
  *	   (This is the default, as it is safest.)
  */
 #if defined(HAVE_SETPROCTITLE)
-#define MOWGLI_SETPROC_USE_SETPROCTITLE
+# define MOWGLI_SETPROC_USE_SETPROCTITLE
 #elif defined(PR_SET_NAME) && defined(HAVE_SYS_PRCTL_H)
-#define MOWGLI_SETPROC_USE_PRCTL
+# define MOWGLI_SETPROC_USE_PRCTL
 #elif defined(HAVE_PSTAT) && defined(PSTAT_SETCMD)
-#define MOWGLI_SETPROC_USE_PSTAT
+# define MOWGLI_SETPROC_USE_PSTAT
 #elif defined(HAVE_PS_STRINGS)
-#define MOWGLI_SETPROC_USE_PS_STRINGS
+# define MOWGLI_SETPROC_USE_PS_STRINGS
 #elif (defined(BSD) || defined(__bsdi__) || defined(__hurd__)) && !defined(__darwin__)
-#define MOWGLI_SETPROC_USE_CHANGE_ARGV
+# define MOWGLI_SETPROC_USE_CHANGE_ARGV
 #elif defined(__linux__) || defined(_AIX) || defined(__sgi) || (defined(sun) && !defined(BSD)) || defined(ultrix) || defined(__ksr__) || defined(__osf__) || defined(__svr4__) || defined(__svr5__) || defined(__darwin__)
-#define MOWGLI_SETPROC_USE_CLOBBER_ARGV
+# define MOWGLI_SETPROC_USE_CLOBBER_ARGV
 #elif defined(WIN32)
-#define MOWGLI_SETPROC_USE_WIN32
+# define MOWGLI_SETPROC_USE_WIN32
 #else
-#define MOWGLI_SETPROC_USE_NONE
+# define MOWGLI_SETPROC_USE_NONE
 #endif
-
 
 /* Different systems want the buffer padded differently */
 #if defined(_AIX) || defined(__linux__) || defined(__svr4__) || defined(__darwin__)
-#define PS_PADDING '\0'
+# define PS_PADDING '\0'
 #else
-#define PS_PADDING ' '
+# define PS_PADDING ' '
 #endif
 
-
 #ifndef MOWGLI_SETPROC_USE_CLOBBER_ARGV
+
 /* all but one option need a buffer to write their ps line in */
-#define PS_BUFFER_SIZE 256
+# define PS_BUFFER_SIZE 256
 static char ps_buffer[PS_BUFFER_SIZE];
 static const size_t ps_buffer_size = PS_BUFFER_SIZE;
-#else					/* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
-static char *ps_buffer;			/* will point to argv area */
+#else /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
+static char *ps_buffer;	/* will point to argv area */
 static size_t ps_buffer_size;	/* space determined at run time */
-#endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
+#endif /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
 static size_t ps_buffer_fixed_size;
-static size_t ps_buffer_cur_len;	/* nominal strlen(ps_buffer) */
+static size_t ps_buffer_cur_len;/* nominal strlen(ps_buffer) */
 
 /* save the original argv[] location here */
 static int save_argc;
@@ -123,9 +122,9 @@ char **mowgli_argv = NULL;
 char **
 mowgli_proctitle_init(int argc, char **argv)
 {
-	if (argc == 0 || argv == NULL)
-		
-	save_argc = argc;
+	if ((argc == 0) || (argv == NULL))
+		save_argc = argc;
+
 	save_argv = argv;
 	int i;
 
@@ -142,12 +141,10 @@ mowgli_proctitle_init(int argc, char **argv)
 	 * check for contiguous argv strings
 	 */
 	for (i = 0; i < argc; i++)
-	{
-		if (i == 0 || end_of_area + 1 == argv[i])
+		if ((i == 0) || (end_of_area + 1 == argv[i]))
 			end_of_area = argv[i] + strlen(argv[i]);
-	}
 
-	if (end_of_area == NULL)	/* probably can't happen? */
+	if (end_of_area == NULL)/* probably can't happen? */
 	{
 		ps_buffer = NULL;
 		ps_buffer_size = 0;
@@ -158,10 +155,8 @@ mowgli_proctitle_init(int argc, char **argv)
 	 * check for contiguous environ strings following argv
 	 */
 	for (i = 0; environ[i] != NULL; i++)
-	{
 		if (end_of_area + 1 == environ[i])
 			end_of_area = environ[i] + strlen(environ[i]);
-	}
 
 	ps_buffer = argv[0];
 	ps_buffer_size = end_of_area - argv[0];
@@ -170,12 +165,14 @@ mowgli_proctitle_init(int argc, char **argv)
 	 * move the environment out of the way
 	 */
 	new_environ = (char **) mowgli_alloc((i + 1) * sizeof(char *));
+
 	for (i = 0; environ[i] != NULL; i++)
 		new_environ[i] = mowgli_strdup(environ[i]);
+
 	new_environ[i] = NULL;
 	environ = new_environ;
 
-#endif   /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
+#endif /* MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
 #if defined(MOWGLI_SETPROC_USE_CHANGE_ARGV) || defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
 
@@ -193,21 +190,24 @@ mowgli_proctitle_init(int argc, char **argv)
 	char **new_argv;
 
 	new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
+
 	for (i = 0; i < argc; i++)
 		new_argv[i] = mowgli_strdup(argv[i]);
+
 	new_argv[argc] = NULL;
 
-#ifdef MOWGLI_OS_OSX
+# ifdef MOWGLI_OS_OSX
+
 	/*
 	 * Darwin (and perhaps other NeXT-derived platforms?) has a static
 	 * copy of the argv pointer, which we may fix like so:
 	 */
 	*_NSGetArgv() = new_argv;
-#endif
+# endif
 
 	argv = new_argv;
 
-#endif   /* MOWGLI_SETPROC_USE_CHANGE_ARGV or MOWGLI_SETPROC_USE_CLOBBER_ARGV */
+#endif /* MOWGLI_SETPROC_USE_CHANGE_ARGV or MOWGLI_SETPROC_USE_CLOBBER_ARGV */
 
 	mowgli_argc = argc;
 	mowgli_argv = argv;
@@ -221,10 +221,12 @@ mowgli_proctitle_set(const char *fmt, ...)
 #ifndef MOWGLI_SETPROC_USE_NONE
 	va_list va;
 
-#if defined(MOWGLI_SETPROC_USE_CHANGE_ARGV) || defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
+# if defined(MOWGLI_SETPROC_USE_CHANGE_ARGV) || defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
+
 	if (!save_argv)
 		return;
-#endif
+
+# endif
 
 	va_start(va, fmt);
 	vsnprintf(ps_buffer, ps_buffer_size, fmt, va);
@@ -234,43 +236,46 @@ mowgli_proctitle_set(const char *fmt, ...)
 
 	ps_buffer_cur_len = ps_buffer_fixed_size = strlen(ps_buffer);
 
-#ifdef MOWGLI_SETPROC_USE_CHANGE_ARGV
+# ifdef MOWGLI_SETPROC_USE_CHANGE_ARGV
 	save_argv[0] = ps_buffer;
 	save_argv[1] = NULL;
-#endif
+# endif
 
-#ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
+# ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
+
 	for (int i = 1; i < save_argc; i++)
 		save_argv[i] = ps_buffer + ps_buffer_size;
 
 	/* Pad unused bytes */
 	memset(ps_buffer + ps_buffer_cur_len, PS_PADDING, ps_buffer_size - ps_buffer_cur_len + 1);
-#endif
+# endif
 
-#ifdef MOWGLI_SETPROC_USE_SETPROCTITLE
+# ifdef MOWGLI_SETPROC_USE_SETPROCTITLE
 	setproctitle("%s", ps_buffer);
-#endif
+# endif
 
-#ifdef MOWGLI_SETPROC_USE_PRCTL
+# ifdef MOWGLI_SETPROC_USE_PRCTL
+
 	/* Limit us to 16 chars to be safe */
 	char procbuf[16];
 	mowgli_strlcpy(procbuf, ps_buffer, sizeof(procbuf));
 	prctl(PR_SET_NAME, procbuf, 0, 0, 0);
-#endif
+# endif
 
-#ifdef MOWGLI_SETPROC_USE_PSTAT
+# ifdef MOWGLI_SETPROC_USE_PSTAT
 	union pstun pst;
 
 	pst.pst_command = ps_buffer;
 	pstat(PSTAT_SETCMD, pst, ps_buffer_cur_len, 0, 0);
-#endif   /* MOWGLI_SETPROC_USE_PSTAT */
+# endif /* MOWGLI_SETPROC_USE_PSTAT */
 
-#ifdef MOWGLI_SETPROC_USE_PS_STRINGS
+# ifdef MOWGLI_SETPROC_USE_PS_STRINGS
 	PS_STRINGS->ps_nargvstr = 1;
 	PS_STRINGS->ps_argvstr = ps_buffer;
-#endif   /* MOWGLI_SETPROC_USE_PS_STRINGS */
+# endif /* MOWGLI_SETPROC_USE_PS_STRINGS */
 
-#ifdef MOWGLI_SETPROC_USE_WIN32
+# ifdef MOWGLI_SETPROC_USE_WIN32
+
 	/*
 	 * Win32 does not support showing any changed arguments. To make it at
 	 * all possible to track which backend is doing what, we create a
@@ -285,10 +290,9 @@ mowgli_proctitle_set(const char *fmt, ...)
 	sprintf(name, "mowgli_ident(%d): %s", getpid(), ps_buffer);
 
 	ident_handle = CreateEvent(NULL, TRUE, FALSE, name);
-#endif   /* MOWGLI_SETPROC_USE_WIN32 */
-#endif   /* not MOWGLI_SETPROC_USE_NONE */
+# endif /* MOWGLI_SETPROC_USE_WIN32 */
+#endif /* not MOWGLI_SETPROC_USE_NONE */
 }
-
 
 /*
  * Returns what's currently in the ps display, in case someone needs
@@ -300,12 +304,14 @@ const char *
 mowgli_proctitle_get(int *displen)
 {
 #ifdef MOWGLI_SETPROC_USE_CLOBBER_ARGV
+
 	/* If ps_buffer is a pointer, it might still be null */
 	if (!ps_buffer)
 	{
 		*displen = 0;
 		return "";
 	}
+
 #endif
 
 	*displen = (int) (ps_buffer_cur_len - ps_buffer_fixed_size);

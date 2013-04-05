@@ -26,7 +26,8 @@
 
 typedef void (*mowgli_program_opts_consumer_t)(const char *arg, void *userdata);
 
-typedef struct {
+typedef struct
+{
 	const char *longopt;
 	const char smallopt;
 	bool has_param;

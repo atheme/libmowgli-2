@@ -80,15 +80,15 @@
 # undef TRUE
 #endif
 
-typedef enum { FALSE, TRUE } mowgli_boolean_t;
+typedef enum {FALSE, TRUE} mowgli_boolean_t;
 
 /* Macros for min/max.  */
 #ifndef MIN
-# define MIN(a,b) (((a)<(b))?(a):(b))
+# define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifndef MAX
-# define MAX(a,b) (((a)>(b))?(a):(b))
+# define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 /* OpenSSL stuff */
@@ -96,8 +96,8 @@ typedef enum { FALSE, TRUE } mowgli_boolean_t;
 # if defined(__APPLE__)
 #  include <AvailabilityMacros.h>
 #  ifdef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
-#    undef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
-#    define DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#   undef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#   define DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
 #  endif
 # endif
 # include <openssl/rand.h>

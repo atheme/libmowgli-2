@@ -17,6 +17,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 /*
  * Description of config files parsed by this:
  *
@@ -35,6 +36,7 @@
  * no matter where the include directive is. Include files must have balanced
  * braces.
  */
+
 /*
  * Original idea from the csircd config parser written by Fred Jacobs
  * and Chris Behrens.
@@ -52,7 +54,8 @@ static mowgli_config_file_t *mowgli_config_file_load_internal(mowgli_config_file
 
 #define CF_ERRORED(cf) ((cf)->curline <= 0)
 
-static void mowgli_config_file_error(mowgli_config_file_t *cf, const char *format, ...)
+static void
+mowgli_config_file_error(mowgli_config_file_t *cf, const char *format, ...)
 {
 	va_list ap;
 	char buffer[1024];
@@ -70,16 +73,19 @@ static void mowgli_config_file_error(mowgli_config_file_t *cf, const char *forma
 		if (cf->curline < 0)
 			cf->curline = -cf->curline;
 
-		mowgli_log("%s:%d: %s",	cf->filename, cf->curline, buffer);
+		mowgli_log("%s:%d: %s", cf->filename, cf->curline, buffer);
 
 		/* mark config parse as failed */
 		cf->curline = -cf->curline;
 	}
 	else
+	{
 		mowgli_log("mowgli_config_file_parse(): %s", buffer);
+	}
 }
 
-static void skip_ws(char **pos, mowgli_config_file_t *cf)
+static void
+skip_ws(char **pos, mowgli_config_file_t *cf)
 {
 	int startline;
 
@@ -87,86 +93,110 @@ static void skip_ws(char **pos, mowgli_config_file_t *cf)
 	{
 		switch (**pos)
 		{
-			case ' ':
-			case '\t':
-			case '\r':
-			case '=': /* XXX */
-				break;
-			case '\n':
-				cf->curline++;
-				break;
-			case '/':
-				if ((*pos)[1] == '*')
+		case ' ':
+		case '\t':
+		case '\r':
+		case '=':	/* XXX */
+			break;
+		case '\n':
+			cf->curline++;
+			break;
+		case '/':
+
+			if ((*pos)[1] == '*')
+			{
+				startline = cf->curline;
+				(*pos)++;
+				(*pos)++;
+
+				while (**pos != '\0' && (**pos != '*' || (*pos)[1] != '/'))
 				{
-					startline = cf->curline;
+					if (**pos == '\n')
+						cf->curline++;
+
 					(*pos)++;
-					(*pos)++;
-					while (**pos != '\0' && (**pos != '*' || (*pos)[1] != '/'))
-					{
-						if (**pos == '\n')
-							cf->curline++;
-						(*pos)++;
-					}
-					if (**pos == '\0')
-						mowgli_config_file_error(cf, "File ends inside comment starting at line %d", startline);
-					else
-						(*pos)++; /* skip '*' */
 				}
-				else if ((*pos)[1] == '/')
-				{
-					while (**pos != '\0' && **pos != '\n' && **pos != '\r')
-						(*pos)++;
-					continue;
-				}
+
+				if (**pos == '\0')
+					mowgli_config_file_error(cf, "File ends inside comment starting at line %d", startline);
 				else
-					return;
-				break;
-			case '#':
+					(*pos)++;		/* skip '*' */
+			}
+			else if ((*pos)[1] == '/')
+			{
 				while (**pos != '\0' && **pos != '\n' && **pos != '\r')
+				{
 					(*pos)++;
+				}
+
 				continue;
-			default:
+			}
+			else
+			{
 				return;
+			}
+
+			break;
+		case '#':
+
+			while (**pos != '\0' && **pos != '\n' && **pos != '\r')
+			{
+				(*pos)++;
+			}
+
+			continue;
+		default:
+			return;
 		}
+
 		if (**pos == '\0')
 			return;
+
 		(*pos)++;
 	}
 }
 
-static char *get_value(char **pos, mowgli_config_file_t *cf, char *skipped)
+static char *
+get_value(char **pos, mowgli_config_file_t *cf, char *skipped)
 {
 	char *p = *pos;
 	char *q;
 	char *start;
 
 	*skipped = '\0';
+
 	if (*p == '"')
 	{
 		p++;
 		start = p;
 		q = p;
+
 		while (*p != '\0' && *p != '\r' && *p != '\n' && *p != '"')
 		{
-			if (*p == '\\' && (p[1] == '"' || p[1] == '\\'))
+			if ((*p == '\\') && ((p[1] == '"') || (p[1] == '\\')))
 				p++;
+
 			*q++ = *p++;
 		}
+
 		if (*p == '\0')
 		{
 			mowgli_config_file_error(cf, "File ends inside quoted string");
 			return NULL;
 		}
-		if (*p == '\r' || *p == '\n')
+
+		if ((*p == '\r') || (*p == '\n'))
 		{
 			mowgli_config_file_error(cf, "Newline inside quoted string");
 			return NULL;
 		}
+
 		if (*p != '"')
 		{
 			mowgli_config_file_error(cf, "Weird character terminating quoted string (BUG)");
 			return NULL;
 		}
+
 		p++;
 		*q = '\0';
 		*pos = p;
@@ -176,24 +206,34 @@ static char *get_value(char **pos, mowgli_config_file_t *cf, char *skipped)
 	else
 	{
 		start = p;
+
 		while (*p != '\0' && *p != '\t' && *p != '\r' && *p != '\n' &&
-				*p != ' ' && *p != '/' && *p != '#' &&
-				*p != ';' && *p != '{' && *p != '}')
+		       *p != ' ' && *p != '/' && *p != '#' &&
+		       *p != ';' && *p != '{' && *p != '}')
+		{
 			p++;
+		}
+
 		if (p == start)
 			return NULL;
+
 		*pos = p;
 		skip_ws(pos, cf);
+
 		if (p == *pos)
 			*skipped = *p;
+
 		*p = '\0';
+
 		if (p == *pos)
 			(*pos)++;
+
 		return start;
 	}
 }
 
-static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char *confdata)
+static mowgli_config_file_t *
+mowgli_config_file_parse(const char *filename, char *confdata)
 {
 	mowgli_config_file_t *cf, *subcf, *lastcf;
 	mowgli_config_file_entry_t **pprevce, *ce, *upce;
@@ -208,11 +248,14 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 	pprevce = &cf->entries;
 	upce = NULL;
 	p = confdata;
+
 	while (*p != '\0')
 	{
 		skip_ws(&p, cf);
-		if (*p == '\0' || CF_ERRORED(cf))
+
+		if ((*p == '\0') || CF_ERRORED(cf))
 			break;
+
 		if (*p == '}')
 		{
 			if (upce == NULL)
@@ -220,31 +263,39 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 				mowgli_config_file_error(cf, "Extraneous closing brace");
 				break;
 			}
+
 			ce = upce;
 			ce->sectlinenum = cf->curline;
 			pprevce = &ce->next;
 			upce = ce->prevlevel;
 			p++;
 			skip_ws(&p, cf);
+
 			if (CF_ERRORED(cf))
 				break;
+
 			if (*p != ';')
 			{
 				mowgli_config_file_error(cf, "Missing semicolon after closing brace for section ending at line %d", ce->sectlinenum);
 				break;
 			}
+
 			ce = NULL;
 			p++;
 			continue;
 		}
+
 		val = get_value(&p, cf, &c);
+
 		if (CF_ERRORED(cf))
 			break;
+
 		if (val == NULL)
 		{
 			mowgli_config_file_error(cf, "Unexpected character trying to read variable name");
 			break;
 		}
+
 		ce = mowgli_alloc(sizeof *ce);
 		ce->fileptr = cf;
 		ce->varlinenum = cf->curline;
@@ -252,8 +303,10 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 		ce->prevlevel = upce;
 		*pprevce = ce;
 		pprevce = &ce->next;
-		if (c == '\0' && (*p == '{' || *p == ';'))
+
+		if ((c == '\0') && ((*p == '{') || (*p == ';')))
 			c = *p++;
+
 		if (c == '{')
 		{
 			pprevce = &ce->entries;
@@ -272,16 +325,21 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 		else
 		{
 			val = get_value(&p, cf, &c);
+
 			if (CF_ERRORED(cf))
 				break;
+
 			if (val == NULL)
 			{
 				mowgli_config_file_error(cf, "Unexpected character trying to read value for %s", ce->varname);
 				break;
 			}
+
 			ce->vardata = val;
-			if (c == '\0' && (*p == '{' || *p == ';'))
+
+			if ((c == '\0') && ((*p == '{') || (*p == ';')))
 				c = *p++;
+
 			if (c == '{')
 			{
 				pprevce = &ce->entries;
@@ -290,18 +348,24 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 			}
 			else if (c == ';')
 			{
-				if (upce == NULL && !strcasecmp(ce->varname, "include"))
+				if ((upce == NULL) && !strcasecmp(ce->varname, "include"))
 				{
 					subcf = mowgli_config_file_load_internal(cf, ce->vardata);
+
 					if (subcf == NULL)
 					{
 						mowgli_config_file_error(cf, "Error in file included from here");
 						break;
 					}
+
 					lastcf->next = subcf;
+
 					while (lastcf->next != NULL)
+					{
 						lastcf = lastcf->next;
+					}
 				}
+
 				ce = NULL;
 			}
 			else
@@ -311,59 +375,74 @@ static mowgli_config_file_t *mowgli_config_file_parse(const char *filename, char
 			}
 		}
 	}
-	if (!CF_ERRORED(cf) && upce != NULL)
+
+	if (!CF_ERRORED(cf) && (upce != NULL))
 	{
 		mowgli_config_file_error(cf, "One or more sections not closed");
 		ce = upce;
+
 		while (ce->prevlevel != NULL)
+		{
 			ce = ce->prevlevel;
+		}
+
 		if (ce->vardata != NULL)
 			mowgli_config_file_error(cf, "First unclosed section is %s %s at line %d",
-					ce->varname, ce->vardata, ce->varlinenum);
+						 ce->varname, ce->vardata, ce->varlinenum);
 		else
 			mowgli_config_file_error(cf, "First unclosed section is %s at line %d",
-					ce->varname, ce->varlinenum);
+						 ce->varname, ce->varlinenum);
 	}
+
 	if (CF_ERRORED(cf))
 	{
 		mowgli_config_file_free(cf);
 		cf = NULL;
 	}
+
 	return cf;
 }
 
-static void mowgli_config_file_entry_free(mowgli_config_file_entry_t *ceptr)
+static void
+mowgli_config_file_entry_free(mowgli_config_file_entry_t *ceptr)
 {
 	mowgli_config_file_entry_t *nptr;
 
 	for (; ceptr; ceptr = nptr)
 	{
 		nptr = ceptr->next;
+
 		if (ceptr->entries)
 			mowgli_config_file_entry_free(ceptr->entries);
+
 		/* ce_varname and ce_vardata are inside cf_mem */
 		mowgli_free(ceptr);
 	}
 }
 
-void mowgli_config_file_free(mowgli_config_file_t *cfptr)
+void
+mowgli_config_file_free(mowgli_config_file_t *cfptr)
 {
 	mowgli_config_file_t *nptr;
 
 	for (; cfptr; cfptr = nptr)
 	{
 		nptr = cfptr->next;
+
 		if (cfptr->entries)
 			mowgli_config_file_entry_free(cfptr->entries);
+
 		mowgli_free(cfptr->filename);
 		mowgli_free(cfptr->mem);
 		mowgli_free(cfptr);
 	}
 }
 
-static mowgli_config_file_t *mowgli_config_file_load_internal(mowgli_config_file_t *parent, const char *filename)
+static mowgli_config_file_t *
+mowgli_config_file_load_internal(mowgli_config_file_t *parent, const char *filename)
 {
 	struct stat sb;
+
 	FILE *fp;
 	size_t ret;
 	char *buf = NULL;
@@ -377,35 +456,42 @@ static mowgli_config_file_t *mowgli_config_file_load_internal(mowgli_config_file
 	}
 
 	fp = fopen(filename, "rb");
+
 	if (!fp)
 	{
 		mowgli_config_file_error(parent, "Couldn't open \"%s\": %s\n", filename, strerror(errno));
 		return NULL;
 	}
+
 	if (stat(filename, &sb) == -1)
 	{
 		mowgli_config_file_error(parent, "Couldn't fstat \"%s\": %s\n", filename, strerror(errno));
 		fclose(fp);
 		return NULL;
 	}
+
 	if (!S_ISREG(sb.st_mode))
 	{
 		mowgli_config_file_error(parent, "Not a regular file: \"%s\"\n", filename);
 		fclose(fp);
 		return NULL;
 	}
+
 	if (sb.st_size > SSIZE_MAX - 1)
 	{
 		mowgli_config_file_error(parent, "File too large: \"%s\"\n", filename);
 		fclose(fp);
 		return NULL;
 	}
+
 	buf = (char *) mowgli_alloc(sb.st_size + 1);
+
 	if (sb.st_size)
 	{
 		errno = 0;
 		ret = fread(buf, 1, sb.st_size, fp);
-		if (ret != (size_t)sb.st_size)
+
+		if (ret != (size_t) sb.st_size)
 		{
 			mowgli_config_file_error(parent, "Error reading \"%s\": %s\n", filename, strerror(errno ? errno : EFAULT));
 			mowgli_free(buf);
@@ -414,17 +500,22 @@ static mowgli_config_file_t *mowgli_config_file_load_internal(mowgli_config_file
 		}
 	}
 	else
+	{
 		ret = 0;
+	}
+
 	buf[ret] = '\0';
 	fclose(fp);
 	nestcnt++;
 	cfptr = mowgli_config_file_parse(filename, buf);
 	nestcnt--;
+
 	/* buf is owned by cfptr or freed now */
 	return cfptr;
 }
 
-mowgli_config_file_t *mowgli_config_file_load(const char *filename)
+mowgli_config_file_t *
+mowgli_config_file_load(const char *filename)
 {
 	return mowgli_config_file_load_internal(NULL, filename);
 }

@@ -62,14 +62,14 @@ struct mowgli_heap_
 
 	unsigned int flags;
 
-	mowgli_list_t blocks; /* list of non-empty blocks */
+	mowgli_list_t blocks;	/* list of non-empty blocks */
 
 	mowgli_allocation_policy_t *allocator;
 	mowgli_boolean_t use_mmap;
 
 	mowgli_mutex_t mutex;
 
-	mowgli_block_t *empty_block; /* a single entirely free block, or NULL */
+	mowgli_block_t *empty_block;	/* a single entirely free block, or NULL */
 };
 
 typedef struct mowgli_heap_elem_header_ mowgli_heap_elem_header_t;
@@ -78,8 +78,8 @@ struct mowgli_heap_elem_header_
 {
 	union
 	{
-		mowgli_block_t *block; /* for allocated elems: block ptr */
-		mowgli_heap_elem_header_t *next; /* for free elems: next free */
+		mowgli_block_t *block;	/* for allocated elems: block ptr */
+		mowgli_heap_elem_header_t *next;/* for free elems: next free */
 	} un;
 };
 
@@ -96,18 +96,22 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 
 	blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
 
-	if(bh->empty_block != NULL)
+	if (bh->empty_block != NULL)
 		return;
 
 #if defined(HAVE_MMAP) && defined(MAP_ANON)
+
 	if (bh->use_mmap)
 		blp = mmap(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
-			PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+			   PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	else
-#elif defined (_WIN32)
+#elif defined(_WIN32)
+
 	if (bh->use_mmap)
+	{
 		blp = VirtualAlloc(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
-			MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+				   MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	}
 	else
 #endif
 	{
@@ -117,9 +121,9 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 			blp = mowgli_alloc(blp_size);
 	}
 
-	block = (mowgli_block_t *)blp;
+	block = (mowgli_block_t *) blp;
 
-	offset = (char*)blp + sizeof(mowgli_block_t);
+	offset = (char *) blp + sizeof(mowgli_block_t);
 	block->data = offset;
 	block->heap = bh;
 
@@ -127,7 +131,7 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 
 	for (a = 0; a < bh->mowgli_heap_elems; a++)
 	{
-		node = (mowgli_heap_elem_header_t *)offset;
+		node = (mowgli_heap_elem_header_t *) offset;
 		node->un.next = prev;
 		offset += bh->alloc_size;
 		prev = node;
@@ -151,10 +155,12 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 		mowgli_node_delete(&b->node, &heap->blocks);
 
 #if defined(HAVE_MMAP)
+
 	if (heap->use_mmap)
 		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
 	else
 #elif defined(_WIN32)
+
 	if (heap->use_mmap)
 		VirtualFree(b, 0, MEM_RELEASE);
 	else
@@ -169,17 +175,18 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 
 /* creates a new mowgli_heap_t */
 mowgli_heap_t *
-mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags,
-	mowgli_allocation_policy_t *allocator)
+mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags, mowgli_allocation_policy_t *allocator)
 {
 	mowgli_heap_t *bh = mowgli_alloc(sizeof(mowgli_heap_t));
 	int numpages, pagesize;
 
 	bh->elem_size = elem_size;
 	bh->mowgli_heap_elems = mowgli_heap_elems;
+
 	/* at least 2, this avoids some silly special cases */
 	if (bh->mowgli_heap_elems < 2)
 		bh->mowgli_heap_elems = 2;
+
 	bh->free_elems = 0;
 
 	bh->alloc_size = bh->elem_size + sizeof(mowgli_heap_elem_header_t);
@@ -204,7 +211,7 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 	bh->use_mmap = allocator != NULL ? FALSE : TRUE;
 #endif
 
-	if(mowgli_mutex_init(&bh->mutex) != 0)
+	if (mowgli_mutex_init(&bh->mutex) != 0)
 		mowgli_log_fatal("heap mutex can't be created");
 
 	if (flags & BH_NOW)
@@ -233,6 +240,7 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	{
 		mowgli_heap_shrink(heap, n->data);
 	}
+
 	if (heap->empty_block)
 		mowgli_heap_shrink(heap, heap->empty_block);
 
@@ -250,7 +258,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	mowgli_block_t *b;
 	mowgli_heap_elem_header_t *h;
 
-	if(mowgli_mutex_lock(&heap->mutex) != 0)
+	if (mowgli_mutex_lock(&heap->mutex) != 0)
 		mowgli_log_fatal("heap mutex can't be locked");
 
 	/* no free space? */
@@ -258,7 +266,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	{
 		mowgli_heap_expand(heap);
 
-		if(heap->free_elems == 0)
+		if (heap->free_elems == 0)
 		{
 			mowgli_mutex_unlock(&heap->mutex);
 			return NULL;
@@ -268,8 +276,10 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	/* try a partially used block before using a fully free block */
 	n = heap->blocks.head;
 	b = n != NULL ? n->data : NULL;
-	if (b == NULL || b->first_free == NULL)
+
+	if ((b == NULL) || (b->first_free == NULL))
 		b = heap->empty_block;
+
 	/* due to above check */
 	return_val_if_fail(b != NULL, NULL);
 
@@ -286,6 +296,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	b->num_allocated++;
 
 	/* move it between the lists if needed */
+
 	/* note that a block has at least two items in it, so these cases
 	 * cannot both occur in the same allocation */
 	if (b->num_allocated == 1)
@@ -301,6 +312,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	}
 
 #ifdef HEAP_DEBUG
+
 	/* debug */
 	mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
 #endif
@@ -308,7 +320,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	mowgli_mutex_unlock(&heap->mutex);
 
 	/* return pointer to it */
-	return (char *)h + sizeof(mowgli_heap_elem_header_t);
+	return (char *) h + sizeof(mowgli_heap_elem_header_t);
 }
 
 /* frees an item back to the mowgli_heap_t */
@@ -318,10 +330,10 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	mowgli_block_t *b;
 	mowgli_heap_elem_header_t *h;
 
-	if(mowgli_mutex_lock(&heap->mutex) != 0)
+	if (mowgli_mutex_lock(&heap->mutex) != 0)
 		mowgli_log_fatal("heap mutex can't be locked");
 
-	h = (mowgli_heap_elem_header_t *)((char *)data - sizeof(mowgli_heap_elem_header_t));
+	h = (mowgli_heap_elem_header_t *) ((char *) data - sizeof(mowgli_heap_elem_header_t));
 	b = h->un.block;
 
 	return_if_fail(b->heap == heap);
@@ -338,14 +350,17 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	heap->free_elems++;
 	b->num_allocated--;
 #ifdef HEAP_DEBUG
+
 	/* debug */
 	mowgli_log("mowgli_heap_free(heap = @%p, data = %p)", heap, data);
 #endif
+
 	/* move it between the lists if needed */
 	if (b->num_allocated == 0)
 	{
 		if (heap->empty_block != NULL)
 			mowgli_heap_shrink(heap, heap->empty_block);
+
 		mowgli_node_delete(&b->node, &heap->blocks);
 		heap->empty_block = b;
 	}

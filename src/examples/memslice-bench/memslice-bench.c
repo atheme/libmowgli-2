@@ -18,15 +18,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define timersub(tvp, uvp, vvp)                                         \
-        do {                                                            \
-                (vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;          \
-                (vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;       \
-                if ((vvp)->tv_usec < 0) {                               \
-                        (vvp)->tv_sec--;                                \
-                        (vvp)->tv_usec += 1000000;                      \
-                }                                                       \
-        } while (0)
+#define timersub(tvp, uvp, vvp)	\
+	do \
+	{ \
+		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec; \
+		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec; \
+		if ((vvp)->tv_usec < 0)	\
+		{ \
+			(vvp)->tv_sec--; \
+			(vvp)->tv_usec += 1000000; \
+		} \
+	} while (0)
 
 #include <mowgli.h>
 
@@ -37,10 +39,11 @@ int
 main(int argc, char *argv[])
 {
 	size_t i;
+
 	size_t objects;
 	size_t *obj_sizes;
 	void **ptrs;
-        struct timeval ts, te;
+	struct timeval ts, te;
 
 	mowgli_thread_set_policy(MOWGLI_THREAD_POLICY_DISABLED);
 
@@ -66,52 +69,57 @@ main(int argc, char *argv[])
 	printf("Going to allocate %zu objects of random sizes < 256\n", objects);
 
 	printf("Assigning sizes...\n");
-	for (i = 0; i < objects; i++) {
+
+	for (i = 0; i < objects; i++)
 		obj_sizes[i] = rand() % 256;
-	}
+
 	printf("Done!  Lets benchmark.\n");
 
 	/* allocate using sysmalloc */
 	gettimeofday(&ts, NULL);
-	for (i = 0; i < objects; i++) {
+
+	for (i = 0; i < objects; i++)
 		ptrs[i] = mowgli_alloc_using_policy(sysmalloc, obj_sizes[i]);
-	}
+
 	gettimeofday(&te, NULL);
 	timersub(&te, &ts, &ts);
 
 	printf("sysmalloc alloc time: %ld usec\n",
-		ts.tv_sec * 1000000L + ts.tv_usec);
+	       ts.tv_sec * 1000000L + ts.tv_usec);
 
 	gettimeofday(&ts, NULL);
-	for (i = 0; i < objects; i++) {
+
+	for (i = 0; i < objects; i++)
 		mowgli_free(ptrs[i]);
-	}
+
 	gettimeofday(&te, NULL);
 	timersub(&te, &ts, &ts);
 
 	printf("sysmalloc free time: %ld usec\n",
-		ts.tv_sec * 1000000L + ts.tv_usec);
+	       ts.tv_sec * 1000000L + ts.tv_usec);
 
 	/* allocate using memslice */
 	gettimeofday(&ts, NULL);
-	for (i = 0; i < objects; i++) {
+
+	for (i = 0; i < objects; i++)
 		ptrs[i] = mowgli_alloc_using_policy(memslice, obj_sizes[i]);
-	}
+
 	gettimeofday(&te, NULL);
 	timersub(&te, &ts, &ts);
 
 	printf("memslice alloc time: %ld usec\n",
-		ts.tv_sec * 1000000L + ts.tv_usec);
+	       ts.tv_sec * 1000000L + ts.tv_usec);
 
 	gettimeofday(&ts, NULL);
-	for (i = 0; i < objects; i++) {
+
+	for (i = 0; i < objects; i++)
 		mowgli_free(ptrs[i]);
-	}
+
 	gettimeofday(&te, NULL);
 	timersub(&te, &ts, &ts);
 
 	printf("memslice free time: %ld usec\n",
-		ts.tv_sec * 1000000L + ts.tv_usec);
+	       ts.tv_sec * 1000000L + ts.tv_usec);
 
 	return EXIT_SUCCESS;
 }

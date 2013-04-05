@@ -24,7 +24,8 @@
 #ifndef __MOWGLI_BITVECTOR_H__
 #define __MOWGLI_BITVECTOR_H__
 
-typedef struct {
+typedef struct
+{
 	unsigned int bits;
 	unsigned int divisor;
 	unsigned int *vector;

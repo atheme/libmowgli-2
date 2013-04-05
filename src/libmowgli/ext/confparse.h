@@ -28,7 +28,7 @@ struct _mowgli_configentry
 	int varlinenum;
 	char *varname;
 	char *vardata;
-	int sectlinenum; /* line containing closing brace */
+	int sectlinenum;/* line containing closing brace */
 
 	mowgli_config_file_entry_t *entries;
 	mowgli_config_file_entry_t *prevlevel;

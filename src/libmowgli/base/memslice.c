@@ -26,7 +26,8 @@ static mowgli_heap_t *allocator_heap;
 /*
  * Our slice allocation engine.
  */
-typedef struct {
+typedef struct
+{
 	size_t size;
 
 	mowgli_heap_t *heap;
@@ -36,7 +37,8 @@ typedef struct {
 /*
  * Allocation tag.
  */
-typedef struct {
+typedef struct
+{
 	slice_alloc_t *owner;
 } slice_tag_t;
 
@@ -49,6 +51,7 @@ nexthigher(size_t k)
 	size_t i;
 
 	k--;
+
 	for (i = 1; i < sizeof(k) * 8; i <<= 1)
 		k |= k >> i;
 
@@ -109,7 +112,7 @@ memslice_alloc(size_t i)
 	ptr = mowgli_heap_alloc(alloc->heap);
 	((slice_tag_t *) ptr)->owner = alloc;
 
-	return (char *)ptr + sizeof(slice_tag_t);
+	return (char *) ptr + sizeof(slice_tag_t);
 }
 
 /*
@@ -122,7 +125,7 @@ memslice_free(void *ptr)
 
 	return_if_fail(ptr != NULL);
 
-	tag = (void *)((char *)ptr - sizeof(slice_tag_t));
+	tag = (void *) ((char *) ptr - sizeof(slice_tag_t));
 	mowgli_heap_free(tag->owner->heap, tag);
 }
 

@@ -28,6 +28,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
 /*
  * Copyright 2003 Niels Provos <provos@citi.umich.edu>
  * All rights reserved.
@@ -63,18 +64,19 @@
  *
  */
 
-#define	timersub(tvp, uvp, vvp)						\
-	do {								\
-		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;	\
-		if ((vvp)->tv_usec < 0) {				\
-			(vvp)->tv_sec--;				\
-			(vvp)->tv_usec += 1000000;			\
-		}							\
+#define timersub(tvp, uvp, vvp)	\
+	do \
+	{ \
+		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec; \
+		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec; \
+		if ((vvp)->tv_usec < 0)	\
+		{ \
+			(vvp)->tv_sec--; \
+			(vvp)->tv_usec += 1000000; \
+		} \
 	} while (0)
 
 #include <mowgli.h>
-
 
 static int count, writes, fired;
 static mowgli_eventloop_t *base_eventloop;
@@ -93,13 +95,17 @@ void
 read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventloop_io_dir_t dir, void *arg)
 {
 	mowgli_eventloop_pollable_t *pollable = mowgli_eventloop_io_pollable(io);
+
 	int idx = (int) (long) arg, widx = idx + 1;
 	u_char ch;
 
 	count += read(pollable->fd, &ch, sizeof(ch));
-	if (writes) {
+
+	if (writes)
+	{
 		if (widx >= num_pipes)
 			widx -= num_pipes;
+
 		write(pipes[2 * widx + 1], "e", 1);
 		writes--;
 		fired++;
@@ -110,24 +116,28 @@ read_cb(mowgli_eventloop_t *eventloop, mowgli_eventloop_io_t *io, mowgli_eventlo
 void
 read_thunk(struct ev_io *w, int revents)
 {
-  read_cb (w->fd, revents, w->data);
+	read_cb(w->fd, revents, w->data);
 }
 
 void
-timer_cb (struct ev_timer *w, int revents)
+timer_cb(struct ev_timer *w, int revents)
 {
-  /* nop */
+	/* nop */
 }
+
 #endif
 
 struct timeval *
 run_once(void)
 {
 	int *cp, i, space;
+
 	static struct timeval ta, ts, te;
 
 	gettimeofday(&ta, NULL);
-	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2) {
+
+	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2)
+	{
 		if (events[i] != NULL)
 			mowgli_pollable_destroy(base_eventloop, events[i]);
 
@@ -138,6 +148,7 @@ run_once(void)
 	fired = 0;
 	space = num_pipes / num_active;
 	space = space * 2;
+
 	for (i = 0; i < num_active; i++, fired++)
 		write(pipes[i * space + 1], "e", 1);
 
@@ -146,7 +157,9 @@ run_once(void)
 
 	int xcount = 0;
 	gettimeofday(&ts, NULL);
-	do {
+
+	do
+	{
 		mowgli_eventloop_run_once(base_eventloop);
 		xcount++;
 	} while (count != fired);
@@ -158,15 +171,16 @@ run_once(void)
 	fprintf(stdout, "%ld\t%ld\n",
 		ta.tv_sec * 1000000L + ta.tv_usec,
 		ts.tv_sec * 1000000L + ts.tv_usec
-               );
+		);
 
-	return (&te);
+	return &te;
 }
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
 	struct rlimit rl;
+
 	int i, c;
 	int *cp;
 	extern char *optarg;
@@ -174,8 +188,11 @@ main (int argc, char **argv)
 	num_pipes = 100;
 	num_active = 1;
 	num_writes = num_pipes;
-	while ((c = getopt(argc, argv, "n:a:w:te")) != -1) {
-		switch (c) {
+
+	while ((c = getopt(argc, argv, "n:a:w:te")) != -1)
+	{
+		switch (c)
+		{
 		case 'n':
 			num_pipes = atoi(optarg);
 			break;
@@ -186,7 +203,7 @@ main (int argc, char **argv)
 			num_writes = atoi(optarg);
 			break;
 		case 't':
-                        timers = 1;
+			timers = 1;
 			break;
 		default:
 			fprintf(stderr, "Illegal argument \"%c\"\n", c);
@@ -196,14 +213,17 @@ main (int argc, char **argv)
 
 #if 1
 	rl.rlim_cur = rl.rlim_max = num_pipes * 2 + 50;
-	if (setrlimit(RLIMIT_NOFILE, &rl) == -1) {
+
+	if (setrlimit(RLIMIT_NOFILE, &rl) == -1)
 		perror("setrlimit");
-	}
+
 #endif
 
 	events = calloc(num_pipes * 2, sizeof(mowgli_eventloop_pollable_t *));
 	pipes = calloc(num_pipes * 2, sizeof(mowgli_descriptor_t));
-	if (events == NULL || pipes == NULL) {
+
+	if ((events == NULL) || (pipes == NULL))
+	{
 		perror("malloc");
 		exit(1);
 	}
@@ -211,20 +231,24 @@ main (int argc, char **argv)
 	mowgli_thread_set_policy(MOWGLI_THREAD_POLICY_DISABLED);
 	base_eventloop = mowgli_eventloop_create();
 
-	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2) {
+	for (cp = pipes, i = 0; i < num_pipes; i++, cp += 2)
+	{
 #ifdef USE_PIPES
-		if (pipe(cp) == -1) {
+
+		if (pipe(cp) == -1)
+		{
 #else
-		if (socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1) {
+
+		if (socketpair(AF_UNIX, SOCK_STREAM, 0, cp) == -1)
+		{
 #endif
 			perror("pipe");
 			exit(1);
 		}
 	}
 
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++)
 		run_once();
-	}
 
 	exit(0);
 }
