@@ -23,7 +23,9 @@ It contains:
     - mowgli.argstack: Safe serialization of valists.
     - mowgli.assert: Various assertion routines that can be used.
     - mowgli.bitvector: Bitmasks with an unlimited level of precision.
-    - mowgli.patricia: A keyword-backed definition hashtable class.
+    - mowgli.patricia: A dictionary implementation based on a modified
+                       patricia tree algorithm (uses nibbles instead of
+                       bits for branching).
     - mowgli.error_backtrace: Provide feedback to users on what caused
                               the error they are recieving.
     - mowgli.formatter: A simple token formatter which is sometimes useful.

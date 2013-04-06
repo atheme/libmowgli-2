@@ -148,21 +148,21 @@ static void
 mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 {
 	mowgli_ports_eventloop_private_t *priv;
-	int i, num, o_errno, nget = 1;
+	int i, ret, o_errno, nget = 1;
 
 	return_if_fail(eventloop != NULL);
 
 	priv = eventloop->poller;
 
-	num = port_getn(priv->port_fd, priv->pfd, priv->pfd_size, &nget,
+	ret = port_getn(priv->port_fd, priv->pfd, priv->pfd_size, &nget,
 			delay >= 0 ? &(struct timespec) { .tv_sec = delay / 1000, .tv_nsec = delay % 1000 * 1000000 } : NULL);
 
 	o_errno = errno;
 	mowgli_eventloop_synchronize(eventloop);
 
-	if (num < 0)
+	if (ret == -1)
 	{
-		if (mowgli_eventloop_ignore_errno(errno))
+		if (mowgli_eventloop_ignore_errno(o_errno))
 			return;
 
 		mowgli_log("mowgli_ports_eventloop_select(): port_getn failed: %d (%s)", o_errno, strerror(o_errno));
@@ -172,6 +172,9 @@ mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	for (i = 0; i < nget; i++)
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->pfd[i].portev_user;
+
+		if (priv->pfd[i].portev_source != PORT_SOURCE_FD)
+			continue;
 
 		if (priv->pfd[i].portev_events & (POLLIN | POLLHUP | POLLERR))
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
