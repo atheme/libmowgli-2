@@ -39,6 +39,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <inttypes.h>
+#include <limits.h>
 
 /* socket stuff */
 #ifndef _WIN32
