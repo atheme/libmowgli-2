@@ -126,7 +126,6 @@ mowgli_proctitle_init(int argc, char **argv)
 		save_argc = argc;
 
 	save_argv = argv;
-	int i;
 
 #if defined(MOWGLI_SETPROC_USE_CLOBBER_ARGV)
 
