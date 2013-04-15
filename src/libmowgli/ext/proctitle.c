@@ -135,6 +135,7 @@ mowgli_proctitle_init(int argc, char **argv)
 	 */
 	char *end_of_area = NULL;
 	char **new_environ;
+	int i;
 
 	/*
 	 * check for contiguous argv strings
@@ -187,11 +188,12 @@ mowgli_proctitle_init(int argc, char **argv)
 	 */
 
 	char **new_argv;
+	int j;
 
 	new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
 
-	for (i = 0; i < argc; i++)
-		new_argv[i] = mowgli_strdup(argv[i]);
+	for (j = 0; j < argc; j++)
+		new_argv[j] = mowgli_strdup(argv[j]);
 
 	new_argv[argc] = NULL;
 
