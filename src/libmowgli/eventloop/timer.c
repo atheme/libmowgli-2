@@ -43,7 +43,7 @@ mowgli_timer_add_real(mowgli_eventloop_t *eventloop, const char *name, mowgli_ev
 	timer->frequency = frequency;
 	timer->active = true;
 
-	if ((eventloop->deadline <= mowgli_eventloop_get_time(eventloop)) || (timer->deadline <= eventloop->deadline))
+	if (eventloop->deadline != -1 && timer->deadline <= eventloop->deadline)
 		eventloop->deadline = timer->deadline;
 
 	mowgli_node_add(timer, &timer->node, &eventloop->timer_list);
