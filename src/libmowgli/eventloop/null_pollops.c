@@ -34,7 +34,7 @@ mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 	currtime = mowgli_eventloop_get_time(eventloop);
 	delay = mowgli_eventloop_next_timer(eventloop);
 
-	while (delay <= currtime)
+	while (delay != -1 && delay <= currtime)
 	{
 		mowgli_eventloop_run_timers(eventloop);
 		mowgli_eventloop_synchronize(eventloop);
@@ -45,6 +45,8 @@ mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 
 	if (timeout)
 		t = timeout;
+	else if (delay == -1)
+		t = 5000; /* arbitrary 5 second default timeout */
 	else
 		t = (delay - currtime) * 1000;
 

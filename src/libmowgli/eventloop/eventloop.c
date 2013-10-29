@@ -88,6 +88,8 @@ mowgli_eventloop_create(void)
 
 	eventloop->eventloop_ops->pollsetup(eventloop);
 
+	eventloop->deadline = -1;
+
 	mowgli_eventloop_calibrate(eventloop);
 
 	return eventloop;
