@@ -957,7 +957,7 @@ res_read_single_reply(mowgli_dns_t *dns)
 	mowgli_dns_reply_t *reply = NULL;
 	int rc;
 	int answer_count;
-	mowgli_vio_sockaddr_t lsin = { };
+	mowgli_vio_sockaddr_t lsin = { .addrlen = sizeof(lsin.addr) };
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
 	rc = mowgli_vio_recvfrom(state->vio, buf, sizeof(buf), &lsin);
