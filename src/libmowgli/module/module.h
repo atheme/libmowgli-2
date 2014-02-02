@@ -2,7 +2,7 @@
  * libmowgli: A collection of useful routines for programming.
  * module.h: Loadable modules.
  *
- * Copyright (c) 2007 William Pitcock <nenolod -at- sacredspiral.co.uk>
+ * Copyright (c) 2007, 2014 William Pitcock <william@dereferenced.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -29,5 +29,16 @@ typedef void *mowgli_module_t;
 extern mowgli_module_t mowgli_module_open(const char *path);
 extern void *mowgli_module_symbol(mowgli_module_t module, const char *symbol);
 extern void mowgli_module_close(mowgli_module_t module);
+
+typedef void mowgli_interface_t;
+
+typedef struct {
+	const char *id;
+	uint32_t abirev;
+} mowgli_interface_base_t;
+
+extern void mowgli_interface_register(mowgli_interface_t *iface);
+extern void mowgli_interface_unregister(mowgli_interface_t *iface);
+extern mowgli_interface_t *mowgli_interface_get(const char *id, uint32_t abirev);
 
 #endif

@@ -3,7 +3,7 @@ include ../../../extra.mk
 STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_MODULE}
 STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_MODULE}
 
-SRCS = loader_${LIBMOWGLI_OS}.c
+SRCS = interface.c loader_${LIBMOWGLI_OS}.c
 
 INCLUDES = module.h
 
