@@ -26,6 +26,10 @@
 #include <signal.h>
 #include "mowgli.h"
 
+#if defined(__linux__) && defined(__GNUC__) && defined(__STRICT_ANSI__)
+#	error GCC/Linux in -std=c99 mode will not compile mowgli_signal; use -std=gnu99 instead
+#endif
+
 static mowgli_signal_handler_t
 mowgli_signal_install_handler_full(int signum, mowgli_signal_handler_t handler, int *sigtoblock, size_t sigtoblocksize)
 {
