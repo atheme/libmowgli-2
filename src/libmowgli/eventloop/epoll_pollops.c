@@ -40,7 +40,7 @@ mowgli_epoll_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	eventloop->poller = priv;
 
 	priv->pfd_size = getdtablesize();
-	priv->epoll_fd = epoll_create(priv->pfd_size);
+	priv->epoll_fd = epoll_create1(EPOLL_CLOEXEC); /* Linux 2.6.27+ */
 	priv->pfd = mowgli_alloc(sizeof(struct epoll_event) * priv->pfd_size);
 
 	return;

@@ -44,6 +44,9 @@ mowgli_kqueue_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 	priv->kqueue_fd = kqueue();
 	priv->events = mowgli_alloc(sizeof(struct kevent) * priv->nevents);
 
+	/* attempt to set the fd as close-on-exec, but ignore errors */
+	fcntl(priv->kqueue_fd, F_SETFD, FD_CLOEXEC);
+
 	return;
 }
 
