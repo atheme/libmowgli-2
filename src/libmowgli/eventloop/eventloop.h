@@ -357,6 +357,7 @@ extern mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *e
 extern void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
 extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function);
 extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking);
+extern void mowgli_pollable_set_cloexec(mowgli_eventloop_pollable_t *pollable, bool cloexec);
 extern void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir);
 
 #endif

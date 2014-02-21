@@ -92,6 +92,29 @@ mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonb
 }
 
 void
+mowgli_pollable_set_cloexec(mowgli_eventloop_pollable_t *pollable, bool cloexec)
+{
+#if defined(FD_CLOEXEC)
+	unsigned long flags;
+
+	return_if_fail(pollable != NULL);
+
+	flags = fcntl(pollable->fd, F_GETFD);
+
+	if (cloexec)
+		flags |= FD_CLOEXEC;
+	else
+		flags &= ~FD_CLOEXEC;
+
+	fcntl(pollable->fd, F_SETFD, flags);
+#elif defined(HAVE_WINSOCK2_H)
+	return_if_fail(pollable != NULL);
+
+	SetHandleInformation((HANDLE)pollable->fd, HANDLE_FLAG_INHERIT, !cloexec);
+#endif
+}
+
+void
 mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir)
 {
 	mowgli_eventloop_io_cb_t *event_function;
