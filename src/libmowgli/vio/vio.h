@@ -189,13 +189,13 @@ typedef struct _mowgli_vio_ssl_settings
 
 /* Flag setting/getting */
 static inline bool
-mowgli_vio_hasflag(mowgli_vio_t *vio, int flag)
+mowgli_vio_hasflag(mowgli_vio_t *vio, unsigned int flag)
 {
 	return (vio->flags & flag) != 0 ? true : false;
 }
 
 static inline void
-mowgli_vio_setflag(mowgli_vio_t *vio, int flag, bool setting)
+mowgli_vio_setflag(mowgli_vio_t *vio, unsigned int flag, bool setting)
 {
 	if (setting)
 		vio->flags |= flag;
