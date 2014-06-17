@@ -186,7 +186,7 @@
 # if defined _LP64 || defined __LP64
 #  define MOWGLI_CPU_BITS 64
 #  define MOWGLI_CPU_BITS_64
-# elif
+# else
 #  define MOWGLI_CPU_BITS 32
 #  define MOWGLI_CPU_BITS_32
 # endif
