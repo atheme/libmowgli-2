@@ -314,7 +314,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 #ifdef HEAP_DEBUG
 
 	/* debug */
-	mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, fn->data);
+	mowgli_log("mowgli_heap_alloc(heap = @%p) -> %p", heap, (char*) h + sizeof(mowgli_heap_elem_header_t));
 #endif
 
 	mowgli_mutex_unlock(&heap->mutex);
