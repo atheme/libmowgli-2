@@ -1179,12 +1179,12 @@ lex_char(mowgli_json_parse_t *parse, char c)
 		case ',': lex_easy(parse, TS_VALUE_SEP); return false;
 		}
 
-		if ((c == '-') || (c == '.') || isdigit(c))
+		if ((c == '-') || (c == '.') || isdigit((unsigned char)c))
 		{
 			parse->lex = LEX_NUMBER;
 			return true;
 		}
-		else if (isalpha(c))
+		else if (isalpha((unsigned char)c))
 		{
 			parse->lex = LEX_IDENTIFIER;
 			return true;
@@ -1194,7 +1194,7 @@ lex_char(mowgli_json_parse_t *parse, char c)
 			parse->lex = LEX_STRING;
 			return false;
 		}
-		else if (isspace(c))
+		else if (isspace((unsigned char)c))
 		{
 			return false;
 		}
@@ -1248,7 +1248,7 @@ lex_char(mowgli_json_parse_t *parse, char c)
 
 	case LEX_NUMBER:
 
-		if ((c == '-') || (c == '.') || isdigit(c) || (toupper(c) == 'E'))
+		if ((c == '-') || (c == '.') || isdigit((unsigned char)c) || (toupper((unsigned char)c) == 'E'))
 		{
 			lex_append(parse, c);
 			return false;
@@ -1263,7 +1263,7 @@ lex_char(mowgli_json_parse_t *parse, char c)
 
 	case LEX_IDENTIFIER:
 
-		if (isalpha(c))
+		if (isalpha((unsigned char)c))
 		{
 			lex_append(parse, c);
 			return false;

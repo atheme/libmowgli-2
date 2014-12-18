@@ -30,7 +30,7 @@ _object_key_canon(char *str)
 {
 	while (*str)
 	{
-		*str = toupper(*str);
+		*str = toupper((unsigned char)*str);
 		str++;
 	}
 }

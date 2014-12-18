@@ -46,7 +46,7 @@ mowgli_fnv_hash_string(const char *p)
 	for (; *p != '\0'; ++p)
 	{
 		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-		hval ^= (tolower(*p) ^ htoast);
+		hval ^= (tolower((unsigned char)*p) ^ htoast);
 	}
 
 	return (hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE;
@@ -71,7 +71,7 @@ mowgli_fnv_hash(unsigned int *p)
 	for (; *p != '\0'; ++p)
 	{
 		hval += (hval << 1) + (hval << 4) + (hval << 7) + (hval << 8) + (hval << 24);
-		hval ^= (tolower(*p) ^ htoast);
+		hval ^= (tolower((unsigned char)*p) ^ htoast);
 	}
 
 	return (hval >> HASHBITS) ^ (hval & ((1 << HASHBITS) - 1)) % HASHSIZE;

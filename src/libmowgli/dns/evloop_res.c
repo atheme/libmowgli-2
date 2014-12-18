@@ -236,7 +236,7 @@ parse_resvconf(mowgli_dns_t *dns)
 		p = input;
 
 		/* skip until something thats not a space is seen */
-		while (isspace(*p))
+		while (isspace((unsigned char)*p))
 		{
 			p++;
 		}
@@ -252,7 +252,7 @@ parse_resvconf(mowgli_dns_t *dns)
 		/* skip until a space is found */
 		opt = p;
 
-		while (!isspace(*p) && *p != '\0')
+		while (!isspace((unsigned char)*p) && *p != '\0')
 		{
 			p++;
 		}
@@ -264,7 +264,7 @@ parse_resvconf(mowgli_dns_t *dns)
 		*p++ = '\0';
 
 		/* skip these spaces that are before the argument */
-		while (isspace(*p))
+		while (isspace((unsigned char)*p))
 		{
 			p++;
 		}

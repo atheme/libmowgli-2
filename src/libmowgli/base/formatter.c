@@ -50,7 +50,7 @@ mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmts
 			arg = atoi(fiter);
 			e = mowgli_node_nth_data(&stack->stack, arg - 1);
 
-			while (isdigit(*fiter))
+			while (isdigit((unsigned char)*fiter))
 			{
 				fiter++;
 			}
