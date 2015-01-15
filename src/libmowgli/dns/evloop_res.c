@@ -713,7 +713,7 @@ do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t *query, const struct socka
 				(unsigned int) (cp[i] & 0xf),
 				(unsigned int) (cp[i] >> 4));
 
-		strcpy(rqptr, ".ip6.arpa");
+		strcpy(rqptr, "ip6.arpa");
 	}
 	else
 	{
