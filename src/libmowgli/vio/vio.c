@@ -226,7 +226,7 @@ mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 int
 mowgli_vio_err_sslerrcode(mowgli_vio_t *vio, unsigned long int errcode)
 {
-	return_if_fail(vio);
+	return_val_if_fail(vio, -255);
 
 	vio->error.type = MOWGLI_VIO_ERR_ERRCODE;
 	vio->error.code = errcode;
