@@ -710,9 +710,9 @@ mowgli_patricia_elem_add(mowgli_patricia_t *dict, const char *key, void *data)
 	int val, keylen;
 	int i, j;
 
-	return_val_if_fail(dict != NULL, FALSE);
-	return_val_if_fail(key != NULL, FALSE);
-	return_val_if_fail(data != NULL, FALSE);
+	return_val_if_fail(dict != NULL, NULL);
+	return_val_if_fail(key != NULL, NULL);
+	return_val_if_fail(data != NULL, NULL);
 
 	keylen = strlen(key);
 	ckey = mowgli_strdup(key);
