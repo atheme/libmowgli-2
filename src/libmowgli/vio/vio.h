@@ -162,7 +162,6 @@ typedef struct _mowgli_vio_ssl_settings
 {
 	const char *cert_path;
 	const char *privatekey_path;
-	int ssl_version;
 	int (*password_func)(char *, int, int, void *);
 	int (*verify_func)(int, void *);
 } mowgli_vio_ssl_settings_t;
@@ -179,13 +178,6 @@ typedef struct _mowgli_vio_ssl_settings
 
 #define MOWGLI_VIO_FLAGS_NEEDREAD 0x00040
 #define MOWGLI_VIO_FLAGS_NEEDWRITE 0x00080
-
-/* SSL flags */
-#define MOWGLI_VIO_SSLFLAGS_SSLV2 0x00001
-#define MOWGLI_VIO_SSLFLAGS_SSLV3 0x00002
-#define MOWGLI_VIO_SSLFLAGS_TLSV10 0x00004
-#define MOWGLI_VIO_SSLFLAGS_TLSV11 0x00008
-#define MOWGLI_VIO_SSLFLAGS_TLSV12 0x00010
 
 /* Flag setting/getting */
 static inline bool

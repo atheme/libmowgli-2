@@ -30,6 +30,27 @@
 
 #ifdef HAVE_OPENSSL
 
+#include <openssl/opensslv.h>
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10000000L)
+#  include <openssl/ec.h>
+#endif
+
+#if defined(LIBRESSL_VERSION_NUMBER) && (LIBRESSL_VERSION_NUMBER >= 0x20020002L)
+#  define MOWGLI_HAVE_OPENSSL_TLS_METHOD_API 1
+#else
+#  if !defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x10100000L)
+#    define MOWGLI_HAVE_OPENSSL_TLS_METHOD_API 1
+#  endif
+#endif
+
+#if (OPENSSL_VERSION_NUMBER >= 0x10000000L) && defined(NID_X9_62_prime256v1)
+#  define MOWGLI_HAVE_OPENSSL_ECDH_SUPPORT 1
+#  if !defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x10002001L)
+#    define MOWGLI_HAVE_OPENSSL_ECDH_AUTO 1
+#  endif
+#endif
+
 typedef struct
 {
 	SSL *ssl_handle;
@@ -61,9 +82,6 @@ mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings
 
 	if (settings)
 		memcpy(&connection->settings, settings, sizeof(mowgli_vio_ssl_settings_t));
-	else
-		/* Greatest compat without being terribly insecure */
-		connection->settings.ssl_version = MOWGLI_VIO_SSLFLAGS_SSLV3;
 
 	if (ops == NULL)
 	{
@@ -161,34 +179,27 @@ mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 	return_val_if_fail(vio, -255);
 
 	mowgli_ssl_connection_t *connection = vio->privdata;
-	const SSL_METHOD *method;
 	const int fd = mowgli_vio_getfd(vio);
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_LISTEN;
 
-	switch (connection->settings.ssl_version)
-	{
-	case MOWGLI_VIO_SSLFLAGS_SSLV2:
-		method = SSLv23_server_method();
-		break;
-	case MOWGLI_VIO_SSLFLAGS_SSLV3:
-		method = SSLv3_server_method();
-		break;
-	case MOWGLI_VIO_SSLFLAGS_TLSV10:
-	case MOWGLI_VIO_SSLFLAGS_TLSV11:
-	case MOWGLI_VIO_SSLFLAGS_TLSV12:
-		method = TLSv1_server_method();
-		break;
-	default:
-
-		/* Compat method */
-		method = SSLv23_server_method();
-	}
-
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
+#ifndef MOWGLI_HAVE_OPENSSL_TLS_METHOD_API
+	connection->ssl_context = SSL_CTX_new(SSLv23_server_method());
+#else
+	connection->ssl_context = SSL_CTX_new(TLS_server_method());
+#endif
 
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
+
+#ifndef MOWGLI_HAVE_OPENSSL_TLS_METHOD_API
+#  ifdef SSL_OP_NO_SSLv2
+	SSL_CTX_set_options(connection->ssl_context, SSL_OP_NO_SSLv2);
+#  endif
+#  ifdef SSL_OP_NO_SSLv3
+	SSL_CTX_set_options(connection->ssl_context, SSL_OP_NO_SSLv3);
+#  endif
+#endif
 
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 
@@ -197,6 +208,26 @@ mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 
 	SSL_set_accept_state(connection->ssl_handle);
 	SSL_CTX_set_options(connection->ssl_context, SSL_OP_SINGLE_DH_USE);
+
+#ifdef MOWGLI_HAVE_OPENSSL_ECDH_SUPPORT
+#  ifdef MOWGLI_HAVE_OPENSSL_ECDH_AUTO
+	SSL_CTX_set_ecdh_auto(connection->ssl_context, 1);
+#  else
+
+	EC_KEY *ec_key_p256 = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
+
+	if (ec_key_p256 != NULL)
+	{
+		SSL_CTX_set_tmp_ecdh(connection->ssl_context, ec_key_p256);
+		EC_KEY_free(ec_key_p256);
+		ec_key_p256 = NULL;
+	}
+
+#  endif
+#  ifdef SSL_OP_SINGLE_ECDH_USE
+	SSL_CTX_set_options(connection->ssl_context, SSL_OP_SINGLE_ECDH_USE);
+#  endif
+#endif
 
 	if (connection->settings.password_func)
 	{
@@ -306,34 +337,26 @@ mowgli_vio_openssl_client_handshake(mowgli_vio_t *vio, mowgli_ssl_connection_t *
 {
 	const int fd = mowgli_vio_getfd(vio);
 	int ret;
-	const SSL_METHOD *method;
 
 	vio->error.op = MOWGLI_VIO_ERR_OP_CONNECT;
 
-	switch (connection->settings.ssl_version)
-	{
-	case MOWGLI_VIO_SSLFLAGS_SSLV2:
-		method = SSLv23_client_method();
-		break;
-	case MOWGLI_VIO_SSLFLAGS_SSLV3:
-		method = SSLv3_client_method();
-		break;
-	case MOWGLI_VIO_SSLFLAGS_TLSV10:
-	case MOWGLI_VIO_SSLFLAGS_TLSV11:
-	case MOWGLI_VIO_SSLFLAGS_TLSV12:
-		method = TLSv1_client_method();
-		break;
-	default:
-
-		/* Compat method */
-		method = SSLv23_client_method();
-	}
-
-	/* Cast is to eliminate an excessively bogus warning on old OpenSSL --Elizacat */
-	connection->ssl_context = SSL_CTX_new((SSL_METHOD *) method);
+#ifndef MOWGLI_HAVE_OPENSSL_TLS_METHOD_API
+	connection->ssl_context = SSL_CTX_new(SSLv23_client_method());
+#else
+	connection->ssl_context = SSL_CTX_new(TLS_client_method());
+#endif
 
 	if (connection->ssl_context == NULL)
 		return mowgli_vio_err_sslerrcode(vio, ERR_get_error());
+
+#ifndef MOWGLI_HAVE_OPENSSL_TLS_METHOD_API
+#  ifdef SSL_OP_NO_SSLv2
+	SSL_CTX_set_options(connection->ssl_context, SSL_OP_NO_SSLv2);
+#  endif
+#  ifdef SSL_OP_NO_SSLv3
+	SSL_CTX_set_options(connection->ssl_context, SSL_OP_NO_SSLv3);
+#  endif
+#endif
 
 	connection->ssl_handle = SSL_new(connection->ssl_context);
 
