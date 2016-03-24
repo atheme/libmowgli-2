@@ -52,24 +52,6 @@ mowgli_program_opts_consumer_bool(const char *arg, void *userdata)
 	*(bool *) userdata = true;
 }
 
-static inline mowgli_program_opts_t *
-mowgli_program_opts_lookup_name(mowgli_program_opts_t *opts, size_t opts_size, const char *name)
-{
-	size_t i;
-
-	if (strlen(name) > 1)
-		for (i = 0; i < opts_size; i++)
-			if (!strcasecmp(name, opts[i].longopt))
-				return &opts[i];
-
-			else
-				for (i = 0; i < opts_size; i++)
-					if (*name == opts[i].smallopt)
-						return &opts[i];
-
-	return NULL;
-}
-
 static inline mowgli_getopt_option_t *
 mowgli_program_opts_convert(const mowgli_program_opts_t *opts, size_t opts_size)
 {
