@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([libmowgli-2], [2.0.0], [http://jira.atheme.org/])
+AC_INIT([libmowgli-2], [2.1.0], [https://github.com/atheme/libmowgli-2])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
 
