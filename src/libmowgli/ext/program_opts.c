@@ -105,17 +105,17 @@ mowgli_program_opts_compute_optstr(const mowgli_program_opts_t *opts, size_t opt
 }
 
 static inline void
-mowgli_program_opts_dispatch(const mowgli_program_opts_t *opt, const char *optarg)
+mowgli_program_opts_dispatch(const mowgli_program_opts_t *opt, const char *opt_arg)
 {
 	return_if_fail(opt != NULL);
 
-	if (opt->has_param && (optarg == NULL))
+	if (opt->has_param && (opt_arg == NULL))
 	{
 		fprintf(stderr, "no optarg for option %s", opt->longopt);
 		return;
 	}
 
-	opt->consumer(optarg, opt->userdata);
+	opt->consumer(opt_arg, opt->userdata);
 }
 
 void

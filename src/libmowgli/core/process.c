@@ -61,23 +61,16 @@ mowgli_process_clone(mowgli_process_start_fn_t start_fn, const char *procname, v
 
 	switch (out->pid)
 	{
-	default:
-		break;
-
 	case 0:
-
 		/* Do our best to set this... */
 		mowgli_proctitle_set("%s", procname);
 		start_fn(out->userdata);
 		_exit(255);
-
 		return NULL;
-		break;
 
 	case -1:
 		mowgli_free(out);
 		return NULL;
-		break;
 	}
 
 	return out;

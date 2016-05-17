@@ -476,15 +476,15 @@ mowgli_vio_sockaddr_info(const mowgli_vio_sockaddr_t *addr, mowgli_vio_sockdata_
 
 	if (saddr->sa_family == AF_INET)
 	{
-		const struct sockaddr_in *saddr = (const struct sockaddr_in *) &addr->addr;
-		data->port = ntohs(saddr->sin_port);
-		sockptr = &saddr->sin_addr;
+		const struct sockaddr_in *saddr4 = (const struct sockaddr_in *) &addr->addr;
+		data->port = ntohs(saddr4->sin_port);
+		sockptr = &saddr4->sin_addr;
 	}
 	else if (saddr->sa_family == AF_INET6)
 	{
-		const struct sockaddr_in6 *saddr = (const struct sockaddr_in6 *) &addr->addr;
-		data->port = ntohs(saddr->sin6_port);
-		sockptr = &saddr->sin6_addr;
+		const struct sockaddr_in6 *saddr6 = (const struct sockaddr_in6 *) &addr->addr;
+		data->port = ntohs(saddr6->sin6_port);
+		sockptr = &saddr6->sin6_addr;
 	}
 	else
 	{

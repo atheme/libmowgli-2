@@ -1259,8 +1259,6 @@ lex_char(mowgli_json_parse_t *parse, char c)
 			return true;
 		}
 
-		break;
-
 	case LEX_IDENTIFIER:
 
 		if (isalpha((unsigned char)c))
@@ -1273,8 +1271,6 @@ lex_char(mowgli_json_parse_t *parse, char c)
 			lex_tokenize(parse);
 			return true;
 		}
-
-		break;
 	}
 
 	/* This should never happen... */

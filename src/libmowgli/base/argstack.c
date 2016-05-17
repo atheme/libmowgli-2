@@ -108,7 +108,6 @@ mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 			mowgli_object_unref(out);
 			mowgli_log_warning("invalid description");
 			return NULL;
-			break;
 		}
 
 		mowgli_node_add(e, mowgli_node_create(), &out->stack);

@@ -30,7 +30,7 @@ typedef struct mowgli_error_context_
 } mowgli_error_context_t;
 
 extern void mowgli_error_context_display(mowgli_error_context_t *e, const char *delim);
-extern void mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error);
+extern void mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error) __attribute__((noreturn));
 extern void mowgli_error_context_destroy(mowgli_error_context_t *e);
 extern void mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...);
 extern void mowgli_error_context_pop(mowgli_error_context_t *e);

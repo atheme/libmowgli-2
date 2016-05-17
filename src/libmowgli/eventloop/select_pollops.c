@@ -134,7 +134,7 @@ mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 
 	MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
 	{
-		mowgli_eventloop_pollable_t *pollable = n->data;
+		pollable = n->data;
 
 # ifdef DEBUG
 		mowgli_log("considering fd %d pollable %p count %d", pollable->fd, pollable, priv->pollable_list.count);

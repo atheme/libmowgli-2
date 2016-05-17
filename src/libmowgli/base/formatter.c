@@ -86,7 +86,7 @@ mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmts
 			}
 
 			continue;
-			break;
+
 		default:
 			*i = *fiter;
 		}
