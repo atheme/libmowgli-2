@@ -11,6 +11,7 @@ fi
 AUTOCONF=${AUTOCONF:-autoconf}
 ACLOCAL=${ACLOCAL:-aclocal}
 AUTOHEADER=${AUTOHEADER:-autoheader}
+AUTOMAKE=${AUTOMAKE:-automake}
 
 dump_help_screen ()
 {
@@ -76,11 +77,24 @@ run_or_die ()
 
 parse_options "$@"
 
-cd $TOP_DIR
+run_or_die cd "$TOP_DIR"
+TOP_DIR=$PWD
 
 run_or_die $ACLOCAL -I m4
 run_or_die $AUTOHEADER
 run_or_die $AUTOCONF
 
-cd $LAST_DIR
+# Redo most things in autogen-automake-trap to extract config.sub and
+# config.guess.
+run_or_die cd "$TOP_DIR"/autogen-automake-trap
+run_or_die $ACLOCAL -I ../m4
+run_or_die $AUTOCONF
+run_or_die $AUTOMAKE --force --add-missing --copy
+run_or_die cd "$TOP_DIR"
+for f in config.{guess,sub}; do
+    cmp -s "${f}" autogen-automake-trap/"${f}" && continue
+    run_or_die cp -v autogen-automake-trap/"${f}" "${f}"
+done
+
+run_or_die cd "$LAST_DIR"
 

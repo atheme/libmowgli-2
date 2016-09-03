@@ -1,4 +1,10 @@
 aclocal.m4
+autogen-automake-trap/Makefile
+autogen-automake-trap/configure
+autogen-automake-trap/config.*
+autogen-automake-trap/m4
+autogen-automake-trap/missing
+autogen-automake-trap/*.in
 autom4te.cache
 buildsys.mk
 src/libmowgli/platform/autoconf.h
