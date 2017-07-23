@@ -33,7 +33,15 @@ void
 mowgli_cacheline_bootstrap(void)
 {
 #ifdef MOWGLI_OS_LINUX
-	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+	#ifdef _SC_LEVEL1_DCACHE_LINESIZE
+		cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+	#else
+		void cacheline_size(int *cacheline_sizep)
+		{
+			if (sysfs__read_int("devices/system/cpu/cpu0/cache/index0/coherency_line_size", cacheline_sizep))
+				perror("cannot determine cacheline size");
+		}
+	#endif
 #elif defined(MOWGLI_OS_OSX)
 	size_t size = sizeof(size_t);
 	sysctlbyname("hw.cachelinesize", &cacheline_size, &size, 0, 0);
