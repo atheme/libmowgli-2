@@ -37,13 +37,18 @@
 AU_ALIAS([CHECK_SSL], [AX_CHECK_OPENSSL])
 AC_DEFUN([AX_CHECK_OPENSSL], [
     found=false
+    skip=false
+    founddir=
     AC_ARG_WITH([openssl],
         [AS_HELP_STRING([--with-openssl=DIR],
             [root of the OpenSSL directory])],
         [
             case "$withval" in
-            "" | y | ye | yes | n | no)
+            "" | y | ye | yes)
             AC_MSG_ERROR([Invalid --with-openssl value])
+              ;;
+            n | no)
+            skip=true
               ;;
             *) ssldirs="$withval"
               ;;
@@ -57,6 +62,7 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
                 if test $? = 0; then
                     OPENSSL_LIBS=`$PKG_CONFIG openssl --libs-only-l 2>/dev/null`
                     OPENSSL_INCLUDES=`$PKG_CONFIG openssl --cflags-only-I 2>/dev/null`
+                    founddir=`$PKG_CONFIG openssl --variable=includedir 2>/dev/null`
                     found=true
                 fi
             fi
@@ -72,7 +78,7 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
     # note that we #include <openssl/foo.h>, so the OpenSSL headers have to be in
     # an 'openssl' subdirectory
 
-    if ! $found; then
+    if ! $found && ! $skip; then
         OPENSSL_INCLUDES=
         for ssldir in $ssldirs; do
             AC_MSG_CHECKING([for openssl/ssl.h in $ssldir])
@@ -80,6 +86,7 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
                 OPENSSL_INCLUDES="-I$ssldir/include"
                 OPENSSL_LDFLAGS="-L$ssldir/lib"
                 OPENSSL_LIBS="-lssl -lcrypto"
+                founddir="$ssldir/include"
                 found=true
                 AC_MSG_RESULT([yes])
                 break
@@ -87,38 +94,44 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
                 AC_MSG_RESULT([no])
             fi
         done
-
-        # if the file wasn't found, well, go ahead and try the link anyway -- maybe
-        # it will just work!
     fi
+
+    # if the file wasn't found, well, go ahead and try the link anyway -- maybe
+    # it will just work!
 
     # try the preprocessor and linker with our new flags,
     # being careful not to pollute the global LIBS, LDFLAGS, and CPPFLAGS
 
-    AC_MSG_CHECKING([whether compiling and linking against OpenSSL works])
-    echo "Trying link with OPENSSL_LDFLAGS=$OPENSSL_LDFLAGS;" \
-        "OPENSSL_LIBS=$OPENSSL_LIBS; OPENSSL_INCLUDES=$OPENSSL_INCLUDES" >&AS_MESSAGE_LOG_FD
+    if ! $skip; then
+        AC_MSG_CHECKING([whether compiling and linking against OpenSSL works])
+        echo "Trying link with OPENSSL_LDFLAGS=$OPENSSL_LDFLAGS;" \
+            "OPENSSL_LIBS=$OPENSSL_LIBS; OPENSSL_INCLUDES=$OPENSSL_INCLUDES" >&AS_MESSAGE_LOG_FD
 
-    save_LIBS="$LIBS"
-    save_LDFLAGS="$LDFLAGS"
-    save_CPPFLAGS="$CPPFLAGS"
-    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
-    LIBS="$OPENSSL_LIBS $LIBS"
-    CPPFLAGS="$OPENSSL_INCLUDES $CPPFLAGS"
-    AC_LINK_IFELSE(
-        [AC_LANG_PROGRAM([#include <openssl/ssl.h>], [SSL_new(NULL)])],
-        [
-            AC_MSG_RESULT([yes])
-            $1
-        ], [
-            AC_MSG_RESULT([no])
-            $2
-        ])
-    CPPFLAGS="$save_CPPFLAGS"
-    LDFLAGS="$save_LDFLAGS"
-    LIBS="$save_LIBS"
+        save_LIBS="$LIBS"
+        save_LDFLAGS="$LDFLAGS"
+        save_CPPFLAGS="$CPPFLAGS"
+        LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
+        LIBS="$OPENSSL_LIBS $LIBS"
+        CPPFLAGS="$OPENSSL_INCLUDES $CPPFLAGS"
+        AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM([#include <openssl/ssl.h>], [SSL_new(NULL)])],
+            [
+                AC_MSG_RESULT([yes])
+                $1
+            ], [
+                AC_MSG_RESULT([no])
+                $2
+            ])
+        CPPFLAGS="$save_CPPFLAGS"
+        LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
 
-    AC_SUBST([OPENSSL_INCLUDES])
-    AC_SUBST([OPENSSL_LIBS])
-    AC_SUBST([OPENSSL_LDFLAGS])
+        if test -f "$founddir/openssl/ec.h"; then
+            AC_DEFINE([OPENSSL_EC_AVAILABLE], [1], [Whether openssl/ec.h exists])
+        fi
+
+        AC_SUBST([OPENSSL_INCLUDES])
+        AC_SUBST([OPENSSL_LIBS])
+        AC_SUBST([OPENSSL_LDFLAGS])
+    fi
 ])

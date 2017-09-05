@@ -1,8 +1,8 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
-AC_INIT([libmowgli-2], [2.1.0], [https://github.com/atheme/libmowgli-2])
+AC_PREREQ([2.69])
+AC_INIT([libmowgli-2],[2.1.0],[https://github.com/atheme/libmowgli-2])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
 
@@ -28,14 +28,10 @@ AC_CHECK_HEADERS([poll.h winsock2.h sys/epoll.h sys/select.h sys/pstat.h sys/prc
 AC_CHECK_FUNCS([fcntl kqueue mmap select dispatch_block port_create setproctitle pstat])
 
 AC_CACHE_CHECK([for PS_STRINGS], [pgac_cv_var_PS_STRINGS],
-[AC_TRY_LINK(
-[#include <machine/vmparam.h>
+[AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <machine/vmparam.h>
 #include <sys/exec.h>
-],
-[PS_STRINGS->ps_nargvstr = 1;
-PS_STRINGS->ps_argvstr = "foo";],
-[pgac_cv_var_PS_STRINGS=yes],
-[pgac_cv_var_PS_STRINGS=no])])
+]], [[PS_STRINGS->ps_nargvstr = 1;
+PS_STRINGS->ps_argvstr = "foo";]])],[pgac_cv_var_PS_STRINGS=yes],[pgac_cv_var_PS_STRINGS=no])])
 if test "$pgac_cv_var_PS_STRINGS" = yes ; then
   AC_DEFINE([HAVE_PS_STRINGS], [], [Define to 1 if the PS_STRINGS struct exists on your platform (likely no).])
 fi

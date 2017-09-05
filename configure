@@ -708,6 +708,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -782,6 +783,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1034,6 +1036,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1171,7 +1182,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1324,6 +1335,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -4497,13 +4509,18 @@ esac
 OPENSSL="no"
 
     found=false
+    skip=false
+    founddir=
 
 # Check whether --with-openssl was given.
 if test "${with_openssl+set}" = set; then :
   withval=$with_openssl;
             case "$withval" in
-            "" | y | ye | yes | n | no)
+            "" | y | ye | yes)
             as_fn_error $? "Invalid --with-openssl value" "$LINENO" 5
+              ;;
+            n | no)
+            skip=true
               ;;
             *) ssldirs="$withval"
               ;;
@@ -4558,6 +4575,7 @@ fi
                 if test $? = 0; then
                     OPENSSL_LIBS=`$PKG_CONFIG openssl --libs-only-l 2>/dev/null`
                     OPENSSL_INCLUDES=`$PKG_CONFIG openssl --cflags-only-I 2>/dev/null`
+                    founddir=`$PKG_CONFIG openssl --variable=includedir 2>/dev/null`
                     found=true
                 fi
             fi
@@ -4575,7 +4593,7 @@ fi
     # note that we #include <openssl/foo.h>, so the OpenSSL headers have to be in
     # an 'openssl' subdirectory
 
-    if ! $found; then
+    if ! $found && ! $skip; then
         OPENSSL_INCLUDES=
         for ssldir in $ssldirs; do
             { $as_echo "$as_me:${as_lineno-$LINENO}: checking for openssl/ssl.h in $ssldir" >&5
@@ -4584,6 +4602,7 @@ $as_echo_n "checking for openssl/ssl.h in $ssldir... " >&6; }
                 OPENSSL_INCLUDES="-I$ssldir/include"
                 OPENSSL_LDFLAGS="-L$ssldir/lib"
                 OPENSSL_LIBS="-lssl -lcrypto"
+                founddir="$ssldir/include"
                 found=true
                 { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -4593,26 +4612,27 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
             fi
         done
-
-        # if the file wasn't found, well, go ahead and try the link anyway -- maybe
-        # it will just work!
     fi
+
+    # if the file wasn't found, well, go ahead and try the link anyway -- maybe
+    # it will just work!
 
     # try the preprocessor and linker with our new flags,
     # being careful not to pollute the global LIBS, LDFLAGS, and CPPFLAGS
 
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiling and linking against OpenSSL works" >&5
+    if ! $skip; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether compiling and linking against OpenSSL works" >&5
 $as_echo_n "checking whether compiling and linking against OpenSSL works... " >&6; }
-    echo "Trying link with OPENSSL_LDFLAGS=$OPENSSL_LDFLAGS;" \
-        "OPENSSL_LIBS=$OPENSSL_LIBS; OPENSSL_INCLUDES=$OPENSSL_INCLUDES" >&5
+        echo "Trying link with OPENSSL_LDFLAGS=$OPENSSL_LDFLAGS;" \
+            "OPENSSL_LIBS=$OPENSSL_LIBS; OPENSSL_INCLUDES=$OPENSSL_INCLUDES" >&5
 
-    save_LIBS="$LIBS"
-    save_LDFLAGS="$LDFLAGS"
-    save_CPPFLAGS="$CPPFLAGS"
-    LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
-    LIBS="$OPENSSL_LIBS $LIBS"
-    CPPFLAGS="$OPENSSL_INCLUDES $CPPFLAGS"
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+        save_LIBS="$LIBS"
+        save_LDFLAGS="$LDFLAGS"
+        save_CPPFLAGS="$CPPFLAGS"
+        LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
+        LIBS="$OPENSSL_LIBS $LIBS"
+        CPPFLAGS="$OPENSSL_INCLUDES $CPPFLAGS"
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <openssl/ssl.h>
 int
@@ -4625,7 +4645,7 @@ SSL_new(NULL)
 _ACEOF
 if ac_fn_c_try_link "$LINENO"; then :
 
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 
    OPENSSL="yes"
@@ -4636,20 +4656,27 @@ $as_echo "#define HAVE_OPENSSL 1" >>confdefs.h
 
 else
 
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
-    CPPFLAGS="$save_CPPFLAGS"
-    LDFLAGS="$save_LDFLAGS"
-    LIBS="$save_LIBS"
+        CPPFLAGS="$save_CPPFLAGS"
+        LDFLAGS="$save_LDFLAGS"
+        LIBS="$save_LIBS"
+
+        if test -f "$founddir/openssl/ec.h"; then
+
+$as_echo "#define OPENSSL_EC_AVAILABLE 1" >>confdefs.h
+
+        fi
 
 
 
 
+    fi
 
 if test x"$OPENSSL" = x"yes"; then :
 

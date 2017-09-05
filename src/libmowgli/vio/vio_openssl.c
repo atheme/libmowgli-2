@@ -30,10 +30,14 @@
 
 #ifdef HAVE_OPENSSL
 
+#include <openssl/ssl.h>
 #include <openssl/opensslv.h>
 
-#if (OPENSSL_VERSION_NUMBER >= 0x10000000L)
+#ifdef OPENSSL_EC_AVAILABLE
 #  include <openssl/ec.h>
+#  if !defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x10002001L)
+#    define MOWGLI_HAVE_OPENSSL_ECDH_AUTO 1
+#  endif
 #endif
 
 #if defined(LIBRESSL_VERSION_NUMBER) && (LIBRESSL_VERSION_NUMBER >= 0x20020002L)
@@ -41,13 +45,6 @@
 #else
 #  if !defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x10100000L)
 #    define MOWGLI_HAVE_OPENSSL_TLS_METHOD_API 1
-#  endif
-#endif
-
-#if (OPENSSL_VERSION_NUMBER >= 0x10000000L) && defined(NID_X9_62_prime256v1)
-#  define MOWGLI_HAVE_OPENSSL_ECDH_SUPPORT 1
-#  if !defined(LIBRESSL_VERSION_NUMBER) && (OPENSSL_VERSION_NUMBER >= 0x10002001L)
-#    define MOWGLI_HAVE_OPENSSL_ECDH_AUTO 1
 #  endif
 #endif
 
@@ -209,7 +206,7 @@ mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog)
 	SSL_set_accept_state(connection->ssl_handle);
 	SSL_CTX_set_options(connection->ssl_context, SSL_OP_SINGLE_DH_USE);
 
-#ifdef MOWGLI_HAVE_OPENSSL_ECDH_SUPPORT
+#ifdef OPENSSL_EC_AVAILABLE
 #  ifdef MOWGLI_HAVE_OPENSSL_ECDH_AUTO
 	SSL_CTX_set_ecdh_auto(connection->ssl_context, 1);
 #  else
