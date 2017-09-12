@@ -44,11 +44,13 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
             [root of the OpenSSL directory])],
         [
             case "$withval" in
-            "" | y | ye | yes)
-            AC_MSG_ERROR([Invalid --with-openssl value])
+            "")
+            AC_MSG_ERROR([Empty --with-openssl value])
               ;;
-            n | no)
+            n | no | N | NO)
             skip=true
+              ;;
+            y | ye | yes | Y | YE | YES)
               ;;
             *) ssldirs="$withval"
               ;;
