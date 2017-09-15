@@ -39,43 +39,41 @@ AC_DEFUN([AX_CHECK_OPENSSL], [
     found=false
     skip=false
     founddir=
+    ssldirs=
     AC_ARG_WITH([openssl],
         [AS_HELP_STRING([--with-openssl=DIR],
             [root of the OpenSSL directory])],
         [
             case "$withval" in
-            "")
-            AC_MSG_ERROR([Empty --with-openssl value])
-              ;;
             n | no | N | NO)
             skip=true
               ;;
-            y | ye | yes | Y | YE | YES)
+            y | ye | yes | Y | YE | YES | "")
               ;;
-            *) ssldirs="$withval"
+            *)
+              ssldirs="$withval"
               ;;
             esac
-        ], [
-            # if pkg-config is installed and openssl has installed a .pc file,
-            # then use that information and don't search ssldirs
-            AC_PATH_PROG([PKG_CONFIG], [pkg-config])
-            if test x"$PKG_CONFIG" != x""; then
-                OPENSSL_LDFLAGS=`$PKG_CONFIG openssl --libs-only-L 2>/dev/null`
-                if test $? = 0; then
-                    OPENSSL_LIBS=`$PKG_CONFIG openssl --libs-only-l 2>/dev/null`
-                    OPENSSL_INCLUDES=`$PKG_CONFIG openssl --cflags-only-I 2>/dev/null`
-                    founddir=`$PKG_CONFIG openssl --variable=includedir 2>/dev/null`
-                    found=true
-                fi
-            fi
+        ], []
+    )
 
-            # no such luck; use some default ssldirs
-            if ! $found; then
-                ssldirs="/usr/local/ssl /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr"
-            fi
-        ]
-        )
+    # if pkg-config is installed and openssl has installed a .pc file,
+    # then use that information and don't search ssldirs
+    AC_PATH_PROG([PKG_CONFIG], [pkg-config])
+    if test x"$ssldirs" = x"" && test x"$PKG_CONFIG" != x""; then
+        OPENSSL_LDFLAGS=`$PKG_CONFIG openssl --libs-only-L 2>/dev/null`
+        if test $? = 0; then
+            OPENSSL_LIBS=`$PKG_CONFIG openssl --libs-only-l 2>/dev/null`
+            OPENSSL_INCLUDES=`$PKG_CONFIG openssl --cflags-only-I 2>/dev/null`
+            founddir=`$PKG_CONFIG openssl --variable=includedir 2>/dev/null`
+            found=true
+        fi
+    fi
 
+    # no such luck; use some default ssldirs
+    if ! $found; then
+        ssldirs="/usr/local/ssl /usr/lib/ssl /usr/ssl /usr/pkg /usr/local /usr"
+    fi
 
     # note that we #include <openssl/foo.h>, so the OpenSSL headers have to be in
     # an 'openssl' subdirectory
