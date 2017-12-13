@@ -74,6 +74,7 @@ mowgli_epoll_eventloop_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_p
 	priv = eventloop->poller;
 	pollable->slot = 0;
 
+	(void) memset(&ep_event, 0x00, sizeof ep_event);
 	ep_event.events = pollable->slot;
 	ep_event.data.ptr = pollable;
 
@@ -142,6 +143,7 @@ mowgli_epoll_eventloop_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop
 	if (op == -1)
 		return;
 
+	(void) memset(&ep_event, 0x00, sizeof ep_event);
 	ep_event.events = pollable->slot;
 	ep_event.data.ptr = pollable;
 
