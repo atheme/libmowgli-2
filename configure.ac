@@ -5,6 +5,7 @@ AC_PREREQ([2.69])
 AC_INIT([libmowgli-2],[2.1.3],[https://github.com/atheme/libmowgli-2])
 AC_CONFIG_SRCDIR([src])
 AC_CONFIG_HEADER([src/libmowgli/platform/autoconf.h])
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
