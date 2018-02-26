@@ -104,7 +104,6 @@ mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 			e->type = MOWGLI_ARG_BOOLEAN;
 			break;
 		default:
-			va_end(va);
 			mowgli_object_unref(out);
 			mowgli_log_warning("invalid description");
 			return NULL;
