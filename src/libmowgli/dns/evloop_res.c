@@ -1069,7 +1069,7 @@ make_dnsreply(mowgli_dns_reslist_t *request)
 	cp = (mowgli_dns_reply_t *) mowgli_alloc(sizeof(mowgli_dns_reply_t));
 
 	cp->h_name = request->name;
-	memcpy(&cp->addr, &request->addr, sizeof(cp->addr));
+	memcpy(&cp->addr.addr, &request->addr, sizeof(request->addr));
 	return cp;
 }
 
