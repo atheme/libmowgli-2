@@ -194,6 +194,7 @@ mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
 
 	mowgli_timer_destroy(state->eventloop, state->timeout_resolver_timer);
 
+	mowgli_object_unref(state->rand);
 	mowgli_free(state);
 	dns->dns_state = NULL;
 }
