@@ -189,7 +189,6 @@ mowgli_dns_evloop_destroy(mowgli_dns_t *dns)
 {
 	mowgli_dns_evloop_t *state = dns->dns_state;
 
-	mowgli_vio_close(state->vio);
 	mowgli_vio_destroy(state->vio);
 
 	mowgli_timer_destroy(state->eventloop, state->timeout_resolver_timer);
