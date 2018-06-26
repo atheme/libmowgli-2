@@ -296,7 +296,7 @@ mowgli_vio_default_recvfrom(mowgli_vio_t *vio, void *buffer, size_t len, mowgli_
 
 	mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_ISCONNECTING, false);
 
-	if ((ret = (int) recvfrom(fd, buffer, len, 0, (struct sockaddr *) &addr->addr, &addr->addrlen)) < 0)
+	if ((ret = (int) recvfrom(fd, buffer, len, 0, (struct sockaddr *) &addr->addr, &addr->addrlen)) <= 0)
 	{
 		mowgli_vio_setflag(vio, MOWGLI_VIO_FLAGS_NEEDREAD, false);
 
