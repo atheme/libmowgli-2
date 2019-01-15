@@ -5,8 +5,8 @@
  * JSON inline functions, to simplify refcounting etc for other users
  */
 
-#ifndef MOWGLI_JSON_INLINE_H
-#define MOWGLI_JSON_INLINE_H
+#ifndef MOWGLI_SRC_LIBMOWGLI_EXT_JSON_INLINE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EXT_JSON_INLINE_H_INCLUDE_GUARD 1
 
 /* We don't need to include any other headers here. This is in a separate
    file to keep clutter out of the main json.h */
@@ -104,4 +104,4 @@ mowgli_json_object_delete(mowgli_json_t *obj, const char *key)
 	return (mowgli_json_t *) mowgli_patricia_delete(MOWGLI_JSON_OBJECT(obj), key);
 }
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_EXT_JSON_INLINE_H_INCLUDE_GUARD */

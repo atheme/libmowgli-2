@@ -22,8 +22,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_DICTIONARY_H__
-#define __MOWGLI_DICTIONARY_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_DICTIONARY_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CONTAINER_DICTIONARY_H_INCLUDE_GUARD 1
 
 struct mowgli_dictionary_;	/* defined in src/dictionary.c */
 
@@ -154,4 +154,4 @@ extern void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *ke
 
 void mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, void *privdata), void *privdata);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CONTAINER_DICTIONARY_H_INCLUDE_GUARD */

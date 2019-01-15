@@ -5,8 +5,8 @@
  * original remains, so...
  */
 
-#ifndef __MOWGLI_DNS_RES_H__
-#define __MOWGLI_DNS_RES_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RES_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RES_H_INCLUDE_GUARD 1
 
 /* Maximum number of nameservers we track */
 #define MOWGLI_DNS_MAXNS 10
@@ -46,4 +46,4 @@ extern int mowgli_dns_evloop_set_resolvconf(mowgli_dns_t *dns, const char *respa
 
 extern const mowgli_dns_ops_t mowgli_dns_evloop_resolver;
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RES_H_INCLUDE_GUARD */

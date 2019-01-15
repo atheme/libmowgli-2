@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _GETOPT_H_
-#define _GETOPT_H_
+#ifndef MOWGLI_SRC_LIBMOWGLI_EXT_GETOPT_LONG_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EXT_GETOPT_LONG_H_INCLUDE_GUARD 1
 
 /*
  * Gnu like getopt_long() and BSD4.4 getsubopt()/optreset extensions
@@ -70,4 +70,4 @@ extern int mowgli_optopt;
 extern int mowgli_optreset;
 extern char *mowgli_optarg;
 
-#endif /* !_GETOPT_H_ */
+#endif /* MOWGLI_SRC_LIBMOWGLI_EXT_GETOPT_LONG_H_INCLUDE_GUARD */

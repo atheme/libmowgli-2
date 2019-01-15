@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_STDINC_H__
-#define __MOWGLI_STDINC_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD 1
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -106,4 +106,4 @@ typedef enum {FALSE, TRUE} mowgli_boolean_t;
 # include <openssl/err.h>
 #endif
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD */

@@ -21,11 +21,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MOWGLI_GLOBAL_STORAGE_H
-#define MOWGLI_GLOBAL_STORAGE_H
+#ifndef MOWGLI_SRC_LIBMOWGLI_EXT_GLOBAL_STORAGE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EXT_GLOBAL_STORAGE_H_INCLUDE_GUARD 1
 
 extern void *mowgli_global_storage_get(char *name);
 extern void mowgli_global_storage_put(char *name, void *value);
 extern void mowgli_global_storage_free(char *name);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_EXT_GLOBAL_STORAGE_H_INCLUDE_GUARD */

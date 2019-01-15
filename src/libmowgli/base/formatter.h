@@ -21,11 +21,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_FORMATTER_H__
-#define __MOWGLI_FORMATTER_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_FORMATTER_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_FORMATTER_H_INCLUDE_GUARD 1
 
 extern void mowgli_formatter_format(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, ...);
 extern void mowgli_formatter_print(const char *fmtstr, const char *descstr, ...);
 extern void mowgli_formatter_format_from_argstack(char *buf, size_t bufstr, const char *fmtstr, const char *descstr, mowgli_argstack_t *stack);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_FORMATTER_H_INCLUDE_GUARD */

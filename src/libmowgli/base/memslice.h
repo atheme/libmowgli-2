@@ -18,9 +18,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_MEMSLICE_H__
-#define __MOWGLI_MEMSLICE_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD 1
 
 mowgli_allocation_policy_t *mowgli_memslice_get_policy(void);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD */

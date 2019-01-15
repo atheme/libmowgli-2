@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_QUEUE_H__
-#define __MOWGLI_QUEUE_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_QUEUE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CONTAINER_QUEUE_H_INCLUDE_GUARD 1
 
 typedef mowgli_iterator_t mowgli_queue_t;
 
@@ -40,4 +40,4 @@ extern void *mowgli_queue_pop_head(mowgli_queue_t **n);
 extern void *mowgli_queue_pop_tail(mowgli_queue_t **n);
 extern int mowgli_queue_length(mowgli_queue_t *head);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CONTAINER_QUEUE_H_INCLUDE_GUARD */

@@ -31,8 +31,8 @@
  * operation).
  */
 
-#ifndef __MOWGLI_MACHINE_H__
-#define __MOWGLI_MACHINE_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_PLATFORM_MACHINE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_PLATFORM_MACHINE_H_INCLUDE_GUARD 1
 
 #if defined __clang__
 # define MOWGLI_COMPILER_CLANG
@@ -337,4 +337,4 @@
 # endif
 #endif
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_PLATFORM_MACHINE_H_INCLUDE_GUARD */

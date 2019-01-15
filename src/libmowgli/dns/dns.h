@@ -18,8 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_DNS_DNS_H__
-#define __MOWGLI_DNS_DNS_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD 1
 
 /* Longest hostname we're willing to work with */
 #define MOWGLI_DNS_RES_HOSTLEN 512
@@ -90,4 +90,4 @@ extern void mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_s
 #include "evloop_res.h"
 #include "evloop_reslib.h"
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD */

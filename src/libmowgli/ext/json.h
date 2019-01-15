@@ -38,8 +38,8 @@
 
    --aji */
 
-#ifndef MOWGLI_JSON_H
-#define MOWGLI_JSON_H
+#ifndef MOWGLI_SRC_LIBMOWGLI_EXT_JSON_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EXT_JSON_H_INCLUDE_GUARD 1
 
 /* Types with public definitons */
 typedef enum
@@ -148,4 +148,4 @@ extern mowgli_json_t *mowgli_json_parse_next(mowgli_json_parse_t *parse);
 extern mowgli_json_t *mowgli_json_parse_file(const char *path);
 extern mowgli_json_t *mowgli_json_parse_string(const char *data);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_EXT_JSON_H_INCLUDE_GUARD */

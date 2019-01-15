@@ -16,8 +16,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_VIO_VIO_H__
-#define __MOWGLI_VIO_VIO_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_VIO_VIO_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_VIO_VIO_H_INCLUDE_GUARD 1
 
 /* Types and structs */
 typedef struct _mowgli_vio mowgli_vio_t;
@@ -319,4 +319,4 @@ extern mowgli_vio_evops_t mowgli_vio_default_evops;
 #define mowgli_vio_seek(vio, ...) vio->ops->seek(vio, __VA_ARGS__)
 #define mowgli_vio_tell(vio) vio->ops->tell(vio)
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_VIO_VIO_H_INCLUDE_GUARD */

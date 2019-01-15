@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ARGSTACK_H__
-#define __MOWGLI_ARGSTACK_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_ARGSTACK_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_ARGSTACK_H_INCLUDE_GUARD 1
 
 typedef enum
 {
@@ -58,4 +58,4 @@ extern int mowgli_argstack_pop_numeric(mowgli_argstack_t *);
 extern mowgli_boolean_t mowgli_argstack_pop_boolean(mowgli_argstack_t *);
 extern void *mowgli_argstack_pop_pointer(mowgli_argstack_t *);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_ARGSTACK_H_INCLUDE_GUARD */

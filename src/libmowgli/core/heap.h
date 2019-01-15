@@ -24,8 +24,8 @@
  * Legal note: code devised from claro.base.block module r288 (Pre MPL)
  */
 
-#ifndef __MOWGLI_HEAP_H__
-#define __MOWGLI_HEAP_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD 1
 
 typedef struct mowgli_heap_ mowgli_heap_t;
 typedef struct mowgli_block_ mowgli_block_t;
@@ -45,4 +45,4 @@ extern void mowgli_heap_destroy(mowgli_heap_t *heap);
 extern void *mowgli_heap_alloc(mowgli_heap_t *heap);
 extern void mowgli_heap_free(mowgli_heap_t *heap, void *data);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD */

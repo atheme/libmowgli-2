@@ -9,8 +9,8 @@
  ***-------------------------------------------------------------------------
  */
 
-#ifndef __PS_STATUS_H__
-#define __PS_STATUS_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_EXT_PROCTITLE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EXT_PROCTITLE_H_INCLUDE_GUARD 1
 
 extern bool mowgli_proctitle_update;
 
@@ -23,4 +23,4 @@ extern void mowgli_proctitle_set(const char *fmt, ...);
 
 extern const char *mowgli_proctitle_get(int *displen);
 
-#endif /* __PS_STATUS_H__ */
+#endif /* MOWGLI_SRC_LIBMOWGLI_EXT_PROCTITLE_H_INCLUDE_GUARD */

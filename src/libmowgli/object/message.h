@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_MESSAGING_H__
-#define __MOWGLI_OBJECT_MESSAGING_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_MESSAGE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_OBJECT_MESSAGE_H_INCLUDE_GUARD 1
 
 typedef struct mowgli_object_message_handler_ mowgli_object_message_handler_t;
 typedef void (*mowgli_object_messaging_func_t)(mowgli_object_t *self, mowgli_object_message_handler_t *sig, mowgli_argstack_t *argstack);
@@ -40,4 +40,4 @@ extern void mowgli_object_message_handler_attach(mowgli_object_t *self, mowgli_o
 extern void mowgli_object_message_handler_detach(mowgli_object_t *self, mowgli_object_message_handler_t *sig);
 extern void mowgli_object_message_broadcast(mowgli_object_t *self, const char *name, ...);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_OBJECT_MESSAGE_H_INCLUDE_GUARD */

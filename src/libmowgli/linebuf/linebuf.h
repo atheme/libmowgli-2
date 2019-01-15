@@ -18,8 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_LINEBUF_LINEBUF_H__
-#define __MOWGLI_LINEBUF_LINEBUF_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_LINEBUF_LINEBUF_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_LINEBUF_LINEBUF_H_INCLUDE_GUARD 1
 
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
@@ -87,4 +87,4 @@ mowgli_linebuf_get_vio(mowgli_linebuf_t *linebuf)
 	return linebuf->vio;
 }
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_LINEBUF_LINEBUF_H_INCLUDE_GUARD */

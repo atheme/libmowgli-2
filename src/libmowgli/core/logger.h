@@ -22,8 +22,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_LOGGER_H__
-#define __MOWGLI_LOGGER_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD 1
 
 typedef void (*mowgli_log_cb_t)(const char *);
 
@@ -59,4 +59,4 @@ extern MOWGLI_COLD(MOWGLI_PRINTF(void mowgli_log_prefix_real(const char *file,
 # define _MOWGLI_FUNCNAME __func__
 #endif
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD */

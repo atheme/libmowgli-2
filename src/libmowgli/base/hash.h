@@ -21,10 +21,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_HASH_H__
-#define __MOWGLI_HASH_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_HASH_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_HASH_H_INCLUDE_GUARD 1
 
 extern int mowgli_fnv_hash_string(const char *data);
 extern int mowgli_fnv_hash(unsigned int *data);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_HASH_H_INCLUDE_GUARD */

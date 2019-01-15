@@ -4,8 +4,8 @@
  * $Id: reslib.h 446 2006-02-12 02:46:54Z db $
  */
 
-#ifndef __MOWGLI_DNS_RESLIB_H__
-#define __MOWGLI_DNS_RESLIB_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RESLIB_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RESLIB_H_INCLUDE_GUARD 1
 
 /* Here we define some values lifted from nameser.h */
 #define MOWGLI_DNS_NS_NOTIFY_OP 4
@@ -112,4 +112,4 @@ extern void mowgli_dns_ns_put16(unsigned int src, unsigned char *dst);
 extern void mowgli_dns_ns_put32(unsigned long src, unsigned char *dst);
 extern int mowgli_dns_res_mkquery(const char *dname, int query_class, int type, unsigned char *buf, int buflen);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RESLIB_H_INCLUDE_GUARD */

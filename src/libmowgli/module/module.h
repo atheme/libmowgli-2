@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_MODULE_H__
-#define __MOWGLI_MODULE_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_MODULE_MODULE_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_MODULE_MODULE_H_INCLUDE_GUARD 1
 
 typedef void *mowgli_module_t;
 
@@ -41,4 +41,4 @@ extern void mowgli_interface_register(mowgli_interface_t *iface);
 extern void mowgli_interface_unregister(mowgli_interface_t *iface);
 extern mowgli_interface_t *mowgli_interface_get(const char *id, uint32_t abirev);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_MODULE_MODULE_H_INCLUDE_GUARD */

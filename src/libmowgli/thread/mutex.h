@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_MUTEX_H__
-#define __MOWGLI_MUTEX_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_H_INCLUDE_GUARD 1
 
 #ifdef MOWGLI_OS_UNIX_TYPE
 # include <thread.h>
@@ -78,4 +78,4 @@ mowgli_thread_set_policy(mowgli_thread_policy_t policy)
 	mowgli_mutex_set_policy(policy);
 }
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_H_INCLUDE_GUARD */

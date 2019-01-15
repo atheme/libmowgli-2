@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_LIST_H__
-#define __MOWGLI_LIST_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_LIST_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CONTAINER_LIST_H_INCLUDE_GUARD 1
 
 /* macros for linked lists */
 #define MOWGLI_LIST_FOREACH(n, head) \
@@ -77,4 +77,4 @@ extern void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2);
 extern void mowgli_list_reverse(mowgli_list_t *l);
 extern void mowgli_list_sort(mowgli_list_t *l, mowgli_list_comparator_t comp, void *opaque);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CONTAINER_LIST_H_INCLUDE_GUARD */

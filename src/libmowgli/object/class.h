@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_CLASS_H__
-#define __MOWGLI_OBJECT_CLASS_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_CLASS_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_OBJECT_CLASS_H_INCLUDE_GUARD 1
 
 typedef void (*mowgli_destructor_t)(void *);
 
@@ -59,4 +59,4 @@ extern void mowgli_object_class_destroy(mowgli_object_class_t *klass);
 		to = u.out; \
 	} while (0)
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_OBJECT_CLASS_H_INCLUDE_GUARD */

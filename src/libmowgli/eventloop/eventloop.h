@@ -18,8 +18,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_EVENTLOOP_EVENTLOOP_H__
-#define __MOWGLI_EVENTLOOP_EVENTLOOP_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_EVENTLOOP_EVENTLOOP_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_EVENTLOOP_EVENTLOOP_H_INCLUDE_GUARD 1
 
 #ifdef MOWGLI_OS_OSX
 
@@ -360,4 +360,4 @@ extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollabl
 extern void mowgli_pollable_set_cloexec(mowgli_eventloop_pollable_t *pollable, bool cloexec);
 extern void mowgli_pollable_trigger(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_EVENTLOOP_EVENTLOOP_H_INCLUDE_GUARD */

@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_BITVECTOR_H__
-#define __MOWGLI_BITVECTOR_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_BITVECTOR_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_BITVECTOR_H_INCLUDE_GUARD 1
 
 typedef struct
 {
@@ -38,4 +38,4 @@ extern mowgli_bitvector_t *mowgli_bitvector_combine(mowgli_bitvector_t *bv1, mow
 extern mowgli_bitvector_t *mowgli_bitvector_xor(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 extern mowgli_boolean_t mowgli_bitvector_compare(mowgli_bitvector_t *bv1, mowgli_bitvector_t *bv2);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_BITVECTOR_H_INCLUDE_GUARD */

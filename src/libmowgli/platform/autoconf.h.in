@@ -1,5 +1,10 @@
 /* src/libmowgli/platform/autoconf.h.in.  Generated from configure.ac by autoheader.  */
 
+
+#ifndef MOWGLI_SRC_LIBMOWGLI_PLATFORM_AUTOCONF_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_PLATFORM_AUTOCONF_H_INCLUDE_GUARD 1
+
+
 /* Define to 1 if you have the `dispatch_block' function. */
 #undef HAVE_DISPATCH_BLOCK
 
@@ -106,3 +111,7 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
+
+
+#endif /* !MOWGLI_SRC_LIBMOWGLI_PLATFORM_AUTOCONF_H_INCLUDE_GUARD */
+

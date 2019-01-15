@@ -22,8 +22,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_HOOK_H__
-#define __MOWGLI_HOOK_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_BASE_HOOK_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_BASE_HOOK_H_INCLUDE_GUARD 1
 
 typedef void (*mowgli_hook_function_t)(void *hook_data, void *user_data);
 
@@ -45,4 +45,4 @@ extern int mowgli_hook_associate(const char *name, mowgli_hook_function_t func, 
 extern int mowgli_hook_dissociate(const char *name, mowgli_hook_function_t func);
 extern void mowgli_hook_call(const char *name, void *hook_data);
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_BASE_HOOK_H_INCLUDE_GUARD */

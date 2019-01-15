@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ITERATOR_H__
-#define __MOWGLI_ITERATOR_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CORE_ITERATOR_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CORE_ITERATOR_H_INCLUDE_GUARD 1
 
 typedef struct _mowgli_iterator
 {
@@ -41,4 +41,4 @@ typedef struct _mowgli_iterator
 #define MOWGLI_ITER_FOREACH_SAFE(n, tn, head) \
 	for (n = (head), tn = n ? n->next : NULL; n != NULL; n = tn, tn = n ? n->next : NULL)
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CORE_ITERATOR_H_INCLUDE_GUARD */

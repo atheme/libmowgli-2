@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_ASSERT_H__
-#define __MOWGLI_ASSERT_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_CORE_ASSERT_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_CORE_ASSERT_H_INCLUDE_GUARD 1
 
 #define _assert_msg(exp) "assertion '" #exp  "' failed."
 
@@ -57,4 +57,4 @@
 
 #define return_null_if_fail(exp) return_val_if_fail(exp, NULL)
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_CORE_ASSERT_H_INCLUDE_GUARD */

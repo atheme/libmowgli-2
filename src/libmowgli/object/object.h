@@ -21,8 +21,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MOWGLI_OBJECT_H__
-#define __MOWGLI_OBJECT_H__
+#ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_OBJECT_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_OBJECT_OBJECT_H_INCLUDE_GUARD 1
 
 typedef struct
 {
@@ -40,4 +40,4 @@ extern void mowgli_object_unref(void *);
 
 #define mowgli_object(x) ((mowgli_object_t *) x)
 
-#endif
+#endif /* MOWGLI_SRC_LIBMOWGLI_OBJECT_OBJECT_H_INCLUDE_GUARD */
