@@ -53,14 +53,7 @@ struct mowgli_dictionary_
 mowgli_dictionary_t *
 mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
-
-	dtree->compare_cb = compare_cb;
-
-	if (!elem_heap)
-		elem_heap = mowgli_heap_create(sizeof(mowgli_dictionary_elem_t), 1024, BH_NOW);
-
-	return dtree;
+	return mowgli_dictionary_create_named(NULL, compare_cb);
 }
 
 /*
@@ -86,7 +79,9 @@ mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_fu
 	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
 
 	dtree->compare_cb = compare_cb;
-	dtree->id = strdup(name);
+
+	if (name && *name)
+		dtree->id = mowgli_strdup(name);
 
 	if (!elem_heap)
 		elem_heap = mowgli_heap_create(sizeof(mowgli_dictionary_elem_t), 1024, BH_NOW);
