@@ -163,19 +163,7 @@ first_leaf(union patricia_elem *delem)
 mowgli_patricia_t *
 mowgli_patricia_create(void (*canonize_cb)(char *key))
 {
-	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
-
-	dtree->canonize_cb = canonize_cb;
-
-	if (!leaf_heap)
-		leaf_heap = mowgli_heap_create(sizeof(struct patricia_leaf), 1024, BH_NOW);
-
-	if (!node_heap)
-		node_heap = mowgli_heap_create(sizeof(struct patricia_node), 128, BH_NOW);
-
-	dtree->root = NULL;
-
-	return dtree;
+	return mowgli_patricia_create_named(NULL, canonize_cb);
 }
 
 /*
@@ -203,7 +191,9 @@ mowgli_patricia_create_named(const char *name, void (*canonize_cb)(char *key))
 	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
 
 	dtree->canonize_cb = canonize_cb;
-	dtree->id = mowgli_strdup(name);
+
+	if (name && *name)
+		dtree->id = mowgli_strdup(name);
 
 	if (!leaf_heap)
 		leaf_heap = mowgli_heap_create(sizeof(struct patricia_leaf), 1024, BH_NOW);
