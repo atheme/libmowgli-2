@@ -21,6 +21,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD 1
 
+#include "eventloop/eventloop.h"
+#include "vio/vio.h"
+
 /* Longest hostname we're willing to work with */
 #define MOWGLI_DNS_RES_HOSTLEN 512
 
@@ -85,9 +88,5 @@ extern int mowgli_dns_restart(mowgli_dns_t *dns);
 extern void mowgli_dns_delete_query(mowgli_dns_t *dns, const mowgli_dns_query_t *query);
 extern void mowgli_dns_gethost_byname(mowgli_dns_t *dns, const char *name, mowgli_dns_query_t *query, int type);
 extern void mowgli_dns_gethost_byaddr(mowgli_dns_t *dns, const struct sockaddr_storage *addr, mowgli_dns_query_t *query);
-
-/* Pull in headers that depend on these types */
-#include "evloop_res.h"
-#include "evloop_reslib.h"
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_DNS_DNS_H_INCLUDE_GUARD */

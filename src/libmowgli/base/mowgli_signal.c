@@ -23,7 +23,6 @@
 
 #ifndef _WIN32
 
-#include <signal.h>
 #include "mowgli.h"
 
 #if defined(__linux__) && defined(__GNUC__) && defined(__STRICT_ANSI__)

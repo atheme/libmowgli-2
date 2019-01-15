@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_patricia_t *mowgli_object_class_dict;
 
@@ -36,7 +37,7 @@ _object_key_canon(char *str)
 }
 
 void
-mowgli_object_class_bootstrap()
+mowgli_object_class_bootstrap(void)
 {
 	mowgli_object_class_dict = mowgli_patricia_create(_object_key_canon);
 }

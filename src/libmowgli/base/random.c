@@ -23,6 +23,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 /* period parameters */
 #define N 624

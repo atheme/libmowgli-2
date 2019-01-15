@@ -21,6 +21,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_PROCESS_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_PROCESS_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+
 typedef void (*mowgli_process_start_fn_t)(void *data);
 
 typedef pid_t mowgli_process_id_t;

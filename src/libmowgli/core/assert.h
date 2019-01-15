@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_ASSERT_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_ASSERT_H_INCLUDE_GUARD 1
 
+#include "core/logger.h"
+
 #define _assert_msg(exp) "assertion '" #exp  "' failed."
 
 #define soft_assert(exp) \

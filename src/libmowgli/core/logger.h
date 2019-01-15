@@ -25,38 +25,42 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD 1
 
+#include "platform/attributes.h"
+
+#if defined(MOWGLI_COMPILER_GCC_COMPAT)
+#  define MOWGLI_FUNC_NAME                              __PRETTY_FUNCTION__
+#else
+#  if defined(MOWGLI_COMPILER_MSVC)
+#    define MOWGLI_FUNC_NAME                            __FUNCTION__
+#  else
+#    define MOWGLI_FUNC_NAME                            __func__
+#  endif
+#endif
+
 typedef void (*mowgli_log_cb_t)(const char *);
 
-extern void mowgli_log_set_cb(mowgli_log_cb_t callback);
+extern void mowgli_log_set_cb(mowgli_log_cb_t);
 
-#define mowgli_log(...)	\
-	mowgli_log_prefix("", __VA_ARGS__)
+extern void mowgli_log_real(const char *file, int line, const char *func, const char *fmt, ...)
+    MOWGLI_FATTR_PRINTF(4, 5);
 
-#define mowgli_log_warning(...)	\
-	mowgli_log_prefix("warning: ", __VA_ARGS__)
+extern void mowgli_log_prefix_real(const char *file, int line, const char *func, const char *prefix, const char *fmt, ...)
+    MOWGLI_FATTR_PRINTF(5, 6);
 
-#define mowgli_log_error(...) \
-	mowgli_log_prefix("error: ", __VA_ARGS__)
+extern void mowgli_soft_assert_log(const char *asrt, const char *file, int line, const char *function);
 
-#define mowgli_log_fatal(...) \
-	do \
-	{ \
-		mowgli_log_prefix("fatal: ", __VA_ARGS__); \
-		abort(); \
-	} while (0)
+#define mowgli_log_prefix(prefix, ...)                  \
+    mowgli_log_prefix_real(__FILE__, __LINE__, MOWGLI_FUNC_NAME, prefix, __VA_ARGS__)
 
-#define mowgli_log_prefix(prefix, ...) \
-	mowgli_log_prefix_real(__FILE__, __LINE__, _MOWGLI_FUNCNAME, prefix, __VA_ARGS__)
+#define mowgli_log(...)                                 mowgli_log_prefix("", __VA_ARGS__)
+#define mowgli_log_warning(...)                         mowgli_log_prefix("warning: ", __VA_ARGS__)
+#define mowgli_log_error(...)                           mowgli_log_prefix("error: ", __VA_ARGS__)
 
-extern MOWGLI_COLD(MOWGLI_PRINTF(void mowgli_log_prefix_real(const char *file,
-							     int line, const char *func, const char *prefix, const char *fmt, ...), 5));
-
-#if defined MOWGLI_COMPILER_GCC_COMPAT
-# define _MOWGLI_FUNCNAME __PRETTY_FUNCTION__
-#elif defined MOWGLI_COMPILER_MSVC
-# define _MOWGLI_FUNCNAME __FUNCTION__
-#else
-# define _MOWGLI_FUNCNAME __func__
-#endif
+#define mowgli_log_fatal(...)                           \
+    do                                                  \
+    {                                                   \
+        mowgli_log_prefix("fatal: ", __VA_ARGS__);      \
+        abort();                                        \
+    } while (0)
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_LOGGER_H_INCLUDE_GUARD */

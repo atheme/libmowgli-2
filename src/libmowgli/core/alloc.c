@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 /*
  * bootstrapped allocators so that we can initialise without blowing up
@@ -31,7 +32,7 @@ typedef struct
 	mowgli_allocation_policy_t *allocator;
 } alloc_tag_t;
 
-static void *
+static void * MOWGLI_FATTR_MALLOC MOWGLI_FATTR_ALLOC_SIZE(1)
 _mowgli_bootstrap_alloc(size_t size)
 {
 	return calloc(size, 1);

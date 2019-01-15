@@ -29,9 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <mowgli.h>
-
-#include "getopt_long.h"
+#include "mowgli.h"
 
 int mowgli_opterr = 1;	/* if error message should be printed */
 int mowgli_optind = 1;	/* index into parent argv vector */
@@ -59,7 +57,7 @@ char *mowgli_optarg = NULL;	/* argument associated with option */
 
 #define EMSG ""
 
-static inline void
+static inline void MOWGLI_FATTR_PRINTF(1, 2)
 warnx(const char *fmt, ...)
 {
 	va_list ap;

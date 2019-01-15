@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_heap_t *mowgli_node_heap;
 static mowgli_heap_t *mowgli_list_heap;

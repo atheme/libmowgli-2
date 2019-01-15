@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_patricia_t *mowgli_global_storage_dict = NULL;
 static mowgli_mutex_t mowgli_global_storage_lock;

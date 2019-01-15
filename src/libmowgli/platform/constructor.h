@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_PLATFORM_CONSTRUCTOR_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_PLATFORM_CONSTRUCTOR_H_INCLUDE_GUARD 1
 
+#include "platform/machine.h"
+
 #if defined MOWGLI_COMPILER_MSVC
 
 /*
@@ -34,22 +36,22 @@
  * See http://blogs.msdn.com/b/vcblog/archive/2006/10/20/crt-initialization.aspx
  * for more information.
  */
-# define MOWGLI_BOOTSTRAP_FUNC(func) \
+#  define MOWGLI_BOOTSTRAP_FUNC(func) \
 	static void __cdecl func(void);	\
 	__declspec(allocate(".CRT$XCU")) void(__cdecl * func##_) (void) = func;	\
 	static void __cdecl func(void)
 #elif defined MOWGLI_COMPILER_GCC_COMPAT
-# if MOWGLI_COMPILER_GCC_VERSION >= 403000
-#  define MOWGLI_BOOTSTRAP_FUNC(func) \
+#  if MOWGLI_COMPILER_GCC_VERSION >= 403000
+#    define MOWGLI_BOOTSTRAP_FUNC(func) \
 	static void func(void) __attribute__((cold, constructor, flatten)); \
 	static void func(void)
-# else
-#  define MOWGLI_BOOTSTRAP_FUNC(func) \
+#  else
+#    define MOWGLI_BOOTSTRAP_FUNC(func) \
 	static void func(void) __attribute__((constructor, flatten)); \
 	static void func(void)
-# endif
+#  endif
 #else
-# error MOWGLI_BOOTSTRAP_FUNC not implemented for your platform :(
+#  error MOWGLI_BOOTSTRAP_FUNC not implemented for your platform :(
 #endif
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_PLATFORM_CONSTRUCTOR_H_INCLUDE_GUARD */

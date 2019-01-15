@@ -25,6 +25,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_DICTIONARY_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CONTAINER_DICTIONARY_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+#include "platform/attributes.h"
+
 struct mowgli_dictionary_;	/* defined in src/dictionary.c */
 
 typedef struct mowgli_dictionary_ mowgli_dictionary_t;
@@ -64,13 +67,15 @@ typedef struct mowgli_dictionary_iteration_state_ mowgli_dictionary_iteration_st
  * compare_cb is the comparison function, typically strcmp, strcasecmp or
  * irccasecmp.
  */
-extern mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb);
+extern mowgli_dictionary_t *mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
+    MOWGLI_FATTR_MALLOC;
 
 /*
  * mowgli_dictionary_create_named() creates a new dictionary tree which has a name.
  * name is the name, compare_cb is the comparator.
  */
-extern mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb);
+extern mowgli_dictionary_t *mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb)
+    MOWGLI_FATTR_MALLOC;
 
 /*
  * mowgli_dictionary_set_comparator_func() resets the comparator used for lookups and
@@ -135,7 +140,8 @@ extern void mowgli_dictionary_foreach_next(mowgli_dictionary_t *dtree, mowgli_di
 /*
  * mowgli_dictionary_add() adds a key->value entry to the dictionary tree.
  */
-extern mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, const void *key, void *data);
+extern mowgli_dictionary_elem_t *mowgli_dictionary_add(mowgli_dictionary_t *dtree, const void *key, void *data)
+    MOWGLI_FATTR_MALLOC;
 
 /*
  * mowgli_dictionary_find() returns a mowgli_dictionary_elem_t container from a dtree for key 'key'.

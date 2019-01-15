@@ -23,6 +23,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_patricia_t *mowgli_hooks = NULL;
 static mowgli_heap_t *mowgli_hook_item_heap;

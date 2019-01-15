@@ -5,7 +5,7 @@
  * Structs and functions for interacting with JSON documents from C
  */
 
-#include <mowgli.h>
+#include "mowgli.h"
 
 /* TOC:
  * 0. JSON subsystem constants
@@ -46,7 +46,9 @@ static mowgli_json_t json_false =
 };
 mowgli_json_t *mowgli_json_false = &json_false;
 
-static mowgli_json_t *json_alloc(mowgli_json_tag_t tag);
+static mowgli_json_t *json_alloc(mowgli_json_tag_t tag)
+    MOWGLI_FATTR_MALLOC;
+
 static void json_destroy(mowgli_json_t *n);
 static void destroy_extra_string(mowgli_json_t *n);
 static void destroy_extra_array(mowgli_json_t *n);
@@ -791,7 +793,7 @@ parse_out_dequeue(mowgli_json_parse_t *parse)
 	return n;
 }
 
-static void
+static void MOWGLI_FATTR_PRINTF(2, 3)
 parse_error(mowgli_json_parse_t *parse, const char *fmt, ...)
 {
 	va_list va;

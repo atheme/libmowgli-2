@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_object_class_t klass;
 static mowgli_patricia_t *mowgli_allocation_policy_dict = NULL;

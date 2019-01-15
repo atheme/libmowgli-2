@@ -19,6 +19,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 static mowgli_list_t allocator_list;
 static mowgli_heap_t *allocator_heap;

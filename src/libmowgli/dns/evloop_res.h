@@ -8,6 +8,11 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RES_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_DNS_EVLOOP_RES_H_INCLUDE_GUARD 1
 
+#include "base/random.h"
+#include "dns/dns.h"
+#include "eventloop/eventloop.h"
+#include "vio/vio.h"
+
 /* Maximum number of nameservers we track */
 #define MOWGLI_DNS_MAXNS 10
 

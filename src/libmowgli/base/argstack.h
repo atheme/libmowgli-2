@@ -24,6 +24,10 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_BASE_ARGSTACK_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_BASE_ARGSTACK_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+#include "core/stdinc.h"
+#include "object/object.h"
+
 typedef enum
 {
 	MOWGLI_ARG_NUMERIC,

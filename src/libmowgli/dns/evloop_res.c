@@ -31,7 +31,6 @@
  */
 
 #include "mowgli.h"
-#include "dns.h"
 
 #define MOWGLI_DNS_MAXPACKET 1024	/* rfc sez 512 but we expand names so ... */
 #define MOWGLI_DNS_RES_MAXALIASES 35	/* maximum aliases allowed */

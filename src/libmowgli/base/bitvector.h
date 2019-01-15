@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_BASE_BITVECTOR_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_BASE_BITVECTOR_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+
 typedef struct
 {
 	unsigned int bits;

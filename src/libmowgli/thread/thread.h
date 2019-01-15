@@ -26,18 +26,20 @@
 #define MOWGLI_SRC_LIBMOWGLI_THREAD_THREAD_H_INCLUDE_GUARD 1
 
 #ifdef MOWGLI_OS_UNIX_TYPE
-# include <thread.h>
-# define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# ifdef MOWGLI_OS_THREADS_SOLARIS
-#  define  MOWGLI_NATIVE_THREAD_DECL(name) pthread_t(name)
-# else
-#  define MOWGLI_NATIVE_THREAD_DECL(name) thread_t(name)
-# endif
-#elif defined MOWGLI_OS_WIN
-# define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
-# define MOWGLI_NATIVE_THREAD_DECL(name) HANDLE(name)
+#  include <thread.h>
+#  define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
+#  ifdef MOWGLI_OS_THREADS_SOLARIS
+#    define MOWGLI_NATIVE_THREAD_DECL(name) pthread_t(name)
+#  else
+#    define MOWGLI_NATIVE_THREAD_DECL(name) thread_t(name)
+#  endif
 #else
-# include <pthread.h>
+#  if defined MOWGLI_OS_WIN
+#    define MOWGLI_FEATURE_HAVE_NATIVE_THREADS
+#    define MOWGLI_NATIVE_THREAD_DECL(name) HANDLE(name)
+#  else
+#    include <pthread.h>
+#  endif
 #endif
 
 typedef struct
@@ -50,7 +52,7 @@ typedef struct
 } mowgli_thread_t;
 
 #ifdef MOWGLI_NATIVE_THREAD_DECL
-# undef MOWGLI_NATIVE_THREAD_DECL
+#  undef MOWGLI_NATIVE_THREAD_DECL
 #endif
 
 typedef void *(*mowgli_thread_start_fn_t)(mowgli_thread_t *thread, void *userdata);

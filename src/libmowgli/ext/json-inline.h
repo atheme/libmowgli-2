@@ -8,6 +8,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_EXT_JSON_INLINE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_EXT_JSON_INLINE_H_INCLUDE_GUARD 1
 
+#include "ext/json.h"
+
 /* We don't need to include any other headers here. This is in a separate
    file to keep clutter out of the main json.h */
 

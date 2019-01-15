@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 #define MOWGLI_LOG_BUF_SIZE 4096
 
@@ -35,7 +36,7 @@ mowgli_log_cb_default(const char *buf)
 }
 
 void
-mowgli_log_bootstrap()
+mowgli_log_bootstrap(void)
 {
 	_mowgli_log_cb = mowgli_log_cb_default;
 }

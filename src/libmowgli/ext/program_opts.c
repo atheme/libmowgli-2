@@ -23,8 +23,6 @@
 
 #include "mowgli.h"
 
-#include "ext/getopt_long.h"
-
 void
 mowgli_program_opts_consumer_str(const char *arg, void *userdata)
 {

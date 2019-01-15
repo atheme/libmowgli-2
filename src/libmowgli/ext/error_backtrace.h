@@ -24,16 +24,27 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_EXT_ERROR_BACKTRACE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_EXT_ERROR_BACKTRACE_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+#include "platform/attributes.h"
+
 typedef struct mowgli_error_context_
 {
 	mowgli_list_t bt;
 } mowgli_error_context_t;
 
 extern void mowgli_error_context_display(mowgli_error_context_t *e, const char *delim);
-extern void mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error) __attribute__((noreturn));
+
+extern void mowgli_error_context_display_with_error(mowgli_error_context_t *e, const char *delim, const char *error)
+    MOWGLI_FATTR_NORETURN;
+
 extern void mowgli_error_context_destroy(mowgli_error_context_t *e);
-extern void mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...);
+
+extern void mowgli_error_context_push(mowgli_error_context_t *e, const char *msg, ...)
+    MOWGLI_FATTR_PRINTF(2, 3);
+
 extern void mowgli_error_context_pop(mowgli_error_context_t *e);
-extern mowgli_error_context_t *mowgli_error_context_create(void);
+
+extern mowgli_error_context_t *mowgli_error_context_create(void)
+    MOWGLI_FATTR_MALLOC;
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_EXT_ERROR_BACKTRACE_H_INCLUDE_GUARD */

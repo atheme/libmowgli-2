@@ -35,6 +35,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_PATRICIA_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CONTAINER_PATRICIA_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+#include "platform/attributes.h"
+
 struct mowgli_patricia_;/* defined in src/patricia.c */
 
 struct mowgli_patricia_elem_;	/* defined in src/patricia.c */
@@ -68,7 +71,10 @@ typedef struct mowgli_patricia_iteration_state_ mowgli_patricia_iteration_state_
 /* defined if this version of Mowgli allows canonize_cb to be NULL */
 #define MOWGLI_PATRICIA_ALLOWS_NULL_CANONIZE
 
-extern mowgli_patricia_t *mowgli_patricia_create(void (*canonize_cb)(char *key));
+extern mowgli_patricia_t *mowgli_patricia_create(void (*canonize_cb)(char *key))
+    MOWGLI_FATTR_MALLOC;
+extern mowgli_patricia_t *mowgli_patricia_create_named(const char *name, void (*canonize_cb)(char *key))
+    MOWGLI_FATTR_MALLOC;
 
 /*
  * mowgli_patricia_shutdown() deallocates all heaps used in patricia trees. This is

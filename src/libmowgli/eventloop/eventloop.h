@@ -21,11 +21,15 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_EVENTLOOP_EVENTLOOP_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_EVENTLOOP_EVENTLOOP_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+#include "core/assert.h"
+#include "core/process.h"
+#include "core/stdinc.h"
+#include "thread/mutex.h"
+
 #ifdef MOWGLI_OS_OSX
-
-# include <mach/mach.h>
-# include <mach/mach_time.h>
-
+#  include <mach/mach.h>
+#  include <mach/mach_time.h>
 #endif
 
 #ifndef _WIN32

@@ -21,6 +21,10 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_LINEBUF_LINEBUF_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_LINEBUF_LINEBUF_H_INCLUDE_GUARD 1
 
+#include "eventloop/eventloop.h"
+#include "platform/attributes.h"
+#include "vio/vio.h"
+
 typedef struct _mowgli_linebuf_buf mowgli_linebuf_buf_t;
 
 typedef void mowgli_linebuf_readline_cb_t (mowgli_linebuf_t *, char *, size_t, void *);
@@ -36,7 +40,10 @@ extern void mowgli_linebuf_destroy(mowgli_linebuf_t *linebuf);
 extern void mowgli_linebuf_setbuflen(mowgli_linebuf_buf_t *buffer, size_t buflen);
 extern void mowgli_linebuf_delim(mowgli_linebuf_t *linebuf, const char *delim, const char *endl);
 extern void mowgli_linebuf_write(mowgli_linebuf_t *linebuf, const char *data, int len);
-extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...);
+
+extern void mowgli_linebuf_writef(mowgli_linebuf_t *linebuf, const char *format, ...)
+    MOWGLI_FATTR_PRINTF(2, 3);
+
 extern void mowgli_linebuf_shut_down(mowgli_linebuf_t *linebuf);
 
 struct _mowgli_linebuf_buf

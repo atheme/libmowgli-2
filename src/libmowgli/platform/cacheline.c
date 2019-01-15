@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 #ifdef MOWGLI_OS_OSX
 # include <sys/sysctl.h>

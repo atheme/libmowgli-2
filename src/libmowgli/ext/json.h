@@ -41,6 +41,12 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_EXT_JSON_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_EXT_JSON_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+#include "container/patricia.h"
+#include "core/mowgli_string.h"
+#include "core/stdinc.h"
+#include "platform/attributes.h"
+
 /* Types with public definitons */
 typedef enum
 {
@@ -106,18 +112,26 @@ extern mowgli_json_t *mowgli_json_false;
 extern mowgli_json_t *mowgli_json_incref(mowgli_json_t *n);
 extern mowgli_json_t *mowgli_json_decref(mowgli_json_t *n);
 
-extern mowgli_json_t *mowgli_json_create_integer(int v_int);
-extern mowgli_json_t *mowgli_json_create_float(double v_float);
+extern mowgli_json_t *mowgli_json_create_integer(int v_int)
+    MOWGLI_FATTR_MALLOC;
+
+extern mowgli_json_t *mowgli_json_create_float(double v_float)
+    MOWGLI_FATTR_MALLOC;
 
 /* #define mowgli_json_create_number(V) _Generic((V), \
         int: mowgli_json_create_integer, \
         double: mowgli_json_create_float)(V) */
-extern mowgli_json_t *mowgli_json_create_string_n(const char *str, size_t len);
-extern mowgli_json_t *mowgli_json_create_string(const char *str);
-extern mowgli_json_t *mowgli_json_create_array(void);
-extern mowgli_json_t *mowgli_json_create_object(void);
+extern mowgli_json_t *mowgli_json_create_string_n(const char *str, size_t len)
+    MOWGLI_FATTR_MALLOC;
 
-#include "json-inline.h"
+extern mowgli_json_t *mowgli_json_create_string(const char *str)
+    MOWGLI_FATTR_MALLOC;
+
+extern mowgli_json_t *mowgli_json_create_array(void)
+    MOWGLI_FATTR_MALLOC;
+
+extern mowgli_json_t *mowgli_json_create_object(void)
+    MOWGLI_FATTR_MALLOC;
 
 typedef struct _mowgli_json_output_t mowgli_json_output_t;
 
@@ -135,7 +149,9 @@ extern void mowgli_json_serialize_to_string(mowgli_json_t *n, mowgli_string_t *s
    whether we intend to parse multiple documents from a single data source
    or not.  If you are expecting exactly one complete JSON document,
    indicate 'false'. */
-extern mowgli_json_parse_t *mowgli_json_parse_create(bool multidoc);
+extern mowgli_json_parse_t *mowgli_json_parse_create(bool multidoc)
+    MOWGLI_FATTR_MALLOC;
+
 extern void mowgli_json_parse_destroy(mowgli_json_parse_t *parse);
 extern void mowgli_json_parse_reset(mowgli_json_parse_t *parse, bool multidoc);
 extern void mowgli_json_parse_data(mowgli_json_parse_t *parse, const char *data, size_t len);

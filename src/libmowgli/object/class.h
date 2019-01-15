@@ -24,6 +24,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_CLASS_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_OBJECT_CLASS_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+#include "core/stdinc.h"
+
 typedef void (*mowgli_destructor_t)(void *);
 
 typedef struct

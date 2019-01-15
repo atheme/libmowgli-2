@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_EXT_PROGRAM_OPTS_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_EXT_PROGRAM_OPTS_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+
 typedef void (*mowgli_program_opts_consumer_t)(const char *arg, void *userdata);
 
 typedef struct

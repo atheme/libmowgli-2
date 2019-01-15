@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 mowgli_allocation_policy_t *mowgli_allocator_malloc = NULL;
 

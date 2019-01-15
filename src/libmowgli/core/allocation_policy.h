@@ -24,6 +24,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATION_POLICY_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATION_POLICY_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+#include "object/object.h"
+
 typedef void *(*mowgli_allocation_func_t)(size_t size);
 typedef void (*mowgli_deallocation_func_t)(void *ptr);
 

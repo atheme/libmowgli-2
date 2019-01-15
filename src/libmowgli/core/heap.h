@@ -27,6 +27,10 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD 1
 
+#include "core/allocation_policy.h"
+#include "core/stdinc.h"
+#include "platform/attributes.h"
+
 typedef struct mowgli_heap_ mowgli_heap_t;
 typedef struct mowgli_block_ mowgli_block_t;
 
@@ -42,7 +46,9 @@ extern mowgli_heap_t *mowgli_heap_create_full(size_t elem_size, size_t mowgli_he
 extern void mowgli_heap_destroy(mowgli_heap_t *heap);
 
 /* Functions for blocks */
-extern void *mowgli_heap_alloc(mowgli_heap_t *heap);
+extern void *mowgli_heap_alloc(mowgli_heap_t *heap)
+    MOWGLI_FATTR_MALLOC;
+
 extern void mowgli_heap_free(mowgli_heap_t *heap, void *data);
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_HEAP_H_INCLUDE_GUARD */

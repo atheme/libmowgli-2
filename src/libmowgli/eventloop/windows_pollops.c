@@ -19,6 +19,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 #ifdef _WIN32
 

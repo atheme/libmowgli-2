@@ -25,6 +25,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_BASE_HOOK_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_BASE_HOOK_H_INCLUDE_GUARD 1
 
+#include "container/list.h"
+
 typedef void (*mowgli_hook_function_t)(void *hook_data, void *user_data);
 
 typedef struct

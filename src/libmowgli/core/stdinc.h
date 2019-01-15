@@ -24,86 +24,85 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD 1
 
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-#include <signal.h>
-#include <time.h>
-#include <errno.h>
-#include <setjmp.h>
-#include <sys/stat.h>
 #include <ctype.h>
-#include <sys/types.h>
-#include <stdint.h>
-#include <stddef.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <setjmp.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <time.h>
 
 /* socket stuff */
 #ifndef _WIN32
-# include <netdb.h>
-# include <netinet/in.h>
-# include <unistd.h>
-# include <grp.h>
-# include <sys/time.h>
-# include <sys/wait.h>
-# include <sys/resource.h>
-# include <sys/socket.h>
-# include <fcntl.h>
-# include <arpa/inet.h>
-# include <libgen.h>
-# include <dirent.h>
+#  include <arpa/inet.h>
+#  include <dirent.h>
+#  include <grp.h>
+#  include <libgen.h>
+#  include <netdb.h>
+#  include <netinet/in.h>
+#  include <sys/resource.h>
+#  include <sys/socket.h>
+#  include <sys/time.h>
+#  include <sys/wait.h>
+#  include <unistd.h>
 #else
-# define WINVER 0x0501
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
-# include <winsock2.h>
-# include <ws2tcpip.h>
-# include <sys/timeb.h>
-# include <direct.h>
-# include <io.h>
-# include <process.h>
-# include <fcntl.h>
-# include "platform/win32/win32_stdinc.h"
+#  define WINVER 0x0501
+#  define WIN32_LEAN_AND_MEAN
+#  include <direct.h>
+#  include <io.h>
+#  include <process.h>
+#  include <sys/timeb.h>
+#  include <windows.h>
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  include "platform/win32/win32_stdinc.h"
 #endif
 
 #ifdef _MSC_VER
-# pragma warning (disable: 4996)
+#  pragma warning (disable: 4996)
 #endif
 
 #ifdef FALSE
-# undef FALSE
+#  undef FALSE
 #endif
 
 #ifdef TRUE
-# undef TRUE
+#  undef TRUE
 #endif
 
 typedef enum {FALSE, TRUE} mowgli_boolean_t;
 
 /* Macros for min/max.  */
 #ifndef MIN
-# define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#  define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
 #ifndef MAX
-# define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#  define MAX(a, b) (((a) > (b)) ? (a) : (b))
 #endif
 
 /* OpenSSL stuff */
 #ifdef HAVE_OPENSSL
-# if defined(__APPLE__)
-#  include <AvailabilityMacros.h>
-#  ifdef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
-#   undef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
-#   define DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#  if defined(__APPLE__)
+#    include <AvailabilityMacros.h>
+#    ifdef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#      undef DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#      define DEPRECATED_IN_MAC_OS_X_VERSION_10_7_AND_LATER
+#    endif
 #  endif
-# endif
-# include <openssl/rand.h>
-# include <openssl/ssl.h>
-# include <openssl/err.h>
+#  include <openssl/rand.h>
+#  include <openssl/ssl.h>
+#  include <openssl/err.h>
 #endif
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_STDINC_H_INCLUDE_GUARD */

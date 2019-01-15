@@ -25,6 +25,10 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_MOWGLI_STRING_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_MOWGLI_STRING_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+#include "eventloop/eventloop.h"
+#include "platform/attributes.h"
+
 typedef struct mowgli_string_
 {
 	char *str;
@@ -48,6 +52,8 @@ extern void mowgli_string_append_char(mowgli_string_t *self, const char c);
 
 extern size_t mowgli_strlcat(char *dest, const char *src, size_t count);
 extern size_t mowgli_strlcpy(char *dest, const char *src, size_t count);
-extern ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...);
+
+extern ssize_t mowgli_writef(mowgli_descriptor_t fd, const char *fmt, ...)
+    MOWGLI_FATTR_PRINTF(2, 3);
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_MOWGLI_STRING_H_INCLUDE_GUARD */

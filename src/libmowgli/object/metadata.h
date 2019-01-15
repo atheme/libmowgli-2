@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_METADATA_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_OBJECT_METADATA_H_INCLUDE_GUARD 1
 
+#include "object/object.h"
+
 typedef struct
 {
 	char *name;

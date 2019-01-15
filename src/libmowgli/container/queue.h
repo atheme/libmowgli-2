@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_QUEUE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CONTAINER_QUEUE_H_INCLUDE_GUARD 1
 
+#include "core/iterator.h"
+
 typedef mowgli_iterator_t mowgli_queue_t;
 
 extern mowgli_queue_t *mowgli_queue_push(mowgli_queue_t *head, void *data);

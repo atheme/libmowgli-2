@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATOR_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATOR_H_INCLUDE_GUARD 1
 
+#include "core/allocation_policy.h"
+
 extern mowgli_allocation_policy_t *mowgli_allocator_malloc;
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATOR_H_INCLUDE_GUARD */

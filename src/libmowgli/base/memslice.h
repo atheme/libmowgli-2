@@ -21,6 +21,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD 1
 
+#include "core/allocation_policy.h"
+
 mowgli_allocation_policy_t *mowgli_memslice_get_policy(void);
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_BASE_MEMSLICE_H_INCLUDE_GUARD */

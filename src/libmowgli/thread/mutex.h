@@ -24,16 +24,19 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_H_INCLUDE_GUARD 1
 
+#include "platform/attributes.h"
+#include "thread/thread.h"
+
 #ifdef MOWGLI_OS_UNIX_TYPE
-# include <thread.h>
-# include <synch.h>
-# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) mutex_t(name)
+#  include <thread.h>
+#  include <synch.h>
+#  define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+#  define MOWGLI_NATIVE_MUTEX_DECL(name) mutex_t(name)
 #elif defined MOWGLI_OS_WIN
-# define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
-# define MOWGLI_NATIVE_MUTEX_DECL(name) HANDLE(name)
+#  define MOWGLI_FEATURE_HAVE_NATIVE_MUTEXES
+#  define MOWGLI_NATIVE_MUTEX_DECL(name) HANDLE(name)
 #else
-# include <pthread.h>
+#  include <pthread.h>
 #endif
 
 typedef struct mowgli_mutex_ mowgli_mutex_t;
@@ -58,10 +61,12 @@ struct mowgli_mutex_
 };
 
 #ifdef MOWGLI_NATIVE_MUTEX_DECL
-# undef MOWGLI_NATIVE_MUTEX_DECL
+#  undef MOWGLI_NATIVE_MUTEX_DECL
 #endif
 
-mowgli_mutex_t *mowgli_mutex_create(void);
+mowgli_mutex_t *mowgli_mutex_create(void)
+    MOWGLI_FATTR_MALLOC;
+
 int mowgli_mutex_init(mowgli_mutex_t *mutex);
 int mowgli_mutex_lock(mowgli_mutex_t *mutex);
 int mowgli_mutex_trylock(mowgli_mutex_t *mutex);

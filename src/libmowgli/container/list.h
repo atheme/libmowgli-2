@@ -24,6 +24,9 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_LIST_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CONTAINER_LIST_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+#include "platform/attributes.h"
+
 /* macros for linked lists */
 #define MOWGLI_LIST_FOREACH(n, head) \
 	for (n = (head); n; n = n->next)
@@ -55,7 +58,9 @@ struct mowgli_list_
 	size_t count;	/* how many entries in the list */
 };
 
-extern mowgli_node_t *mowgli_node_create(void);
+extern mowgli_node_t *mowgli_node_create(void)
+    MOWGLI_FATTR_MALLOC;
+
 extern void mowgli_node_free(mowgli_node_t *n);
 extern void mowgli_node_add(void *data, mowgli_node_t *n, mowgli_list_t *l);
 extern void mowgli_node_add_head(void *data, mowgli_node_t *n, mowgli_list_t *l);
@@ -71,7 +76,9 @@ extern void *mowgli_node_nth_data(mowgli_list_t *l, size_t pos);
 
 typedef int (*mowgli_list_comparator_t)(mowgli_node_t *n, mowgli_node_t *n2, void *opaque);
 
-extern mowgli_list_t *mowgli_list_create(void);
+extern mowgli_list_t *mowgli_list_create(void)
+    MOWGLI_FATTR_MALLOC;
+
 extern void mowgli_list_free(mowgli_list_t *l);
 extern void mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2);
 extern void mowgli_list_reverse(mowgli_list_t *l);

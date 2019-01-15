@@ -43,8 +43,6 @@
  */
 
 #include "mowgli.h"
-#include <sys/stat.h>
-#include <limits.h>
 
 #define MAX_INCLUDE_NESTING 16
 
@@ -54,7 +52,7 @@ static mowgli_config_file_t *mowgli_config_file_load_internal(mowgli_config_file
 
 #define CF_ERRORED(cf) ((cf)->curline <= 0)
 
-static void
+static void MOWGLI_FATTR_PRINTF(2, 3)
 mowgli_config_file_error(mowgli_config_file_t *cf, const char *format, ...)
 {
 	va_list ap;

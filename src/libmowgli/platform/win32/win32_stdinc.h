@@ -25,16 +25,14 @@
 #define MOWGLI_SRC_LIBMOWGLI_PLATFORM_WIN32_WIN32_STDINC_H_INCLUDE_GUARD 1
 
 #ifdef _WIN32
-
-# include <winsock2.h>
-# include <ws2tcpip.h>
-# include <time.h>
-
-# define strcasecmp _stricmp
-# define strdup _strdup
-# ifdef _MSC_VER
-#  define snprintf _snprintf
-# endif
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  include <time.h>
+#  define strcasecmp _stricmp
+#  define strdup _strdup
+#  ifdef _MSC_VER
+#    define snprintf _snprintf
+#  endif
 
 extern int setenv(const char *name, const char *value, int overwrite);
 
@@ -45,11 +43,10 @@ extern int inet_pton(int af, const char *src, void *dst);
 extern const char *inet_ntop(int af, const void *addr, char *host, size_t hostlen);
 
 /* MSYS autoconf is fucko. */
-# ifndef HAVE_WINSOCK2_H
-#  define HAVE_WINSOCK2_H
-# endif
-
-# define HAVE_SELECT
+#  ifndef HAVE_WINSOCK2_H
+#    define HAVE_WINSOCK2_H
+#  endif
+#  define HAVE_SELECT
 
 #endif
 

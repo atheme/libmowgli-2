@@ -21,11 +21,15 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_CONTAINER_INDEX_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_CONTAINER_INDEX_H_INCLUDE_GUARD 1
 
+#include "platform/attributes.h"
+
 struct mowgli_index_;
 
 typedef struct mowgli_index_ mowgli_index_t;
 
-mowgli_index_t *mowgli_index_create(void);
+mowgli_index_t *mowgli_index_create(void)
+    MOWGLI_FATTR_MALLOC;
+
 void mowgli_index_destroy(mowgli_index_t *index);
 int mowgli_index_count(mowgli_index_t *index);
 void mowgli_index_allocate(mowgli_index_t *index, int size);

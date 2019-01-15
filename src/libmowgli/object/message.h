@@ -24,6 +24,11 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_OBJECT_MESSAGE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_OBJECT_MESSAGE_H_INCLUDE_GUARD 1
 
+#include "base/argstack.h"
+#include "object/class.h"
+#include "object/message.h"
+#include "object/object.h"
+
 typedef struct mowgli_object_message_handler_ mowgli_object_message_handler_t;
 typedef void (*mowgli_object_messaging_func_t)(mowgli_object_t *self, mowgli_object_message_handler_t *sig, mowgli_argstack_t *argstack);
 

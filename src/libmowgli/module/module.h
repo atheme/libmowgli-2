@@ -24,6 +24,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_MODULE_MODULE_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_MODULE_MODULE_H_INCLUDE_GUARD 1
 
+#include "core/stdinc.h"
+
 typedef void *mowgli_module_t;
 
 extern mowgli_module_t mowgli_module_open(const char *path);

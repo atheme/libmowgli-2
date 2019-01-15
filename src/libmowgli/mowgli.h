@@ -25,76 +25,64 @@
 #define MOWGLI_SRC_LIBMOWGLI_MOWGLI_H_INCLUDE_GUARD 1
 
 #ifdef __cplusplus
-# define MOWGLI_DECLS_START extern "C" {
-# define MOWGLI_DECLS_END \
-	}
-#else
-# define MOWGLI_DECLS_START
-# define MOWGLI_DECLS_END
+extern "C" {
 #endif
 
 #ifdef MOWGLI_CORE
-# include "platform/autoconf.h"
+#  include "platform/autoconf.h"
 #endif
 
-#include "core/stdinc.h"
-
-MOWGLI_DECLS_START
-
-#include "platform/machine.h"
-#include "platform/cacheline.h"
-#include "platform/attributes.h"
-#include "platform/constructor.h"
-
-#include "core/logger.h"
-#include "core/assert.h"
-#include "core/iterator.h"
-
-#include "container/list.h"
-#include "object/class.h"
-#include "object/object.h"
-
-#include "core/allocation_policy.h"
-#include "core/alloc.h"
-
-#include "container/dictionary.h"
-
-#include "thread/thread.h"
-#include "thread/mutex.h"
-
-#include "base/memslice.h"
-#include "container/patricia.h"
-#include "module/module.h"
-#include "container/queue.h"
-#include "base/hash.h"
-#include "core/heap.h"
-#include "core/bootstrap.h"
-#include "base/bitvector.h"
-#include "base/hook.h"
-#include "base/mowgli_signal.h"
-#include "ext/proctitle.h"
-#include "ext/error_backtrace.h"
-#include "base/random.h"
 #include "base/argstack.h"
+#include "base/bitvector.h"
+#include "base/formatter.h"
+#include "base/hash.h"
+#include "base/hook.h"
+#include "base/memslice.h"
+#include "base/mowgli_signal.h"
+#include "base/random.h"
+#include "container/dictionary.h"
+#include "container/index.h"
+#include "container/list.h"
+#include "container/patricia.h"
+#include "container/queue.h"
+#include "core/allocation_policy.h"
+#include "core/allocator.h"
+#include "core/alloc.h"
+#include "core/assert.h"
+#include "core/bootstrap.h"
+#include "core/heap.h"
+#include "core/iterator.h"
+#include "core/logger.h"
+#include "core/mowgli_string.h"
+#include "core/process.h"
+#include "dns/dns.h"
+#include "dns/evloop_res.h"
+#include "dns/evloop_reslib.h"
+#include "eventloop/eventloop.h"
+#include "ext/confparse.h"
+#include "ext/error_backtrace.h"
+#include "ext/getopt_long.h"
+#include "ext/global_storage.h"
+#include "ext/json.h"
+#include "ext/json-inline.h"
+#include "ext/proctitle.h"
+#include "ext/program_opts.h"
+#include "linebuf/linebuf.h"
+#include "module/module.h"
+#include "object/class.h"
 #include "object/message.h"
 #include "object/metadata.h"
-#include "ext/global_storage.h"
-#include "core/process.h"
-#include "eventloop/eventloop.h"
+#include "object/object.h"
+#include "platform/attributes.h"
+#include "platform/cacheline.h"
+#include "platform/constructor.h"
+#include "platform/machine.h"
+#include "thread/mutex.h"
+#include "thread/thread.h"
 #include "vio/vio.h"
-#include "core/mowgli_string.h"
-#include "core/allocator.h"
-#include "base/formatter.h"
-#include "container/index.h"
 
-#include "ext/confparse.h"
-#include "ext/program_opts.h"
-
-#include "ext/json.h"
-
-#include "linebuf/linebuf.h"
-#include "dns/dns.h"
-
-MOWGLI_DECLS_END
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_MOWGLI_H_INCLUDE_GUARD */

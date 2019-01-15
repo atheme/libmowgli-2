@@ -3,7 +3,6 @@
  * Rights to this code are as documented in doc/LICENSE.
  *
  * Config file parser.
- *
  */
 
 #ifndef MOWGLI_SRC_LIBMOWGLI_EXT_CONFPARSE_H_INCLUDE_GUARD
@@ -40,6 +39,3 @@ extern void mowgli_config_file_free(mowgli_config_file_t *cfptr);
 extern mowgli_config_file_t *mowgli_config_file_load(const char *filename);
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_EXT_CONFPARSE_H_INCLUDE_GUARD */
-
-/* vim:cinoptions=>s,e0,n0,f0,{0,}0,^0,=s,ps,t0,c3,+s,(2s,us,)20,*30,gs,hs ts=8 sw=8 noexpandtab
- */

@@ -19,6 +19,8 @@
 #ifndef MOWGLI_SRC_LIBMOWGLI_VIO_VIO_H_INCLUDE_GUARD
 #define MOWGLI_SRC_LIBMOWGLI_VIO_VIO_H_INCLUDE_GUARD 1
 
+#include "eventloop/eventloop.h"
+
 /* Types and structs */
 typedef struct _mowgli_vio mowgli_vio_t;
 
@@ -71,7 +73,7 @@ typedef struct _mowgli_vio_sockaddr
 } mowgli_vio_sockaddr_t;
 
 #ifndef INET6_ADDRSTRLEN
-# define INET6_ADDRSTRLEN 46	/* Good enough I tell you */
+#  define INET6_ADDRSTRLEN 46	/* Good enough I tell you */
 #endif
 
 /* Socket data */
@@ -277,6 +279,7 @@ extern void *mowgli_vio_openssl_getsslhandle(mowgli_vio_t *vio);
 extern void *mowgli_vio_openssl_getsslcontext(mowgli_vio_t *vio);
 
 #ifdef HAVE_OPENSSL
+
 extern int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr);
 extern int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog);
 extern int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio);
@@ -285,13 +288,15 @@ extern int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffe
 extern int mowgli_vio_openssl_default_close(mowgli_vio_t *vio);
 
 #else
-# define NOSSLSUPPORT { mowgli_log("Attempting to use default OpenSSL op with no SSL support; this will not work!"); return -255; }
+#  define NOSSLSUPPORT { mowgli_log("Attempting to use default OpenSSL op with no SSL support; this will not work!"); return -255; }
+
 static inline int mowgli_vio_openssl_default_connect(mowgli_vio_t *vio, mowgli_vio_sockaddr_t *addr) NOSSLSUPPORT
 static inline int mowgli_vio_openssl_default_listen(mowgli_vio_t *vio, int backlog) NOSSLSUPPORT
 static inline int mowgli_vio_openssl_default_accept(mowgli_vio_t *vio, mowgli_vio_t *newvio) NOSSLSUPPORT
 static inline int mowgli_vio_openssl_default_read(mowgli_vio_t *vio, void *buffer, size_t len) NOSSLSUPPORT
 static inline int mowgli_vio_openssl_default_write(mowgli_vio_t *vio, const void *buffer, size_t len) NOSSLSUPPORT
 static inline int mowgli_vio_openssl_default_close(mowgli_vio_t *vio) NOSSLSUPPORT
+
 #endif
 
 /* Default ops -- change these if you want something besides the default */
