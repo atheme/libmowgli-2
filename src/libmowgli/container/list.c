@@ -349,17 +349,23 @@ mowgli_list_concat(mowgli_list_t *l, mowgli_list_t *l2)
 	return_if_fail(l != NULL);
 	return_if_fail(l2 != NULL);
 
+	if (l->head == NULL)
+		l->head = l2->head;
+
 	if (l->tail != NULL)
+	{
 		l->tail->next = l2->head;
 
-	if (l->tail->next != NULL)
-		l->tail->next->prev = l->tail;
+		if (l->tail->next != NULL)
+			l->tail->next->prev = l->tail;
+	}
 
 	l->tail = l2->tail;
 	l->count += l2->count;
 
 	/* clear out l2 as it is no longer needed. */
-	l2->head = l2->tail = NULL;
+	l2->head = NULL;
+	l2->tail = NULL;
 	l2->count = 0;
 }
 
