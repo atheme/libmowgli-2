@@ -26,22 +26,21 @@
 
 mowgli_allocation_policy_t *mowgli_allocator_malloc = NULL;
 
-static void *
+static void * MOWGLI_FATTR_MALLOC MOWGLI_FATTR_ALLOC_SIZE(1)
 mowgli_allocator_func_malloc(size_t size)
 {
-	return calloc(size, 1);
+	return calloc(1, size);
 }
 
 static void
 mowgli_allocator_func_free(void *ptr)
 {
-	if (ptr)
-		free(ptr);
+	(void) free(ptr);
 }
 
 void
 mowgli_allocator_bootstrap(void)
 {
-	mowgli_allocator_malloc = mowgli_allocation_policy_create("malloc", mowgli_allocator_func_malloc,
-								  mowgli_allocator_func_free);
+	mowgli_allocator_malloc = \
+	    mowgli_allocation_policy_create("malloc", &mowgli_allocator_func_malloc, &mowgli_allocator_func_free);
 }

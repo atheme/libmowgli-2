@@ -35,14 +35,13 @@ typedef struct
 static void * MOWGLI_FATTR_MALLOC MOWGLI_FATTR_ALLOC_SIZE(1)
 _mowgli_bootstrap_alloc(size_t size)
 {
-	return calloc(size, 1);
+	return calloc(1, size);
 }
 
 static void
 _mowgli_bootstrap_free(void *ptr)
 {
-	if (ptr)
-		free(ptr);
+	(void) free(ptr);
 }
 
 static mowgli_allocation_policy_t _mowgli_allocator_bootstrap =
