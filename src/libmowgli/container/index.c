@@ -19,6 +19,7 @@
  */
 
 #include "mowgli.h"
+#include "core/bootstrap_internal.h"
 
 struct mowgli_index_
 {
@@ -31,9 +32,10 @@ struct mowgli_index_
 static mowgli_heap_t *index_heap = NULL;
 
 void
-mowgli_index_init(void)
+mowgli_index_bootstrap(void)
 {
-	index_heap = mowgli_heap_create(sizeof(mowgli_index_t), 32, BH_NOW);
+	if (! (index_heap = mowgli_heap_create(sizeof(mowgli_index_t), 32, BH_NOW)))
+		abort();
 }
 
 mowgli_index_t *

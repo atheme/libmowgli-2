@@ -38,6 +38,7 @@ extern void mowgli_node_bootstrap(void);
 extern void mowgli_object_class_bootstrap(void);
 extern void mowgli_queue_bootstrap(void);
 extern void mowgli_random_bootstrap(void);
+extern void mowgli_index_bootstrap(void);
 
 #ifdef _WIN32
 extern void mowgli_winsock_bootstrap(void);

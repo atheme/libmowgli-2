@@ -47,6 +47,7 @@ MOWGLI_BOOTSTRAP_FUNC(mowgli_bootstrap_real)
 	mowgli_memslice_bootstrap();
 	mowgli_cacheline_bootstrap();
 	mowgli_interface_bootstrap();
+	mowgli_index_bootstrap();
 
 #ifdef _WIN32
 	mowgli_winsock_bootstrap();
