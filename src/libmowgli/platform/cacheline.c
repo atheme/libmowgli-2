@@ -28,7 +28,7 @@
 # include <sys/sysctl.h>
 #endif
 
-size_t cacheline_size;
+static size_t cacheline_size = 0;
 
 void
 mowgli_cacheline_bootstrap(void)
