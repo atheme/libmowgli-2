@@ -25,5 +25,6 @@
 #define MOWGLI_SRC_LIBMOWGLI_CORE_BOOTSTRAP_H_INCLUDE_GUARD 1
 
 extern void mowgli_bootstrap(void);
+extern void mowgli_init(void);
 
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_BOOTSTRAP_H_INCLUDE_GUARD */
