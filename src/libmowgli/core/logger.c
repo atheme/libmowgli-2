@@ -26,10 +26,10 @@
 
 #define MOWGLI_LOG_BUF_SIZE 4096
 
-char _mowgli_log_buf[MOWGLI_LOG_BUF_SIZE];
-mowgli_log_cb_t _mowgli_log_cb;
+static char _mowgli_log_buf[MOWGLI_LOG_BUF_SIZE];
+static mowgli_log_cb_t _mowgli_log_cb;
 
-void
+static void
 mowgli_log_cb_default(const char *buf)
 {
 	fprintf(stderr, "%s\n", buf);
