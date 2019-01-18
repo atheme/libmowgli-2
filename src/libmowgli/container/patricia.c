@@ -930,9 +930,15 @@ mowgli_patricia_elem_delete(mowgli_patricia_t *dict, struct patricia_leaf *leaf)
 				dict->root = next;
 
 			if (IS_LEAF(next))
-				next->leaf.parent = prev, next->leaf.parent_val = val;
+			{
+				next->leaf.parent = prev;
+				next->leaf.parent_val = val;
+			}
 			else
-				next->node.parent = prev, next->node.parent_val = val;
+			{
+				next->node.parent = prev;
+				next->node.parent_val = val;
+			}
 
 			mowgli_heap_free(node_heap, delem);
 		}
