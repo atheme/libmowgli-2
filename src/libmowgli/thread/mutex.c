@@ -47,7 +47,7 @@ get_mutex_platform(void)
 mowgli_mutex_t *
 mowgli_mutex_create(void)
 {
-	mowgli_mutex_t *mutex = mowgli_alloc(sizeof(mowgli_mutex_t));
+	mowgli_mutex_t *mutex = mowgli_alloc(sizeof *mutex);
 
 	return_val_if_fail(mutex != NULL, NULL);
 

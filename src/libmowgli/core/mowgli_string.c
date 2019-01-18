@@ -27,7 +27,7 @@
 mowgli_string_t *
 mowgli_string_create(void)
 {
-	mowgli_string_t *self = mowgli_alloc(sizeof(mowgli_string_t));
+	mowgli_string_t *self = mowgli_alloc(sizeof *self);
 
 	self->size = 64;
 	self->pos = 0;

@@ -46,7 +46,7 @@ mowgli_object_metadata_associate(mowgli_object_t *self, const char *key, void *v
 		return;
 	}
 
-	e = mowgli_alloc(sizeof(mowgli_object_metadata_entry_t));
+	e = mowgli_alloc(sizeof *e);
 	e->name = mowgli_strdup(key);
 	e->data = value;
 

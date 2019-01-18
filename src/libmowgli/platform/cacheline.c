@@ -44,7 +44,7 @@ mowgli_cacheline_bootstrap(void)
 	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buf = 0;
 
 	GetLogicalProcessorInformation(0, &buf_size);
-	buf = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION *) mowgli_alloc(buf_size);
+	buf = mowgli_alloc(buf_size);
 	GetLogicalProcessorInformation(&buf[0], &buf_size);
 
 	for (i = 0; i != buf_size / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION); ++i)

@@ -144,7 +144,7 @@ json_alloc(mowgli_json_tag_t tag)
 {
 	mowgli_json_t *n;
 
-	n = mowgli_alloc(sizeof(*n));
+	n = mowgli_alloc(sizeof *n);
 
 	n->tag = tag;
 	n->refcount = 0;
@@ -746,7 +746,7 @@ ll_token_alloc(enum ll_sym sym, mowgli_json_t *val)
 {
 	struct ll_token *tok;
 
-	tok = mowgli_alloc(sizeof(*tok));
+	tok = mowgli_alloc(sizeof *tok);
 	tok->sym = sym;
 	tok->val = val;
 
@@ -1285,7 +1285,7 @@ mowgli_json_parse_create(bool multidoc)
 {
 	mowgli_json_parse_t *parse;
 
-	parse = mowgli_alloc(sizeof(*parse));
+	parse = mowgli_alloc(sizeof *parse);
 
 	parse->out = mowgli_list_create();
 	parse->error[0] = '\0';

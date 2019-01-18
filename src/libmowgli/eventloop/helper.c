@@ -39,7 +39,7 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 	return_if_fail(req != NULL);
 	return_if_fail(req->start_fn != NULL);
 
-	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper = mowgli_alloc(sizeof *helper);
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->fd = req->fd;
 
@@ -82,7 +82,7 @@ mowgli_helper_create(mowgli_eventloop_t *eventloop, mowgli_eventloop_helper_star
 	child.start_fn = start_fn;
 	child.userdata = userdata;
 
-	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper = mowgli_alloc(sizeof *helper);
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
 
@@ -125,7 +125,7 @@ mowgli_helper_spawn(mowgli_eventloop_t *eventloop, const char *path, char *const
 	return_val_if_fail(eventloop != NULL, NULL);
 	return_val_if_fail(path != NULL, NULL);
 
-	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper = mowgli_alloc(sizeof *helper);
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
 
@@ -178,7 +178,7 @@ mowgli_helper_setup(mowgli_eventloop_t *eventloop)
 	if (env_io_fd == NULL)
 		return NULL;
 
-	helper = mowgli_alloc(sizeof(mowgli_eventloop_helper_proc_t));
+	helper = mowgli_alloc(sizeof *helper);
 	helper->type.type = MOWGLI_EVENTLOOP_TYPE_HELPER;
 	helper->eventloop = eventloop;
 	helper->fd = atoi(env_io_fd);

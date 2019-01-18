@@ -482,7 +482,7 @@ mowgli_config_file_load_internal(mowgli_config_file_t *parent, const char *filen
 		return NULL;
 	}
 
-	buf = (char *) mowgli_alloc(sb.st_size + 1);
+	buf = mowgli_alloc(sb.st_size + 1);
 
 	if (sb.st_size)
 	{

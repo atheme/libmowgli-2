@@ -63,7 +63,7 @@ mowgli_winsock_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 
 	return_if_fail(wsock_env.iMaxSockets > 0);
 
-	priv = mowgli_alloc(sizeof(mowgli_winsock_eventloop_private_t));
+	priv = mowgli_alloc(sizeof *priv);
 	eventloop->poller = priv;
 
 	priv->pfd_size = wsock_env.iMaxSockets;

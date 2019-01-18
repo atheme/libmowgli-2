@@ -50,7 +50,7 @@ mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t alloc
 	if ((policy = mowgli_patricia_retrieve(mowgli_allocation_policy_dict, name)))
 		return policy;
 
-	policy = mowgli_alloc(sizeof(mowgli_allocation_policy_t));
+	policy = mowgli_alloc(sizeof *policy);
 	mowgli_object_init_from_class(mowgli_object(policy), name, &klass);
 
 	policy->allocate = allocator;

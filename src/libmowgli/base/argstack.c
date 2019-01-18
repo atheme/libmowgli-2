@@ -79,12 +79,12 @@ mowgli_argstack_create_from_va_list(const char *descstr, va_list va)
 	return_null_if_fail(descstr != NULL);
 
 	const char *cp = descstr;
-	mowgli_argstack_t *out = mowgli_alloc(sizeof(mowgli_argstack_t));
+	mowgli_argstack_t *out = mowgli_alloc(sizeof *out);
 	mowgli_object_init(mowgli_object(out), descstr, &klass, NULL);
 
 	while (*cp)
 	{
-		mowgli_argstack_element_t *e = mowgli_alloc(sizeof(mowgli_argstack_element_t));
+		mowgli_argstack_element_t *e = mowgli_alloc(sizeof *e);
 
 		switch (*cp)
 		{

@@ -84,7 +84,7 @@ mowgli_vio_openssl_setssl(mowgli_vio_t *vio, mowgli_vio_ssl_settings_t *settings
 	{
 		if (!openssl_ops)
 		{
-			openssl_ops = mowgli_alloc(sizeof(mowgli_vio_ops_t));
+			openssl_ops = mowgli_alloc(sizeof *openssl_ops);
 			memcpy(openssl_ops, &mowgli_vio_default_ops, sizeof(mowgli_vio_ops_t));
 		}
 

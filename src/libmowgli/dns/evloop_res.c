@@ -689,7 +689,7 @@ do_query_number(mowgli_dns_t *dns, mowgli_dns_query_t *query, const struct socka
 	{
 		request = make_request(dns, query);
 		memcpy(&request->addr, addr, size);
-		request->name = (char *) mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
+		request->name = mowgli_alloc(MOWGLI_DNS_RES_HOSTLEN + 1);
 	}
 
 	if (addr->ss_family == AF_INET)
@@ -1065,7 +1065,7 @@ make_dnsreply(mowgli_dns_reslist_t *request)
 
 	return_val_if_fail(request != 0, NULL);
 
-	cp = (mowgli_dns_reply_t *) mowgli_alloc(sizeof(mowgli_dns_reply_t));
+	cp = mowgli_alloc(sizeof *cp);
 
 	cp->h_name = request->name;
 	memcpy(&cp->addr.addr, &request->addr, sizeof(request->addr));

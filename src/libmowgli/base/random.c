@@ -59,7 +59,7 @@ mowgli_random_create(void)
 mowgli_random_t *
 mowgli_random_create_with_seed(unsigned int seed)
 {
-	mowgli_random_t *out = mowgli_alloc(sizeof(mowgli_random_t));
+	mowgli_random_t *out = mowgli_alloc(sizeof *out);
 
 	mowgli_object_init(mowgli_object(out), NULL, &klass, NULL);
 

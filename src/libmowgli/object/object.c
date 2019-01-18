@@ -54,7 +54,7 @@ mowgli_object_init(mowgli_object_t *obj, const char *name, mowgli_object_class_t
 	}
 	else
 	{
-		mowgli_object_class_t *tmp = mowgli_alloc(sizeof(mowgli_object_class_t));
+		mowgli_object_class_t *tmp = mowgli_alloc(sizeof *tmp);
 		mowgli_object_class_init(tmp, name, des, TRUE);
 		obj->klass = tmp;
 	}

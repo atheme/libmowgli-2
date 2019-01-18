@@ -188,7 +188,7 @@ mowgli_patricia_create(void (*canonize_cb)(char *key))
 mowgli_patricia_t *
 mowgli_patricia_create_named(const char *name, void (*canonize_cb)(char *key))
 {
-	mowgli_patricia_t *dtree = (mowgli_patricia_t *) mowgli_alloc(sizeof(mowgli_patricia_t));
+	mowgli_patricia_t *dtree = mowgli_alloc(sizeof *dtree);
 
 	dtree->canonize_cb = canonize_cb;
 

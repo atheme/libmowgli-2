@@ -38,7 +38,7 @@ mowgli_kqueue_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_kqueue_eventloop_private_t *priv;
 
-	priv = mowgli_alloc(sizeof(mowgli_kqueue_eventloop_private_t));
+	priv = mowgli_alloc(sizeof *priv);
 	eventloop->poller = priv;
 
 	priv->nevents = getdtablesize();

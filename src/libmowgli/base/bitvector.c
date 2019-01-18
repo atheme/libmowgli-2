@@ -63,7 +63,7 @@ mowgli_bitvector_bootstrap(void)
 mowgli_bitvector_t *
 mowgli_bitvector_create(int bits)
 {
-	mowgli_bitvector_t *bv = (mowgli_bitvector_t *) mowgli_alloc(sizeof(mowgli_bitvector_t));
+	mowgli_bitvector_t *bv = mowgli_alloc(sizeof *bv);
 
 	mowgli_object_init(mowgli_object(bv), "mowgli_bitvector_t", &klass, NULL);
 

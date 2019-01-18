@@ -409,7 +409,7 @@ mowgli_vio_sockaddr_create(mowgli_vio_sockaddr_t *naddr, int proto, const char *
 	return_val_if_fail(addr, NULL);
 
 	if (naddr == NULL)
-		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
+		naddr = mowgli_alloc(sizeof *naddr);
 
 	if (proto == AF_INET)
 	{
@@ -456,7 +456,7 @@ mowgli_vio_sockaddr_from_struct(mowgli_vio_sockaddr_t *naddr, const void *addr, 
 	return_val_if_fail(saddr->ss_family == AF_INET || saddr->ss_family == AF_INET6, NULL);
 
 	if (naddr == NULL)
-		naddr = mowgli_alloc(sizeof(mowgli_vio_sockaddr_t));
+		naddr = mowgli_alloc(sizeof *naddr);
 
 	memcpy(&naddr->addr, saddr, size);
 	naddr->addrlen = size;

@@ -76,7 +76,7 @@ mowgli_dictionary_create(mowgli_dictionary_comparator_func_t compare_cb)
 mowgli_dictionary_t *
 mowgli_dictionary_create_named(const char *name, mowgli_dictionary_comparator_func_t compare_cb)
 {
-	mowgli_dictionary_t *dtree = (mowgli_dictionary_t *) mowgli_alloc(sizeof(mowgli_dictionary_t));
+	mowgli_dictionary_t *dtree = mowgli_alloc(sizeof *dtree);
 
 	dtree->compare_cb = compare_cb;
 

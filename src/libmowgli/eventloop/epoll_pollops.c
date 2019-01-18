@@ -37,7 +37,7 @@ mowgli_epoll_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_epoll_eventloop_private_t *priv;
 
-	priv = mowgli_alloc(sizeof(mowgli_epoll_eventloop_private_t));
+	priv = mowgli_alloc(sizeof *priv);
 	eventloop->poller = priv;
 
 	priv->pfd_size = getdtablesize();

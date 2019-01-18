@@ -37,7 +37,7 @@ mowgli_qnx_eventloop_pollsetup(mowgli_eventloop_t *eventloop)
 {
 	mowgli_qnx_eventloop_private_t *priv;
 
-	priv = mowgli_alloc(sizeof(mowgli_qnx_eventloop_private_t));
+	priv = mowgli_alloc(sizeof *priv);
 	eventloop->poller = priv;
 
 	priv->dpp = dispatch_create();

@@ -164,7 +164,7 @@ mowgli_proctitle_init(int argc, char **argv)
 	/*
 	 * move the environment out of the way
 	 */
-	new_environ = (char **) mowgli_alloc((i + 1) * sizeof(char *));
+	new_environ = mowgli_alloc((i + 1) * sizeof(char *));
 
 	for (i = 0; environ[i] != NULL; i++)
 		new_environ[i] = mowgli_strdup(environ[i]);
@@ -190,7 +190,7 @@ mowgli_proctitle_init(int argc, char **argv)
 	char **new_argv;
 	int j;
 
-	new_argv = (char **) mowgli_alloc((argc + 1) * sizeof(char *));
+	new_argv = mowgli_alloc((argc + 1) * sizeof(char *));
 
 	for (j = 0; j < argc; j++)
 		new_argv[j] = mowgli_strdup(argv[j]);
