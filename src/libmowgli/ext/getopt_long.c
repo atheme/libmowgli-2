@@ -38,7 +38,7 @@ int mowgli_optreset = 0;/* reset getopt */
 char *mowgli_optarg = NULL;	/* argument associated with option */
 
 /* XXX: suppress const warnings */
-#define __UNCONST(a) ((void *) (unsigned long) (const void *) (a))
+#define PTR_UNCONSTIFY(a) ((void *)((uintptr_t)((const void *)(a))))
 
 #define IGNORE_FIRST (*options == '-' || *options == '+')
 #define PRINT_ERROR ((mowgli_opterr) && ((*options != ':') \
@@ -307,7 +307,7 @@ start:
 
 		if (*place)	/* no white space */
 		{
-			mowgli_optarg = __UNCONST(place);
+			mowgli_optarg = PTR_UNCONSTIFY(place);
 		}
 
 		/* XXX: disable test for :: if PC? (GNU doesn't) */
@@ -354,7 +354,7 @@ const char *options;
 	return_val_if_fail(nargv != NULL, -1);
 	return_val_if_fail(options != NULL, -1);
 
-	retval = getopt_internal(nargc, __UNCONST(nargv), options);
+	retval = getopt_internal(nargc, PTR_UNCONSTIFY(nargv), options);
 
 	if (retval == -2)
 	{
@@ -367,7 +367,7 @@ const char *options;
 		if (nonopt_end != -1)
 		{
 			permute_args(nonopt_start, nonopt_end, mowgli_optind,
-				     __UNCONST(nargv));
+				     PTR_UNCONSTIFY(nargv));
 			mowgli_optind -= nonopt_end - nonopt_start;
 		}
 
@@ -398,7 +398,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 
 	/* idx may be NULL */
 
-	retval = getopt_internal(nargc, __UNCONST(nargv), options);
+	retval = getopt_internal(nargc, PTR_UNCONSTIFY(nargv), options);
 
 	if (retval == -2)
 	{
@@ -406,7 +406,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 		size_t current_argv_len;
 		int i, ambiguous, match;
 
-		current_argv = __UNCONST(place);
+		current_argv = PTR_UNCONSTIFY(place);
 		match = -1;
 		ambiguous = 0;
 
@@ -421,7 +421,7 @@ mowgli_getopt_long(int nargc, char *const *nargv, const char *options, const mow
 			if (nonopt_end != -1)
 			{
 				permute_args(nonopt_start, nonopt_end,
-					     mowgli_optind, __UNCONST(nargv));
+					     mowgli_optind, PTR_UNCONSTIFY(nargv));
 				mowgli_optind -= nonopt_end - nonopt_start;
 			}
 
