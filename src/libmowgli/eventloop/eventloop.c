@@ -19,32 +19,9 @@
  */
 
 #include "mowgli.h"
+#include "eventloop/eventloop_internal.h"
 
 static mowgli_heap_t *eventloop_heap = NULL;
-
-extern mowgli_eventloop_ops_t _mowgli_null_pollops;
-
-#ifdef HAVE_PORT_CREATE
-extern mowgli_eventloop_ops_t _mowgli_ports_pollops;
-#endif
-#ifdef HAVE_DISPATCH_BLOCK
-extern mowgli_eventloop_ops_t _mowgli_qnx_pollops;
-#endif
-#ifdef HAVE_SELECT
-extern mowgli_eventloop_ops_t _mowgli_select_pollops;
-#endif
-#ifdef HAVE_POLL_H
-extern mowgli_eventloop_ops_t _mowgli_poll_pollops;
-#endif
-#ifdef HAVE_SYS_EPOLL_H
-extern mowgli_eventloop_ops_t _mowgli_epoll_pollops;
-#endif
-#ifdef HAVE_KQUEUE
-extern mowgli_eventloop_ops_t _mowgli_kqueue_pollops;
-#endif
-#if 0
-extern mowgli_eventloop_ops_t _mowgli_winsock_pollops;
-#endif
 
 mowgli_eventloop_t *
 mowgli_eventloop_create(void)

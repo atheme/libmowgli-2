@@ -19,6 +19,7 @@
  */
 
 #include "mowgli.h"
+#include "eventloop/eventloop_internal.h"
 
 #ifdef HAVE_SYS_EPOLL_H
 

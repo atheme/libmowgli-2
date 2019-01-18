@@ -20,6 +20,7 @@
 
 #include "mowgli.h"
 #include "core/bootstrap_internal.h"
+#include "eventloop/eventloop_internal.h"
 
 #ifdef _WIN32
 

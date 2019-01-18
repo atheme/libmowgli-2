@@ -20,6 +20,7 @@
  */
 
 #include "mowgli.h"
+#include "eventloop/eventloop_internal.h"
 
 #ifdef HAVE_KQUEUE
 

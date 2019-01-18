@@ -19,6 +19,7 @@
  */
 
 #include "mowgli.h"
+#include "eventloop/eventloop_internal.h"
 
 void
 mowgli_simple_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
