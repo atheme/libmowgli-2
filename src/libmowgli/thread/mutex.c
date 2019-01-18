@@ -22,14 +22,7 @@
  */
 
 #include "mowgli.h"
-
-#if defined(_WIN32)
-extern const mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
-#else
-extern const mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
-#endif
-
-extern const mowgli_mutex_ops_t _mowgli_null_mutex_ops;
+#include "thread/mutex_internal.h"
 
 static const mowgli_mutex_ops_t *_mowgli_mutex_ops = NULL;
 

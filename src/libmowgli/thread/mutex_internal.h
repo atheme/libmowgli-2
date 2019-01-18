@@ -1,6 +1,6 @@
 /*
  * libmowgli: A collection of useful routines for programming.
- * null_mutexops.c: null mutex operations
+ * mutex.h: Cross-platform mutexes.
  *
  * Copyright (c) 2011 William Pitcock <nenolod@dereferenced.org>
  *
@@ -21,44 +21,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mowgli.h"
-#include "thread/mutex_internal.h"
+#ifndef MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_INTERNAL_H_INCLUDE_GUARD
+#define MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_INTERNAL_H_INCLUDE_GUARD 1
 
-static int
-mowgli_null_mutex_create(mowgli_mutex_t *mutex)
-{
-	return 0;
-}
+#include "platform/autoconf.h"
+#include "thread/mutex.h"
 
-static int
-mowgli_null_mutex_lock(mowgli_mutex_t *mutex)
-{
-	return 0;
-}
+#ifdef _WIN32
+extern const mowgli_mutex_ops_t _mowgli_win32_mutex_ops;
+#else
+extern const mowgli_mutex_ops_t _mowgli_posix_mutex_ops;
+#endif
 
-static int
-mowgli_null_mutex_trylock(mowgli_mutex_t *mutex)
-{
-	return 0;
-}
+extern const mowgli_mutex_ops_t _mowgli_null_mutex_ops;
 
-static int
-mowgli_null_mutex_unlock(mowgli_mutex_t *mutex)
-{
-	return 0;
-}
-
-static int
-mowgli_null_mutex_destroy(mowgli_mutex_t *mutex)
-{
-	return 0;
-}
-
-const mowgli_mutex_ops_t _mowgli_null_mutex_ops =
-{
-	.mutex_create = mowgli_null_mutex_create,
-	.mutex_lock = mowgli_null_mutex_lock,
-	.mutex_trylock = mowgli_null_mutex_trylock,
-	.mutex_unlock = mowgli_null_mutex_unlock,
-	.mutex_destroy = mowgli_null_mutex_destroy
-};
+#endif /* MOWGLI_SRC_LIBMOWGLI_THREAD_MUTEX_INTERNAL_H_INCLUDE_GUARD */

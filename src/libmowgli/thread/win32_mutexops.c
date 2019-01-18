@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "thread/mutex_internal.h"
 
 /*************
 * This Windows implementation is guaranteed to work on Windows 95,

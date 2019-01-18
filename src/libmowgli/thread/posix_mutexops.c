@@ -22,6 +22,7 @@
  */
 
 #include "mowgli.h"
+#include "thread/mutex_internal.h"
 
 #ifndef _WIN32
 
