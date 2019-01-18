@@ -232,7 +232,7 @@ mowgli_dictionary_get_linear_index(mowgli_dictionary_t *dict, const void *key)
  * Side Effects:
  *     - a new root node is nominated.
  */
-void
+static void
 mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
 {
 	mowgli_dictionary_elem_t n, *tn, *left, *right, *node;
@@ -331,7 +331,7 @@ mowgli_dictionary_retune(mowgli_dictionary_t *dict, const void *key)
  * Side Effects:
  *     - a node is linked to the dictionary tree
  */
-void
+static void
 mowgli_dictionary_link(mowgli_dictionary_t *dict, mowgli_dictionary_elem_t *delem)
 {
 	return_if_fail(dict != NULL);
@@ -410,7 +410,7 @@ mowgli_dictionary_link(mowgli_dictionary_t *dict, mowgli_dictionary_elem_t *dele
  * Side Effects:
  *     - the root node is unlinked from the dictionary tree
  */
-void
+static void
 mowgli_dictionary_unlink_root(mowgli_dictionary_t *dict)
 {
 	mowgli_dictionary_elem_t *delem, *nextnode, *parentofnext;
@@ -752,13 +752,6 @@ mowgli_dictionary_add(mowgli_dictionary_t *dict, const void *key, void *data)
 	delem = mowgli_heap_alloc(elem_heap);
 	delem->key = key;
 	delem->data = data;
-
-	if (delem->key == NULL)
-	{
-		mowgli_log("major WTF: delem->key<%p> is NULL, not adding node.", (void *) key);
-		mowgli_heap_free(elem_heap, delem);
-		return NULL;
-	}
 
 	mowgli_dictionary_link(dict, delem);
 

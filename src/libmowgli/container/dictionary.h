@@ -154,6 +154,11 @@ extern mowgli_dictionary_elem_t *mowgli_dictionary_find(mowgli_dictionary_t *dtr
 extern void *mowgli_dictionary_retrieve(mowgli_dictionary_t *dtree, const void *key);
 
 /*
+ * mowgli_dictionary_size(): returns the size of a dictionary.
+ */
+extern unsigned int mowgli_dictionary_size(mowgli_dictionary_t *dict);
+
+/*
  * mowgli_dictionary_delete() deletes a key->value entry from the dictionary tree.
  */
 extern void *mowgli_dictionary_delete(mowgli_dictionary_t *dtree, const void *key);
