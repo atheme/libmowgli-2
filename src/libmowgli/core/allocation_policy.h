@@ -40,8 +40,4 @@ typedef struct
 mowgli_allocation_policy_t *mowgli_allocation_policy_create(const char *name, mowgli_allocation_func_t allocator, mowgli_deallocation_func_t deallocator);
 mowgli_allocation_policy_t *mowgli_allocation_policy_lookup(const char *name);
 
-/* for mowgli_alloc, et. al */
-void mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy);
-void mowgli_allocator_set_policy_by_name(const char *name);
-
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_ALLOCATION_POLICY_H_INCLUDE_GUARD */

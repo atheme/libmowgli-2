@@ -204,6 +204,17 @@ mowgli_free(void *ptr)
 }
 
 /*
+ * \brief Gets the mowgli.allocation_policy used by the allocation primitives.
+ *
+ * \return The mowgli_allocation_policy_t object currently in use.
+ */
+mowgli_allocation_policy_t * MOWGLI_FATTR_RETURNS_NONNULL
+mowgli_allocator_get_policy(void)
+{
+	return _mowgli_allocator;
+}
+
+/*
  * \brief Sets the mowgli.allocation_policy used by the allocation primitives.
  *
  * \param policy The mowgli_allocation_policy_t object to use.

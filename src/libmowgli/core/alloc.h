@@ -48,4 +48,8 @@ extern char *mowgli_strndup(const char *in, size_t size)
 
 extern void mowgli_free(void *ptr);
 
+extern mowgli_allocation_policy_t *mowgli_allocator_get_policy(void) MOWGLI_FATTR_RETURNS_NONNULL;
+extern void mowgli_allocator_set_policy(mowgli_allocation_policy_t *policy);
+extern void mowgli_allocator_set_policy_by_name(const char *name);
+
 #endif /* MOWGLI_SRC_LIBMOWGLI_CORE_ALLOC_H_INCLUDE_GUARD */
