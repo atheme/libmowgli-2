@@ -5,6 +5,9 @@
 #define MOWGLI_SRC_LIBMOWGLI_PLATFORM_AUTOCONF_H_INCLUDE_GUARD 1
 
 
+/* Disable the heap allocator */
+#undef DISABLE_HEAP_ALLOCATOR
+
 /* Define to 1 if you have the `dispatch_block' function. */
 #undef HAVE_DISPATCH_BLOCK
 

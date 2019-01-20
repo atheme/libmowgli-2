@@ -142,6 +142,12 @@ AS_IF([test x"$enable_examples" = x"yes"], [
 
 AC_SUBST(EXAMPLES_BUILD)
 
+AC_ARG_ENABLE([heap-allocator],
+   [AS_HELP_STRING([--disable-heap-allocator], [Disable the heap allocator])],
+   [AS_IF([test x"$enable_heap_allocator" = x"no"], [
+      AC_DEFINE([DISABLE_HEAP_ALLOCATOR], [1], [Disable the heap allocator])])
+   ], [enable_heap_allocator="yes"])
+
 BUILDSYS_INIT
 BUILDSYS_TOUCH_DEPS
 
@@ -152,6 +158,7 @@ cat << _EOF_
 
 Configuration:
    OpenSSL support: ${OPENSSL}
+   Heap allocator: ${enable_heap_allocator}
    Examples: ${EXAMPLES}
 
 Now type "make" to build, and "make install" to install.
