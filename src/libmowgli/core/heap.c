@@ -108,18 +108,11 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 #elif defined(_WIN32)
 
 	if (bh->use_mmap)
-	{
 		blp = VirtualAlloc(NULL, sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems),
 				   MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	}
 	else
 #endif
-	{
-		if (bh->allocator)
-			blp = bh->allocator->allocate(blp_size);
-		else
-			blp = mowgli_alloc(blp_size);
-	}
+		blp = mowgli_alloc_using_policy(bh->allocator, blp_size);
 
 	block = (mowgli_block_t *) blp;
 
@@ -154,7 +147,7 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 	else
 		mowgli_node_delete(&b->node, &heap->blocks);
 
-#if defined(HAVE_MMAP)
+#if defined(HAVE_MMAP) && defined(MAP_ANON)
 
 	if (heap->use_mmap)
 		munmap(b, sizeof(mowgli_block_t) + (heap->alloc_size * heap->mowgli_heap_elems));
@@ -165,9 +158,6 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 		VirtualFree(b, 0, MEM_RELEASE);
 	else
 #endif
-	if (heap->allocator)
-		heap->allocator->deallocate(b);
-	else
 		mowgli_free(b);
 
 	heap->free_elems -= heap->mowgli_heap_elems;
@@ -177,7 +167,12 @@ mowgli_heap_shrink(mowgli_heap_t *heap, mowgli_block_t *b)
 mowgli_heap_t *
 mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int flags, mowgli_allocation_policy_t *allocator)
 {
-	mowgli_heap_t *bh = mowgli_alloc(sizeof *bh);
+	mowgli_allocation_policy_t *bhallocator = allocator;
+
+	if (bhallocator == NULL)
+		bhallocator = mowgli_allocator_get_policy();
+
+	mowgli_heap_t *bh = mowgli_alloc_using_policy(bhallocator, sizeof *bh);
 	int numpages, pagesize;
 
 	bh->elem_size = elem_size;
@@ -204,10 +199,9 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 	}
 
 	bh->flags = flags;
+	bh->allocator = bhallocator;
 
-	bh->allocator = allocator ? allocator : mowgli_allocator_malloc;
-
-#ifdef HAVE_MMAP
+#if (defined(HAVE_MMAP) && defined(MAP_ANON)) || defined(_WIN32)
 	bh->use_mmap = allocator != NULL ? FALSE : TRUE;
 #endif
 
