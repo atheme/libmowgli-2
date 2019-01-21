@@ -48,17 +48,16 @@ struct mowgli_block_
 	/* singly linked list of free items */
 	void *first_free;
 
-	unsigned int num_allocated;
+	size_t num_allocated;
 };
 
 /* A pile of blocks */
 struct mowgli_heap_
 {
-	unsigned int elem_size;
-	unsigned int mowgli_heap_elems;
-	unsigned int free_elems;
-
-	unsigned int alloc_size;
+	size_t elem_size;
+	size_t mowgli_heap_elems;
+	size_t free_elems;
+	size_t alloc_size;
 
 	unsigned int flags;
 
@@ -95,7 +94,7 @@ mowgli_heap_expand(mowgli_heap_t *bh)
 	void *blp = NULL;
 	mowgli_heap_elem_header_t *node, *prev;
 	char *offset;
-	unsigned int a;
+	size_t a;
 	size_t blp_size;
 
 	blp_size = sizeof(mowgli_block_t) + (bh->alloc_size * bh->mowgli_heap_elems);
@@ -239,7 +238,7 @@ mowgli_heap_create_full(size_t elem_size, size_t mowgli_heap_elems, unsigned int
 	}
 
 #ifdef HEAP_DEBUG
-	(void) mowgli_log("heap@%p: created (elem_size %u, num_elems %u, flags %u)",
+	(void) mowgli_log("heap@%p: created (elem_size %zu, num_elems %zu, flags %u)",
 	                  bh, bh->elem_size, bh->mowgli_heap_elems, bh->flags);
 #endif
 
@@ -260,7 +259,7 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	return_if_fail(heap->allocator != NULL);
 	return_if_fail(heap->allocator->deallocate != NULL);
 
-	const unsigned int elem_size = heap->elem_size;
+	const size_t elem_size = heap->elem_size;
 	mowgli_node_t *n, *tn;
 
 	MOWGLI_LIST_FOREACH_SAFE(n, tn, heap->blocks.head)
@@ -277,7 +276,7 @@ mowgli_heap_destroy(mowgli_heap_t *heap)
 	heap->allocator->deallocate(heap);
 
 #ifdef HEAP_DEBUG
-	(void) mowgli_log("heap@%p: destroyed (elem_size %u)", heap, elem_size);
+	(void) mowgli_log("heap@%p: destroyed (elem_size %zu)", heap, elem_size);
 #endif
 }
 
@@ -347,7 +346,7 @@ mowgli_heap_alloc(mowgli_heap_t *heap)
 	void *const result = (char *) h + sizeof(mowgli_heap_elem_header_t);
 
 #ifdef HEAP_DEBUG
-	(void) mowgli_log("heap@%p: allocated ptr %p (elem_size %u)", heap, result, heap->elem_size);
+	(void) mowgli_log("heap@%p: allocated ptr %p (elem_size %zu)", heap, result, heap->elem_size);
 #endif
 
 	mowgli_mutex_unlock(&heap->mutex);
@@ -374,7 +373,7 @@ mowgli_heap_free(mowgli_heap_t *heap, void *data)
 	return_if_fail(b->num_allocated > 0);
 
 #ifdef HEAP_DEBUG
-	(void) mowgli_log("pseudoheap@%p: freeing ptr %p (elem_size %u)", heap, data, heap->elem_size);
+	(void) mowgli_log("pseudoheap@%p: freeing ptr %p (elem_size %zu)", heap, data, heap->elem_size);
 #endif
 
 	/* memset the element before returning it to the heap. */
