@@ -668,6 +668,9 @@ mowgli_patricia_elem_find(mowgli_patricia_t *dict, const char *key)
 	if (ckey_buf != NULL)
 		mowgli_free(ckey_buf);
 
+	if (delem == NULL)
+		return NULL;
+
 	return &delem->leaf;
 }
 
