@@ -844,10 +844,10 @@ mowgli_dictionary_size(mowgli_dictionary_t *dict)
 }
 
 /* returns the sum of the depths of the subtree rooted in delem at depth depth */
-static int
-stats_recurse(mowgli_dictionary_elem_t *delem, int depth, int *pmaxdepth)
+static unsigned int
+stats_recurse(mowgli_dictionary_elem_t *delem, unsigned int depth, unsigned int *pmaxdepth)
 {
-	int result;
+	unsigned int result;
 
 	if (depth > *pmaxdepth)
 		*pmaxdepth = depth;
@@ -883,15 +883,15 @@ void
 mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, void *privdata), void *privdata)
 {
 	char str[256];
-	int sum, maxdepth;
+	unsigned int sum, maxdepth;
 
 	return_if_fail(dict != NULL);
 
 	if (dict->id != NULL)
-		snprintf(str, sizeof str, "Dictionary stats for %s (%d)",
+		snprintf(str, sizeof str, "Dictionary stats for %s (%u)",
 			 dict->id, dict->count);
 	else
-		snprintf(str, sizeof str, "Dictionary stats for <%p> (%d)",
+		snprintf(str, sizeof str, "Dictionary stats for <%p> (%u)",
 			 (void *) dict, dict->count);
 
 	cb(str, privdata);
@@ -900,7 +900,7 @@ mowgli_dictionary_stats(mowgli_dictionary_t *dict, void (*cb)(const char *line, 
 	if (dict->root != NULL)
 	{
 		sum = stats_recurse(dict->root, 0, &maxdepth);
-		snprintf(str, sizeof str, "Depth sum %d Avg depth %d Max depth %d", sum, sum / dict->count, maxdepth);
+		snprintf(str, sizeof str, "Depth sum %u Avg depth %u Max depth %u", sum, sum / dict->count, maxdepth);
 	}
 	else
 	{
