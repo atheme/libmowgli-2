@@ -590,17 +590,17 @@ mowgli_dns_decode_bitstring(const char **cpp, char *dn, const char *eom)
 	dn += sprintf(dn, "\\[x");
 
 	for (b = blen; b > 7; b -= 8, cp++)
-		dn += sprintf(dn, "%02x", *cp & 0xff);
+		dn += sprintf(dn, "%02x", (unsigned int) (*cp & 0xFFU));
 
 	if (b > 4)
 	{
 		tc = *cp++;
-		dn += sprintf(dn, "%02x", tc & (0xff << (8 - b)));
+		dn += sprintf(dn, "%02x", (unsigned int) (tc & (0xFFU << (8U - b))));
 	}
 	else if (b > 0)
 	{
 		tc = *cp++;
-		dn += sprintf(dn, "%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
+		dn += sprintf(dn, "%1x", (unsigned int) (((tc >> 4U) & 0x0FU) & (0x0FU << (4U - b))));
 	}
 
 	dn += sprintf(dn, "/%d]", blen);
