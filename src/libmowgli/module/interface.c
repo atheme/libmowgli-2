@@ -64,7 +64,7 @@ mowgli_interface_get(const char *id, uint32_t abirev)
 	base_iface = mowgli_patricia_retrieve(mowgli_interface_dict, id);
 	if (base_iface->abirev != abirev)
 	{
-		mowgli_log("requested interface %s, abi mismatch %d != %d", id, abirev, base_iface->abirev);
+		mowgli_log("requested interface %s, abi mismatch %" PRIu32 " != %" PRIu32, id, abirev, base_iface->abirev);
 		base_iface = NULL;
 	}
 
