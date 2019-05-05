@@ -50,6 +50,10 @@
 	static void func(void) __attribute__((constructor, flatten)); \
 	static void func(void)
 #  endif
+#elif defined __SUNPRO_C || defined __SUNPRO_CC
+#   define MOWGLI_BOOTSTRAP_FUNC(func) \
+  static void func(void) __attribute__((constructor)); \
+  static void func(void)
 #else
 #  error MOWGLI_BOOTSTRAP_FUNC not implemented for your platform :(
 #endif
