@@ -33,7 +33,7 @@ static size_t cacheline_size = 0;
 void
 mowgli_cacheline_bootstrap(void)
 {
-#ifdef MOWGLI_OS_LINUX
+#if defined(MOWGLI_OS_LINUX) && defined(_SC_LEVEL1_DCACHE_LINESIZE)
 	cacheline_size = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 #elif defined(MOWGLI_OS_OSX)
 	size_t size = sizeof(size_t);
