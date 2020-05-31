@@ -46,8 +46,8 @@ if test "$pgac_cv_var_PS_STRINGS" = yes ; then
   AC_DEFINE([HAVE_PS_STRINGS], [], [Define to 1 if the PS_STRINGS struct exists on your platform (likely no).])
 fi
 
-AC_PATH_PROG(AR, ar)
-AC_PATH_PROG(RANLIB, ranlib)
+AC_CHECK_TOOL(AR, ar)
+AC_CHECK_TOOL(RANLIB, ranlib)
 
 LIBMOWGLI_MODULES="core base container dns eventloop ext linebuf module object platform thread vio"
 AC_SUBST(LIBMOWGLI_MODULES)
