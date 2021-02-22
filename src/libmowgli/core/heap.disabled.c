@@ -23,15 +23,9 @@
 
 #include "mowgli.h"
 
-struct mowgli_block_
-{
-	mowgli_node_t node;
-	void *ptr;
-};
-
 struct mowgli_heap_
 {
-	mowgli_list_t blocks;
+	mowgli_list_t blocks; // retained for ABI compatibility
 	mowgli_allocation_policy_t *allocator;
 	size_t elem_size;
 };
@@ -89,25 +83,6 @@ mowgli_heap_destroy(mowgli_heap_t *const restrict heap)
 	return_if_fail(heap->allocator != NULL);
 	return_if_fail(heap->allocator->deallocate != NULL);
 
-	const size_t elem_size = heap->elem_size;
-	mowgli_node_t *node, *tnode;
-
-	MOWGLI_LIST_FOREACH_SAFE(node, tnode, heap->blocks.head)
-	{
-		mowgli_block_t *const block = node->data;
-		return_if_fail(node == &block->node);
-
-#ifdef HEAP_DEBUG
-		// An object allocated by us wasn't freed already -- possible program logic problem
-		(void) mowgli_log_warning("pseudoheap@%p: freeing ptr %p (elem_size %zu)",
-		                          heap, block->ptr, elem_size);
-#endif
-
-		(void) mowgli_node_delete(&block->node, &heap->blocks);
-		(void) heap->allocator->deallocate(block->ptr);
-		(void) heap->allocator->deallocate(block);
-	}
-
 	(void) heap->allocator->deallocate(heap);
 
 #ifdef HEAP_DEBUG
@@ -123,32 +98,21 @@ mowgli_heap_alloc(mowgli_heap_t *const restrict heap)
 	return_null_if_fail(heap->allocator->allocate != NULL);
 	return_null_if_fail(heap->allocator->deallocate != NULL);
 
-	mowgli_block_t *const block = heap->allocator->allocate(sizeof *block);
+	void *ptr = heap->allocator->allocate(heap->elem_size);
 
-	if (! block)
-	{
-#ifdef HEAP_DEBUG
-		(void) mowgli_log_warning("pseudoheap@%p: cannot allocate memory for block", heap);
-#endif
-		return NULL;
-	}
-
-	if (! (block->ptr = heap->allocator->allocate(heap->elem_size)))
+	if (!ptr)
 	{
 #ifdef HEAP_DEBUG
 		(void) mowgli_log_warning("pseudoheap@%p: cannot allocate memory for ptr", heap);
 #endif
-		(void) heap->allocator->deallocate(block);
 		return NULL;
 	}
-
-	(void) mowgli_node_add(block, &block->node, &heap->blocks);
 
 #ifdef HEAP_DEBUG
 	(void) mowgli_log("pseudoheap@%p: allocated ptr %p (elem_size %zu)", heap, block->ptr, heap->elem_size);
 #endif
 
-	return memset(block->ptr, 0x00, heap->elem_size);
+	return memset(ptr, 0x00, heap->elem_size);
 }
 
 void
@@ -159,29 +123,10 @@ mowgli_heap_free(mowgli_heap_t *const restrict heap, void *const restrict ptr)
 	return_if_fail(heap->allocator->deallocate != NULL);
 	return_if_fail(ptr != NULL);
 
-	mowgli_node_t *node;
-
-	MOWGLI_LIST_FOREACH(node, heap->blocks.head)
-	{
-		mowgli_block_t *const block = node->data;
-		return_if_fail(node == &block->node);
-
-		if (block->ptr != ptr)
-			continue;
-
 #ifdef HEAP_DEBUG
-		(void) mowgli_log("pseudoheap@%p: freeing ptr %p (elem_size %zu)",
-		                  heap, block->ptr, heap->elem_size);
+	(void) mowgli_log("pseudoheap@%p: freeing ptr %p (elem_size %zu)",
+	                  heap, ptr, heap->elem_size);
 #endif
 
-		(void) mowgli_node_delete(&block->node, &heap->blocks);
-		(void) heap->allocator->deallocate(block->ptr);
-		(void) heap->allocator->deallocate(block);
-
-		return;
-	}
-
-#ifdef HEAP_DEBUG
-	(void) mowgli_log_warning("pseudoheap@%p: cannot free ptr %p: not found in blocks list", heap, ptr);
-#endif
+	(void) heap->allocator->deallocate(ptr);
 }
