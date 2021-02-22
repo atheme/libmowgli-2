@@ -186,7 +186,6 @@ mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 	{
 		mowgli_eventloop_synchronize(eventloop);
 
-		/* iterate twice so we don't touch freed memory if a pollable is destroyed */
 		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
 		{
 			pollable = n->data;
@@ -195,7 +194,7 @@ mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 			if ((slot == -1) || (priv->pollfds[slot].revents == 0))
 				continue;
 
-			if (priv->pollfds[slot].revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR) && pollable->read_function)
+			if (priv->pollfds[slot].revents & (POLLRDNORM | POLLIN | POLLHUP | POLLERR) && pollable->read_function && !pollable->removed)
 			{
 # ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
@@ -204,17 +203,8 @@ mowgli_poll_eventloop_select(mowgli_eventloop_t *eventloop, int time)
 				priv->pollfds[slot].events &= ~(POLLRDNORM | POLLIN);
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 			}
-		}
 
-		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
-		{
-			pollable = n->data;
-			slot = pollable->slot;
-
-			if ((slot == -1) || (priv->pollfds[slot].revents == 0))
-				continue;
-
-			if (priv->pollfds[slot].revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR) && pollable->write_function)
+			if (priv->pollfds[slot].revents & (POLLWRNORM | POLLOUT | POLLHUP | POLLERR) && pollable->write_function && !pollable->removed)
 			{
 # ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);

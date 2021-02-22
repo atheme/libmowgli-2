@@ -81,6 +81,18 @@ mowgli_eventloop_destroy(mowgli_eventloop_t *eventloop)
 	mowgli_heap_free(eventloop_heap, eventloop);
 }
 
+static void
+mowgli_eventloop_reap_pollables(mowgli_eventloop_t *eventloop)
+{
+	mowgli_node_t *n, *tn;
+	MOWGLI_ITER_FOREACH_SAFE(n, tn, eventloop->destroyed_pollable_list.head)
+	{
+		mowgli_pollable_free(n->data);
+		mowgli_node_delete(n, &eventloop->destroyed_pollable_list);
+		mowgli_node_free(n);
+	}
+}
+
 void
 mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
 {
@@ -90,10 +102,15 @@ mowgli_eventloop_run(mowgli_eventloop_t *eventloop)
 
 	eventloop->death_requested = false;
 
+	eventloop->processing_events = true;
+
 	while (!eventloop->death_requested)
 	{
 		eventloop->eventloop_ops->run_once(eventloop);
+		mowgli_eventloop_reap_pollables(eventloop);
 	}
+
+	eventloop->processing_events = false;
 
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
@@ -105,7 +122,11 @@ mowgli_eventloop_run_once(mowgli_eventloop_t *eventloop)
 
 	mowgli_mutex_lock(&eventloop->mutex);
 
+	eventloop->processing_events = true;
 	eventloop->eventloop_ops->run_once(eventloop);
+	eventloop->processing_events = false;
+
+	mowgli_eventloop_reap_pollables(eventloop);
 
 	mowgli_mutex_unlock(&eventloop->mutex);
 }
@@ -117,10 +138,16 @@ mowgli_eventloop_timeout_once(mowgli_eventloop_t *eventloop, int timeout)
 
 	mowgli_mutex_lock(&eventloop->mutex);
 
+	eventloop->processing_events = true;
+
 	if (timeout >= 0)
 		eventloop->eventloop_ops->timeout_once(eventloop, timeout);
 	else
 		eventloop->eventloop_ops->run_once(eventloop);
+
+	eventloop->processing_events = false;
+
+	mowgli_eventloop_reap_pollables(eventloop);
 
 	mowgli_mutex_unlock(&eventloop->mutex);
 }

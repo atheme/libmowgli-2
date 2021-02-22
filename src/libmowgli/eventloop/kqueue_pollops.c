@@ -171,10 +171,10 @@ mowgli_kqueue_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->events[i].udata;
 
-		if (priv->events[i].filter == EVFILT_READ)
+		if (priv->events[i].filter == EVFILT_READ && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->events[i].filter == EVFILT_WRITE)
+		if (priv->events[i].filter == EVFILT_WRITE && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 
 		/* XXX Perhaps we need to recheck read_function and

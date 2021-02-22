@@ -43,15 +43,35 @@ mowgli_pollable_create(mowgli_eventloop_t *eventloop, mowgli_descriptor_t fd, vo
 }
 
 void
+mowgli_pollable_free(mowgli_eventloop_pollable_t *pollable)
+{
+	mowgli_heap_free(pollable_heap, pollable);
+}
+
+void
 mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable)
 {
 	return_if_fail(eventloop != NULL);
 	return_if_fail(pollable != NULL);
+	return_if_fail(!pollable->removed);
 
 	/* unregister any interest in the pollable. */
 	eventloop->eventloop_ops->destroy(eventloop, pollable);
 
-	mowgli_heap_free(pollable_heap, pollable);
+	/* we cannot safely free a pollable from within the event loop
+	 * as the event processing code might still hold pointers to it;
+	 * only mark it as removed in that case and have the event loop
+	 * handle cleanup as needed
+	 */
+	if (eventloop->processing_events)
+	{
+		pollable->removed = true;
+		mowgli_node_add(pollable, mowgli_node_create(), &eventloop->destroyed_pollable_list);
+	}
+	else
+	{
+		mowgli_pollable_free(pollable);
+	}
 }
 
 void

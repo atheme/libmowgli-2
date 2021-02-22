@@ -166,12 +166,11 @@ mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	{
 		mowgli_eventloop_synchronize(eventloop);
 
-		/* iterate twice so we don't touch freed memory if a pollable is destroyed */
 		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
 		{
 			pollable = n->data;
 
-			if ((FD_ISSET(pollable->fd, &rfds) || FD_ISSET(pollable->fd, &efds)))
+			if (!pollable->removed && (FD_ISSET(pollable->fd, &rfds) || FD_ISSET(pollable->fd, &efds)))
 			{
 # ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_READ, %p)\n", pollable->read_function, eventloop, pollable, pollable->userdata);
@@ -179,13 +178,8 @@ mowgli_select_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 			}
-		}
 
-		MOWGLI_ITER_FOREACH_SAFE(n, tn, priv->pollable_list.head)
-		{
-			pollable = n->data;
-
-			if ((FD_ISSET(pollable->fd, &wfds) || FD_ISSET(pollable->fd, &efds)))
+			if (!pollable->removed && (FD_ISSET(pollable->fd, &wfds) || FD_ISSET(pollable->fd, &efds)))
 			{
 # ifdef DEBUG
 				mowgli_log("run %p(%p, %p, MOWGLI_EVENTLOOP_IO_WRITE, %p)\n", pollable->write_function, eventloop, pollable, pollable->userdata);

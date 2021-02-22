@@ -96,10 +96,10 @@ mowgli_qnx_eventloop_event_cb(select_context_t *ctp, mowgli_descriptor_t fd, uns
 
 	return_if_fail(eventloop != NULL);
 
-	if (flags & (SELECT_FLAG_READ | SELECT_FLAG_EXCEPT))
+	if (flags & (SELECT_FLAG_READ | SELECT_FLAG_EXCEPT) && !pollable->removed)
 		mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-	if (flags & (SELECT_FLAG_WRITE | SELECT_FLAG_EXCEPT))
+	if (flags & (SELECT_FLAG_WRITE | SELECT_FLAG_EXCEPT) && !pollable->removed)
 		mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 }
 

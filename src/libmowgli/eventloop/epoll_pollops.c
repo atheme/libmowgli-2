@@ -187,10 +187,10 @@ mowgli_epoll_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 	{
 		mowgli_eventloop_pollable_t *pollable = priv->pfd[i].data.ptr;
 
-		if (priv->pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR))
+		if (priv->pfd[i].events & (EPOLLIN | EPOLLHUP | EPOLLERR) && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR))
+		if (priv->pfd[i].events & (EPOLLOUT | EPOLLHUP | EPOLLERR) && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 	}
 }

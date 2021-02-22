@@ -262,10 +262,10 @@ mowgli_winsock_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 
 			WSAEnumNetworkEvents(pollable->fd, priv->pfd[pollable->slot], &events);
 
-			if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB))
+			if (events.lNetworkEvents & (FD_READ | FD_CLOSE | FD_ACCEPT | FD_OOB) && !pollable->removed)
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-			if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE))
+			if (events.lNetworkEvents & (FD_WRITE | FD_CONNECT | FD_CLOSE) && !pollable->removed)
 				mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 		}
 	}

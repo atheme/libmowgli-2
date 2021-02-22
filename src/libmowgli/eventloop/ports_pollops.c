@@ -177,10 +177,10 @@ mowgli_ports_eventloop_select(mowgli_eventloop_t *eventloop, int delay)
 		if (priv->pfd[i].portev_source != PORT_SOURCE_FD)
 			continue;
 
-		if (priv->pfd[i].portev_events & (POLLIN | POLLHUP | POLLERR))
+		if (priv->pfd[i].portev_events & (POLLIN | POLLHUP | POLLERR) && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_READ);
 
-		if (priv->pfd[i].portev_events & (POLLOUT | POLLHUP | POLLERR))
+		if (priv->pfd[i].portev_events & (POLLOUT | POLLHUP | POLLERR) && !pollable->removed)
 			mowgli_pollable_trigger(eventloop, pollable, MOWGLI_EVENTLOOP_IO_WRITE);
 	}
 }

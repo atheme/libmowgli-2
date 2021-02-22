@@ -122,6 +122,8 @@ struct _mowgli_pollable
 	mowgli_node_t node;
 
 	mowgli_eventloop_t *eventloop;
+
+	bool removed;
 };
 
 typedef struct
@@ -153,6 +155,9 @@ struct _mowgli_eventloop
 	void *data;
 
 	time_t epochbias;
+
+	mowgli_list_t destroyed_pollable_list;
+	bool processing_events;
 };
 
 typedef void mowgli_event_dispatch_func_t (void *userdata);
@@ -358,6 +363,7 @@ extern mowgli_eventloop_timer_t *mowgli_timer_find(mowgli_eventloop_t *eventloop
 
 /* pollable.c */
 extern mowgli_eventloop_pollable_t *mowgli_pollable_create(mowgli_eventloop_t *eventloop, mowgli_descriptor_t fd, void *userdata);
+extern void mowgli_pollable_free(mowgli_eventloop_pollable_t *pollable);
 extern void mowgli_pollable_destroy(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable);
 extern void mowgli_pollable_setselect(mowgli_eventloop_t *eventloop, mowgli_eventloop_pollable_t *pollable, mowgli_eventloop_io_dir_t dir, mowgli_eventloop_io_cb_t *event_function);
 extern void mowgli_pollable_set_nonblocking(mowgli_eventloop_pollable_t *pollable, bool nonblocking);
