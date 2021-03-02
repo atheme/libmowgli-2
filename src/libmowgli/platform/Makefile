@@ -3,6 +3,8 @@ include ../../../extra.mk
 STATIC_PIC_LIB_NOINST = ${LIBMOWGLI_SHARED_PLATFORM}
 STATIC_LIB_NOINST = ${LIBMOWGLI_STATIC_PLATFORM}
 
+DISTCLEAN = autoconf.h
+
 SUBDIRS = win32
 
 SRCS = cacheline.c
