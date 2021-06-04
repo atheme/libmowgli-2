@@ -264,6 +264,7 @@ case $basic_machine in
 	| ip2k | iq2000 \
 	| k1om \
 	| le32 | le64 \
+	| loongarch32 | loongarch64 \
 	| lm32 \
 	| m32c | m32r | m32rle | m68000 | m68k | m88k \
 	| maxq | mb | microblaze | microblazeel | mcore | mep | metag \
@@ -389,6 +390,7 @@ case $basic_machine in
 	| ip2k-* | iq2000-* \
 	| k1om-* \
 	| le32-* | le64-* \
+	| loongarch32-* | loongarch64-* \
 	| lm32-* \
 	| m32c-* | m32r-* | m32rle-* \
 	| m68000-* | m680[012346]0-* | m68360-* | m683?2-* | m68k-* \
