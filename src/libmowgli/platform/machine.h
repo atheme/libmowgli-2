@@ -173,6 +173,11 @@
 #  define MOWGLI_CPU superh
 #  define MOWGLI_CPU_BITS_32
 #  define MOWGLI_CPU_BITS 32
+#elif defined __loongarch__ || defined __loongarch64
+# define MOWGLI_CPU_LOONGARCH64
+# define MOWGLI_CPU loongarch64
+# define MOWGLI_CPU_BITS_64
+# define MOWGLI_CPU_BITS 64
 
 // SyoerH can be either endian
 #endif
