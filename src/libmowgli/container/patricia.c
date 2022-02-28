@@ -234,7 +234,7 @@ mowgli_patricia_shutdown(void)
 }
 
 /*
- * mowgli_patricia_destroy(mowgli_patricia_t *dtree,
+ * mowgli_patricia_clear(mowgli_patricia_t *dtree,
  *     void (*destroy_cb)(const char *key, void *data, void *privdata),
  *     void *privdata);
  *
@@ -249,14 +249,14 @@ mowgli_patricia_shutdown(void)
  *     - nothing
  *
  * Side Effects:
- *     - on success, a dtree and optionally it's children are destroyed.
+ *     - on success, a dtree's children are destroyed.
  *
  * Notes:
  *     - if this is called without a callback, the objects bound to the
  *       DTree will not be destroyed.
  */
 void
-mowgli_patricia_destroy(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata)
+mowgli_patricia_clear(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata)
 {
 	mowgli_patricia_iteration_state_t state;
 	union patricia_elem *delem;
@@ -275,7 +275,35 @@ mowgli_patricia_destroy(mowgli_patricia_t *dtree, void (*destroy_cb)(const char 
 
 		mowgli_patricia_delete(dtree, delem->leaf.key);
 	}
+}
 
+/*
+ * mowgli_patricia_destroy(mowgli_patricia_t *dtree,
+ *     void (*destroy_cb)(const char *key, void *data, void *privdata),
+ *     void *privdata);
+ *
+ * Recursively destroys all nodes in a patricia tree and then
+ * destroys the tree itself.
+ *
+ * Inputs:
+ *     - patricia tree object
+ *     - optional iteration callback
+ *     - optional opaque/private data to pass to callback
+ *
+ * Outputs:
+ *     - nothing
+ *
+ * Side Effects:
+ *     - on success, a dtree and optionally its children are destroyed.
+ *
+ * Notes:
+ *     - if this is called without a callback, the objects bound to the
+ *       DTree will not be destroyed.
+ */
+void
+mowgli_patricia_destroy(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata)
+{
+	mowgli_patricia_clear(dtree, destroy_cb, privdata);
 	mowgli_free(dtree);
 }
 

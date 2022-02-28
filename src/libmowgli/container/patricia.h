@@ -84,8 +84,13 @@ extern mowgli_patricia_t *mowgli_patricia_create_named(const char *name, void (*
 extern void mowgli_patricia_shutdown(void);
 
 /*
- * mowgli_patricia_destroy() destroys all entries in a dtree, and also optionally calls
+ * mowgli_patricia_clear() destroys all entries in a dtree and also optionally calls
  * a defined callback function to destroy any data attached to it.
+ */
+extern void mowgli_patricia_clear(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata);
+
+/*
+ * mowgli_patricia_destroy() clears the dtree (as above) and then destroys it.
  */
 extern void mowgli_patricia_destroy(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *key, void *data, void *privdata), void *privdata);
 
