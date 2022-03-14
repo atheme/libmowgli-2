@@ -68,6 +68,9 @@ Installation is fairly typical:
 (If sudo isn't on your system, su to root. On GNU systems you can even do
 "su -c 'make install'", which is basically the same thing as using sudo.)
 
+There is also an Arch User Repository package available here:
+https://aur.archlinux.org/packages/libmowgli-2-git/
+
 
 Bug Reports
 -----------
