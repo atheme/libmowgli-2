@@ -51,9 +51,23 @@ mowgli_helper_trampoline(mowgli_helper_create_req_t *req)
 
 	x = open("/dev/null", O_RDWR);
 
+	if (x < 0)
+	{
+		mowgli_log_error("open(2) on the null(4) device failed: %s", strerror(errno));
+		_exit(EXIT_FAILURE);
+	}
+
 	for (i = 0; i < 2; i++)
-		if (req->fd != i)
-			dup2(x, i);
+	{
+		if (x == i || req->fd == i)
+			continue;
+
+		if (dup2(x, i) == i)
+			continue;
+
+		mowgli_log_error("dup2(%d,%d) failed: %s", x, i, strerror(errno));
+		_exit(EXIT_FAILURE);
+	}
 
 	if (x > 2)
 		close(x);
