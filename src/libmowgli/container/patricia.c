@@ -273,7 +273,7 @@ mowgli_patricia_clear(mowgli_patricia_t *dtree, void (*destroy_cb)(const char *k
 			(*destroy_cb)(delem->leaf.key, delem->leaf.data,
 				      privdata);
 
-		mowgli_patricia_delete(dtree, delem->leaf.key);
+		mowgli_patricia_elem_delete(dtree, &delem->leaf);
 	}
 }
 
